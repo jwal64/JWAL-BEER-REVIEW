@@ -1791,17 +1791,11 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const lD=[
-  {beer:"Grolsch",country:"NL",region:"Groenlo/Enschede",lang:"Dutch",rating:3.50},{beer:"Hertog Jan",country:"NL",region:"Arcen",lang:"Dutch",rating:2.00},{beer:"Heineken",country:"NL",region:"Amsterdam",lang:"Dutch",rating:3.25},{beer:"Stella Artois",country:"BE",region:"Leuven",lang:"Dutch",rating:2.75},{beer:"Stella Artois",country:"BE",region:"Leuven",lang:"Dutch",rating:2.75},{beer:"Duvel",country:"BE",region:"Puurs",lang:"Dutch",rating:4.00},{beer:"Duvel",country:"BE",region:"Puurs",lang:"Dutch",rating:4.25},
-  {beer:"Coors Light",country:"US",region:"Golden CO",lang:"English",rating:3.00},{beer:"Michelob Ultra",country:"US",region:"St. Louis MO",lang:"English",rating:2.50},{beer:"Bud Light",country:"US",region:"St. Louis MO",lang:"English",rating:3.00},{beer:"Budweiser",country:"US",region:"St. Louis MO",lang:"English",rating:3.00},{beer:"Harp",country:"IE",region:"Dundalk",lang:"English",rating:4.25},{beer:"Guinness",country:"IE",region:"Dublin",lang:"English",rating:3.25},{beer:"Guinness",country:"IE",region:"Dublin",lang:"English",rating:4.00},{beer:"Red Stripe",country:"JM",region:"Kingston",lang:"English",rating:3.75},
-  {beer:"La Fin Du Monde",country:"CA",region:"Chambly QC",lang:"French",rating:2.75},{beer:"1664",country:"FR",region:"Obernai",lang:"French",rating:3.00},
-  {beer:"Weihenstephaner",country:"DE",region:"Freising",lang:"German",rating:4.50},{beer:"Müchner Weisse",country:"DE",region:"Munich",lang:"German",rating:4.75},{beer:"Munchen Dunkel",country:"DE",region:"Munich",lang:"German",rating:2.75},
-  {beer:"Sapporo",country:"JP",region:"Sapporo",lang:"Japanese",rating:3.50},{beer:"Ichiban",country:"JP",region:"Namamugi, Yokohama",lang:"Japanese",rating:3.00},
-  {beer:"Modelo",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.25},{beer:"Modelo Negra",country:"MX",region:"Mexico City",lang:"Spanish",rating:2.25},{beer:"Modelo Negra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.00},{beer:"Corona Extra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.00},{beer:"Corona Extra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.75},
-  {beer:"Carlsberg",country:"DK",region:"Copenhagen",lang:"Danish",rating:2.75},{beer:"Carlsberg",country:"DK",region:"Copenhagen",lang:"Danish",rating:3.00},
-];
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#00cc44","Danish":"#555"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰"};
+const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech"};
+const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa"};
+const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿"};
+const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
+const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:LANG_MAP[b.origin]||b.origin,rating:b.rating}));
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
 const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
