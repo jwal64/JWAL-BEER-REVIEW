@@ -1108,6 +1108,33 @@ z-index: 100;
     </div>
   </div>
 
+  <!-- PIPELINE RECOMMENDATIONS -->
+  <div class="bb-panel" id="ipoRecsPanel" style="display:none;margin-bottom:16px">
+    <div class="bb-panel-head">◈ PIPELINE — RECOMMENDED REPLACEMENTS <span class="ph-right" id="ipo-recs-count">0 SLOTS</span></div>
+    <div class="bb-body" style="font-size:9px;color:#555;line-height:1.6;margin-bottom:6px">
+      <span style="color:#ff6600">AUTO-GENERATED</span> — one replacement recommended per priced slot &nbsp;·&nbsp;
+      ranked by <span style="color:#00cc44">new market coverage</span> first, then <span style="color:#00aaff">new style</span>, then <span style="color:#bb44ff">Untappd consensus</span>
+    </div>
+    <div class="bb-body">
+      <div style="overflow-x:auto">
+        <table class="bb-table">
+          <thead><tr>
+            <th style="width:36px"></th>
+            <th>BEER</th>
+            <th>STYLE</th>
+            <th>ORIGIN</th>
+            <th>BREWERY REGION</th>
+            <th>EST. ABV</th>
+            <th style="color:#bb44ff">MKT RATING</th>
+            <th style="color:#00aaff">ANALYST TARGET</th>
+            <th>RATIONALE</th>
+          </tr></thead>
+          <tbody id="ipoRecsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ FUTURES ══ -->
   <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◆ FUTURES — MASS-MARKET PREDICTIVE PRICING</div>
   <div class="g4" style="margin-bottom:8px">
@@ -1249,8 +1276,8 @@ z-index: 100;
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",ES:"🇪🇸",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland"};
 
 const beers=[
   // JAN 2026 (17 beers)
@@ -2186,6 +2213,63 @@ function drawIPO(){
         <td class="${vsAnalyst>=0?'up':'dn'}" style="font-family:var(--mono)">${vsAnalyst>=0?'+':''}${vsAnalyst.toFixed(2)}</td>
         <td class="${vsMkt>=0?'up':'dn'}" style="font-family:var(--mono)">${vsMkt>=0?'+':''}${vsMkt.toFixed(2)}</td>
         <td><span style="font-size:8px;padding:1px 6px;border:1px solid ${vColor};color:${vColor}">${verdict}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── RECOMMENDATIONS
+  if(priced.length>0){
+    const coveredBeerNames=new Set([...beers.map(b=>b.beer),...watchlist.map(w=>w.beer)]);
+    const coveredOrigins=new Set([...beers.map(b=>b.origin),...watchlist.map(w=>w.origin)]);
+    const coveredStyles=new Set([...beers.map(b=>b.style),...watchlist.map(w=>w.style)]);
+    const candidates=[
+      {beer:'Asahi Super Dry',  style:'Lager-Pale',              origin:'JP',abv:5.0,region:'Tokyo',               untappd:3.60,method:'Bottle'},
+      {beer:'Leffe Blonde',     style:'Abbey Ale-Blonde',         origin:'BE',abv:6.6,region:'Leuven',              untappd:3.75,method:'Bottle'},
+      {beer:'Chimay Blue',      style:'Belgian Strong Dark Ale',  origin:'BE',abv:9.0,region:'Chimay, Hainaut',     untappd:4.05,method:'Bottle'},
+      {beer:'Paulaner Hefe',    style:'Wheat Beer-Hefeweizen',    origin:'DE',abv:5.5,region:'Munich',              untappd:3.87,method:'Bottle'},
+      {beer:'Augustiner Helles',style:'Lager-Helles',             origin:'DE',abv:5.2,region:'Munich',              untappd:4.10,method:'Draft'},
+      {beer:'Nastro Azzurro',   style:'Lager-Pale',               origin:'IT',abv:5.1,region:'Rome, Lazio',         untappd:3.56,method:'Bottle'},
+      {beer:'Sam Adams',        style:'Lager-Vienna',             origin:'US',abv:5.0,region:'Boston, MA',          untappd:3.48,method:'Bottle'},
+      {beer:'Kronenbourg',      style:'Lager-Pale',               origin:'FR',abv:5.0,region:'Obernai, Alsace',     untappd:3.30,method:'Can'},
+      {beer:"Smithwick's",      style:'Irish Red Ale',            origin:'IE',abv:4.5,region:'Kilkenny',            untappd:3.45,method:'Draft'},
+      {beer:'Newcastle Brown',  style:'Brown Ale-English',        origin:'GB',abv:4.7,region:'Tadcaster, Yorkshire',untappd:3.28,method:'Bottle'},
+      {beer:"Tennent's",        style:'Lager-Pale',               origin:'GB',abv:4.0,region:'Glasgow, Scotland',   untappd:2.95,method:'Can'},
+      {beer:'Ringnes',          style:'Lager-Pale',               origin:'NO',abv:4.7,region:'Oslo',                untappd:3.10,method:'Can'},
+      {beer:'Tyskie',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Tychy, Silesia',      untappd:3.28,method:'Can'},
+      {beer:'Żywiec',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Żywiec, Silesia',     untappd:3.35,method:'Bottle'},
+      {beer:'Hoegaarden',       style:'Witbier',                  origin:'BE',abv:4.9,region:'Hoegaarden',          untappd:3.72,method:'Bottle'},
+      {beer:'Orion',            style:'Lager-Pale',               origin:'JP',abv:5.0,region:'Naha, Okinawa',       untappd:3.42,method:'Can'},
+      {beer:'Menabrea',         style:'Lager-Pale',               origin:'IT',abv:4.8,region:'Biella, Piedmont',    untappd:3.55,method:'Bottle'},
+      {beer:'Tuborg',           style:'Pilsner-Other',            origin:'DK',abv:4.6,region:'Copenhagen',          untappd:3.10,method:'Can'},
+      {beer:'Sol',              style:'Lager-Mexican',            origin:'MX',abv:4.5,region:'Mexico City',         untappd:3.15,method:'Bottle'},
+      {beer:'Coopers Pale Ale', style:'Pale Ale-American',        origin:'AU',abv:4.5,region:'Adelaide, SA',        untappd:3.72,method:'Bottle'},
+    ];
+    const recs=candidates
+      .filter(c=>!coveredBeerNames.has(c.beer))
+      .sort((a,b)=>{
+        const aS=(!coveredOrigins.has(a.origin)?2:0)+(!coveredStyles.has(a.style)?1:0);
+        const bS=(!coveredOrigins.has(b.origin)?2:0)+(!coveredStyles.has(b.style)?1:0);
+        return bS!==aS?bS-aS:b.untappd-a.untappd;
+      })
+      .slice(0,priced.length);
+    document.getElementById('ipoRecsPanel').style.display='';
+    document.getElementById('ipo-recs-count').textContent=recs.length+' SLOT'+(recs.length!==1?'S':'');
+    document.getElementById('ipoRecsBody').innerHTML=recs.map(c=>{
+      const isNewMkt=!coveredOrigins.has(c.origin);
+      const isNewStyle=!coveredStyles.has(c.style);
+      const [tag,tagColor]=isNewMkt?['NEW MARKET','#00cc44']:isNewStyle?['NEW STYLE','#00aaff']:c.untappd>=3.8?['HIGH CONSENSUS','#bb44ff']:['SIMILAR PROFILE','#555'];
+      const target=analystTarget(c.beer,c.style,c.origin,c.untappd,c.method);
+      const upside=target-c.untappd;
+      return `<tr>
+        <td>${logoImg(c.beer,24)}</td>
+        <td style="color:#ff6600;font-weight:600">${c.beer}</td>
+        <td style="color:#555;font-size:9px">${c.style}</td>
+        <td>${FLAGS[c.origin]||''} ${c.origin}</td>
+        <td style="color:#555;font-size:9px">${c.region}</td>
+        <td style="color:#00aaff">${c.abv.toFixed(1)}%</td>
+        <td style="color:#bb44ff;font-family:var(--mono)">${c.untappd.toFixed(2)}</td>
+        <td><span style="display:inline-block;padding:1px 8px;background:rgba(0,170,255,0.1);border:1px solid #00aaff;color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</span> <span class="${upside>=0?'up':'dn'}" style="font-size:8px">${upside>=0?'+':''}${upside.toFixed(2)}</span></td>
+        <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${tagColor};color:${tagColor};font-weight:700;letter-spacing:1px">${tag}</span></td>
       </tr>`;
     }).join('');
   }
