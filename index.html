@@ -603,6 +603,7 @@ z-index: 100;
   <div class="mb-item" onclick="showTab('contrarian',this)"><span class="fkey">G1</span>CNTRN</div>
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
+  <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -1258,6 +1259,32 @@ z-index: 100;
   </div>
 </div>
 
+<!-- ══════════════════════ COMMENTS PANEL ══════════════════════ -->
+<div class="panel" id="comments">
+  <div class="bb-panel" style="margin-bottom:16px">
+    <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
+    <div class="bb-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
+        <div style="flex:1">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER / SUBJECT</div>
+          <input id="comment-subject" type="text" placeholder="e.g. Estrella Damm, general note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div style="flex:2">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COMMENT</div>
+          <input id="comment-text" type="text" placeholder="Write your note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'" onkeydown="if(event.key==='Enter')addComment()">
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="font-size:9px;color:transparent;margin-bottom:4px">.</div>
+          <button onclick="addComment()" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px" onmouseover="this.style.background='#ff8833'" onmouseout="this.style.background='var(--orange)'">POST</button>
+        </div>
+      </div>
+      <div id="comment-list" style="max-height:520px;overflow-y:auto">
+        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
 </div><!-- /terminal-body -->
 
@@ -1473,6 +1500,7 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
+  if(id==='comments') renderComments();
   if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -2548,6 +2576,56 @@ function drawFutures(){
     if(dot) dot.style.background='#ffaa00';
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// COMMENTS
+// ══════════════════════════════════════════════════════════════
+function loadComments(){
+  return JSON.parse(localStorage.getItem('brewComments')||'[]');
+}
+function saveComments(arr){
+  localStorage.setItem('brewComments',JSON.stringify(arr));
+}
+function renderComments(){
+  const arr=loadComments();
+  const el=document.getElementById('comment-list');
+  const cnt=document.getElementById('comment-count');
+  if(cnt) cnt.textContent=arr.length+' ENTR'+(arr.length===1?'Y':'IES');
+  if(!arr.length){
+    el.innerHTML='<div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>';
+    return;
+  }
+  el.innerHTML=arr.slice().reverse().map((c,i)=>`
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1a1a1a">
+      <div style="flex-shrink:0;width:6px;height:6px;background:var(--orange);margin-top:4px"></div>
+      <div style="flex:1;min-width:0">
+        ${c.subject?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-bottom:2px">${escHtml(c.subject)}</div>`:''}
+        <div style="font-size:11px;color:#e8e8e8;line-height:1.5;word-break:break-word">${escHtml(c.text)}</div>
+        <div style="font-size:9px;color:#333;margin-top:3px">${c.ts}</div>
+      </div>
+      <button onclick="deleteComment(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer;flex-shrink:0;padding:0 4px" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
+    </div>`).join('');
+}
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function addComment(){
+  const subj=document.getElementById('comment-subject').value.trim();
+  const txt=document.getElementById('comment-text').value.trim();
+  if(!txt) return;
+  const arr=loadComments();
+  arr.push({subject:subj,text:txt,ts:new Date().toLocaleString()});
+  saveComments(arr);
+  document.getElementById('comment-subject').value='';
+  document.getElementById('comment-text').value='';
+  renderComments();
+}
+function deleteComment(idx){
+  const arr=loadComments();
+  arr.splice(idx,1);
+  saveComments(arr);
+  renderComments();
+}
 
 function drawAudit(){
   window._auditD=true;
