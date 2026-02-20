@@ -603,6 +603,7 @@ z-index: 100;
   <div class="mb-item" onclick="showTab('contrarian',this)"><span class="fkey">G1</span>CNTRN</div>
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
+  <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -1108,6 +1109,33 @@ z-index: 100;
     </div>
   </div>
 
+  <!-- PIPELINE RECOMMENDATIONS -->
+  <div class="bb-panel" id="ipoRecsPanel" style="display:none;margin-bottom:16px">
+    <div class="bb-panel-head">◈ PIPELINE — RECOMMENDED REPLACEMENTS <span class="ph-right" id="ipo-recs-count">0 SLOTS</span></div>
+    <div class="bb-body" style="font-size:9px;color:#555;line-height:1.6;margin-bottom:6px">
+      <span style="color:#ff6600">AUTO-GENERATED</span> — one replacement recommended per priced slot &nbsp;·&nbsp;
+      ranked by <span style="color:#00cc44">new market coverage</span> first, then <span style="color:#00aaff">new style</span>, then <span style="color:#bb44ff">Untappd consensus</span>
+    </div>
+    <div class="bb-body">
+      <div style="overflow-x:auto">
+        <table class="bb-table">
+          <thead><tr>
+            <th style="width:36px"></th>
+            <th>BEER</th>
+            <th>STYLE</th>
+            <th>ORIGIN</th>
+            <th>BREWERY REGION</th>
+            <th>EST. ABV</th>
+            <th style="color:#bb44ff">MKT RATING</th>
+            <th style="color:#00aaff">ANALYST TARGET</th>
+            <th>RATIONALE</th>
+          </tr></thead>
+          <tbody id="ipoRecsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ FUTURES ══ -->
   <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◆ FUTURES — MASS-MARKET PREDICTIVE PRICING</div>
   <div class="g4" style="margin-bottom:8px">
@@ -1231,6 +1259,32 @@ z-index: 100;
   </div>
 </div>
 
+<!-- ══════════════════════ COMMENTS PANEL ══════════════════════ -->
+<div class="panel" id="comments">
+  <div class="bb-panel" style="margin-bottom:16px">
+    <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
+    <div class="bb-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
+        <div style="flex:1">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER / SUBJECT</div>
+          <input id="comment-subject" type="text" placeholder="e.g. Estrella Damm, general note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div style="flex:2">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COMMENT</div>
+          <input id="comment-text" type="text" placeholder="Write your note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'" onkeydown="if(event.key==='Enter')addComment()">
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="font-size:9px;color:transparent;margin-bottom:4px">.</div>
+          <button onclick="addComment()" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px" onmouseover="this.style.background='#ff8833'" onmouseout="this.style.background='var(--orange)'">POST</button>
+        </div>
+      </div>
+      <div id="comment-list" style="max-height:520px;overflow-y:auto">
+        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
 </div><!-- /terminal-body -->
 
@@ -1249,8 +1303,8 @@ z-index: 100;
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",ES:"🇪🇸",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland"};
 
 const beers=[
   // JAN 2026 (17 beers)
@@ -1446,6 +1500,7 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
+  if(id==='comments') renderComments();
   if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -1791,17 +1846,11 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const lD=[
-  {beer:"Grolsch",country:"NL",region:"Groenlo/Enschede",lang:"Dutch",rating:3.50},{beer:"Hertog Jan",country:"NL",region:"Arcen",lang:"Dutch",rating:2.00},{beer:"Heineken",country:"NL",region:"Amsterdam",lang:"Dutch",rating:3.25},{beer:"Stella Artois",country:"BE",region:"Leuven",lang:"Dutch",rating:2.75},{beer:"Stella Artois",country:"BE",region:"Leuven",lang:"Dutch",rating:2.75},{beer:"Duvel",country:"BE",region:"Puurs",lang:"Dutch",rating:4.00},{beer:"Duvel",country:"BE",region:"Puurs",lang:"Dutch",rating:4.25},
-  {beer:"Coors Light",country:"US",region:"Golden CO",lang:"English",rating:3.00},{beer:"Michelob Ultra",country:"US",region:"St. Louis MO",lang:"English",rating:2.50},{beer:"Bud Light",country:"US",region:"St. Louis MO",lang:"English",rating:3.00},{beer:"Budweiser",country:"US",region:"St. Louis MO",lang:"English",rating:3.00},{beer:"Harp",country:"IE",region:"Dundalk",lang:"English",rating:4.25},{beer:"Guinness",country:"IE",region:"Dublin",lang:"English",rating:3.25},{beer:"Guinness",country:"IE",region:"Dublin",lang:"English",rating:4.00},{beer:"Red Stripe",country:"JM",region:"Kingston",lang:"English",rating:3.75},
-  {beer:"La Fin Du Monde",country:"CA",region:"Chambly QC",lang:"French",rating:2.75},{beer:"1664",country:"FR",region:"Obernai",lang:"French",rating:3.00},
-  {beer:"Weihenstephaner",country:"DE",region:"Freising",lang:"German",rating:4.50},{beer:"Müchner Weisse",country:"DE",region:"Munich",lang:"German",rating:4.75},{beer:"Munchen Dunkel",country:"DE",region:"Munich",lang:"German",rating:2.75},
-  {beer:"Sapporo",country:"JP",region:"Sapporo",lang:"Japanese",rating:3.50},{beer:"Ichiban",country:"JP",region:"Namamugi, Yokohama",lang:"Japanese",rating:3.00},
-  {beer:"Modelo",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.25},{beer:"Modelo Negra",country:"MX",region:"Mexico City",lang:"Spanish",rating:2.25},{beer:"Modelo Negra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.00},{beer:"Corona Extra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.00},{beer:"Corona Extra",country:"MX",region:"Mexico City",lang:"Spanish",rating:3.75},
-  {beer:"Carlsberg",country:"DK",region:"Copenhagen",lang:"Danish",rating:2.75},{beer:"Carlsberg",country:"DK",region:"Copenhagen",lang:"Danish",rating:3.00},
-];
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#00cc44","Danish":"#555"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰"};
+const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech"};
+const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa"};
+const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿"};
+const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
+const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:LANG_MAP[b.origin]||b.origin,rating:b.rating}));
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
 const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
@@ -2196,6 +2245,63 @@ function drawIPO(){
     }).join('');
   }
 
+  // ── RECOMMENDATIONS
+  if(priced.length>0){
+    const coveredBeerNames=new Set([...beers.map(b=>b.beer),...watchlist.map(w=>w.beer)]);
+    const coveredOrigins=new Set([...beers.map(b=>b.origin),...watchlist.map(w=>w.origin)]);
+    const coveredStyles=new Set([...beers.map(b=>b.style),...watchlist.map(w=>w.style)]);
+    const candidates=[
+      {beer:'Asahi Super Dry',  style:'Lager-Pale',              origin:'JP',abv:5.0,region:'Tokyo',               untappd:3.60,method:'Bottle'},
+      {beer:'Leffe Blonde',     style:'Abbey Ale-Blonde',         origin:'BE',abv:6.6,region:'Leuven',              untappd:3.75,method:'Bottle'},
+      {beer:'Chimay Blue',      style:'Belgian Strong Dark Ale',  origin:'BE',abv:9.0,region:'Chimay, Hainaut',     untappd:4.05,method:'Bottle'},
+      {beer:'Paulaner Hefe',    style:'Wheat Beer-Hefeweizen',    origin:'DE',abv:5.5,region:'Munich',              untappd:3.87,method:'Bottle'},
+      {beer:'Augustiner Helles',style:'Lager-Helles',             origin:'DE',abv:5.2,region:'Munich',              untappd:4.10,method:'Draft'},
+      {beer:'Nastro Azzurro',   style:'Lager-Pale',               origin:'IT',abv:5.1,region:'Rome, Lazio',         untappd:3.56,method:'Bottle'},
+      {beer:'Sam Adams',        style:'Lager-Vienna',             origin:'US',abv:5.0,region:'Boston, MA',          untappd:3.48,method:'Bottle'},
+      {beer:'Kronenbourg',      style:'Lager-Pale',               origin:'FR',abv:5.0,region:'Obernai, Alsace',     untappd:3.30,method:'Can'},
+      {beer:"Smithwick's",      style:'Irish Red Ale',            origin:'IE',abv:4.5,region:'Kilkenny',            untappd:3.45,method:'Draft'},
+      {beer:'Newcastle Brown',  style:'Brown Ale-English',        origin:'GB',abv:4.7,region:'Tadcaster, Yorkshire',untappd:3.28,method:'Bottle'},
+      {beer:"Tennent's",        style:'Lager-Pale',               origin:'GB',abv:4.0,region:'Glasgow, Scotland',   untappd:2.95,method:'Can'},
+      {beer:'Ringnes',          style:'Lager-Pale',               origin:'NO',abv:4.7,region:'Oslo',                untappd:3.10,method:'Can'},
+      {beer:'Tyskie',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Tychy, Silesia',      untappd:3.28,method:'Can'},
+      {beer:'Żywiec',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Żywiec, Silesia',     untappd:3.35,method:'Bottle'},
+      {beer:'Hoegaarden',       style:'Witbier',                  origin:'BE',abv:4.9,region:'Hoegaarden',          untappd:3.72,method:'Bottle'},
+      {beer:'Orion',            style:'Lager-Pale',               origin:'JP',abv:5.0,region:'Naha, Okinawa',       untappd:3.42,method:'Can'},
+      {beer:'Menabrea',         style:'Lager-Pale',               origin:'IT',abv:4.8,region:'Biella, Piedmont',    untappd:3.55,method:'Bottle'},
+      {beer:'Tuborg',           style:'Pilsner-Other',            origin:'DK',abv:4.6,region:'Copenhagen',          untappd:3.10,method:'Can'},
+      {beer:'Sol',              style:'Lager-Mexican',            origin:'MX',abv:4.5,region:'Mexico City',         untappd:3.15,method:'Bottle'},
+      {beer:'Coopers Pale Ale', style:'Pale Ale-American',        origin:'AU',abv:4.5,region:'Adelaide, SA',        untappd:3.72,method:'Bottle'},
+    ];
+    const recs=candidates
+      .filter(c=>!coveredBeerNames.has(c.beer))
+      .sort((a,b)=>{
+        const aS=(!coveredOrigins.has(a.origin)?2:0)+(!coveredStyles.has(a.style)?1:0);
+        const bS=(!coveredOrigins.has(b.origin)?2:0)+(!coveredStyles.has(b.style)?1:0);
+        return bS!==aS?bS-aS:b.untappd-a.untappd;
+      })
+      .slice(0,priced.length);
+    document.getElementById('ipoRecsPanel').style.display='';
+    document.getElementById('ipo-recs-count').textContent=recs.length+' SLOT'+(recs.length!==1?'S':'');
+    document.getElementById('ipoRecsBody').innerHTML=recs.map(c=>{
+      const isNewMkt=!coveredOrigins.has(c.origin);
+      const isNewStyle=!coveredStyles.has(c.style);
+      const [tag,tagColor]=isNewMkt?['NEW MARKET','#00cc44']:isNewStyle?['NEW STYLE','#00aaff']:c.untappd>=3.8?['HIGH CONSENSUS','#bb44ff']:['SIMILAR PROFILE','#555'];
+      const target=analystTarget(c.beer,c.style,c.origin,c.untappd,c.method);
+      const upside=target-c.untappd;
+      return `<tr>
+        <td>${logoImg(c.beer,24)}</td>
+        <td style="color:#ff6600;font-weight:600">${c.beer}</td>
+        <td style="color:#555;font-size:9px">${c.style}</td>
+        <td>${FLAGS[c.origin]||''} ${c.origin}</td>
+        <td style="color:#555;font-size:9px">${c.region}</td>
+        <td style="color:#00aaff">${c.abv.toFixed(1)}%</td>
+        <td style="color:#bb44ff;font-family:var(--mono)">${c.untappd.toFixed(2)}</td>
+        <td><span style="display:inline-block;padding:1px 8px;background:rgba(0,170,255,0.1);border:1px solid #00aaff;color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</span> <span class="${upside>=0?'up':'dn'}" style="font-size:8px">${upside>=0?'+':''}${upside.toFixed(2)}</span></td>
+        <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${tagColor};color:${tagColor};font-weight:700;letter-spacing:1px">${tag}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
   } catch(e){ console.error('IPO error:',e); }
 }
 
@@ -2470,6 +2576,56 @@ function drawFutures(){
     if(dot) dot.style.background='#ffaa00';
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// COMMENTS
+// ══════════════════════════════════════════════════════════════
+function loadComments(){
+  return JSON.parse(localStorage.getItem('brewComments')||'[]');
+}
+function saveComments(arr){
+  localStorage.setItem('brewComments',JSON.stringify(arr));
+}
+function renderComments(){
+  const arr=loadComments();
+  const el=document.getElementById('comment-list');
+  const cnt=document.getElementById('comment-count');
+  if(cnt) cnt.textContent=arr.length+' ENTR'+(arr.length===1?'Y':'IES');
+  if(!arr.length){
+    el.innerHTML='<div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>';
+    return;
+  }
+  el.innerHTML=arr.slice().reverse().map((c,i)=>`
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1a1a1a">
+      <div style="flex-shrink:0;width:6px;height:6px;background:var(--orange);margin-top:4px"></div>
+      <div style="flex:1;min-width:0">
+        ${c.subject?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-bottom:2px">${escHtml(c.subject)}</div>`:''}
+        <div style="font-size:11px;color:#e8e8e8;line-height:1.5;word-break:break-word">${escHtml(c.text)}</div>
+        <div style="font-size:9px;color:#333;margin-top:3px">${c.ts}</div>
+      </div>
+      <button onclick="deleteComment(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer;flex-shrink:0;padding:0 4px" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
+    </div>`).join('');
+}
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function addComment(){
+  const subj=document.getElementById('comment-subject').value.trim();
+  const txt=document.getElementById('comment-text').value.trim();
+  if(!txt) return;
+  const arr=loadComments();
+  arr.push({subject:subj,text:txt,ts:new Date().toLocaleString()});
+  saveComments(arr);
+  document.getElementById('comment-subject').value='';
+  document.getElementById('comment-text').value='';
+  renderComments();
+}
+function deleteComment(idx){
+  const arr=loadComments();
+  arr.splice(idx,1);
+  saveComments(arr);
+  renderComments();
+}
 
 function drawAudit(){
   window._auditD=true;
