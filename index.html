@@ -628,6 +628,69 @@ BEER DETAIL MODAL
   line-height: 1;
   padding: 0 2px;
 }
+
+/* ═══════════════════════════════════════════
+PASSWORD GATE
+═══════════════════════════════════════════ */
+#pwModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+}
+#pwModal.open { display: flex; }
+#pwBox {
+  background: var(--panel);
+  border: 1px solid var(--orange);
+  width: min(360px, 92vw);
+  box-shadow: 0 0 40px rgba(255,102,0,0.3);
+}
+#pwHead {
+  background: var(--orange);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  letter-spacing: 1.5px;
+}
+#pwBody { padding: 20px 16px; }
+#pwInput {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  color: var(--orange);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 8px 10px;
+  outline: none;
+  letter-spacing: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+#pwInput:focus { border-color: var(--orange); }
+#pwBtn {
+  width: 100%;
+  background: var(--orange);
+  color: #000;
+  border: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+#pwBtn:hover { background: #ff8833; }
+#pwErr {
+  font-size: 9px;
+  color: var(--red);
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  min-height: 14px;
+}
 </style>
 
 </head>
@@ -641,6 +704,21 @@ BEER DETAIL MODAL
       <button id="beerModalClose" onclick="closeBeerModal()">✕</button>
     </div>
     <div id="beerModalBody"></div>
+  </div>
+</div>
+
+<!-- PASSWORD GATE MODAL -->
+<div id="pwModal">
+  <div id="pwBox">
+    <div id="pwHead">🔒 RESTRICTED — ENTER PASSWORD</div>
+    <div id="pwBody">
+      <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:8px">ACCESS REQUIRED FOR THIS SECTION</div>
+      <input id="pwInput" type="password" placeholder="PASSWORD" autocomplete="off"
+        onkeydown="if(event.key==='Enter')checkPw()"
+        oninput="document.getElementById('pwErr').textContent=''">
+      <button id="pwBtn" onclick="checkPw()">UNLOCK</button>
+      <div id="pwErr"></div>
+    </div>
   </div>
 </div>
 
@@ -1667,8 +1745,8 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
-  if(id==='comments') renderComments();
-  if(id==='addnew') renderAddLog();
+  if(id==='comments'){ if(!isUnlocked()){openPwModal('comments');return;} renderComments(); }
+  if(id==='addnew'){ if(!isUnlocked()){openPwModal('addnew');return;} renderAddLog(); }
   if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -2831,6 +2909,43 @@ function drawFutures(){
     if(dot) dot.style.background='#ffaa00';
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// PASSWORD GATE
+// ══════════════════════════════════════════════════════════════
+const PW_KEY='brewUnlocked';
+const PW_HASH='ClemsonNewRo';  // stored as plain string; this is client-side only
+let _pwPendingTab=null;
+
+function isUnlocked(){
+  return sessionStorage.getItem(PW_KEY)==='1';
+}
+function openPwModal(pendingTab){
+  _pwPendingTab=pendingTab;
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwErr').textContent='';
+  document.getElementById('pwModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pwInput').focus(),80);
+}
+function checkPw(){
+  const val=document.getElementById('pwInput').value;
+  if(val===PW_HASH){
+    sessionStorage.setItem(PW_KEY,'1');
+    document.getElementById('pwModal').classList.remove('open');
+    if(_pwPendingTab) showTab(_pwPendingTab);
+    _pwPendingTab=null;
+  } else {
+    const err=document.getElementById('pwErr');
+    err.textContent='✗ INCORRECT PASSWORD';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+    // brief shake
+    const box=document.getElementById('pwBox');
+    box.style.transform='translateX(6px)';
+    setTimeout(()=>box.style.transform='translateX(-6px)',80);
+    setTimeout(()=>box.style.transform='',160);
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 // EXPORT
