@@ -581,10 +581,68 @@ z-index: 100;
 .bb-table { min-width: 420px; }
 .insight-key { width: 100px; font-size: 8px; }
 }
+
+/* ═══════════════════════════════════════════
+BEER DETAIL MODAL
+═══════════════════════════════════════════ */
+#beerModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+#beerModal.open { display: flex; }
+#beerModalBox {
+  background: var(--panel);
+  border: 1px solid var(--orange);
+  width: min(760px, 96vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 40px rgba(255,102,0,0.25);
+}
+#beerModalHead {
+  background: var(--orange);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+#beerModalBody { overflow-y: auto; padding: 12px; }
+#beerModalClose {
+  background: none;
+  border: none;
+  color: #000;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
 </style>
 
 </head>
 <body>
+
+<!-- BEER DETAIL MODAL -->
+<div id="beerModal" onclick="if(event.target===this)closeBeerModal()">
+  <div id="beerModalBox">
+    <div id="beerModalHead">
+      <span id="beerModalTitle">BEER DETAIL</span>
+      <button id="beerModalClose" onclick="closeBeerModal()">✕</button>
+    </div>
+    <div id="beerModalBody"></div>
+  </div>
+</div>
 
 <!-- MENU BAR -->
 
@@ -604,6 +662,7 @@ z-index: 100;
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
   <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
+  <div class="mb-item" onclick="showTab('addnew',this)"><span class="fkey">G5</span>+NEW</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -634,6 +693,11 @@ z-index: 100;
   <div class="hdr-block hdr-stat">
     <div class="hdr-val" style="color:var(--amber)">13</div>
     <div class="hdr-lbl">COUNTRIES</div>
+  </div>
+  <div class="hdr-block hdr-stat">
+    <div class="hdr-val" style="color:var(--cyan)" id="streak-days">—</div>
+    <div class="hdr-lbl">DAYS AGO</div>
+    <div class="hdr-sub" id="streak-beer" style="font-size:8px;color:var(--dim)"></div>
   </div>
   <div id="clock-block">
     <div id="clock-time">00:00:00</div>
@@ -739,13 +803,19 @@ z-index: 100;
   <div class="bb-panel">
     <div class="bb-panel-head">ALL BEERS — FULL DATASET<span class="ph-right">31 ENTRIES · +5 NEW</span></div>
     <div class="bb-body">
-      <div class="bb-ctrl">
+      <div class="bb-ctrl" style="flex-wrap:wrap;gap:6px">
         <span class="bb-ctrl-title">BEER INDEX <span class="new-tag">+5 NEW</span></span>
-        <select class="bb-select" onchange="sortTable(this.value)">
-          <option value="rating">SORT: RATING ↓</option>
-          <option value="name">SORT: NAME A→Z</option>
-          <option value="abv">SORT: ABV ↓</option>
-        </select>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <input id="beerSearch" type="text" placeholder="SEARCH..." oninput="applyBeerFilter()" style="background:var(--border2);border:1px solid var(--border);color:var(--orange);font-family:var(--mono);font-size:9px;padding:3px 6px;outline:none;width:130px" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='var(--border)'">
+          <select id="beerStyleFilter" class="bb-select" onchange="applyBeerFilter()"><option value="">ALL STYLES</option></select>
+          <select id="beerOriginFilter" class="bb-select" onchange="applyBeerFilter()"><option value="">ALL ORIGINS</option></select>
+          <select id="beerSortSel" class="bb-select" onchange="applyBeerFilter()">
+            <option value="rating">SORT: RATING ↓</option>
+            <option value="name">SORT: NAME A→Z</option>
+            <option value="abv">SORT: ABV ↓</option>
+          </select>
+          <span id="beerFilterCount" style="font-size:9px;color:#555"></span>
+        </div>
       </div>
       <div style="overflow-x:auto">
         <table class="bb-table">
@@ -1283,6 +1353,88 @@ z-index: 100;
       </div>
     </div>
   </div>
+  <div class="bb-panel">
+    <div class="bb-panel-head">⬡ DATA EXPORT</div>
+    <div class="bb-body" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button onclick="exportData('json')" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT JSON</button>
+      <button onclick="exportData('csv')" style="background:var(--border2);color:var(--orange);border:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT CSV</button>
+      <span style="font-size:9px;color:#555" id="exportCount">Downloads all beer reviews</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ADD NEW BEER ══════════════════════ -->
+<div class="panel" id="addnew">
+  <div class="bb-panel" style="margin-bottom:8px">
+    <div class="bb-panel-head">+ LOG NEW BEER REVIEW <span class="ph-right" id="addnew-count">0 LOGGED THIS SESSION</span></div>
+    <div class="bb-body">
+      <div class="g3" style="margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER NAME *</div>
+          <input id="an-beer" type="text" placeholder="e.g. Peroni" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">STYLE *</div>
+          <input id="an-style" type="text" placeholder="e.g. Lager-Pale" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">RATING (1–5) *</div>
+          <input id="an-rating" type="number" min="1" max="5" step="0.25" placeholder="e.g. 3.75" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+      </div>
+      <div class="g3" style="margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ORIGIN (CC) *</div>
+          <input id="an-origin" type="text" placeholder="e.g. IT" maxlength="2" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;text-transform:uppercase" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ABV (%) *</div>
+          <input id="an-abv" type="number" min="0" max="20" step="0.1" placeholder="e.g. 5.1" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">METHOD *</div>
+          <select id="an-method" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none">
+            <option value="Draft">Draft</option>
+            <option value="Bottle">Bottle</option>
+            <option value="Can">Can</option>
+            <option value="Nitro">Nitro</option>
+          </select>
+        </div>
+      </div>
+      <div class="g3" style="margin-bottom:12px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">CITY *</div>
+          <input id="an-city" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">REGION *</div>
+          <input id="an-region" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY *</div>
+          <input id="an-country" type="text" placeholder="e.g. USA" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button onclick="submitNewBeer()" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:7px 20px;cursor:pointer;letter-spacing:1px">LOG REVIEW</button>
+        <button onclick="clearNewBeerForm()" style="background:var(--border2);color:var(--dim);border:1px solid var(--border);font-family:var(--mono);font-size:10px;padding:7px 14px;cursor:pointer;letter-spacing:1px">CLEAR</button>
+        <span id="an-msg" style="font-size:9px;color:#555"></span>
+      </div>
+    </div>
+  </div>
+  <div class="bb-panel">
+    <div class="bb-panel-head">SESSION LOG <span class="ph-right">PENDING INTEGRATION INTO DATA FILE</span></div>
+    <div class="bb-body">
+      <div id="an-log" style="max-height:400px;overflow-y:auto">
+        <div style="color:#333;font-size:9px;text-align:center;padding:20px">NO REVIEWS LOGGED THIS SESSION</div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button onclick="exportNewBeers()" id="an-export-btn" style="display:none;background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT SESSION JSON</button>
+        <button onclick="clearNewBeers()" id="an-clear-btn" style="display:none;background:var(--border2);color:var(--dim);border:1px solid var(--border);font-family:var(--mono);font-size:10px;padding:6px 14px;cursor:pointer;letter-spacing:1px">CLEAR SESSION LOG</button>
+      </div>
+      <div style="margin-top:8px;font-size:9px;color:#333">Reviews logged here are saved in your browser. Export the JSON and paste entries into the <code style="color:#ff6600">beers</code> array in the HTML to make them permanent.</div>
+    </div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -1419,7 +1571,6 @@ const BRAND_SVGS = {
 "Mythos":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="42" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">MYTHOS</text></svg>`,
 "Victoria Bitter":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#ffd700" text-anchor="middle">VB</text><text x="100" y="48" font-family="Arial,sans-serif" font-size="11" fill="#fff" text-anchor="middle" letter-spacing="1">VICTORIA BITTER</text></svg>`,
 "Norrlands Guld":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006AA7"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#FECC02" text-anchor="middle" letter-spacing="2">NORRLANDS</text><text x="100" y="48" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#FECC02" text-anchor="middle" letter-spacing="2">GULD</text></svg>`,
-"Estrella Galicia":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#f5d76e" text-anchor="middle" letter-spacing="2">ESTRELLA</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f5d76e" text-anchor="middle" letter-spacing="1">GALICIA</text></svg>`,
 };
 
 const LOGO_URIS={};
@@ -1485,6 +1636,22 @@ function cardLogo(name){
   } catch(e){ console.error('Ticker error:',e); }
 })();
 
+// ── KEYBOARD SHORTCUTS (1-9, 0, q-r for tabs; Esc for modal)
+(function(){
+  const tabMap={
+    '1':'overview','2':'beers','3':'rankings','4':'countries',
+    '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
+    '9':'mapbrewed','0':'language',
+    'q':'contrarian','w':'ipo','e':'audit','r':'comments','t':'addnew'
+  };
+  document.addEventListener('keydown',function(ev){
+    if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
+    if(ev.key==='Escape'){closeBeerModal();return;}
+    const tab=tabMap[ev.key.toLowerCase()];
+    if(tab&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ev.preventDefault();showTab(tab);}
+  });
+})();
+
 // ── TAB
 function showTab(id,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1501,6 +1668,7 @@ function showTab(id,btn){
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
   if(id==='comments') renderComments();
+  if(id==='addnew') renderAddLog();
   if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -1566,13 +1734,32 @@ document.getElementById('latestPanel').innerHTML=`
 window._smA=smA; window._sA=sA; window._mO=mO; window._mM=mM; window._mA=mA; window._mCt=mCt; window._sortedB=sortedB;
 } catch(e){ console.error('Overview init error:',e); }
 
+// ── STREAK / RECENCY
+try {
+  const monthMap={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const latest=beers.reduce((best,b)=>{
+    const d=new Date(b.year,monthMap[b.month]||0,1);
+    return d>best.d?{d,b}:best;
+  },{d:new Date(0),b:null});
+  if(latest.b){
+    const today=new Date();
+    const diffDays=Math.floor((today-latest.d)/(1000*60*60*24));
+    const el=document.getElementById('streak-days');
+    const bl=document.getElementById('streak-beer');
+    if(el) el.textContent=diffDays;
+    if(bl) bl.textContent=latest.b.month+' '+latest.b.year;
+  }
+} catch(e){ console.error('Streak error:',e); }
+
 // ══════════════════════════════════════════════════════════════
 // BEER TABLE + GRID
 // ══════════════════════════════════════════════════════════════
 function renderTable(data){
   try {
+    const countEl=document.getElementById('beerFilterCount');
+    if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
     document.getElementById('beerBody').innerHTML=data.map(b=>`
-      <tr${b.isNew?' class="new-row"':''}>
+      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
         <td>${logoImg(b.beer,22)}</td>
         <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
@@ -1585,13 +1772,34 @@ function renderTable(data){
       </tr>`).join('');
   } catch(e){ console.error('renderTable error:',e); }
 }
-function sortTable(k){renderTable([...beers].sort((a,b)=>k==='rating'?b.rating-a.rating:k==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv));}
-try { renderTable([...beers].sort((a,b)=>b.rating-a.rating)); } catch(e){ console.error('renderTable init:',e); }
+function applyBeerFilter(){
+  const q=(document.getElementById('beerSearch').value||'').toLowerCase();
+  const st=document.getElementById('beerStyleFilter').value;
+  const or=document.getElementById('beerOriginFilter').value;
+  const sk=document.getElementById('beerSortSel').value;
+  let data=[...beers];
+  if(q) data=data.filter(b=>b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||b.country.toLowerCase().includes(q)||b.city.toLowerCase().includes(q));
+  if(st) data=data.filter(b=>b.style===st);
+  if(or) data=data.filter(b=>b.origin===or);
+  data.sort((a,b)=>sk==='rating'?b.rating-a.rating:sk==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv);
+  renderTable(data);
+}
+function sortTable(k){applyBeerFilter();}
+try {
+  // Populate filter dropdowns
+  const styles=[...new Set(beers.map(b=>b.style))].sort();
+  const origins=[...new Set(beers.map(b=>b.origin))].sort();
+  const styleEl=document.getElementById('beerStyleFilter');
+  const origEl=document.getElementById('beerOriginFilter');
+  styles.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;styleEl.appendChild(o);});
+  origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=`${FLAGS[o]||''} ${o}`;origEl.appendChild(el);});
+  applyBeerFilter();
+} catch(e){ console.error('renderTable init:',e); }
 
 try {
 const unique=[...new Map(beers.map(b=>[b.beer,b])).values()].sort((a,b)=>b.rating-a.rating);
 document.getElementById('beerGrid').innerHTML=unique.map(b=>`
-  <div class="beer-card">
+  <div class="beer-card" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
     ${b.isNew?'<span class="bc-new">NEW</span>':''}
     <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
     <div class="bc-ticker">${b.beer}</div>
@@ -1603,6 +1811,52 @@ document.getElementById('beerGrid').innerHTML=unique.map(b=>`
     <div style="font-size:8px;color:#555;margin-top:3px">${FLAGS[b.origin]||''} ${CNAMES[b.origin]||b.origin} · ${b.method.toUpperCase()}</div>
   </div>`).join('');
 } catch(e){ console.error('beerGrid init:',e); }
+
+// ══════════════════════════════════════════════════════════════
+// BEER DETAIL MODAL
+// ══════════════════════════════════════════════════════════════
+function openBeerModal(name){
+  const reviews=beers.filter(b=>b.beer===name);
+  if(!reviews.length) return;
+  const ratings=reviews.map(b=>b.rating);
+  const avgR=avg(ratings),bestR=Math.max(...ratings),worstR=Math.min(...ratings);
+  const b0=reviews[0];
+  document.getElementById('beerModalTitle').textContent=`${name.toUpperCase()} — DETAIL VIEW`;
+  document.getElementById('beerModalBody').innerHTML=`
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #1a1a1a;margin-bottom:12px;flex-wrap:wrap">
+      <div style="width:120px;height:60px;background:#0a0a0a;border:1px solid #222;display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0">${cardLogo(name)}</div>
+      <div style="flex:1;min-width:160px">
+        <div style="font-size:15px;font-weight:700;color:#ff6600;margin-bottom:4px">${name}</div>
+        <div style="font-size:10px;color:#555;margin-bottom:2px">${b0.style}</div>
+        <div style="font-size:10px;color:#aaa">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin} · ${b0.abv}% ABV</div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(avgR)}">${avgR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">AVG</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(bestR)}">${bestR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">BEST</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(worstR)}">${worstR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">WORST</div></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#00aaff">${reviews.length}</div><div style="font-size:8px;color:#555;letter-spacing:1px">REVIEWS</div></div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:#ff6600;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
+    <table class="bb-table" style="min-width:unset">
+      <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
+      <tbody>${reviews.map((b,i)=>`
+        <tr>
+          <td style="color:#555">${i+1}</td>
+          <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
+          <td style="color:#ffaa00;font-size:9px">${strs(b.rating)}</td>
+          <td style="color:#555">${b.method}</td>
+          <td style="color:#aaa">${b.city}, ${b.region}</td>
+          <td>${FLAGS[b.cc]||''} ${b.country}</td>
+          <td style="color:#555;font-size:9px">${b.month} ${b.year}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  document.getElementById('beerModal').classList.add('open');
+}
+function closeBeerModal(){
+  document.getElementById('beerModal').classList.remove('open');
+}
 
 // ══════════════════════════════════════════════════════════════
 // RANKINGS
@@ -1886,8 +2140,9 @@ function initDrunkMap(){
   addTiles(map);
   drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
     const d=cM[l.city],a=(d.t/d.c).toFixed(2),r=Math.max(8,Math.min(22,6+d.c*3));
+    const beerRows=beers.filter(b=>b.city===l.city).map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
     circleM(map,l.lat,l.lng,cityColors[l.city]||'#ff6600',r,
-      `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}<br>${FLAGS[l.cc]||''} ${l.country}<br>${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44">${a}/5</span><br><span style="color:#555">${d.bs.join(', ')}</span>`);
+      `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
   });
   document.getElementById('drunkLeg').innerHTML=drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
@@ -2576,6 +2831,115 @@ function drawFutures(){
     if(dot) dot.style.background='#ffaa00';
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════════════════════════════
+try {
+  const ec=document.getElementById('exportCount');
+  if(ec) ec.textContent=`Downloads all ${beers.length} beer reviews`;
+} catch(e){}
+function exportData(fmt){
+  try {
+    let content,mime,ext;
+    if(fmt==='json'){
+      content=JSON.stringify(beers,null,2);
+      mime='application/json'; ext='json';
+    } else {
+      const cols=['beer','style','origin','abv','method','city','region','country','cc','rating','month','year'];
+      const rows=beers.map(b=>cols.map(k=>JSON.stringify(b[k]??'')).join(','));
+      content=cols.join(',')+'\n'+rows.join('\n');
+      mime='text/csv'; ext='csv';
+    }
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+    a.download=`brew-reviews-${new Date().toISOString().slice(0,10)}.${ext}`;
+    a.click(); URL.revokeObjectURL(a.href);
+  } catch(e){ console.error('Export error:',e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADD NEW BEER FORM
+// ══════════════════════════════════════════════════════════════
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function getSessionBeers(){ return JSON.parse(localStorage.getItem('sessionBeers')||'[]'); }
+function saveSessionBeers(arr){ localStorage.setItem('sessionBeers',JSON.stringify(arr)); }
+
+function renderAddLog(){
+  const arr=getSessionBeers();
+  const cnt=document.getElementById('addnew-count');
+  if(cnt) cnt.textContent=arr.length+' LOGGED THIS SESSION';
+  const eb=document.getElementById('an-export-btn');
+  const cb=document.getElementById('an-clear-btn');
+  if(eb) eb.style.display=arr.length?'inline-block':'none';
+  if(cb) cb.style.display=arr.length?'inline-block':'none';
+  const log=document.getElementById('an-log');
+  if(!log) return;
+  if(!arr.length){ log.innerHTML='<div style="color:#333;font-size:9px;text-align:center;padding:20px">NO REVIEWS LOGGED THIS SESSION</div>'; return; }
+  log.innerHTML=arr.slice().reverse().map((b,i)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1a1a;flex-wrap:wrap;gap:4px">
+      <div>
+        <span style="color:#ff6600;font-weight:700;font-size:11px">${b.beer}</span>
+        <span style="color:#555;font-size:9px;margin-left:8px">${b.style} · ${b.abv}% ABV · ${b.method}</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
+        <span style="color:#555;font-size:9px">${b.city} · ${b.month} ${b.year}</span>
+        <button onclick="removeSessionBeer(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function submitNewBeer(){
+  const msg=document.getElementById('an-msg');
+  const fv=id=>document.getElementById(id)?.value?.trim();
+  const beer=fv('an-beer'),style=fv('an-style'),origin=(fv('an-origin')||'').toUpperCase();
+  const abv=parseFloat(fv('an-abv')),rating=parseFloat(fv('an-rating'));
+  const method=fv('an-method'),city=fv('an-city'),region=fv('an-region'),country=fv('an-country');
+  if(!beer||!style||!origin||isNaN(abv)||isNaN(rating)||!city||!region||!country){
+    msg.style.color='#ff2222'; msg.textContent='✗ Fill in all required fields'; return;
+  }
+  if(rating<1||rating>5){ msg.style.color='#ff2222'; msg.textContent='✗ Rating must be 1–5'; return; }
+  if(abv<0||abv>20){ msg.style.color='#ff2222'; msg.textContent='✗ ABV must be 0–20%'; return; }
+  const now=new Date();
+  const entry={beer,style,origin,abv,method,city,region,country,cc:origin,rating,
+    isNew:true,month:MONTHS[now.getMonth()],monthN:now.getMonth()+1,year:now.getFullYear()};
+  const arr=getSessionBeers();
+  arr.push(entry);
+  saveSessionBeers(arr);
+  // Add to live beers array so modal and table update immediately
+  beers.push(entry);
+  applyBeerFilter();
+  msg.style.color='#00cc44';
+  msg.textContent=`✓ ${beer} logged! Export JSON to save permanently.`;
+  clearNewBeerForm(true);
+  renderAddLog();
+  setTimeout(()=>{msg.textContent='';},5000);
+}
+
+function clearNewBeerForm(keepMsg=false){
+  ['an-beer','an-style','an-rating','an-origin','an-abv','an-city','an-region','an-country'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  if(!keepMsg){ const m=document.getElementById('an-msg'); if(m) m.textContent=''; }
+}
+
+function removeSessionBeer(idx){
+  const arr=getSessionBeers(); arr.splice(idx,1); saveSessionBeers(arr); renderAddLog();
+}
+
+function clearNewBeers(){
+  saveSessionBeers([]); renderAddLog();
+}
+
+function exportNewBeers(){
+  const arr=getSessionBeers();
+  if(!arr.length) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(arr,null,2)],{type:'application/json'}));
+  a.download=`new-reviews-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
 
 // ══════════════════════════════════════════════════════════════
 // COMMENTS
