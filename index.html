@@ -740,7 +740,6 @@ PASSWORD GATE
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
   <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
-  <div class="mb-item" onclick="showTab('addnew',this)"><span class="fkey">G5</span>+NEW</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -1441,79 +1440,6 @@ PASSWORD GATE
   </div>
 </div>
 
-<!-- ══════════════════════ ADD NEW BEER ══════════════════════ -->
-<div class="panel" id="addnew">
-  <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">+ LOG NEW BEER REVIEW <span class="ph-right" id="addnew-count">0 LOGGED THIS SESSION</span></div>
-    <div class="bb-body">
-      <div class="g3" style="margin-bottom:8px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER NAME *</div>
-          <input id="an-beer" type="text" placeholder="e.g. Peroni" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">STYLE *</div>
-          <input id="an-style" type="text" placeholder="e.g. Lager-Pale" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">RATING (1–5) *</div>
-          <input id="an-rating" type="number" min="1" max="5" step="0.25" placeholder="e.g. 3.75" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-      </div>
-      <div class="g3" style="margin-bottom:8px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ORIGIN (CC) *</div>
-          <input id="an-origin" type="text" placeholder="e.g. IT" maxlength="2" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;text-transform:uppercase" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ABV (%) *</div>
-          <input id="an-abv" type="number" min="0" max="20" step="0.1" placeholder="e.g. 5.1" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">METHOD *</div>
-          <select id="an-method" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none">
-            <option value="Draft">Draft</option>
-            <option value="Bottle">Bottle</option>
-            <option value="Can">Can</option>
-            <option value="Nitro">Nitro</option>
-          </select>
-        </div>
-      </div>
-      <div class="g3" style="margin-bottom:12px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">CITY *</div>
-          <input id="an-city" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">REGION *</div>
-          <input id="an-region" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY *</div>
-          <input id="an-country" type="text" placeholder="e.g. USA" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button onclick="submitNewBeer()" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:7px 20px;cursor:pointer;letter-spacing:1px">LOG REVIEW</button>
-        <button onclick="clearNewBeerForm()" style="background:var(--border2);color:var(--dim);border:1px solid var(--border);font-family:var(--mono);font-size:10px;padding:7px 14px;cursor:pointer;letter-spacing:1px">CLEAR</button>
-        <span id="an-msg" style="font-size:9px;color:#555"></span>
-      </div>
-    </div>
-  </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">SESSION LOG <span class="ph-right">PENDING INTEGRATION INTO DATA FILE</span></div>
-    <div class="bb-body">
-      <div id="an-log" style="max-height:400px;overflow-y:auto">
-        <div style="color:#333;font-size:9px;text-align:center;padding:20px">NO REVIEWS LOGGED THIS SESSION</div>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button onclick="exportNewBeers()" id="an-export-btn" style="display:none;background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT SESSION JSON</button>
-        <button onclick="clearNewBeers()" id="an-clear-btn" style="display:none;background:var(--border2);color:var(--dim);border:1px solid var(--border);font-family:var(--mono);font-size:10px;padding:6px 14px;cursor:pointer;letter-spacing:1px">CLEAR SESSION LOG</button>
-      </div>
-      <div style="margin-top:8px;font-size:9px;color:#333">Reviews logged here are saved in your browser. Export the JSON and paste entries into the <code style="color:#ff6600">beers</code> array in the HTML to make them permanent.</div>
-    </div>
-  </div>
-</div>
 
 </div><!-- /main -->
 </div><!-- /terminal-body -->
@@ -1722,7 +1648,7 @@ function cardLogo(name){
     '1':'overview','2':'beers','3':'rankings','4':'countries',
     '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
     '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit','r':'comments','t':'addnew'
+    'q':'contrarian','w':'ipo','e':'audit','r':'comments'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -1748,8 +1674,7 @@ function showTab(id,btn){
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
   if(id==='comments'){ if(!isUnlocked()){openPwModal('comments');return;} renderComments(); }
-  if(id==='addnew'){ if(!isUnlocked()){openPwModal('addnew');return;} renderAddLog(); }
-  if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
+if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
 
@@ -2976,87 +2901,6 @@ function exportData(fmt){
 }
 
 // ══════════════════════════════════════════════════════════════
-// ADD NEW BEER FORM
-// ══════════════════════════════════════════════════════════════
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function getSessionBeers(){ return JSON.parse(localStorage.getItem('sessionBeers')||'[]'); }
-function saveSessionBeers(arr){ localStorage.setItem('sessionBeers',JSON.stringify(arr)); }
-
-function renderAddLog(){
-  const arr=getSessionBeers();
-  const cnt=document.getElementById('addnew-count');
-  if(cnt) cnt.textContent=arr.length+' LOGGED THIS SESSION';
-  const eb=document.getElementById('an-export-btn');
-  const cb=document.getElementById('an-clear-btn');
-  if(eb) eb.style.display=arr.length?'inline-block':'none';
-  if(cb) cb.style.display=arr.length?'inline-block':'none';
-  const log=document.getElementById('an-log');
-  if(!log) return;
-  if(!arr.length){ log.innerHTML='<div style="color:#333;font-size:9px;text-align:center;padding:20px">NO REVIEWS LOGGED THIS SESSION</div>'; return; }
-  log.innerHTML=arr.slice().reverse().map((b,i)=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1a1a;flex-wrap:wrap;gap:4px">
-      <div>
-        <span style="color:#ff6600;font-weight:700;font-size:11px">${b.beer}</span>
-        <span style="color:#555;font-size:9px;margin-left:8px">${b.style} · ${b.abv}% ABV · ${b.method}</span>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
-        <span style="color:#555;font-size:9px">${b.city} · ${b.month} ${b.year}</span>
-        <button onclick="removeSessionBeer(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
-      </div>
-    </div>`).join('');
-}
-
-function submitNewBeer(){
-  const msg=document.getElementById('an-msg');
-  const fv=id=>document.getElementById(id)?.value?.trim();
-  const beer=fv('an-beer'),style=fv('an-style'),origin=(fv('an-origin')||'').toUpperCase();
-  const abv=parseFloat(fv('an-abv')),rating=parseFloat(fv('an-rating'));
-  const method=fv('an-method'),city=fv('an-city'),region=fv('an-region'),country=fv('an-country');
-  if(!beer||!style||!origin||isNaN(abv)||isNaN(rating)||!city||!region||!country){
-    msg.style.color='#ff2222'; msg.textContent='✗ Fill in all required fields'; return;
-  }
-  if(rating<1||rating>5){ msg.style.color='#ff2222'; msg.textContent='✗ Rating must be 1–5'; return; }
-  if(abv<0||abv>20){ msg.style.color='#ff2222'; msg.textContent='✗ ABV must be 0–20%'; return; }
-  const now=new Date();
-  const entry={beer,style,origin,abv,method,city,region,country,cc:origin,rating,
-    isNew:true,month:MONTHS[now.getMonth()],monthN:now.getMonth()+1,year:now.getFullYear()};
-  const arr=getSessionBeers();
-  arr.push(entry);
-  saveSessionBeers(arr);
-  // Add to live beers array so modal and table update immediately
-  beers.push(entry);
-  applyBeerFilter();
-  msg.style.color='#00cc44';
-  msg.textContent=`✓ ${beer} logged! Export JSON to save permanently.`;
-  clearNewBeerForm(true);
-  renderAddLog();
-  setTimeout(()=>{msg.textContent='';},5000);
-}
-
-function clearNewBeerForm(keepMsg=false){
-  ['an-beer','an-style','an-rating','an-origin','an-abv','an-city','an-region','an-country'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  if(!keepMsg){ const m=document.getElementById('an-msg'); if(m) m.textContent=''; }
-}
-
-function removeSessionBeer(idx){
-  const arr=getSessionBeers(); arr.splice(idx,1); saveSessionBeers(arr); renderAddLog();
-}
-
-function clearNewBeers(){
-  saveSessionBeers([]); renderAddLog();
-}
-
-function exportNewBeers(){
-  const arr=getSessionBeers();
-  if(!arr.length) return;
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(arr,null,2)],{type:'application/json'}));
-  a.download=`new-reviews-${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
-}
 
 // ══════════════════════════════════════════════════════════════
 // COMMENTS
