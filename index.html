@@ -628,6 +628,69 @@ BEER DETAIL MODAL
   line-height: 1;
   padding: 0 2px;
 }
+
+/* ═══════════════════════════════════════════
+PASSWORD GATE
+═══════════════════════════════════════════ */
+#pwModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0,0,0,0.92);
+  align-items: center;
+  justify-content: center;
+}
+#pwModal.open { display: flex; }
+#pwBox {
+  background: var(--panel);
+  border: 1px solid var(--orange);
+  width: min(360px, 92vw);
+  box-shadow: 0 0 40px rgba(255,102,0,0.3);
+}
+#pwHead {
+  background: var(--orange);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  letter-spacing: 1.5px;
+}
+#pwBody { padding: 20px 16px; }
+#pwInput {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  color: var(--orange);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 8px 10px;
+  outline: none;
+  letter-spacing: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+#pwInput:focus { border-color: var(--orange); }
+#pwBtn {
+  width: 100%;
+  background: var(--orange);
+  color: #000;
+  border: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+#pwBtn:hover { background: #ff8833; }
+#pwErr {
+  font-size: 9px;
+  color: var(--red);
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  min-height: 14px;
+}
 </style>
 
 </head>
@@ -641,6 +704,21 @@ BEER DETAIL MODAL
       <button id="beerModalClose" onclick="closeBeerModal()">✕</button>
     </div>
     <div id="beerModalBody"></div>
+  </div>
+</div>
+
+<!-- PASSWORD GATE MODAL -->
+<div id="pwModal">
+  <div id="pwBox">
+    <div id="pwHead">🔒 RESTRICTED — ENTER PASSWORD</div>
+    <div id="pwBody">
+      <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:8px">ACCESS REQUIRED FOR THIS SECTION</div>
+      <input id="pwInput" type="password" placeholder="PASSWORD" autocomplete="off"
+        onkeydown="if(event.key==='Enter')checkPw()"
+        oninput="document.getElementById('pwErr').textContent=''">
+      <button id="pwBtn" onclick="checkPw()">UNLOCK</button>
+      <div id="pwErr"></div>
+    </div>
   </div>
 </div>
 
@@ -1477,7 +1555,7 @@ const beers=[
   {beer:"Michelob Ultra",  style:"Lager-American",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Guinness",        style:"Stout-Irish Dry",          origin:"IE",abv:4.2,method:"Nitro", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Red Stripe",      style:"Lager-Pale",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026},
-  // FEB 2026 (12 beers)
+  // FEB 2026 (13 beers)
   {beer:"Heineken",        style:"Lager-Pale",               origin:"NL",abv:5.0,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Guinness",        style:"Stout-Irish Dry",          origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Weihenstephaner", style:"Wheat Beer-Hefeweizen",    origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
@@ -1490,6 +1568,7 @@ const beers=[
   {beer:"Budweiser",       style:"Lager-American",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager-Mexican",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager-Mexican",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Heineken",        style:"Lager-Pale",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncassville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
   // MAR 2026
   {beer:"Estrella Galicia",style:"Lager-Helles",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Pilsner Urquell", style:"Pilsner-Other",             origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
@@ -1504,6 +1583,7 @@ const drunkLocs=[
   {city:"Montreal",    region:"Quebec",               country:"Canada",      cc:"CA", lat:45.5017,lng:-73.5673},
   {city:"Amsterdam",   region:"Noord-Holland",        country:"Netherlands", cc:"NL", lat:52.3676,lng:4.9041},
   {city:"Hengelo",     region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.2660,lng:6.7930},
+  {city:"Uncassville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
 ];
 
 const breweries=[
@@ -1667,8 +1747,8 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
-  if(id==='comments') renderComments();
-  if(id==='addnew') renderAddLog();
+  if(id==='comments'){ if(!isUnlocked()){openPwModal('comments');return;} renderComments(); }
+  if(id==='addnew'){ if(!isUnlocked()){openPwModal('addnew');return;} renderAddLog(); }
   if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -2124,7 +2204,7 @@ document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-
 // ══════════════════════════════════════════════════════════════
 // MAPS
 // ══════════════════════════════════════════════════════════════
-const cityColors={"New York":"#ff6600","New Rochelle":"#bb44ff","White Plains":"#00cc44","Eastchester":"#00aaff","Hartsdale":"#ff2222","Montreal":"#ff8800","Amsterdam":"#00cccc","Hengelo":"#6666ff"};
+const cityColors={"New York":"#ff6600","New Rochelle":"#bb44ff","White Plains":"#00cc44","Eastchester":"#00aaff","Hartsdale":"#ff2222","Montreal":"#ff8800","Amsterdam":"#00cccc","Hengelo":"#6666ff","Uncassville":"#ff44aa"};
 function addTiles(map){L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);}
 function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.6">${h}</div>`;}
 function circleM(map,lat,lng,color,r,html){L.circleMarker([lat,lng],{radius:r,fillColor:color,color:'#000',weight:1.5,opacity:1,fillOpacity:.9}).addTo(map).bindPopup(popHtml(html),{className:'dpop'});}
@@ -2831,6 +2911,43 @@ function drawFutures(){
     if(dot) dot.style.background='#ffaa00';
   }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// PASSWORD GATE
+// ══════════════════════════════════════════════════════════════
+const PW_KEY='brewUnlocked';
+const PW_HASH='ClemsonNewRo';  // stored as plain string; this is client-side only
+let _pwPendingTab=null;
+
+function isUnlocked(){
+  return sessionStorage.getItem(PW_KEY)==='1';
+}
+function openPwModal(pendingTab){
+  _pwPendingTab=pendingTab;
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwErr').textContent='';
+  document.getElementById('pwModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pwInput').focus(),80);
+}
+function checkPw(){
+  const val=document.getElementById('pwInput').value;
+  if(val===PW_HASH){
+    sessionStorage.setItem(PW_KEY,'1');
+    document.getElementById('pwModal').classList.remove('open');
+    if(_pwPendingTab) showTab(_pwPendingTab);
+    _pwPendingTab=null;
+  } else {
+    const err=document.getElementById('pwErr');
+    err.textContent='✗ INCORRECT PASSWORD';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+    // brief shake
+    const box=document.getElementById('pwBox');
+    box.style.transform='translateX(6px)';
+    setTimeout(()=>box.style.transform='translateX(-6px)',80);
+    setTimeout(()=>box.style.transform='',160);
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 // EXPORT
