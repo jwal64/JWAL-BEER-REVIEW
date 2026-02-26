@@ -749,26 +749,26 @@ PASSWORD GATE
 <div id="hdr">
   <div class="hdr-block wide">
     <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:11px;color:var(--dim)">· BREW TERMINAL v2.7</span></div>
-    <div class="hdr-sub">PERSONAL BREW INTELLIGENCE SYSTEM · 31 REVIEWS · 13 MARKETS · 25 BRANDS</div>
+    <div class="hdr-sub" id="hdr-sub">PERSONAL BREW INTELLIGENCE SYSTEM</div>
   </div>
   <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--green2)">4.75</div>
+    <div class="hdr-val" style="color:var(--green2)" id="hdr-top">—</div>
     <div class="hdr-lbl">TOP SCORE</div>
   </div>
   <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--orange)">3.29</div>
+    <div class="hdr-val" style="color:var(--orange)" id="hdr-avg">—</div>
     <div class="hdr-lbl">AVG RATING</div>
   </div>
   <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--red)">2.00</div>
+    <div class="hdr-val" style="color:var(--red)" id="hdr-low">—</div>
     <div class="hdr-lbl">LOWEST</div>
   </div>
   <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--cyan)">5.2%</div>
+    <div class="hdr-val" style="color:var(--cyan)" id="hdr-abv">—</div>
     <div class="hdr-lbl">AVG ABV</div>
   </div>
   <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--amber)">13</div>
+    <div class="hdr-val" style="color:var(--amber)" id="hdr-ctry">—</div>
     <div class="hdr-lbl">COUNTRIES</div>
   </div>
   <div class="hdr-block hdr-stat">
@@ -878,10 +878,10 @@ PASSWORD GATE
 
 <div id="beers" class="panel">
   <div class="bb-panel">
-    <div class="bb-panel-head">ALL BEERS — FULL DATASET<span class="ph-right">31 ENTRIES · +5 NEW</span></div>
+    <div class="bb-panel-head">ALL BEERS — FULL DATASET<span class="ph-right" id="ph-beer-count">—</span></div>
     <div class="bb-body">
       <div class="bb-ctrl" style="flex-wrap:wrap;gap:6px">
-        <span class="bb-ctrl-title">BEER INDEX <span class="new-tag">+5 NEW</span></span>
+        <span class="bb-ctrl-title">BEER INDEX <span class="new-tag" id="ph-new-tag"></span></span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           <input id="beerSearch" type="text" placeholder="SEARCH..." oninput="applyBeerFilter()" style="background:var(--border2);border:1px solid var(--border);color:var(--orange);font-family:var(--mono);font-size:9px;padding:3px 6px;outline:none;width:130px" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='var(--border)'">
           <select id="beerStyleFilter" class="bb-select" onchange="applyBeerFilter()"><option value="">ALL STYLES</option></select>
@@ -903,7 +903,7 @@ PASSWORD GATE
     </div>
   </div>
   <div class="bb-panel">
-    <div class="bb-panel-head">BEER CARDS — QUICK VIEW<span class="ph-right">25 UNIQUE BRANDS</span></div>
+    <div class="bb-panel-head">BEER CARDS — QUICK VIEW<span class="ph-right" id="ph-brands-count">—</span></div>
     <div class="bb-body">
       <div class="beer-grid" id="beerGrid"></div>
     </div>
@@ -1084,28 +1084,7 @@ PASSWORD GATE
 
 <div id="temporal" class="panel">
 
-  <div class="g4" style="margin-bottom:8px">
-    <div class="kpi">
-      <div class="kpi-val" style="color:var(--orange)">2</div>
-      <div class="kpi-label">MONTHS TRACKED</div>
-      <div class="kpi-sub">Jan – Feb 2026</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-val up">17</div>
-      <div class="kpi-label">JAN REVIEWS</div>
-      <div class="kpi-sub">Avg: <span id="janAvgKpi">—</span></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-val" style="color:var(--cyan)">12</div>
-      <div class="kpi-label">FEB REVIEWS</div>
-      <div class="kpi-sub">Avg: <span id="febAvgKpi">—</span></div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-val" style="color:var(--amber)" id="momKpi">—</div>
-      <div class="kpi-label">MOM RATING ΔDELTA</div>
-      <div class="kpi-sub" id="momDir">Month-over-month</div>
-    </div>
-  </div>
+  <div class="g4" style="margin-bottom:8px" id="temporalKpis"><!-- filled by drawTemporal --></div>
 
   <div class="g2">
     <div class="bb-panel">
@@ -1119,24 +1098,15 @@ PASSWORD GATE
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">RATING DISTRIBUTION — JAN vs FEB COMPARISON<span class="ph-right">SIDE-BY-SIDE</span></div>
+    <div class="bb-panel-head">RATING DISTRIBUTION — MONTH COMPARISON<span class="ph-right" id="distChartSub">SIDE-BY-SIDE</span></div>
     <div class="bb-body"><canvas id="monthDistChart" height="140"></canvas></div>
   </div>
 
-  <div class="g2">
-    <div class="bb-panel">
-      <div class="bb-panel-head">STYLE MIX — JANUARY 2026<span class="ph-right">17 REVIEWS</span></div>
-      <div class="bb-body"><canvas id="janStyleChart" height="180"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">STYLE MIX — FEBRUARY 2026<span class="ph-right">12 REVIEWS</span></div>
-      <div class="bb-body"><canvas id="febStyleChart" height="180"></canvas></div>
-    </div>
-  </div>
+  <div class="g2" id="styleChartsGrid"><!-- filled by drawTemporal --></div>
 
   <div class="g2">
     <div class="bb-panel">
-      <div class="bb-panel-head">COUNTRY EXPOSURE — JAN vs FEB</div>
+      <div class="bb-panel-head">COUNTRY EXPOSURE — MONTH COMPARISON</div>
       <div class="bb-body"><canvas id="monthCountryChart" height="180"></canvas></div>
     </div>
     <div class="bb-panel">
@@ -1634,6 +1604,31 @@ const STATS=(function(){
 })();
 
 // ══════════════════════════════════════════════════════════════
+// HEADER & PANEL STAT INIT — fill all dynamic counts from STATS
+// ══════════════════════════════════════════════════════════════
+(function initHeaderStats(){
+  const ratings=beers.map(b=>b.rating);
+  const set=el=>id=>{const e=document.getElementById(id);if(e)e.textContent=el;};
+  set(Math.max(...ratings).toFixed(2))('hdr-top');
+  set(STATS.globalAvg.toFixed(2))('hdr-avg');
+  set(Math.min(...ratings).toFixed(2))('hdr-low');
+  set((avg(beers.map(b=>b.abv))).toFixed(1)+'%')('hdr-abv');
+  const nCtry=Object.keys(STATS.countryMap).length;
+  set(nCtry)('hdr-ctry');
+  const nNew=beers.filter(b=>b.isNew).length;
+  const nBrands=Object.keys(STATS.brandMap).length;
+  const sub=document.getElementById('hdr-sub');
+  if(sub) sub.textContent=`PERSONAL BREW INTELLIGENCE SYSTEM · ${beers.length} REVIEWS · ${Object.keys(STATS.cityMap).length} MARKETS · ${nBrands} BRANDS`;
+  // Beers panel headers
+  const phBeer=document.getElementById('ph-beer-count');
+  if(phBeer) phBeer.textContent=`${beers.length} ENTRIES${nNew?` · +${nNew} NEW`:''}`;
+  const phNew=document.getElementById('ph-new-tag');
+  if(phNew){ phNew.textContent=nNew?`+${nNew} NEW`:''; phNew.style.display=nNew?'':'none'; }
+  const phBrands=document.getElementById('ph-brands-count');
+  if(phBrands) phBrands.textContent=`${nBrands} UNIQUE BRANDS`;
+})();
+
+// ══════════════════════════════════════════════════════════════
 // CLOCK & TICKER — isolated first, cannot be killed by downstream errors
 // ══════════════════════════════════════════════════════════════
 (function initClockAndTicker(){
@@ -1810,7 +1805,7 @@ function renderTable(data){
     const countEl=document.getElementById('beerFilterCount');
     if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
     document.getElementById('beerBody').innerHTML=data.map(b=>`
-      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
+      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" data-beer="${escHtml(b.beer)}">
         <td>${logoImg(b.beer,22)}</td>
         <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
@@ -1850,7 +1845,7 @@ try {
 try {
 const unique=[...new Map(beers.map(b=>[b.beer,b])).values()].sort((a,b)=>b.rating-a.rating);
 document.getElementById('beerGrid').innerHTML=unique.map(b=>`
-  <div class="beer-card" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
+  <div class="beer-card" data-beer="${escHtml(b.beer)}">
     ${b.isNew?'<span class="bc-new">NEW</span>':''}
     <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
     <div class="bc-ticker">${b.beer}</div>
@@ -1862,6 +1857,16 @@ document.getElementById('beerGrid').innerHTML=unique.map(b=>`
     <div style="font-size:8px;color:#555;margin-top:3px">${FLAGS[b.origin]||''} ${CNAMES[b.origin]||b.origin} · ${b.method.toUpperCase()}</div>
   </div>`).join('');
 } catch(e){ console.error('beerGrid init:',e); }
+
+// Event delegation — beer table rows and grid cards
+document.getElementById('beerBody').addEventListener('click',function(e){
+  const row=e.target.closest('tr[data-beer]');
+  if(row) openBeerModal(row.dataset.beer);
+});
+document.getElementById('beerGrid').addEventListener('click',function(e){
+  const card=e.target.closest('[data-beer]');
+  if(card) openBeerModal(card.dataset.beer);
+});
 
 // ══════════════════════════════════════════════════════════════
 // BEER DETAIL MODAL
@@ -2068,16 +2073,23 @@ function drawInsights(){
     <span class="insight-val ${c}">${n} <span style="color:#555;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
   </div>`).join('');
 
+  // Taste profile — computed from live data
+  const fAvg=fn=>{const rs=beers.filter(fn).map(b=>b.rating);return rs.length?avg(rs):null;};
+  const sAvg=s=>STATS.styleMap[s]?STATS.styleMap[s].t/STATS.styleMap[s].c:null;
+  const cAvg=c=>STATS.countryMap[c]?STATS.countryMap[c].t/STATS.countryMap[c].c:null;
+  const lagerKeys=Object.keys(STATS.styleMap).filter(s=>s.startsWith('Lager'));
+  const darkKeys=['Lager-Munich Dunkel','Stout-Irish Dry','Belgian Strong Dark Ale'];
+  const artisanKeys=['Belgian Strong Golden Ale','Belgian Tripel','Wheat Beer-Hefeweizen'];
   const profile=[
-    {l:'WHEAT/HEFEWEIZEN BIAS',v:4.63,color:'#ff6600'},
-    {l:'DARK BEER TOLERANCE',v:2.67,color:'#444'},
-    {l:'LAGER APPRECIATION',v:3.23,color:'#00cc44'},
-    {l:'GERMAN BEER PREMIUM',v:4.00,color:'#ff6600'},
-    {l:'AMERICAN BEER DISCOUNT',v:2.83,color:'#ff2222'},
-    {l:'ARTISAN vs MACRO',v:3.80,color:'#bb44ff'},
-    {l:'HIGH ABV PREFERENCE',v:3.38,color:'#00aaff'},
-    {l:'DRAFT/NITRO PREMIUM',v:3.70,color:'#00aaff'},
-  ];
+    {l:'WHEAT/HEFEWEIZEN BIAS',   v:sAvg('Wheat Beer-Hefeweizen'),                       color:'#ff6600'},
+    {l:'DARK BEER TOLERANCE',     v:fAvg(b=>darkKeys.includes(b.style)),                  color:'#444'},
+    {l:'LAGER APPRECIATION',      v:fAvg(b=>lagerKeys.includes(b.style)),                 color:'#00cc44'},
+    {l:'GERMAN BEER PREMIUM',     v:cAvg('DE'),                                           color:'#ff6600'},
+    {l:'AMERICAN BEER DISCOUNT',  v:cAvg('US'),                                           color:'#ff2222'},
+    {l:'ARTISAN vs MACRO',        v:fAvg(b=>artisanKeys.includes(b.style)),               color:'#bb44ff'},
+    {l:'HIGH ABV PREFERENCE',     v:fAvg(b=>b.abv>=7),                                   color:'#00aaff'},
+    {l:'DRAFT/NITRO PREMIUM',     v:fAvg(b=>b.method==='Draft'||b.method==='Nitro'),      color:'#00aaff'},
+  ].filter(p=>p.v!==null);
   document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
     <div class="bb-bar-row">
       <div class="bb-bar-label"><span class="name">${p.l}</span><span class="val">${p.v.toFixed(2)}/5</span></div>
@@ -2095,9 +2107,7 @@ function drawInsights(){
     options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#444',maxTicksLimit:12}}}}
   });
 
-  const brands2={};
-  beers.forEach(b=>{if(!brands2[b.beer])brands2[b.beer]=[];brands2[b.beer].push(b.rating);});
-  const multi=Object.entries(brands2).filter(([,rs])=>rs.length>1).map(([n,rs])=>({n,rs,avg:avg(rs),std:std(rs)})).sort((a,b)=>a.std-b.std);
+  const multi=STATS.brandList.filter(b=>b.cnt>1).map(b=>({n:b.n,rs:STATS.brandMap[b.n],avg:b.avg,std:b.std})).sort((a,b)=>a.std-b.std);
   document.getElementById('consistencyPanel').innerHTML=multi.map(b=>`
     <div class="mini-row" style="gap:10px">
       ${logoImg(b.n,28)}
@@ -2201,31 +2211,39 @@ function initBrewedMap(){
 function drawTemporal(){
   window._tmpD = true;
 
-  const months = ['Jan','Feb'];
-  const monthLabels = ['January 2026','February 2026'];
-  const monthColors = ['#ff6600','#00aaff'];
+  // Auto-detect all months from data, sorted chronologically
+  const MONTH_FULL={Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
+  const MONTH_PALETTE=['#ff6600','#00aaff','#00cc44','#bb44ff','#ffaa00','#ff2222'];
+  const months=[...new Set(beers.map(b=>b.month))].sort((a,b)=>
+    beers.find(x=>x.month===a).monthN - beers.find(x=>x.month===b).monthN
+  );
+  const getYear=m=>beers.find(b=>b.month===m).year;
+  const monthLabels=months.map(m=>`${MONTH_FULL[m]||m} ${getYear(m)}`);
+  const monthColors=months.map((_,i)=>MONTH_PALETTE[i%MONTH_PALETTE.length]);
 
-  const byMonth = {};
-  months.forEach(m => { byMonth[m] = beers.filter(b => b.month === m); });
+  const byMonth={};
+  months.forEach(m=>{ byMonth[m]=beers.filter(b=>b.month===m); });
 
-  const counts  = months.map(m => byMonth[m].length);
-  const avgRatings = months.map(m => {
-    const rs = byMonth[m].map(b => b.rating);
+  const counts=months.map(m=>byMonth[m].length);
+  const avgRatings=months.map(m=>{
+    const rs=byMonth[m].map(b=>b.rating);
     return rs.length ? +(rs.reduce((a,v)=>a+v,0)/rs.length).toFixed(2) : 0;
   });
 
-  document.getElementById('janAvgKpi').textContent = avgRatings[0].toFixed(2);
-  document.getElementById('febAvgKpi').textContent = avgRatings[1].toFixed(2);
-  const delta = (avgRatings[1] - avgRatings[0]);
-  const momEl = document.getElementById('momKpi');
-  momEl.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(2);
-  momEl.style.color = delta > 0 ? 'var(--green2)' : delta < 0 ? 'var(--red)' : 'var(--amber)';
-  document.getElementById('momDir').textContent = delta > 0 ? '▲ IMPROVING' : delta < 0 ? '▼ DECLINING' : '→ FLAT';
+  // KPI tiles — generated dynamically for all detected months
+  const last=months.length-1;
+  const momDelta=months.length>=2 ? avgRatings[last]-avgRatings[last-1] : 0;
+  const momColor=momDelta>0?'var(--green2)':momDelta<0?'var(--red)':'var(--amber)';
+  document.getElementById('temporalKpis').innerHTML=`
+    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${months[0]} – ${months[last]} ${getYear(months[0])}</div></div>
+    ${months.slice(0,2).map((m,i)=>`<div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${m.toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
+    <div class="kpi"><div class="kpi-val" style="color:${momColor}">${momDelta>=0?'+':''}${momDelta.toFixed(2)}</div><div class="kpi-label">MOM RATING ΔDELTA</div><div class="kpi-sub">${momDelta>0?'▲ IMPROVING':momDelta<0?'▼ DECLINING':'→ FLAT'}</div></div>`;
 
-  new Chart(document.getElementById('monthlyChart'), {
-    data: {
-      labels: monthLabels,
-      datasets: [
+  // Monthly chart
+  new Chart(document.getElementById('monthlyChart'),{
+    data:{
+      labels:monthLabels,
+      datasets:[
         {type:'bar',label:'Reviews',data:counts,backgroundColor:monthColors.map(c=>c+'33'),borderColor:monthColors,borderWidth:2,yAxisID:'y'},
         {type:'line',label:'Avg Rating',data:avgRatings,borderColor:'#ffaa00',backgroundColor:'transparent',pointBackgroundColor:avgRatings.map(r=>rC(r)),pointRadius:8,pointBorderColor:'#000',pointBorderWidth:2,tension:0.3,yAxisID:'y2'}
       ]
@@ -2236,97 +2254,102 @@ function drawTemporal(){
               x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
   });
 
-  document.getElementById('monthBestWorst').innerHTML = months.map((m,i) => {
-    const mb = byMonth[m];
+  // Best/worst per month
+  document.getElementById('monthBestWorst').innerHTML=months.map((m,i)=>{
+    const mb=byMonth[m];
     if(!mb.length) return '';
-    const best  = mb.reduce((a,b)=>b.rating>a.rating?b:a);
-    const worst = mb.reduce((a,b)=>b.rating<a.rating?b:a);
+    const best=mb.reduce((a,b)=>b.rating>a.rating?b:a);
+    const worst=mb.reduce((a,b)=>b.rating<a.rating?b:a);
     return `
       <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
         <div style="font-size:9px;font-weight:700;color:${monthColors[i]};letter-spacing:1px;margin-bottom:6px">${monthLabels[i].toUpperCase()} · ${mb.length} REVIEWS · AVG ${avgRatings[i].toFixed(2)}</div>
         <div class="mini-row">
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:9px;color:var(--green2);font-weight:700">▲ BEST</span>
-            ${logoImg(best.beer,18)}
-            <span style="color:#ddd;font-size:10px">${best.beer}</span>
+            ${logoImg(best.beer,18)}<span style="color:#ddd;font-size:10px">${best.beer}</span>
           </div>
           <span class="rb ${rbC(best.rating)}">${best.rating.toFixed(2)}</span>
         </div>
         <div class="mini-row">
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:9px;color:var(--red);font-weight:700">▼ WORST</span>
-            ${logoImg(worst.beer,18)}
-            <span style="color:#ddd;font-size:10px">${worst.beer}</span>
+            ${logoImg(worst.beer,18)}<span style="color:#ddd;font-size:10px">${worst.beer}</span>
           </div>
           <span class="rb ${rbC(worst.rating)}">${worst.rating.toFixed(2)}</span>
         </div>
       </div>`;
   }).join('');
 
-  const bucketKeys = ['2.0-2.4','2.5-2.9','3.0-3.4','3.5-3.9','4.0-4.4','4.5+'];
-  const bucketFn = r => r>=4.5?5:r>=4?4:r>=3.5?3:r>=3?2:r>=2.5?1:0;
-  const janBuckets = [0,0,0,0,0,0];
-  const febBuckets = [0,0,0,0,0,0];
-  byMonth['Jan'].forEach(b=>janBuckets[bucketFn(b.rating)]++);
-  byMonth['Feb'].forEach(b=>febBuckets[bucketFn(b.rating)]++);
-
+  // Distribution chart — all detected months
+  const bucketKeys=['2.0-2.4','2.5-2.9','3.0-3.4','3.5-3.9','4.0-4.4','4.5+'];
+  const bucketFn=r=>r>=4.5?5:r>=4?4:r>=3.5?3:r>=3?2:r>=2.5?1:0;
+  const distSub=document.getElementById('distChartSub');
+  if(distSub) distSub.textContent=months.join(' vs ').toUpperCase();
   new Chart(document.getElementById('monthDistChart'),{type:'bar',
-    data:{labels:bucketKeys,datasets:[
-      {label:'Jan 2026',data:janBuckets,backgroundColor:'#ff660066',borderColor:'#ff6600',borderWidth:2},
-      {label:'Feb 2026',data:febBuckets,backgroundColor:'#00aaff66',borderColor:'#00aaff',borderWidth:2},
-    ]},
+    data:{labels:bucketKeys,datasets:months.map((m,i)=>{
+      const bkts=[0,0,0,0,0,0];
+      byMonth[m].forEach(b=>bkts[bucketFn(b.rating)]++);
+      return {label:`${m} ${getYear(m)}`,data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
+    })},
     options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
       scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
   });
 
-  ['Jan','Feb'].forEach((m,i)=>{
-    const styleMap={};
-    byMonth[m].forEach(b=>{styleMap[b.style]=(styleMap[b.style]||0)+1;});
-    const labels=Object.keys(styleMap),data=Object.values(styleMap);
-    new Chart(document.getElementById(i===0?'janStyleChart':'febStyleChart'),{type:'doughnut',
+  // Style mix — one panel per detected month, canvases generated dynamically
+  document.getElementById('styleChartsGrid').innerHTML=months.map((m,i)=>`
+    <div class="bb-panel">
+      <div class="bb-panel-head">STYLE MIX — ${monthLabels[i].toUpperCase()}<span class="ph-right">${counts[i]} REVIEWS</span></div>
+      <div class="bb-body"><canvas id="styleChart_${m}" height="180"></canvas></div>
+    </div>`).join('');
+  months.forEach(m=>{
+    const sm={};
+    byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
+    const labels=Object.keys(sm),data=Object.values(sm);
+    new Chart(document.getElementById(`styleChart_${m}`),{type:'doughnut',
       data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
       options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
     });
   });
 
+  // Country exposure — all detected months
   const allCountries=[...new Set(beers.map(b=>b.origin))].sort();
-  const janCountCts=allCountries.map(c=>byMonth['Jan'].filter(b=>b.origin===c).length);
-  const febCountCts=allCountries.map(c=>byMonth['Feb'].filter(b=>b.origin===c).length);
   new Chart(document.getElementById('monthCountryChart'),{type:'bar',
-    data:{labels:allCountries.map(c=>`${FLAGS[c]||''} ${c}`),datasets:[
-      {label:'Jan',data:janCountCts,backgroundColor:'#ff660066',borderColor:'#ff6600',borderWidth:2},
-      {label:'Feb',data:febCountCts,backgroundColor:'#00aaff66',borderColor:'#00aaff',borderWidth:2},
-    ]},
+    data:{labels:allCountries.map(c=>`${FLAGS[c]||''} ${c}`),datasets:months.map((m,i)=>({
+      label:m,
+      data:allCountries.map(c=>byMonth[m].filter(b=>b.origin===c).length),
+      backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2
+    }))},
     options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
       scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
   });
 
-  const overlap=[...new Set(byMonth['Jan'].map(b=>b.beer))].filter(n=>byMonth['Feb'].some(b=>b.beer===n));
-  const janAbv=avg(byMonth['Jan'].map(b=>b.abv));
-  const febAbv=avg(byMonth['Feb'].map(b=>b.abv));
+  // Momentum panel — compare first vs most recent month
+  const refM=months[0], curM=months[last];
+  const refAbv=avg(byMonth[refM].map(b=>b.abv));
+  const curAbv=avg(byMonth[curM].map(b=>b.abv));
+  const overlap=[...new Set(byMonth[refM].map(b=>b.beer))].filter(n=>byMonth[curM].some(b=>b.beer===n));
   document.getElementById('momentumPanel').innerHTML=[
-    ['JAN REVIEW COUNT',counts[0],'fl'],
-    ['FEB REVIEW COUNT',counts[1],'fl'],
-    ['PACE CHANGE',(counts[1]-counts[0]>=0?'+':'')+(counts[1]-counts[0])+' REVIEWS',counts[1]>=counts[0]?'up':'dn'],
-    ['JAN AVG RATING',avgRatings[0].toFixed(2),'fl'],
-    ['FEB AVG RATING',avgRatings[1].toFixed(2),delta>=0?'up':'dn'],
-    ['MOM Δ RATING',(delta>=0?'+':'')+delta.toFixed(2),delta>=0?'up':'dn'],
-    ['JAN AVG ABV',janAbv.toFixed(2)+'%',''],
-    ['FEB AVG ABV',febAbv.toFixed(2)+'%',''],
-    ['REPEAT BRANDS',overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')','' ],
-    ['UNIQUE TO JAN',byMonth['Jan'].filter(b=>!byMonth['Feb'].some(x=>x.beer===b.beer)).length+' brands','fl'],
-    ['UNIQUE TO FEB',byMonth['Feb'].filter(b=>!byMonth['Jan'].some(x=>x.beer===b.beer)).length+' brands','fl'],
-  ].map(([l,v,c])=>`
+    ...months.map((m,i)=>[`${m.toUpperCase()} REVIEW COUNT`,counts[i],'fl']),
+    months.length>=2?['PACE CHANGE',(counts[last]-counts[last-1]>=0?'+':'')+(counts[last]-counts[last-1])+' REVIEWS',counts[last]>=counts[last-1]?'up':'dn']:null,
+    ...months.map((m,i)=>[`${m.toUpperCase()} AVG RATING`,avgRatings[i].toFixed(2),'fl']),
+    ['MOM Δ RATING',(momDelta>=0?'+':'')+momDelta.toFixed(2),momDelta>=0?'up':'dn'],
+    [`${refM.toUpperCase()} AVG ABV`,refAbv.toFixed(2)+'%',''],
+    [`${curM.toUpperCase()} AVG ABV`,curAbv.toFixed(2)+'%',''],
+    ['REPEAT BRANDS',overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')', ''],
+    [`UNIQUE TO ${refM.toUpperCase()}`,byMonth[refM].filter(b=>!byMonth[curM].some(x=>x.beer===b.beer)).length+' brands','fl'],
+    [`UNIQUE TO ${curM.toUpperCase()}`,byMonth[curM].filter(b=>!byMonth[refM].some(x=>x.beer===b.beer)).length+' brands','fl'],
+  ].filter(Boolean).map(([l,v,c])=>`
     <div class="mini-row">
       <span style="font-size:9px;color:var(--orange)">${l}</span>
       <span class="${c}" style="font-family:var(--mono);font-size:10px;font-weight:700">${v}</span>
     </div>`).join('');
 
+  // Chronological table
   const sorted=[...beers].sort((a,b)=>a.monthN-b.monthN||b.rating-a.rating);
-  const mColor={Jan:'#ff6600',Feb:'#00aaff',Mar:'#00cc44'};
+  const mColorMap=Object.fromEntries(months.map((m,i)=>[m,monthColors[i]]));
   document.getElementById('temporalTableBody').innerHTML=sorted.map(b=>`
     <tr>
-      <td><span style="color:${mColor[b.month]||'#888'};font-weight:700;font-size:9px">${b.month.toUpperCase()} 2026</span></td>
+      <td><span style="color:${mColorMap[b.month]||'#888'};font-weight:700;font-size:9px">${b.month.toUpperCase()} ${b.year}</span></td>
       <td>${logoImg(b.beer,20)}</td>
       <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?'<span class="new-tag">NEW</span>':''}</td>
       <td style="color:#555;font-size:9px">${b.style}</td>
@@ -2848,7 +2871,8 @@ function drawFutures(){
 // PASSWORD GATE
 // ══════════════════════════════════════════════════════════════
 const PW_KEY='brewUnlocked';
-const PW_HASH='ClemsonNewRo';  // stored as plain string; this is client-side only
+// SHA-256 hash of the password (never store plaintext in source)
+const PW_HASH='116c9876439446c3a86b677d0dbec5915d09469905ffabe974445bab1c05ce3d';
 let _pwPendingTab=null;
 
 function isUnlocked(){
@@ -2861,9 +2885,11 @@ function openPwModal(pendingTab){
   document.getElementById('pwModal').classList.add('open');
   setTimeout(()=>document.getElementById('pwInput').focus(),80);
 }
-function checkPw(){
+async function checkPw(){
   const val=document.getElementById('pwInput').value;
-  if(val===PW_HASH){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(val));
+  const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hex===PW_HASH){
     sessionStorage.setItem(PW_KEY,'1');
     document.getElementById('pwModal').classList.remove('open');
     if(_pwPendingTab) showTab(_pwPendingTab);
@@ -2873,7 +2899,6 @@ function checkPw(){
     err.textContent='✗ INCORRECT PASSWORD';
     document.getElementById('pwInput').value='';
     document.getElementById('pwInput').focus();
-    // brief shake
     const box=document.getElementById('pwBox');
     box.style.transform='translateX(6px)';
     setTimeout(()=>box.style.transform='translateX(-6px)',80);
