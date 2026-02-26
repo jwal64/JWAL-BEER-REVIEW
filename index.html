@@ -1602,6 +1602,38 @@ function cardLogo(name){
 }
 
 // ══════════════════════════════════════════════════════════════
+// PRE-COMPUTED STATISTICS — computed once at startup, reused everywhere
+// ══════════════════════════════════════════════════════════════
+const STATS=(function(){
+  const styleMap={};
+  beers.forEach(b=>{if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;});
+  const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+
+  const METHOD_ORDER=['Draft','Nitro','Bottle','Can'];
+  const methodMap={};
+  beers.forEach(b=>{if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;});
+  const methodAvgs=METHOD_ORDER.map(m=>methodMap[m]?+(methodMap[m].t/methodMap[m].c).toFixed(2):0);
+  const methodCounts=METHOD_ORDER.map(m=>methodMap[m]?methodMap[m].c:0);
+
+  const countryMap={};
+  beers.forEach(b=>{if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;});
+  const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+
+  const cityMap={};
+  beers.forEach(b=>{if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;});
+  const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+
+  const brandMap={};
+  beers.forEach(b=>{if(!brandMap[b.beer])brandMap[b.beer]=[];brandMap[b.beer].push(b.rating);});
+  const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:Math.max(...rs),worst:Math.min(...rs),std:std(rs)})).sort((a,b)=>b.avg-a.avg);
+
+  const sorted=[...beers].sort((a,b)=>b.rating-a.rating);
+  const globalAvg=avg(beers.map(b=>b.rating));
+
+  return {styleMap,styleRanked,METHOD_ORDER,methodMap,methodAvgs,methodCounts,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,sorted,globalAvg};
+})();
+
+// ══════════════════════════════════════════════════════════════
 // CLOCK & TICKER — isolated first, cannot be killed by downstream errors
 // ══════════════════════════════════════════════════════════════
 (function initClockAndTicker(){
@@ -1664,7 +1696,10 @@ function showTab(id,btn){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mb-item').forEach(m=>m.style.background='');
   document.getElementById(id).classList.add('active');
-  if(btn&&btn.classList.contains('nav-item')) btn.classList.add('active');
+  // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
+  const navEl=btn&&btn.classList.contains('nav-item')?btn:
+    [...document.querySelectorAll('.nav-item')].find(n=>(n.getAttribute('onclick')||'').includes(`'${id}'`));
+  if(navEl) navEl.classList.add('active');
   if(id==='countries'&&!window._cD) drawCountry();
   if(id==='city'&&!window._ciD) drawCity();
   if(id==='rankings'&&!window._rkD) drawRankings();
@@ -1691,18 +1726,14 @@ const TT={backgroundColor:'#111',borderColor:'#333',borderWidth:1,titleColor:'#f
 // OVERVIEW
 // ══════════════════════════════════════════════════════════════
 try {
-const smA={};
-beers.forEach(b=>{if(!smA[b.style])smA[b.style]={t:0,c:0};smA[b.style].t+=b.rating;smA[b.style].c++;});
-const sA=Object.entries(smA).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-
+// Use pre-computed statistics
+const sA=STATS.styleRanked;
 new Chart(document.getElementById('styleChart'),{type:'bar',
   data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
   options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
 });
 
-const mO=['Draft','Nitro','Bottle','Can'],mM={};
-beers.forEach(b=>{if(!mM[b.method])mM[b.method]={t:0,c:0};mM[b.method].t+=b.rating;mM[b.method].c++;});
-const mA=mO.map(m=>mM[m]?+(mM[m].t/mM[m].c).toFixed(2):0),mCt=mO.map(m=>mM[m]?mM[m].c:0);
+const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
 new Chart(document.getElementById('methodChart'),{type:'bar',
   data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
@@ -1715,28 +1746,43 @@ new Chart(document.getElementById('scatterChart'),{type:'scatter',
             y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
 });
 
-const sortedB=[...beers].sort((a,b)=>b.rating-a.rating);
-document.getElementById('bestPanel').innerHTML=sortedB.slice(0,5).map((b,i)=>`
+document.getElementById('bestPanel').innerHTML=STATS.sorted.slice(0,5).map((b,i)=>`
   <div class="insight-row">
     <span class="insight-key">#${i+1} ${logoImg(b.beer,16)} ${b.beer}</span>
     <div><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span> <span class="insight-sub">${b.origin} · ${b.method}</span></div>
   </div>`).join('');
 
+// Dynamic market signals — computed from live data
+const bestStyle=STATS.styleRanked[0];
+const worstStyle=STATS.styleRanked[STATS.styleRanked.length-1];
+const topCountry=STATS.countryRanked[0];
+const topCity=STATS.cityRanked[0];
+const bestMethodIdx=mA.indexOf(Math.max(...mA.filter(a=>a>0)));
+const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
+const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
+const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
+
 document.getElementById('mktPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div class="insight-val up">Hefeweizen</div><div class="insight-sub">4.63 avg</div></div>
-  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div class="insight-val dn">Munich Dunkel</div><div class="insight-sub">2.67 avg</div></div>
-  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div class="insight-val">🇪🇸 Spain</div><div class="insight-sub">4.25 avg · 1 review</div></div>
-  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div class="insight-val">New York, NY</div><div class="insight-sub">3.46 avg · 6 reviews</div></div>
-  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div class="insight-val">Draft</div><div class="insight-sub">3.70 avg · 5 reviews</div></div>`;
+  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>`;
+
+// Dynamic latest activity panel
+const latestTwo=[...beers].sort((a,b)=>b.monthN-a.monthN||b.year-a.year).slice(0,2);
+const hitRate=(beers.filter(b=>b.rating>=3).length/beers.length*100).toFixed(0);
+const last5=beers.slice(-5).map(b=>b.rating);
+const prev5=beers.slice(-10,-5).map(b=>b.rating);
+const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
+const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
+const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
 
 document.getElementById('latestPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">LATEST</span><div class="insight-val">Estrella Galicia &amp; PU</div><div class="insight-sub">4.25 / 3.25 · New Rochelle</div></div>
-  <div class="insight-row"><span class="insight-key">TREND</span><div class="insight-val fl">→ FLAT</div><div class="insight-sub">30-day rolling avg</div></div>
-  <div class="insight-row"><span class="insight-key">COVERAGE</span><div class="insight-val">13 countries</div><div class="insight-sub">5 continents</div></div>
-  <div class="insight-row"><span class="insight-key">HIT RATE</span><div class="insight-val up">▲ 65%</div><div class="insight-sub">Rated ≥3.00</div></div>`;
-
-// expose for other sections
-window._smA=smA; window._sA=sA; window._mO=mO; window._mM=mM; window._mA=mA; window._mCt=mCt; window._sortedB=sortedB;
+  <div class="insight-row"><span class="insight-key">LATEST</span><div><div class="insight-val">${latestTwo.map(b=>b.beer).join(' &amp; ')}</div><div class="insight-sub">${latestTwo.map(b=>b.rating.toFixed(2)).join(' / ')} · ${latestTwo[0]?latestTwo[0].city:'—'}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg</div></div></div>
+  <div class="insight-row"><span class="insight-key">COVERAGE</span><div><div class="insight-val">${Object.keys(STATS.countryMap).length} countries</div><div class="insight-sub">${Object.keys(STATS.cityMap).length} markets</div></div></div>
+  <div class="insight-row"><span class="insight-key">HIT RATE</span><div><div class="insight-val ${hitRate>=60?'up':hitRate>=40?'fl':'dn'}">${hitRate>=60?'▲ ':''}${hitRate}%</div><div class="insight-sub">Rated ≥3.00</div></div></div>`;
 } catch(e){ console.error('Overview init error:',e); }
 
 // ── STREAK / RECENCY
@@ -1868,7 +1914,7 @@ function closeBeerModal(){
 // ══════════════════════════════════════════════════════════════
 function drawRankings(){
   window._rkD=true;
-  const sr=[...beers].sort((a,b)=>b.rating-a.rating);
+  const sr=STATS.sorted;
   const mkList=(data,i0)=>data.map((b,i)=>`
     <div class="mini-row">
       <div style="display:flex;align-items:center;gap:6px">
@@ -1884,9 +1930,7 @@ function drawRankings(){
   document.getElementById('top10').innerHTML=mkList(sr.slice(0,10),0);
   document.getElementById('bot10').innerHTML=mkList([...sr].reverse().slice(0,10),sr.length-10);
 
-  const brands={};
-  beers.forEach(b=>{if(!brands[b.beer])brands[b.beer]=[];brands[b.beer].push(b.rating);});
-  const bList=Object.entries(brands).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:Math.max(...rs),worst:Math.min(...rs),std:std(rs)})).sort((a,b)=>b.avg-a.avg);
+  const bList=STATS.brandList;
   document.getElementById('brandBody').innerHTML=bList.map((b,i)=>`
     <tr>
       <td style="color:#555;font-size:9px">${i+1}</td>
@@ -1916,42 +1960,11 @@ function drawRankings(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// ABV
-// ══════════════════════════════════════════════════════════════
-function drawABV(){
-  window._abvD=true;
-  const hB=[{l:'4.0–4.4%',min:4,max:4.5},{l:'4.5–4.9%',min:4.5,max:5},{l:'5.0–5.4%',min:5,max:5.5},{l:'5.5–5.9%',min:5.5,max:6},{l:'6.0–7.9%',min:6,max:8},{l:'8.0%+',min:8,max:99}];
-  const hV=hB.map(b=>beers.filter(x=>x.abv>=b.min&&x.abv<b.max).length);
-  new Chart(document.getElementById('abvHistChart'),{type:'bar',
-    data:{labels:hB.map(b=>b.l),datasets:[{data:hV,backgroundColor:'#00aaff',borderWidth:0}]},
-    options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-  });
-  const styleAbv=Object.entries(smA).map(([s])=>({s,ab:avg(beers.filter(b=>b.style===s).map(b=>b.abv))})).sort((a,b)=>b.ab-a.ab);
-  new Chart(document.getElementById('abvStyleChart'),{type:'bar',
-    data:{labels:styleAbv.map(s=>s.s.length>14?s.s.slice(0,14)+'…':s.s),datasets:[{data:styleAbv.map(s=>s.ab.toFixed(1)),backgroundColor:styleAbv.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw}% ABV`}}},scales:{x:{grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-  });
-  const abvCat=a=>a>=8?'VERY HIGH':a>=6?'HIGH':a>=5?'MEDIUM':a>=4.5?'MED-LOW':'LOW';
-  document.getElementById('abvTableBody').innerHTML=[...beers].sort((a,b)=>b.abv-a.abv).map(b=>`
-    <tr>
-      <td>${logoImg(b.beer,20)}</td>
-      <td style="color:#ff6600;font-weight:600">${b.beer}</td>
-      <td style="font-weight:700;color:${b.abv>=8?'#ff2222':b.abv>=6?'#ff6600':b.abv>=5?'#ffaa00':'#00cc44'}">${b.abv.toFixed(1)}%</td>
-      <td><span style="font-size:8px;padding:1px 5px;border:1px solid #333;color:#666">${abvCat(b.abv)}</span></td>
-      <td style="color:#555;font-size:9px">${b.style}</td>
-      <td>${FLAGS[b.origin]||''} ${b.origin}</td>
-      <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-    </tr>`).join('');
-}
-
-// ══════════════════════════════════════════════════════════════
 // COUNTRY
 // ══════════════════════════════════════════════════════════════
 function drawCountry(){
   window._cD=true;
-  const cM={};
-  beers.forEach(b=>{if(!cM[b.origin])cM[b.origin]={t:0,c:0};cM[b.origin].t+=b.rating;cM[b.origin].c++;});
-  const cD=Object.entries(cM).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+  const cD=STATS.countryRanked;
   new Chart(document.getElementById('countryChart'),{type:'bar',
     data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:0}]},
     options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
@@ -1973,9 +1986,9 @@ function drawCountry(){
 try {
 const eM={Draft:'🍺',Nitro:'🫧',Bottle:'🍾',Can:'🥫'};
 const mColors=['#ff6600','#00aaff','#bb44ff','#555'];
-const mO=window._mO||['Draft','Nitro','Bottle','Can'];
-const mA=window._mA||mO.map(()=>0);
-const mCt=window._mCt||mO.map(()=>0);
+const mO=STATS.METHOD_ORDER;
+const mA=STATS.methodAvgs;
+const mCt=STATS.methodCounts;
 new Chart(document.getElementById('methodDetailChart'),{type:'bar',
   data:{labels:mO.map((m,i)=>`${m} (${mCt[i]})`),datasets:[{data:mA,backgroundColor:mColors,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
@@ -2009,9 +2022,7 @@ document.getElementById('methodDetailBody').innerHTML=mO.map((m,i)=>{
 // ══════════════════════════════════════════════════════════════
 function drawCity(){
   window._ciD=true;
-  const cM={};
-  beers.forEach(b=>{if(!cM[b.city])cM[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cM[b.city].t+=b.rating;cM[b.city].c++;});
-  const cD=Object.entries(cM).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+  const cD=STATS.cityRanked;
   new Chart(document.getElementById('cityChart'),{type:'bar',
     data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:0}]},
     options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
@@ -2345,7 +2356,7 @@ function drawContrarian(){
   };
 
   const jwalByBeer={};
-  beers.forEach(b=>{const n=b.beer;if(!jwalByBeer[n])jwalByBeer[n]={total:0,cnt:0};jwalByBeer[n].total+=b.rating;jwalByBeer[n].cnt++;});
+  Object.entries(STATS.brandMap).forEach(([n,rs])=>{jwalByBeer[n]={total:rs.reduce((s,v)=>s+v,0),cnt:rs.length};});
 
   const rows=Object.entries(jwalByBeer).filter(([n])=>globalAvgs[n]!==undefined).map(([name,v])=>{
     const jwal=v.total/v.cnt,global=globalAvgs[name],delta=jwal-global;
@@ -2400,15 +2411,11 @@ function drawIPO(){
   window._ipoD=true;
   try {
 
-  const styleAvgs={};
-  beers.forEach(b=>{if(!styleAvgs[b.style])styleAvgs[b.style]={t:0,c:0};styleAvgs[b.style].t+=b.rating;styleAvgs[b.style].c++;});
-  const jwalStyleAvg={}; Object.entries(styleAvgs).forEach(([s,v])=>jwalStyleAvg[s]=v.t/v.c);
-
-  const countryAvgs={};
-  beers.forEach(b=>{if(!countryAvgs[b.origin])countryAvgs[b.origin]={t:0,c:0};countryAvgs[b.origin].t+=b.rating;countryAvgs[b.origin].c++;});
-  const jwalCountryAvg={}; Object.entries(countryAvgs).forEach(([c,v])=>jwalCountryAvg[c]=v.t/v.c);
-
-  const jwalGlobal=avg(beers.map(b=>b.rating));
+  const jwalStyleAvg={};
+  Object.entries(STATS.styleMap).forEach(([s,v])=>jwalStyleAvg[s]=v.t/v.c);
+  const jwalCountryAvg={};
+  Object.entries(STATS.countryMap).forEach(([c,v])=>jwalCountryAvg[c]=v.t/v.c);
+  const jwalGlobal=STATS.globalAvg;
 
   // Analyst target formula:
   // 50% Untappd global avg (market consensus)
