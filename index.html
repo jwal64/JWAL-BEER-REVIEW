@@ -1668,7 +1668,7 @@ const STATS=(function(){
   try {
     const beerMap={};
     beers.forEach(b=>{if(!beerMap[b.beer]||b.rating>beerMap[b.beer].rating)beerMap[b.beer]=b;});
-    const tickerBeers=Object.values(beerMap).sort((a,b)=>b.rating-a.rating);
+    const tickerBeers=Object.values(beerMap).sort(()=>Math.random()-0.5);
     const SEP='<span style="color:#333;margin:0 20px;font-size:10px">◆</span>';
     let tk=tickerBeers.map(b=>{
       const arr=b.rating>=4?'▲':b.rating>=3?'▶':'▼';
