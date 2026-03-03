@@ -1202,21 +1202,14 @@ PASSWORD GATE
   <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◈ IPO WATCHLIST — PRE-REVIEW ANALYST TARGETS</div>
   <div class="g4" style="margin-bottom:8px">
     <div class="kpi"><div class="kpi-val" id="ipo-pending" style="color:var(--orange)">15</div><div class="kpi-label">ON WATCHLIST</div></div>
-    <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">PRICED (REVIEWED)</div></div>
+    <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">PRICED</div></div>
     <div class="kpi"><div class="kpi-val" id="ipo-avg-analyst" style="color:#00aaff">—</div><div class="kpi-label">AVG ANALYST TARGET</div></div>
     <div class="kpi"><div class="kpi-val" id="ipo-avg-market" style="color:#bb44ff">—</div><div class="kpi-label">AVG MARKET RATING</div></div>
   </div>
 
   <!-- METHODOLOGY CALLOUT -->
-  <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">ANALYST RATING METHODOLOGY <span class="ph-right">JWAL PREDICTIVE MODEL v1.0</span></div>
-    <div class="bb-body" style="font-size:9px;color:#555;line-height:1.8">
-      <span style="color:#ff6600">BASE:</span> Untappd global avg (50%) &nbsp;·&nbsp;
-      <span style="color:#00aaff">STYLE FACTOR:</span> JWAL's historical avg for that style vs global avg (25%) &nbsp;·&nbsp;
-      <span style="color:#bb44ff">COUNTRY FACTOR:</span> JWAL's avg for that origin country vs global avg (15%) &nbsp;·&nbsp;
-      <span style="color:#00cc44">METHOD BONUS:</span> Draft +0.10 / Nitro +0.05 / Bottle ±0 / Can −0.10 (10%) &nbsp;·&nbsp;
-      <span style="color:#c9a84c">RANGE:</span> Clamped 1.0–5.0
-    </div>
+  <div style="font-size:9px;color:#444;padding:3px 0 6px;border-bottom:1px solid #1e1e1e;margin-bottom:8px">
+    <span style="color:#ff6600">MODEL v1.0:</span> Untappd 50% &nbsp;·&nbsp; JWAL style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10% &nbsp;(<span style="color:#00cc44">Draft +0.10</span> / Nitro +0.05 / Bottle ±0 / <span style="color:#ff6600">Can −0.10</span>)
   </div>
 
   <!-- WATCHLIST TABLE -->
@@ -1227,15 +1220,13 @@ PASSWORD GATE
         <table class="bb-table" id="ipoWatchTable">
           <thead><tr>
             <th style="width:36px"></th>
-            <th>BEER</th>
-            <th>STYLE</th>
+            <th>BEER / STYLE</th>
             <th>ORIGIN</th>
-            <th>BREWERY REGION</th>
-            <th>EST. ABV</th>
-            <th style="color:#bb44ff">MKT RATING <span style="font-weight:400;font-size:8px">(Untappd)</span></th>
-            <th style="color:#00aaff">ANALYST TARGET <span style="font-weight:400;font-size:8px">(JWAL Model)</span></th>
-            <th>UPSIDE/RISK</th>
-            <th>STATUS</th>
+            <th>ABV</th>
+            <th style="color:#bb44ff">UNTAPPD</th>
+            <th style="color:#00aaff">JWAL TARGET</th>
+            <th>UPSIDE</th>
+            <th>SIGNAL</th>
           </tr></thead>
           <tbody id="ipoWatchBody"></tbody>
         </table>
@@ -1251,17 +1242,16 @@ PASSWORD GATE
         <table class="bb-table">
           <thead><tr>
             <th style="width:36px"></th>
-            <th>BEER</th>
-            <th>STYLE</th>
+            <th>BEER / STYLE</th>
             <th>ORIGIN</th>
-            <th style="color:#bb44ff">MKT RATING</th>
-            <th style="color:#00aaff">ANALYST TARGET</th>
+            <th style="color:#bb44ff">UNTAPPD</th>
+            <th style="color:#00aaff">JWAL TARGET</th>
             <th style="color:#ff6600">JWAL PRICE</th>
-            <th>vs ANALYST</th>
-            <th>vs MARKET</th>
+            <th>vs TARGET</th>
+            <th>vs MKT</th>
             <th>VERDICT</th>
           </tr></thead>
-          <tbody id="ipoPricedBody"><tr><td colspan="10" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr></tbody>
+          <tbody id="ipoPricedBody"><tr><td colspan="9" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1279,13 +1269,11 @@ PASSWORD GATE
         <table class="bb-table">
           <thead><tr>
             <th style="width:36px"></th>
-            <th>BEER</th>
-            <th>STYLE</th>
+            <th>BEER / STYLE</th>
             <th>ORIGIN</th>
-            <th>BREWERY REGION</th>
-            <th>EST. ABV</th>
-            <th style="color:#bb44ff">MKT RATING</th>
-            <th style="color:#00aaff">ANALYST TARGET</th>
+            <th>ABV</th>
+            <th style="color:#bb44ff">UNTAPPD</th>
+            <th style="color:#00aaff">JWAL TARGET</th>
             <th>RATIONALE</th>
           </tr></thead>
           <tbody id="ipoRecsBody"></tbody>
@@ -1461,7 +1449,7 @@ PASSWORD GATE
   <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
   <div class="sb-item">SYS: JWAL'S BREW TERMINAL v2.7</div>
   <div class="sb-item">USER: JWAL</div>
-  <div class="sb-item">RECORDS: 31 · BRANDS: 25 · MKTS: 8 · WATCHLIST: 13</div>
+  <div class="sb-item">RECORDS: 31 · BRANDS: 25 · MKTS: 8 · WATCHLIST: 20</div>
   <div class="sb-spacer"></div>
   <div class="sb-item" id="sb-time">--:--:--</div>
 </div>
@@ -2466,6 +2454,12 @@ function drawIPO(){
     {beer:'Mythos',          style:'Lager-Pale',            origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
     {beer:'Victoria Bitter', style:'Lager-Pale',            origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
     {beer:'Norrlands Guld',  style:'Lager-Pale',            origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
+    // Additional picks
+    {beer:'Asahi Super Dry', style:'Lager-Pale',            origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
+    {beer:'Hoegaarden',      style:'Witbier',               origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
+    {beer:'Kronenbourg',     style:'Lager-Pale',            origin:'FR', abv:5.0, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
+    {beer:'Newcastle Brown', style:'Brown Ale-English',     origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
+    {beer:'Ringnes',         style:'Lager-Pale',            origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
   ];
 
   const reviewed=new Set(beers.map(b=>b.beer));
@@ -2488,20 +2482,18 @@ function drawIPO(){
     const sigColor=target>=4.0?'#00cc44':target>=3.5?'#aacc00':target>=3.0?'#ffaa00':target>=2.5?'#ff6600':'#ff2222';
     return `<tr>
       <td>${logoImg(w.beer,24)}</td>
-      <td style="color:#ff6600;font-weight:600">${w.beer}</td>
-      <td style="color:#555;font-size:9px">${w.style}</td>
-      <td>${FLAGS[w.origin]||''} ${w.origin}</td>
-      <td style="color:#555;font-size:9px">${w.region}</td>
+      <td style="color:#ff6600;font-weight:600">${w.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${w.style}</span></td>
+      <td>${FLAGS[w.origin]||''} <span style="color:#888">${w.origin}</span></td>
       <td style="color:#00aaff">${w.abv.toFixed(1)}%</td>
       <td style="color:#bb44ff;font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
-      <td><span style="display:inline-block;padding:1px 8px;background:rgba(0,170,255,0.1);border:1px solid #00aaff;color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</span> <span style="color:#555;font-size:8px">${strs(target)}</span></td>
+      <td style="color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
       <td class="${uClass}" style="font-family:var(--mono);font-weight:700">${upside>=0?'+':''}${upside.toFixed(2)}</td>
       <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700;letter-spacing:1px">${signal}</span></td>
     </tr>`;
   }).join('');
 
   if(priced.length===0){
-    document.getElementById('ipoPricedBody').innerHTML='<tr><td colspan="10" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr>';
+    document.getElementById('ipoPricedBody').innerHTML='<tr><td colspan="9" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr>';
     document.getElementById('ipo-priced-count').textContent='0 BEERS';
   } else {
     document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length>1?'S':'');
@@ -2515,9 +2507,8 @@ function drawIPO(){
       const vColor=vsAnalyst>0.3?'#00cc44':vsAnalyst<-0.3?'#ff2222':'#ffaa00';
       return `<tr>
         <td>${logoImg(w.beer,24)}</td>
-        <td style="color:#ff6600;font-weight:600">${w.beer}</td>
-        <td style="color:#555;font-size:9px">${w.style}</td>
-        <td>${FLAGS[w.origin]||''} ${w.origin}</td>
+        <td style="color:#ff6600;font-weight:600">${w.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${w.style}</span></td>
+        <td>${FLAGS[w.origin]||''} <span style="color:#888">${w.origin}</span></td>
         <td style="color:#bb44ff;font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
         <td style="color:#00aaff;font-family:var(--mono)">${target.toFixed(2)}</td>
         <td><span class="rb ${rbC(jwalPrice)}">${jwalPrice.toFixed(2)}</span></td>
@@ -2534,21 +2525,16 @@ function drawIPO(){
     const coveredOrigins=new Set([...beers.map(b=>b.origin),...watchlist.map(w=>w.origin)]);
     const coveredStyles=new Set([...beers.map(b=>b.style),...watchlist.map(w=>w.style)]);
     const candidates=[
-      {beer:'Asahi Super Dry',  style:'Lager-Pale',              origin:'JP',abv:5.0,region:'Tokyo',               untappd:3.60,method:'Bottle'},
       {beer:'Leffe Blonde',     style:'Abbey Ale-Blonde',         origin:'BE',abv:6.6,region:'Leuven',              untappd:3.75,method:'Bottle'},
       {beer:'Chimay Blue',      style:'Belgian Strong Dark Ale',  origin:'BE',abv:9.0,region:'Chimay, Hainaut',     untappd:4.05,method:'Bottle'},
       {beer:'Paulaner Hefe',    style:'Wheat Beer-Hefeweizen',    origin:'DE',abv:5.5,region:'Munich',              untappd:3.87,method:'Bottle'},
       {beer:'Augustiner Helles',style:'Lager-Helles',             origin:'DE',abv:5.2,region:'Munich',              untappd:4.10,method:'Draft'},
       {beer:'Nastro Azzurro',   style:'Lager-Pale',               origin:'IT',abv:5.1,region:'Rome, Lazio',         untappd:3.56,method:'Bottle'},
       {beer:'Sam Adams',        style:'Lager-Vienna',             origin:'US',abv:5.0,region:'Boston, MA',          untappd:3.48,method:'Bottle'},
-      {beer:'Kronenbourg',      style:'Lager-Pale',               origin:'FR',abv:5.0,region:'Obernai, Alsace',     untappd:3.30,method:'Can'},
       {beer:"Smithwick's",      style:'Irish Red Ale',            origin:'IE',abv:4.5,region:'Kilkenny',            untappd:3.45,method:'Draft'},
-      {beer:'Newcastle Brown',  style:'Brown Ale-English',        origin:'GB',abv:4.7,region:'Tadcaster, Yorkshire',untappd:3.28,method:'Bottle'},
       {beer:"Tennent's",        style:'Lager-Pale',               origin:'GB',abv:4.0,region:'Glasgow, Scotland',   untappd:2.95,method:'Can'},
-      {beer:'Ringnes',          style:'Lager-Pale',               origin:'NO',abv:4.7,region:'Oslo',                untappd:3.10,method:'Can'},
       {beer:'Tyskie',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Tychy, Silesia',      untappd:3.28,method:'Can'},
       {beer:'Żywiec',           style:'Pilsner-Other',            origin:'PL',abv:5.6,region:'Żywiec, Silesia',     untappd:3.35,method:'Bottle'},
-      {beer:'Hoegaarden',       style:'Witbier',                  origin:'BE',abv:4.9,region:'Hoegaarden',          untappd:3.72,method:'Bottle'},
       {beer:'Orion',            style:'Lager-Pale',               origin:'JP',abv:5.0,region:'Naha, Okinawa',       untappd:3.42,method:'Can'},
       {beer:'Menabrea',         style:'Lager-Pale',               origin:'IT',abv:4.8,region:'Biella, Piedmont',    untappd:3.55,method:'Bottle'},
       {beer:'Tuborg',           style:'Pilsner-Other',            origin:'DK',abv:4.6,region:'Copenhagen',          untappd:3.10,method:'Can'},
@@ -2573,13 +2559,11 @@ function drawIPO(){
       const upside=target-c.untappd;
       return `<tr>
         <td>${logoImg(c.beer,24)}</td>
-        <td style="color:#ff6600;font-weight:600">${c.beer}</td>
-        <td style="color:#555;font-size:9px">${c.style}</td>
-        <td>${FLAGS[c.origin]||''} ${c.origin}</td>
-        <td style="color:#555;font-size:9px">${c.region}</td>
+        <td style="color:#ff6600;font-weight:600">${c.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${c.style}</span></td>
+        <td>${FLAGS[c.origin]||''} <span style="color:#888">${c.origin}</span></td>
         <td style="color:#00aaff">${c.abv.toFixed(1)}%</td>
         <td style="color:#bb44ff;font-family:var(--mono)">${c.untappd.toFixed(2)}</td>
-        <td><span style="display:inline-block;padding:1px 8px;background:rgba(0,170,255,0.1);border:1px solid #00aaff;color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</span> <span class="${upside>=0?'up':'dn'}" style="font-size:8px">${upside>=0?'+':''}${upside.toFixed(2)}</span></td>
+        <td style="color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
         <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${tagColor};color:${tagColor};font-weight:700;letter-spacing:1px">${tag}</span></td>
       </tr>`;
     }).join('');
@@ -2800,7 +2784,8 @@ function drawFutures(){
 
   // ── 7. IPO WATCHLIST INTEGRITY
   const ipoBeers = ['Moretti','Peroni','Blue Moon','Miller Lite','Estrella Damm','Estrella Galicia',
-    'Brahma','Quilmes','Tsingtao','Castle Lager','Pilsner Urquell','Mythos','Victoria Bitter','Norrlands Guld','Super Bock'];
+    'Brahma','Quilmes','Tsingtao','Castle Lager','Pilsner Urquell','Mythos','Victoria Bitter','Norrlands Guld','Super Bock',
+    'Asahi Super Dry','Hoegaarden','Kronenbourg','Newcastle Brown','Ringnes'];
   const reviewedSet = new Set(beers.map(b=>b.beer));
   const ipoReviewed = ipoBeers.filter(n=>reviewedSet.has(n));
   const ipoPending  = ipoBeers.filter(n=>!reviewedSet.has(n));
