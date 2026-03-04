@@ -1581,6 +1581,14 @@ const BRAND_SVGS = {
 "Mythos":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="42" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">MYTHOS</text></svg>`,
 "Victoria Bitter":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#ffd700" text-anchor="middle">VB</text><text x="100" y="48" font-family="Arial,sans-serif" font-size="11" fill="#fff" text-anchor="middle" letter-spacing="1">VICTORIA BITTER</text></svg>`,
 "Norrlands Guld":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006AA7"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#FECC02" text-anchor="middle" letter-spacing="2">NORRLANDS</text><text x="100" y="48" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#FECC02" text-anchor="middle" letter-spacing="2">GULD</text></svg>`,
+"Asahi Super Dry":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">ASAHI</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="20" font-weight="900" fill="#c0c0c0" text-anchor="middle" letter-spacing="2">SUPER DRY</text></svg>`,
+"Hoegaarden":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a6b"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#f0e68c" text-anchor="middle" letter-spacing="3">BROUWERIJ</text><text x="100" y="48" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">Hoegaarden</text></svg>`,
+"Kronenbourg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">BIÈRE DE</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">KRONENBOURG</text></svg>`,
+"Newcastle Brown":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#3d1c02"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">NEWCASTLE</text><polygon points="100,26 104,36 114,36 106,42 109,52 100,46 91,52 94,42 86,36 96,36" fill="#00aaff"/><text x="100" y="58" font-family="Arial Black,sans-serif" font-size="8" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BROWN ALE</text></svg>`,
+"Ringnes":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="42" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">RINGNES</text></svg>`,
+"Żywiec":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#ffd700" text-anchor="middle" letter-spacing="3">PIWO</text><text x="100" y="48" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">ŻYWIEC</text></svg>`,
+"Tyskie":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#c9a84c" text-anchor="middle" letter-spacing="3">GRONIE</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="2">TYSKIE</text></svg>`,
+"Chimay Blue":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002366"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">CHIMAY</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#4a90d9" text-anchor="middle" letter-spacing="3">GRANDE RÉSERVE</text></svg>`,
 };
 
 const LOGO_URIS={};
@@ -1589,7 +1597,7 @@ Object.entries(BRAND_SVGS).forEach(([n,s])=>{LOGO_URIS[n]='data:image/svg+xml;ch
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
-const sC={"Wheat Beer-Hefeweizen":"#ff6600","Belgian Strong Golden Ale":"#ffaa00","Stout-Irish Dry":"#888","Lager-Pale":"#00cc44","Lager-Mexican":"#00aa33","Pilsner-Other":"#00aaff","Belgian Tripel":"#bb44ff","Lager-Munich Dunkel":"#ff4400","Lager-American":"#555","Lager-American Light":"#444","Lager-Helles":"#22bb77"};
+const sC={"Wheat Beer-Hefeweizen":"#ff6600","Belgian Strong Golden Ale":"#ffaa00","Stout-Irish Dry":"#888","Lager-Pale":"#00cc44","Lager-Mexican":"#00aa33","Pilsner-Other":"#00aaff","Belgian Tripel":"#bb44ff","Lager-Munich Dunkel":"#ff4400","Lager-American":"#555","Lager-American Light":"#444","Lager-Helles":"#22bb77","Belgian Strong Dark Ale":"#8b0000","Witbier":"#f0c040","Brown Ale-English":"#8b4513"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
 function rC(r){return r>=4.5?"#00cc44":r>=4?"#22dd55":r>=3.5?"#aacc00":r>=3?"#ffaa00":r>=2.5?"#ff6600":"#ff2222";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
@@ -2435,7 +2443,7 @@ function drawIPO(){
     return Math.min(5.0,Math.max(1.0,target));
   }
 
-  // 15 beers from 15 different countries (9 user-specified + 6 Claude picks)
+  // 23 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 3 pipeline promotions)
   const watchlist=[
     // User-specified
     {beer:'Moretti',         style:'Pilsner-Other',         origin:'IT', abv:4.6, region:'Udine, Friuli',         untappd:3.58, method:'Bottle'},
@@ -2460,6 +2468,10 @@ function drawIPO(){
     {beer:'Kronenbourg',     style:'Lager-Pale',            origin:'FR', abv:5.0, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
     {beer:'Newcastle Brown', style:'Brown Ale-English',     origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
     {beer:'Ringnes',         style:'Lager-Pale',            origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
+    // Pipeline promotions
+    {beer:'Żywiec',          style:'Pilsner-Other',         origin:'PL', abv:5.6, region:'Żywiec, Silesia',      untappd:3.35, method:'Bottle'},
+    {beer:'Tyskie',          style:'Pilsner-Other',         origin:'PL', abv:5.6, region:'Tychy, Silesia',       untappd:3.28, method:'Can'},
+    {beer:'Chimay Blue',     style:'Belgian Strong Dark Ale',origin:'BE',abv:9.0, region:'Chimay, Hainaut',      untappd:4.05, method:'Bottle'},
   ];
 
   const reviewed=new Set(beers.map(b=>b.beer));
