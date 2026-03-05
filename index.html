@@ -1840,7 +1840,7 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
-  if(id==='comments'){ if(!isUnlocked()){openPwModal('comments');return;} renderComments(); }
+  if(id==='comments'){ renderComments(); }
   if(id==='beerentry'){ if(!isUnlocked()){openPwModal('beerentry');return;} renderBeerEntries(); }
 if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
@@ -3077,10 +3077,19 @@ function renderComments(){
 function escHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+const BLOCKED_WORDS=["fuck","shit","damn","bitch","ass","asshole","bastard","dick","piss","crap","cunt","slut","whore","fag","faggot","retard","retarded","nigger","nigga","chink","spic","kike","dyke","tranny","twat","wanker","bollocks","prick","cock","motherfucker","dumbass","jackass","dipshit","bullshit","horseshit","shithead","douchebag","douche"];
+function containsBadWords(str){
+  const lower=str.toLowerCase().replace(/[^a-z ]/g,' ');
+  return BLOCKED_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(lower));
+}
 function addComment(){
   const subj=document.getElementById('comment-subject').value.trim();
   const txt=document.getElementById('comment-text').value.trim();
   if(!txt) return;
+  if(containsBadWords(subj+' '+txt)){
+    alert('⚠ Your comment contains inappropriate language. Please revise.');
+    return;
+  }
   const arr=loadComments();
   arr.push({subject:subj,text:txt,ts:new Date().toLocaleString()});
   saveComments(arr);
