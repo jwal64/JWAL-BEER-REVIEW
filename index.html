@@ -1309,16 +1309,13 @@ PASSWORD GATE
       <div style="overflow-x:auto">
         <table class="bb-table" id="ftContractTable">
           <thead><tr>
-            <th style="width:36px"></th>
+            <th style="width:28px"></th>
             <th>BEER</th>
-            <th>STYLE</th>
-            <th>REVIEWS</th>
-            <th>JWAL AVG</th>
-            <th style="color:#bb44ff">MKT RATING</th>
-            <th style="color:#ff6600">FUTURES PRICE</th>
-            <th>52W HIGH</th>
-            <th>52W LOW</th>
-            <th>VOLATILITY</th>
+            <th>RVW</th>
+            <th>AVG</th>
+            <th style="color:#ff6600">FUTURES</th>
+            <th>52W H/L</th>
+            <th>VOL</th>
             <th>SIGNAL</th>
           </tr></thead>
           <tbody id="ftContractBody"></tbody>
@@ -1522,7 +1519,7 @@ const breweries=[
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
-  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25]},
+  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25]},
   {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", beers:"Grolsch",                                           lat:52.2215,lng:6.8937,  ratings:[3.50]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
@@ -1531,7 +1528,7 @@ const breweries=[
   {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", beers:"Carlsberg",                                         lat:55.6614,lng:12.5361,  ratings:[2.75,3.00]},
   {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[2.75]},
   {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", beers:"1664",                                              lat:48.4637,lng:7.4845,  ratings:[3.00]},
-  {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", beers:"Sapporo",                                           lat:43.0685,lng:141.3544, ratings:[3.50]},
+  {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", beers:"Sapporo",                                           lat:43.0685,lng:141.3544, ratings:[3.50,3.00]},
   {name:"Kirin Brewery",          location:"Yokohama, Kanagawa",        country:"Japan",       cc:"JP", beers:"Ichiban (Kirin Ichiban)",                           lat:35.4634,lng:139.6220, ratings:[3.00]},
   {name:"Red Stripe (D&G)",       location:"Kingston, Surrey",          country:"Jamaica",     cc:"JM", beers:"Red Stripe",                                        lat:17.9972,lng:-76.7939, ratings:[3.75]},
   {name:"Estrella Galicia",       location:"A Coruña, Galicia",         country:"Spain",       cc:"ES", beers:"Estrella Galicia",                                   lat:43.3623,lng:-8.4115,  ratings:[4.25]},
@@ -2140,9 +2137,9 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech"};
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿"};
+const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian"};
+const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa"};
+const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹"};
 const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
 const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:LANG_MAP[b.origin]||b.origin,rating:b.rating}));
 const lA={};
@@ -2662,13 +2659,12 @@ function drawFutures(){
 
     if(!history.length){
       return `<tr>
-        <td>${logoImg(name,24)}</td>
+        <td>${logoImg(name,22)}</td>
         <td style="color:#ff6600;font-weight:600">${name}</td>
-        <td style="color:#555;font-size:9px">—</td>
         <td style="color:#333;text-align:center">0</td>
         <td style="color:#333">—</td>
-        <td style="color:#bb44ff;font-family:var(--mono)">${untappd.toFixed(2)}</td>
-        <td colspan="4" style="color:#333;font-size:9px;padding:8px">NO REVIEW DATA YET</td>
+        <td style="color:#333">—</td>
+        <td colspan="2" style="color:#333;font-size:9px">NO REVIEW DATA YET</td>
         <td></td>
       </tr>`;
     }
@@ -2682,17 +2678,14 @@ function drawFutures(){
     const signal=ft>=4.0?'STRONG BUY':ft>=3.5?'BUY':ft>=3.0?'HOLD':ft>=2.5?'SELL':'STRONG SELL';
     const sigColor=ft>=4.0?'#00cc44':ft>=3.5?'#aacc00':ft>=3.0?'#ffaa00':ft>=2.5?'#ff6600':'#ff2222';
     return `<tr>
-      <td>${logoImg(name,24)}</td>
+      <td>${logoImg(name,22)}</td>
       <td style="color:#ff6600;font-weight:600">${name}</td>
-      <td style="color:#555;font-size:9px">${history[0].style}</td>
       <td style="text-align:center">${history.length}</td>
       <td><span class="rb ${rbC(jwalAvg)}">${jwalAvg.toFixed(2)}</span></td>
-      <td style="color:#bb44ff;font-family:var(--mono)">${untappd.toFixed(2)}</td>
-      <td style="color:#ff6600;font-family:var(--mono);font-weight:700;font-size:12px">${ft.toFixed(2)}</td>
-      <td class="up" style="font-family:var(--mono)">${hi.toFixed(2)}</td>
-      <td class="dn" style="font-family:var(--mono)">${lo.toFixed(2)}</td>
-      <td class="${volClass}">${volLabel} <span style="font-size:8px">(σ${volatility.toFixed(2)})</span></td>
-      <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700">${signal}</span></td>
+      <td style="color:#ff6600;font-family:var(--mono);font-weight:700">${ft.toFixed(2)}</td>
+      <td style="font-family:var(--mono);font-size:9px"><span class="up">${hi.toFixed(2)}</span>/<span class="dn">${lo.toFixed(2)}</span></td>
+      <td class="${volClass}" style="font-size:9px">${volLabel} <span style="font-size:8px">(σ${volatility.toFixed(2)})</span></td>
+      <td><span style="font-size:8px;padding:2px 6px;border:1px solid ${sigColor};color:${sigColor};font-weight:700">${signal}</span></td>
     </tr>`;
   }).join('');
 
