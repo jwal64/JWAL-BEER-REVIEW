@@ -1410,14 +1410,20 @@ PASSWORD GATE
   <div class="bb-panel" style="margin-bottom:16px">
     <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
     <div class="bb-body">
-      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
-        <div style="flex:1">
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER / SUBJECT</div>
-          <input id="comment-subject" type="text" placeholder="e.g. Estrella Damm, general note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">YOUR NAME <span style="color:var(--orange)">*</span></div>
+          <input id="comment-name" type="text" placeholder="Enter your name" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
         </div>
-        <div style="flex:2">
+        <div style="flex:1;min-width:140px">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER <span style="color:var(--orange)">*</span></div>
+          <select id="comment-beer" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box;cursor:pointer" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+            <option value="">-- Select a beer --</option>
+          </select>
+        </div>
+        <div style="flex:2;min-width:180px">
           <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COMMENT</div>
-          <input id="comment-text" type="text" placeholder="Write your note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'" onkeydown="if(event.key==='Enter')addComment()">
+          <input id="comment-text" type="text" placeholder="Write your note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'" onkeydown="if(event.key==='Enter')addComment()">
         </div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end">
           <div style="font-size:9px;color:transparent;margin-bottom:4px">.</div>
@@ -1840,7 +1846,7 @@ function showTab(id,btn){
   if(id==='contrarian'&&!window._ciX) drawContrarian();
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
-  if(id==='comments'){ renderComments(); }
+  if(id==='comments'){ populateBeerDropdown(); renderComments(); }
   if(id==='beerentry'){ if(!isUnlocked()){openPwModal('beerentry');return;} renderBeerEntries(); }
 if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
@@ -3069,7 +3075,7 @@ function renderComments(){
       <div style="flex:1;min-width:0">
         ${c.subject?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-bottom:2px">${escHtml(c.subject)}</div>`:''}
         <div style="font-size:11px;color:#e8e8e8;line-height:1.5;word-break:break-word">${escHtml(c.text)}</div>
-        <div style="font-size:9px;color:#333;margin-top:3px">${c.ts}</div>
+        <div style="font-size:9px;color:#333;margin-top:3px">${c.name?'<span style="color:#888">'+escHtml(c.name)+'</span> — ':''} ${c.ts}</div>
       </div>
       <button onclick="deleteComment(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer;flex-shrink:0;padding:0 4px" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
     </div>`).join('');
@@ -3094,18 +3100,41 @@ function containsBadWords(str){
   const lower=str.toLowerCase().replace(/[^a-z ]/g,' ');
   return BLOCKED_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(lower));
 }
+function populateBeerDropdown(){
+  const sel=document.getElementById('comment-beer');
+  if(!sel) return;
+  const existing=sel.options.length;
+  if(existing>1) return;
+  const unique=[...new Set(beers.map(b=>b.beer))].sort();
+  unique.forEach(name=>{
+    const opt=document.createElement('option');
+    opt.value=name;
+    opt.textContent=name;
+    sel.appendChild(opt);
+  });
+}
 function addComment(){
-  const subj=document.getElementById('comment-subject').value.trim();
+  const name=document.getElementById('comment-name').value.trim();
+  const beer=document.getElementById('comment-beer').value;
   const txt=document.getElementById('comment-text').value.trim();
+  if(!name){
+    alert('⚠ Please enter your name.');
+    document.getElementById('comment-name').focus();
+    return;
+  }
+  if(!beer){
+    alert('⚠ Please select a beer from the dropdown.');
+    document.getElementById('comment-beer').focus();
+    return;
+  }
   if(!txt) return;
-  if(containsBadWords(subj+' '+txt)){
+  if(containsBadWords(name+' '+txt)){
     alert('⚠ Your comment contains inappropriate language. Please revise.');
     return;
   }
   const arr=loadComments();
-  arr.push({subject:subj,text:txt,ts:new Date().toLocaleString()});
+  arr.push({name:name,subject:beer,text:txt,ts:new Date().toLocaleString()});
   saveComments(arr);
-  document.getElementById('comment-subject').value='';
   document.getElementById('comment-text').value='';
   renderComments();
 }
