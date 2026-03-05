@@ -750,7 +750,7 @@ PASSWORD GATE
   <div class="mb-item" onclick="showTab('contrarian',this)"><span class="fkey">G1</span>CNTRN</div>
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
-  <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
+  <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>COMMENTS</div>
   <div class="mb-item" onclick="showTab('beerentry',this)"><span class="fkey">G5</span>ENTRY</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
@@ -1408,7 +1408,7 @@ PASSWORD GATE
 <!-- ══════════════════════ COMMENTS PANEL ══════════════════════ -->
 <div class="panel" id="comments">
   <div class="bb-panel" style="margin-bottom:16px">
-    <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
+    <div class="bb-panel-head">✎ COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
     <div class="bb-body">
       <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
         <div style="flex:1">
@@ -1429,7 +1429,7 @@ PASSWORD GATE
         </div>
       </div>
       <div id="comment-list" style="max-height:520px;overflow-y:auto">
-        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>
+        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO COMMENTS YET — ADD ONE ABOVE</div>
       </div>
     </div>
   </div>
@@ -3064,7 +3064,7 @@ function renderComments(){
   const cnt=document.getElementById('comment-count');
   if(cnt) cnt.textContent=arr.length+' ENTR'+(arr.length===1?'Y':'IES');
   if(!arr.length){
-    el.innerHTML='<div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>';
+    el.innerHTML='<div style="color:#333;text-align:center;padding:30px;font-size:9px">NO COMMENTS YET — ADD ONE ABOVE</div>';
     return;
   }
   el.innerHTML=arr.slice().reverse().map((c,i)=>`
