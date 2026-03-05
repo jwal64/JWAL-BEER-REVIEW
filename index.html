@@ -3077,7 +3077,7 @@ function renderComments(){
 function escHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-const BLOCKED_WORDS=["fuck","shit","damn","bitch","ass","asshole","bastard","dick","piss","crap","cunt","slut","whore","fag","faggot","retard","retarded","nigger","nigga","chink","spic","kike","dyke","tranny","twat","wanker","bollocks","prick","cock","motherfucker","dumbass","jackass","dipshit","bullshit","horseshit","shithead","douchebag","douche"];
+const BLOCKED_WORDS=JSON.parse(atob('WyJmdWNrIiwic2hpdCIsImRhbW4iLCJiaXRjaCIsImFzcyIsImFzc2hvbGUiLCJiYXN0YXJkIiwiZGljayIsInBpc3MiLCJjcmFwIiwiY3VudCIsInNsdXQiLCJ3aG9yZSIsImZhZyIsImZhZ2dvdCIsInJldGFyZCIsInJldGFyZGVkIiwibmlnZ2VyIiwibmlnZ2EiLCJjaGluayIsInNwaWMiLCJraWtlIiwiZHlrZSIsInRyYW5ueSIsInR3YXQiLCJ3YW5rZXIiLCJib2xsb2NrcyIsInByaWNrIiwiY29jayIsIm1vdGhlcmZ1Y2tlciIsImR1bWJhc3MiLCJqYWNrYXNzIiwiZGlwc2hpdCIsImJ1bGxzaGl0IiwiaG9yc2VzaGl0Iiwic2hpdGhlYWQiLCJkb3VjaGViYWciLCJkb3VjaGUiXQ=='));
 function containsBadWords(str){
   const lower=str.toLowerCase().replace(/[^a-z ]/g,' ');
   return BLOCKED_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(lower));
