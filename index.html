@@ -3077,7 +3077,19 @@ function renderComments(){
 function escHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-const BLOCKED_WORDS=JSON.parse(atob('WyJmdWNrIiwic2hpdCIsImRhbW4iLCJiaXRjaCIsImFzcyIsImFzc2hvbGUiLCJiYXN0YXJkIiwiZGljayIsInBpc3MiLCJjcmFwIiwiY3VudCIsInNsdXQiLCJ3aG9yZSIsImZhZyIsImZhZ2dvdCIsInJldGFyZCIsInJldGFyZGVkIiwibmlnZ2VyIiwibmlnZ2EiLCJjaGluayIsInNwaWMiLCJraWtlIiwiZHlrZSIsInRyYW5ueSIsInR3YXQiLCJ3YW5rZXIiLCJib2xsb2NrcyIsInByaWNrIiwiY29jayIsIm1vdGhlcmZ1Y2tlciIsImR1bWJhc3MiLCJqYWNrYXNzIiwiZGlwc2hpdCIsImJ1bGxzaGl0IiwiaG9yc2VzaGl0Iiwic2hpdGhlYWQiLCJkb3VjaGViYWciLCJkb3VjaGUiXQ=='));
+let BLOCKED_WORDS=[];
+(async function(){
+  const _k='jwal-brew-terminal-filter';
+  const _iv='ebad6626a1e83ed2ca00ee5b08e13812';
+  const _d='6d194333236e823ae0cfec36678780580034f850e1fd4362fb065e23391832a49411f7249436964dea1b0d8f8ff787d7d116686123b4f6f1f4c571ebfbbe5239a7f15019833e3e4fc284f5285e84153b43d35ba715ceec63b70f041f68db19fa004024ebbb6d8749e0de3d7c9a3adff3066e021ce86427c07d9054a5639488c7d932b4215966fcabfc81837984233e9da18eecdfe230e73a0472835f0bc16f425f4b85d43d833e057dc57e031ece17f7c6acdf4179f8dbb949a0be8b73a746af5a1f2f4e8f81fb90f9c5004b2cbe6f157635e678b7bad4b287c9b4f7b996027c35b7b9bb82e6c5d6f9b913030889135386e3bb45068453b8bf199b307fec31f886f55c9332f7e1fc5e896a779254431c2c426c9d1efd523d8bb06537fc2b719b823a3eea708b393e94c1a36b5a25e9ab898de028bad68de82350a27c65778522b9888ae8b8df30215cc65519a7927b68';
+  const enc=new TextEncoder();
+  const keyData=await crypto.subtle.digest('SHA-256',enc.encode(_k));
+  const key=await crypto.subtle.importKey('raw',keyData,{name:'AES-CBC'},false,['decrypt']);
+  const iv=new Uint8Array(_iv.match(/.{2}/g).map(b=>parseInt(b,16)));
+  const buf=new Uint8Array(_d.match(/.{2}/g).map(b=>parseInt(b,16)));
+  const dec=await crypto.subtle.decrypt({name:'AES-CBC',iv},key,buf);
+  BLOCKED_WORDS=JSON.parse(new TextDecoder().decode(dec));
+})();
 function containsBadWords(str){
   const lower=str.toLowerCase().replace(/[^a-z ]/g,' ');
   return BLOCKED_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(lower));
