@@ -751,6 +751,7 @@ PASSWORD GATE
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
   <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
+  <div class="mb-item" onclick="showTab('beerentry',this)"><span class="fkey">G5</span>ENTRY</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -824,6 +825,8 @@ PASSWORD GATE
   <div class="nav-section-head">MAPS</div>
   <div class="nav-item" onclick="showTab('mapdrunk',this)"><span class="nav-icon">◉</span>CONSUMED<span class="nkey">F11</span></div>
   <div class="nav-item" onclick="showTab('mapbrewed',this)"><span class="nav-icon">◎</span>BREWERIES<span class="nkey">F12</span></div>
+  <div class="nav-section-head">DATA ENTRY</div>
+  <div class="nav-item" onclick="showTab('beerentry',this)"><span class="nav-icon">✚</span>BEER ENTRY<span class="nkey">T</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -1436,6 +1439,105 @@ PASSWORD GATE
   </div>
 </div>
 
+<!-- ══════════════════════ BEER ENTRY PANEL ══════════════════════ -->
+<div class="panel" id="beerentry">
+  <div class="bb-panel" style="margin-bottom:16px">
+    <div class="bb-panel-head">✚ NEW BEER ENTRY <span class="ph-right" id="entry-count">0 ENTRIES</span></div>
+    <div class="bb-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER NAME *</div>
+          <input id="entry-beer" type="text" placeholder="e.g. Heineken" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">STYLE *</div>
+          <input id="entry-style" list="style-list" type="text" placeholder="e.g. Lager-Pale" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+          <datalist id="style-list"></datalist>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ORIGIN (COUNTRY CODE) *</div>
+          <select id="entry-origin" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+            <option value="">Select...</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ABV % *</div>
+          <input id="entry-abv" type="number" step="0.1" min="0" max="20" placeholder="5.0" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">METHOD *</div>
+          <select id="entry-method" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+            <option value="Draft">Draft</option>
+            <option value="Bottle" selected>Bottle</option>
+            <option value="Can">Can</option>
+            <option value="Nitro">Nitro</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">RATING (1-5) *</div>
+          <input id="entry-rating" type="number" step="0.25" min="1" max="5" placeholder="3.00" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">NEW BEER?</div>
+          <label style="display:flex;align-items:center;gap:6px;height:30px;cursor:pointer">
+            <input id="entry-isNew" type="checkbox" style="accent-color:#ff6600">
+            <span style="font-size:10px;color:#888">First time trying</span>
+          </label>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">CITY *</div>
+          <input id="entry-city" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">REGION *</div>
+          <input id="entry-region" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY *</div>
+          <input id="entry-country" type="text" placeholder="e.g. USA" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY CODE *</div>
+          <select id="entry-cc" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+            <option value="">Select...</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">MONTH *</div>
+          <select id="entry-month" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+            <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar" selected>Mar</option>
+            <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
+            <option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
+            <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">YEAR *</div>
+          <input id="entry-year" type="number" min="2020" max="2030" value="2026" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button onclick="addBeerEntry()" style="width:100%;background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;letter-spacing:1px" onmouseover="this.style.background='#ff8833'" onmouseout="this.style.background='var(--orange)'">SUBMIT ENTRY</button>
+        </div>
+      </div>
+      <div id="entry-err" style="font-size:10px;color:#ff2222;margin-bottom:8px;display:none"></div>
+      <div id="entry-ok" style="font-size:10px;color:#00cc44;margin-bottom:8px;display:none"></div>
+    </div>
+  </div>
+  <div class="bb-panel">
+    <div class="bb-panel-head">◉ YOUR SAVED ENTRIES <span class="ph-right" id="entry-saved-count">0</span></div>
+    <div class="bb-body">
+      <div id="entry-list" style="max-height:400px;overflow-y:auto">
+        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO ENTRIES YET — ADD ONE ABOVE</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div><!-- /main -->
 </div><!-- /terminal-body -->
@@ -1500,6 +1602,14 @@ const beers=[
   {beer:"Pilsner Urquell", style:"Pilsner-Other",             origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Wrench",         style:"IPA-New England Hazy",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
+
+// Merge user-added beers from localStorage
+(function(){
+  try {
+    const saved=JSON.parse(localStorage.getItem('brewUserBeers')||'[]');
+    saved.forEach(b=>beers.push(b));
+  } catch(e){ console.error('Failed to load user beers:',e); }
+})();
 
 const drunkLocs=[
   {city:"New York",    region:"New York",             country:"USA",         cc:"US", lat:40.7128,lng:-74.0060},
@@ -1701,7 +1811,8 @@ const STATS=(function(){
     '1':'overview','2':'beers','3':'rankings','4':'countries',
     '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
     '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit','r':'comments'
+    'q':'contrarian','w':'ipo','e':'audit','r':'comments',
+    't':'beerentry'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -1730,6 +1841,7 @@ function showTab(id,btn){
   if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
   if(id==='audit'&&!window._auditD) drawAudit();
   if(id==='comments'){ if(!isUnlocked()){openPwModal('comments');return;} renderComments(); }
+  if(id==='beerentry'){ if(!isUnlocked()){openPwModal('beerentry');return;} renderBeerEntries(); }
 if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
 }
@@ -2982,6 +3094,146 @@ function deleteComment(idx){
   saveComments(arr);
   renderComments();
 }
+
+// ══════════════════════════════════════════════════════════════
+// BEER ENTRY
+// ══════════════════════════════════════════════════════════════
+function loadUserBeers(){
+  return JSON.parse(localStorage.getItem('brewUserBeers')||'[]');
+}
+function saveUserBeers(arr){
+  localStorage.setItem('brewUserBeers',JSON.stringify(arr));
+}
+function initBeerEntryForm(){
+  // Populate style datalist
+  const styles=[...new Set(beers.map(b=>b.style))].sort();
+  const dl=document.getElementById('style-list');
+  if(dl) dl.innerHTML=styles.map(s=>`<option value="${s}">`).join('');
+  // Populate origin and cc dropdowns
+  const codes=Object.keys(CNAMES).sort((a,b)=>(CNAMES[a]||a).localeCompare(CNAMES[b]||b));
+  const originSel=document.getElementById('entry-origin');
+  const ccSel=document.getElementById('entry-cc');
+  codes.forEach(c=>{
+    const lbl=`${FLAGS[c]||''} ${CNAMES[c]||c} (${c})`;
+    if(originSel) originSel.innerHTML+=`<option value="${c}">${lbl}</option>`;
+    if(ccSel) ccSel.innerHTML+=`<option value="${c}">${lbl}</option>`;
+  });
+}
+function renderBeerEntries(){
+  const arr=loadUserBeers();
+  const cnt=document.getElementById('entry-count');
+  const scnt=document.getElementById('entry-saved-count');
+  if(cnt) cnt.textContent=arr.length+' ENTR'+(arr.length===1?'Y':'IES');
+  if(scnt) scnt.textContent=arr.length+' SAVED';
+  const el=document.getElementById('entry-list');
+  if(!arr.length){
+    el.innerHTML='<div style="color:#333;text-align:center;padding:30px;font-size:9px">NO ENTRIES YET — ADD ONE ABOVE</div>';
+    return;
+  }
+  const MONTHS={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:10px">
+    <thead><tr style="border-bottom:1px solid #333">
+      <th style="text-align:left;padding:4px 6px;color:#ff6600">BEER</th>
+      <th style="text-align:left;padding:4px 6px;color:#ff6600">STYLE</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600">ORIGIN</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600">ABV</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600">METHOD</th>
+      <th style="text-align:left;padding:4px 6px;color:#ff6600">CITY</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600">RATING</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600">DATE</th>
+      <th style="text-align:center;padding:4px 6px;color:#ff6600"></th>
+    </tr></thead><tbody>`
+    +arr.map((b,i)=>{
+      const rc=b.rating>=4?'#00cc44':b.rating>=3?'#ff6600':'#ff2222';
+      return `<tr style="border-bottom:1px solid #1a1a1a">
+        <td style="padding:5px 6px;color:#e8e8e8">${escHtml(b.beer)}</td>
+        <td style="padding:5px 6px;color:#888">${escHtml(b.style)}</td>
+        <td style="text-align:center;padding:5px 6px">${FLAGS[b.origin]||''} ${b.origin}</td>
+        <td style="text-align:center;padding:5px 6px;color:#888">${b.abv}%</td>
+        <td style="text-align:center;padding:5px 6px;color:#888">${b.method}</td>
+        <td style="padding:5px 6px;color:#888">${escHtml(b.city)}</td>
+        <td style="text-align:center;padding:5px 6px;color:${rc};font-weight:700">${b.rating.toFixed(2)}</td>
+        <td style="text-align:center;padding:5px 6px;color:#555">${b.month} ${b.year}</td>
+        <td style="text-align:center;padding:5px 6px">
+          <button onclick="deleteBeerEntry(${i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer;padding:0 4px" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
+        </td>
+      </tr>`;
+    }).join('')
+    +`</tbody></table>`;
+}
+function addBeerEntry(){
+  const errEl=document.getElementById('entry-err');
+  const okEl=document.getElementById('entry-ok');
+  errEl.style.display='none'; okEl.style.display='none';
+
+  const beer=document.getElementById('entry-beer').value.trim();
+  const style=document.getElementById('entry-style').value.trim();
+  const origin=document.getElementById('entry-origin').value;
+  const abv=parseFloat(document.getElementById('entry-abv').value);
+  const method=document.getElementById('entry-method').value;
+  const rating=parseFloat(document.getElementById('entry-rating').value);
+  const isNew=document.getElementById('entry-isNew').checked;
+  const city=document.getElementById('entry-city').value.trim();
+  const region=document.getElementById('entry-region').value.trim();
+  const country=document.getElementById('entry-country').value.trim();
+  const cc=document.getElementById('entry-cc').value;
+  const month=document.getElementById('entry-month').value;
+  const year=parseInt(document.getElementById('entry-year').value);
+
+  // Validation
+  if(!beer||!style||!origin||isNaN(abv)||!method||isNaN(rating)||!city||!region||!country||!cc||!month||isNaN(year)){
+    errEl.textContent='✗ ALL REQUIRED FIELDS MUST BE FILLED';
+    errEl.style.display='block';
+    return;
+  }
+  if(rating<1||rating>5){
+    errEl.textContent='✗ RATING MUST BE BETWEEN 1.0 AND 5.0';
+    errEl.style.display='block';
+    return;
+  }
+
+  const MONTHS={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  const entry={beer,style,origin,abv,method,city,region,country,cc,rating,isNew,month,monthN:MONTHS[month]||1,year};
+
+  // Save to localStorage
+  const arr=loadUserBeers();
+  arr.push(entry);
+  saveUserBeers(arr);
+
+  // Also add to in-memory beers array for current session
+  beers.push(entry);
+
+  // Clear form
+  document.getElementById('entry-beer').value='';
+  document.getElementById('entry-style').value='';
+  document.getElementById('entry-origin').value='';
+  document.getElementById('entry-abv').value='';
+  document.getElementById('entry-rating').value='';
+  document.getElementById('entry-isNew').checked=false;
+  document.getElementById('entry-city').value='';
+  document.getElementById('entry-region').value='';
+  document.getElementById('entry-country').value='';
+  document.getElementById('entry-cc').value='';
+
+  okEl.textContent='✓ BEER ENTRY SAVED — '+beer.toUpperCase()+' ('+rating.toFixed(2)+'/5)';
+  okEl.style.display='block';
+  setTimeout(()=>okEl.style.display='none',4000);
+
+  renderBeerEntries();
+}
+function deleteBeerEntry(idx){
+  const arr=loadUserBeers();
+  const removed=arr.splice(idx,1)[0];
+  saveUserBeers(arr);
+  // Remove from in-memory beers array
+  if(removed){
+    const bi=beers.findIndex(b=>b.beer===removed.beer&&b.style===removed.style&&b.rating===removed.rating&&b.city===removed.city&&b.month===removed.month&&b.year===removed.year);
+    if(bi!==-1) beers.splice(bi,1);
+  }
+  renderBeerEntries();
+}
+// Initialize form dropdowns
+try { initBeerEntryForm(); } catch(e){ console.error('Beer entry form init error:',e); }
 
 function drawAudit(){
   window._auditD=true;
