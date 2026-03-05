@@ -1412,6 +1412,10 @@ PASSWORD GATE
     <div class="bb-body">
       <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
         <div style="flex:1">
+          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">YOUR NAME</div>
+          <input id="comment-author" type="text" placeholder="e.g. John W." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
+        </div>
+        <div style="flex:1">
           <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER / SUBJECT</div>
           <input id="comment-subject" type="text" placeholder="e.g. Estrella Damm, general note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
         </div>
@@ -3069,7 +3073,7 @@ function renderComments(){
       <div style="flex:1;min-width:0">
         ${c.subject?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-bottom:2px">${escHtml(c.subject)}</div>`:''}
         <div style="font-size:11px;color:#e8e8e8;line-height:1.5;word-break:break-word">${escHtml(c.text)}</div>
-        <div style="font-size:9px;color:#333;margin-top:3px">${c.ts}</div>
+        <div style="font-size:9px;color:#333;margin-top:3px">${c.author?'<span style="color:#666">'+escHtml(c.author)+'</span> · ':''}${c.ts}</div>
       </div>
       <button onclick="deleteComment(${arr.length-1-i})" style="background:none;border:none;color:#333;font-family:var(--mono);font-size:10px;cursor:pointer;flex-shrink:0;padding:0 4px" onmouseover="this.style.color='#ff2222'" onmouseout="this.style.color='#333'">✕</button>
     </div>`).join('');
@@ -3095,15 +3099,17 @@ function containsBadWords(str){
   return BLOCKED_WORDS.some(w=>new RegExp('\\b'+w+'\\b').test(lower));
 }
 function addComment(){
+  const author=document.getElementById('comment-author').value.trim();
   const subj=document.getElementById('comment-subject').value.trim();
   const txt=document.getElementById('comment-text').value.trim();
+  if(!author){ alert('⚠ Please enter your name before posting.'); return; }
   if(!txt) return;
-  if(containsBadWords(subj+' '+txt)){
+  if(containsBadWords(author+' '+subj+' '+txt)){
     alert('⚠ Your comment contains inappropriate language. Please revise.');
     return;
   }
   const arr=loadComments();
-  arr.push({subject:subj,text:txt,ts:new Date().toLocaleString()});
+  arr.push({author:author,subject:subj,text:txt,ts:new Date().toLocaleString()});
   saveComments(arr);
   document.getElementById('comment-subject').value='';
   document.getElementById('comment-text').value='';
