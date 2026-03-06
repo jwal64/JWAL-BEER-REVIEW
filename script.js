@@ -46,6 +46,7 @@ const beers=[
   {beer:"Pilsner Urquell", style:"Pilsner-Other",             origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Wrench",         style:"IPA-New England Hazy",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"La Fin Du Monde",style:"Belgian Tripel",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Żywiec",         style:"Lager-Pale",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
