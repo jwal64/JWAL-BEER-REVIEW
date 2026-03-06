@@ -35,21 +35,6 @@
   </div>
 </div>
 
-<!-- PASSWORD GATE MODAL -->
-<div id="pwModal">
-  <div id="pwBox">
-    <div id="pwHead">🔒 RESTRICTED — ENTER PASSWORD</div>
-    <div id="pwBody">
-      <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:8px">ACCESS REQUIRED FOR THIS SECTION</div>
-      <input id="pwInput" type="password" placeholder="PASSWORD" autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkPw()"
-        oninput="document.getElementById('pwErr').textContent=''">
-      <button id="pwBtn" onclick="checkPw()">UNLOCK</button>
-      <div id="pwErr"></div>
-    </div>
-  </div>
-</div>
-
 <!-- MENU BAR -->
 
 <div id="menubar">
@@ -67,8 +52,6 @@
   <div class="mb-item" onclick="showTab('contrarian',this)"><span class="fkey">G1</span>CNTRN</div>
   <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
   <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
-  <div class="mb-item" onclick="showTab('comments',this)"><span class="fkey">G4</span>NOTES</div>
-  <div class="mb-item" onclick="showTab('beerentry',this)"><span class="fkey">G5</span>ENTRY</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -142,8 +125,6 @@
   <div class="nav-section-head">MAPS</div>
   <div class="nav-item" onclick="showTab('mapdrunk',this)"><span class="nav-icon">◉</span>CONSUMED<span class="nkey">F11</span></div>
   <div class="nav-item" onclick="showTab('mapbrewed',this)"><span class="nav-icon">◎</span>BREWERIES<span class="nkey">F12</span></div>
-  <div class="nav-section-head">DATA ENTRY</div>
-  <div class="nav-item" onclick="showTab('beerentry',this)"><span class="nav-icon">✚</span>BEER ENTRY<span class="nkey">T</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -694,145 +675,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════ COMMENTS PANEL ══════════════════════ -->
-<div class="panel" id="comments">
-  <div class="bb-panel collapsible collapsed" style="margin-bottom:16px">
-    <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
-    <div class="bb-body">
-      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;flex-wrap:wrap">
-        <div style="flex:1;min-width:120px">
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">YOUR NAME <span style="color:var(--orange)">*</span></div>
-          <input id="comment-name" type="text" placeholder="Enter your name" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div style="flex:1;min-width:140px">
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER <span style="color:var(--orange)">*</span></div>
-          <select id="comment-beer" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box;cursor:pointer" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-            <option value="">-- Select a beer --</option>
-          </select>
-        </div>
-        <div style="flex:2;min-width:180px">
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COMMENT</div>
-          <input id="comment-text" type="text" placeholder="Write your note..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'" onkeydown="if(event.key==='Enter')addComment()">
-        </div>
-        <div style="display:flex;flex-direction:column;justify-content:flex-end">
-          <div style="font-size:9px;color:transparent;margin-bottom:4px">.</div>
-          <button onclick="addComment()" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px" onmouseover="this.style.background='#ff8833'" onmouseout="this.style.background='var(--orange)'">POST</button>
-        </div>
-      </div>
-      <div id="comment-list" style="max-height:520px;overflow-y:auto">
-        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO NOTES YET — ADD ONE ABOVE</div>
-      </div>
-    </div>
-  </div>
-  <div class="bb-panel collapsible collapsed">
-    <div class="bb-panel-head">⬡ DATA EXPORT</div>
-    <div class="bb-body" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button onclick="exportData('json')" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT JSON</button>
-      <button onclick="exportData('csv')" style="background:var(--border2);color:var(--orange);border:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT CSV</button>
-      <span style="font-size:9px;color:#555" id="exportCount">Downloads all beer reviews</span>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ BEER ENTRY PANEL ══════════════════════ -->
-<div class="panel" id="beerentry">
-  <div class="bb-panel collapsible collapsed" style="margin-bottom:16px">
-    <div class="bb-panel-head">✚ NEW BEER ENTRY <span class="ph-right" id="entry-count">0 ENTRIES</span></div>
-    <div class="bb-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">BEER NAME *</div>
-          <input id="entry-beer" type="text" placeholder="e.g. Heineken" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">STYLE *</div>
-          <input id="entry-style" list="style-list" type="text" placeholder="e.g. Lager-Pale" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-          <datalist id="style-list"></datalist>
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ORIGIN (COUNTRY CODE) *</div>
-          <select id="entry-origin" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-            <option value="">Select...</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">ABV % *</div>
-          <input id="entry-abv" type="number" step="0.1" min="0" max="20" placeholder="5.0" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">METHOD *</div>
-          <select id="entry-method" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-            <option value="Draft">Draft</option>
-            <option value="Bottle" selected>Bottle</option>
-            <option value="Can">Can</option>
-            <option value="Nitro">Nitro</option>
-          </select>
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">RATING (1-5) *</div>
-          <input id="entry-rating" type="number" step="0.25" min="1" max="5" placeholder="3.00" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">NEW BEER?</div>
-          <label style="display:flex;align-items:center;gap:6px;height:30px;cursor:pointer">
-            <input id="entry-isNew" type="checkbox" style="accent-color:#ff6600">
-            <span style="font-size:10px;color:#888">First time trying</span>
-          </label>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">CITY *</div>
-          <input id="entry-city" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">REGION *</div>
-          <input id="entry-region" type="text" placeholder="e.g. New York" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY *</div>
-          <input id="entry-country" type="text" placeholder="e.g. USA" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">COUNTRY CODE *</div>
-          <select id="entry-cc" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-            <option value="">Select...</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">MONTH *</div>
-          <select id="entry-month" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-            <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar" selected>Mar</option>
-            <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
-            <option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
-            <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
-          </select>
-        </div>
-        <div>
-          <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:4px">YEAR *</div>
-          <input id="entry-year" type="number" min="2020" max="2030" value="2026" style="width:100%;background:#0a0a0a;border:1px solid #222;color:#e8e8e8;font-family:var(--mono);font-size:11px;padding:6px 8px;outline:none" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='#222'">
-        </div>
-        <div style="display:flex;align-items:flex-end">
-          <button onclick="addBeerEntry()" style="width:100%;background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:8px 14px;cursor:pointer;letter-spacing:1px" onmouseover="this.style.background='#ff8833'" onmouseout="this.style.background='var(--orange)'">SUBMIT ENTRY</button>
-        </div>
-      </div>
-      <div id="entry-err" style="font-size:10px;color:#ff2222;margin-bottom:8px;display:none"></div>
-      <div id="entry-ok" style="font-size:10px;color:#00cc44;margin-bottom:8px;display:none"></div>
-    </div>
-  </div>
-  <div class="bb-panel collapsible collapsed">
-    <div class="bb-panel-head">◉ YOUR SAVED ENTRIES <span class="ph-right" id="entry-saved-count">0</span></div>
-    <div class="bb-body">
-      <div id="entry-list" style="max-height:400px;overflow-y:auto">
-        <div style="color:#333;text-align:center;padding:30px;font-size:9px">NO ENTRIES YET — ADD ONE ABOVE</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 </div><!-- /main -->
 </div><!-- /terminal-body -->
