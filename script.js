@@ -57,6 +57,14 @@ const beers=[
   } catch(e){ console.error('Failed to load user beers:',e); }
 })();
 
+// isNew is true iff the entry belongs to the current calendar month/year.
+// This is computed dynamically so it never needs to be hardcoded.
+(function(){
+  const now=new Date();
+  const curM=now.getMonth()+1, curY=now.getFullYear();
+  beers.forEach(b=>{ b.isNew = b.monthN===curM && b.year===curY; });
+})();
+
 const drunkLocs=[
   {city:"New York",    region:"New York",             country:"USA",         cc:"US", lat:40.7128,lng:-74.0060},
   {city:"New Rochelle",region:"New York",             country:"USA",         cc:"US", lat:40.9115,lng:-73.7826},
@@ -92,6 +100,7 @@ const breweries=[
   {name:"Birra Moretti (Heineken Italia)", location:"Udine, Friuli-Venezia Giulia", country:"Italy", cc:"IT", beers:"Moretti",                                          lat:46.0640,lng:13.2350,  ratings:[3.75]},
   {name:"Erdinger Weissbräu",  location:"Erding, Bavaria",             country:"Germany",     cc:"DE", beers:"Erdinger Weissbier",                                 lat:48.3063,lng:11.9071,  ratings:[3.25]},
   {name:"Industrial Arts Brewing",location:"Beacon, New York",          country:"USA",         cc:"US", beers:"Wrench",                                             lat:41.5048,lng:-73.9690,  ratings:[4.00]},
+  {name:"Żywiec Brewery",         location:"Żywiec, Silesia",           country:"Poland",      cc:"PL", beers:"Żywiec",                                             lat:49.6856,lng:19.1944,  ratings:[2.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -1468,6 +1477,26 @@ function drawFutures(){
   });
   if(ccOriginMismatches.length) ccOriginMismatches.forEach(b=>fail(`Beer "${b.beer}" has unmapped cc/origin`));
   else pass('All beer cc and origin codes map to valid FLAGS entries');
+
+  // ── 11. BREWERY COVERAGE: every reviewed beer must have a brewery entry
+  const allBeerNames=[...new Set(beers.map(b=>b.beer))];
+  const coveredByBrewery=new Set();
+  breweries.forEach(b=>{
+    b.beers.split(' · ').forEach(n=>coveredByBrewery.add(n.replace(/\s*\([^)]+\)/,'').trim()));
+  });
+  allBeerNames.forEach(name=>{
+    if(!coveredByBrewery.has(name)) warn(`Beer "${name}" has no brewery entry — add to breweries[]`);
+  });
+  const brewCoverage=allBeerNames.filter(n=>coveredByBrewery.has(n));
+  pass(`Brewery coverage: ${brewCoverage.length}/${allBeerNames.length} reviewed beers have brewery entries`);
+
+  // ── 12. isNew FLAGS: must match current calendar month/year (dynamic rule)
+  const _now=new Date(), _cM=_now.getMonth()+1, _cY=_now.getFullYear();
+  const badNew   =beers.filter(b=>b.isNew && !(b.monthN===_cM && b.year===_cY));
+  const missingNew=beers.filter(b=>!b.isNew && b.monthN===_cM && b.year===_cY);
+  badNew.forEach(b=>fail(`Beer "${b.beer}" isNew:true but month is ${b.month} ${b.year}, not current month`));
+  missingNew.forEach(b=>warn(`Beer "${b.beer}" is current month but isNew:false`));
+  if(!badNew.length&&!missingNew.length) pass('All isNew flags correctly reflect current calendar month');
 
   // ── REPORT
   const totalIssues = errors.length + warnings.length;
