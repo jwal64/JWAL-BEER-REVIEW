@@ -696,7 +696,7 @@
 
 <!-- ══════════════════════ COMMENTS PANEL ══════════════════════ -->
 <div class="panel" id="comments">
-  <div class="bb-panel" style="margin-bottom:16px">
+  <div class="bb-panel collapsible collapsed" style="margin-bottom:16px">
     <div class="bb-panel-head">✎ NOTES &amp; COMMENTS <span class="ph-right" id="comment-count">0 ENTRIES</span></div>
     <div class="bb-body">
       <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;flex-wrap:wrap">
@@ -724,7 +724,7 @@
       </div>
     </div>
   </div>
-  <div class="bb-panel">
+  <div class="bb-panel collapsible collapsed">
     <div class="bb-panel-head">⬡ DATA EXPORT</div>
     <div class="bb-body" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <button onclick="exportData('json')" style="background:var(--orange);color:#000;border:none;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 14px;cursor:pointer;letter-spacing:1px">EXPORT JSON</button>
@@ -736,7 +736,7 @@
 
 <!-- ══════════════════════ BEER ENTRY PANEL ══════════════════════ -->
 <div class="panel" id="beerentry">
-  <div class="bb-panel" style="margin-bottom:16px">
+  <div class="bb-panel collapsible collapsed" style="margin-bottom:16px">
     <div class="bb-panel-head">✚ NEW BEER ENTRY <span class="ph-right" id="entry-count">0 ENTRIES</span></div>
     <div class="bb-body">
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
@@ -824,7 +824,7 @@
       <div id="entry-ok" style="font-size:10px;color:#00cc44;margin-bottom:8px;display:none"></div>
     </div>
   </div>
-  <div class="bb-panel">
+  <div class="bb-panel collapsible collapsed">
     <div class="bb-panel-head">◉ YOUR SAVED ENTRIES <span class="ph-right" id="entry-saved-count">0</span></div>
     <div class="bb-body">
       <div id="entry-list" style="max-height:400px;overflow-y:auto">

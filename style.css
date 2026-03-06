@@ -279,6 +279,25 @@ justify-content: space-between;
 .bb-panel-head .ph-right { font-size: 8px; font-weight: 400; color: var(--orange3); }
 .bb-body { padding: 8px; }
 
+/* Collapsible bb-panels */
+.bb-panel.collapsible .bb-panel-head {
+  cursor: pointer;
+  user-select: none;
+}
+.bb-panel.collapsible .bb-panel-head::after {
+  content: '[-]';
+  font-size: 8px;
+  font-weight: 400;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.bb-panel.collapsible.collapsed .bb-panel-head::after {
+  content: '[+]';
+}
+.bb-panel.collapsible.collapsed .bb-body {
+  display: none;
+}
+
 /* Grid layouts */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }

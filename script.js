@@ -1796,6 +1796,13 @@ function deleteBeerEntry(idx){
 // Initialize form dropdowns
 try { initBeerEntryForm(); } catch(e){ console.error('Beer entry form init error:',e); }
 
+// Collapsible bb-panels
+document.querySelectorAll('.bb-panel.collapsible .bb-panel-head').forEach(head => {
+  head.addEventListener('click', () => {
+    head.closest('.bb-panel').classList.toggle('collapsed');
+  });
+});
+
 function drawAudit(){
   window._auditD=true;
   try {
