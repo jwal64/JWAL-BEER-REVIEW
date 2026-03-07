@@ -23,6 +23,13 @@
 --yellow:   #ffdd00;
 --mono:     'IBM Plex Mono', 'Courier New', monospace;
 --sans:     'IBM Plex Sans', sans-serif;
+--glass-bg: rgba(17, 17, 17, 0.75);
+--glass-border: rgba(255, 255, 255, 0.06);
+--glass-blur: 12px;
+--cyan-glow: rgba(0, 170, 255, 0.15);
+--orange-glow: rgba(255, 102, 0, 0.15);
+--transition-fast: 0.15s ease;
+--transition-med: 0.25s ease;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,10 +55,13 @@ background: repeating-linear-gradient(
 0deg,
 transparent,
 transparent 1px,
-rgba(0,0,0,0.04) 1px,
-rgba(0,0,0,0.04) 2px
+rgba(0,0,0,0.02) 1px,
+rgba(0,0,0,0.02) 2px
 );
+opacity: 1;
+transition: opacity 0.3s ease;
 }
+body.no-scanlines::after { opacity: 0; }
 
 /* ═══════════════════════════════════════════
 TOP MENU BAR — Bloomberg-style function keys
@@ -102,7 +112,9 @@ letter-spacing: 1px;
 HEADER BAR
 ═══════════════════════════════════════════ */
 #hdr {
-background: var(--panel);
+background: var(--glass-bg);
+backdrop-filter: blur(var(--glass-blur));
+-webkit-backdrop-filter: blur(var(--glass-blur));
 border-bottom: 2px solid var(--orange);
 display: flex;
 align-items: stretch;
@@ -152,7 +164,9 @@ min-width: 200px;
 TICKER
 ═══════════════════════════════════════════ */
 #ticker-bar {
-background: #000;
+background: rgba(0, 0, 0, 0.8);
+backdrop-filter: blur(8px);
+-webkit-backdrop-filter: blur(8px);
 border-bottom: 1px solid var(--border);
 height: 20px;
 overflow: hidden;
@@ -197,7 +211,9 @@ height: calc(100vh - 90px);
 #sidebar {
 width: 168px;
 flex-shrink: 0;
-background: var(--panel);
+background: var(--glass-bg);
+backdrop-filter: blur(var(--glass-blur));
+-webkit-backdrop-filter: blur(var(--glass-blur));
 border-right: 2px solid var(--orange);
 overflow-y: auto;
 display: flex;
@@ -229,13 +245,13 @@ align-items: center;
 padding: 5px 8px;
 cursor: pointer;
 border-bottom: 1px solid var(--border);
-transition: background 0.08s;
+transition: background var(--transition-fast), color var(--transition-fast), padding-left var(--transition-fast);
 gap: 6px;
 font-size: 10px;
 color: #aaa;
 letter-spacing: 0.3px;
 }
-.nav-item:hover { background: var(--panel2); color: var(--orange); }
+.nav-item:hover { background: var(--panel2); color: var(--cyan); padding-left: 12px; }
 .nav-item.active { background: var(--orange); color: #000; font-weight: 700; }
 .nav-item .nkey {
 margin-left: auto;
@@ -276,6 +292,8 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 }
+.bb-panel-head { transition: box-shadow var(--transition-fast); }
+.bb-panel-head:hover { box-shadow: 0 2px 8px var(--orange-glow); }
 .bb-panel-head .ph-right { font-size: 8px; font-weight: 400; color: var(--orange3); }
 .bb-body { padding: 8px; }
 
@@ -293,7 +311,9 @@ background: var(--panel);
 border: 1px solid var(--border2);
 border-top: 2px solid var(--orange);
 padding: 8px 10px;
+transition: border-top-color var(--transition-fast), box-shadow var(--transition-fast);
 }
+.kpi:hover { border-top-color: var(--cyan); box-shadow: 0 -2px 8px var(--cyan-glow); }
 .kpi-val {
 font-size: 20px;
 font-weight: 700;
@@ -331,9 +351,9 @@ font-weight: 600;
 }
 .bb-table tbody tr {
 border-bottom: 1px solid var(--border);
-transition: background 0.06s;
+transition: background 0.1s ease;
 }
-.bb-table tbody tr:hover { background: var(--panel2); }
+.bb-table tbody tr:hover { background: rgba(0, 170, 255, 0.04); }
 .bb-table tbody td {
 padding: 5px 8px;
 color: var(--white);
@@ -395,7 +415,7 @@ padding: 3px 6px;
 outline: none;
 cursor: pointer;
 }
-.bb-select:focus { border-color: var(--orange); }
+.bb-select:focus { border-color: var(--cyan); }
 .bb-select option { background: var(--panel); }
 .new-tag {
 background: var(--green);
@@ -417,10 +437,10 @@ border: 1px solid var(--border2);
 border-top: 2px solid var(--dim2);
 padding: 8px;
 cursor: pointer;
-transition: border-top-color 0.1s, background 0.1s;
+transition: border-top-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 position: relative;
 }
-.beer-card:hover { border-top-color: var(--orange); background: var(--panel2); }
+.beer-card:hover { border-top-color: var(--orange); background: var(--panel2); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 8px var(--orange-glow); }
 .bc-logo-wrap {
 width: 100%;
 height: 52px;
@@ -505,7 +525,7 @@ SCROLLBARS
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--black); }
 ::-webkit-scrollbar-thumb { background: var(--orange3); }
-::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan2); }
 
 /* ═══════════════════════════════════════════
 MINI-ROW
@@ -538,7 +558,7 @@ letter-spacing: 0.5px;
 z-index: 100;
 }
 .sb-item { display: flex; align-items: center; gap: 4px; }
-.sb-dot { width: 6px; height: 6px; background: #000; border-radius: 50%; animation: blink 1.2s step-end infinite; }
+.sb-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: blink 1.2s step-end infinite; box-shadow: 0 0 4px var(--cyan); }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 .sb-spacer { flex: 1; }
 
@@ -575,24 +595,33 @@ z-index: 100;
 BEER DETAIL MODAL
 ═══════════════════════════════════════════ */
 #beerModal {
-  display: none;
+  display: flex;
   position: fixed;
   inset: 0;
   z-index: 1000;
   background: rgba(0,0,0,0.85);
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--transition-med), visibility var(--transition-med);
 }
-#beerModal.open { display: flex; }
+#beerModal.open { opacity: 1; visibility: visible; pointer-events: auto; }
 #beerModalBox {
-  background: var(--panel);
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--orange);
   width: min(760px, 96vw);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 40px rgba(255,102,0,0.25);
+  box-shadow: 0 0 60px rgba(255,102,0,0.2), 0 0 120px rgba(0,0,0,0.6);
+  transform: scale(0.96);
+  transition: transform var(--transition-med);
 }
+#beerModal.open #beerModalBox { transform: scale(1); }
 #beerModalHead {
   background: var(--orange);
   color: #000;

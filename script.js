@@ -347,7 +347,7 @@ try {
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
   Chart.defaults.font.size=10;
 } catch(e){ console.error('Chart.defaults error:',e); }
-const TT={backgroundColor:'#111',borderColor:'#333',borderWidth:1,titleColor:'#ff6600',bodyColor:'#aaa',padding:8};
+const TT={backgroundColor:'#111',borderColor:'#333',borderWidth:1,titleColor:'#00aaff',bodyColor:'#aaa',padding:8};
 
 // ══════════════════════════════════════════════════════════════
 // OVERVIEW
@@ -1521,3 +1521,22 @@ function drawAudit(){
       <div><div style="font-size:9px;font-weight:700;color:#00cc44;letter-spacing:2px;margin-bottom:4px">PASSED (${r.passes.length})</div>${mkRows(r.passes,'#00cc44','✓')}</div>`;
   } catch(e){ console.error('Audit panel error:',e); }
 }
+
+// ══════════════════════════════════════════════════════════════
+// SCANLINE TOGGLE
+// ══════════════════════════════════════════════════════════════
+function toggleScanlines(){
+  document.body.classList.toggle('no-scanlines');
+  const on=!document.body.classList.contains('no-scanlines');
+  document.getElementById('scanline-status').textContent=on?'ON':'OFF';
+  try{localStorage.setItem('brewScanlines',on?'1':'0');}catch(e){}
+}
+(function(){
+  try{
+    if(localStorage.getItem('brewScanlines')==='0'){
+      document.body.classList.add('no-scanlines');
+      const el=document.getElementById('scanline-status');
+      if(el) el.textContent='OFF';
+    }
+  }catch(e){}
+})();
