@@ -28,7 +28,7 @@ const beers=[
   {beer:"Guinness",        style:"Stout-Irish Dry",          origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Weihenstephaner", style:"Wheat Beer-Hefeweizen",    origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Modelo Negra",    style:"Lager-Munich Dunkel",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Müchner Weisse",  style:"Wheat Beer-Hefeweizen",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Münchner Weisse",  style:"Wheat Beer-Hefeweizen",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Modelo Negra",    style:"Lager-Munich Dunkel",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Stella Artois",   style:"Lager-Pale",               origin:"BE",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Munchen Dunkel",  style:"Lager-Munich Dunkel",      origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
@@ -36,7 +36,7 @@ const beers=[
   {beer:"Budweiser",       style:"Lager-American",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager-Mexican",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager-Mexican",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Heineken",        style:"Lager-Pale",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncassville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Heineken",        style:"Lager-Pale",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncassville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Moretti",         style:"Lager-Pale",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Erdinger Weissbier",style:"Wheat Beer-Hefeweizen",  origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Sapporo",           style:"Lager-Pale",            origin:"JP",abv:4.9,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
@@ -70,11 +70,11 @@ const drunkLocs=[
 ];
 
 const breweries=[
-  {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner · Müchner Weisse · Munchen Dunkel", nativeName:"Weihenstephaner · Münchner Weiße · Münchner Dunkel", lat:48.3953,lng:11.7291, ratings:[4.50,4.75,2.75]},
+  {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner · Münchner Weisse · Munchen Dunkel", nativeName:"Weihenstephaner · Münchner Weiße · Münchner Dunkel", lat:48.3953,lng:11.7291, ratings:[4.50,4.75,2.75]},
   {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
-  {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"fr", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
+  {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
   {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25]},
   {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch",                                           lat:52.2215,lng:6.8937,  ratings:[3.50]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
@@ -119,7 +119,7 @@ const BRAND_SVGS = {
 "Red Stripe":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="24" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">RED</text><text x="100" y="50" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">STRIPE</text></svg>`,
 "Harp":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="85" y="42" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">HARP</text><text x="165" y="22" font-family="Georgia,serif" font-size="32" fill="#c9a84c">♦</text></svg>`,
 "Weihenstephaner":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="26" font-family="Georgia,serif" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="0.5">WEIHENSTEPHANER</text><line x1="10" y1="32" x2="190" y2="32" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ANNO 1040</text></svg>`,
-"Müchner Weisse":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="26" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">MÜCHNER</text><line x1="20" y1="34" x2="180" y2="34" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">WEISSE</text></svg>`,
+"Münchner Weisse":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="26" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">MÜNCHNER</text><line x1="20" y1="34" x2="180" y2="34" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">WEISSE</text></svg>`,
 "Munchen Dunkel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#2a1400"/><text x="100" y="26" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">MUNCHEN</text><line x1="20" y1="34" x2="180" y2="34" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#e8d49a" text-anchor="middle" letter-spacing="1">DUNKEL</text></svg>`,
 "Hertog Jan":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#6b0000"/><text x="100" y="22" font-family="Georgia,serif" font-size="11" fill="#c9a84c" text-anchor="middle" letter-spacing="2">HERTOG</text><line x1="30" y1="28" x2="170" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="3">JAN</text></svg>`,
 // IPO BEERS
@@ -743,9 +743,9 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian"};
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹"};
+const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
+const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444"};
+const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱"};
 const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
 const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:LANG_MAP[b.origin]||b.origin,rating:b.rating}));
 const lA={};
@@ -861,7 +861,7 @@ function drawTemporal(){
     <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${kpiRange} 2026</div></div>
     ${months.map((m,i)=>`
     <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${m.toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
-    <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">MOM RATING ΔDELTA</div><div class="kpi-sub">${deltaLabel}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">MOM RATING Δ</div><div class="kpi-sub">${deltaLabel}</div></div>
   </div>`;
 
   // ── Monthly volume + avg rating chart
@@ -1000,7 +1000,7 @@ function drawContrarian(){
     'Harp':3.42,'La Fin Du Monde':4.07,'1664':3.21,
     'Michelob Ultra':2.84,'Guinness':3.80,'Red Stripe':3.31,
     'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
-    'Müchner Weisse':3.80,'Munchen Dunkel':3.55,
+    'Münchner Weisse':3.80,'Munchen Dunkel':3.55,
     'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
   };
 
