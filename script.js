@@ -232,12 +232,32 @@ const STATS=(function(){
     const maxAbv       = Math.max(...beers.map(b=>b.abv));
     const newCount     = beers.filter(b=>b.isNew).length;
 
+    const hitCount  = beers.filter(b=>b.rating>=3).length;
+    const hitRate   = (hitCount/totalReviews*100).toFixed(0);
+    const uniqueStyles = Object.keys(STATS.styleMap).length;
+
+    // Latest month (dynamic)
+    const maxMonthN = Math.max(...beers.map(b=>b.monthN));
+    const maxYear   = Math.max(...beers.filter(b=>b.monthN===maxMonthN).map(b=>b.year));
+    const moBeers   = beers.filter(b=>b.monthN===maxMonthN&&b.year===maxYear);
+    const moLabel   = moBeers[0]?.month||'—';
+    const moAvg     = moBeers.length ? avg(moBeers.map(b=>b.rating)) : 0;
+    const moNew     = moBeers.filter(b=>b.isNew).length;
+    const moCtry    = [...new Set(moBeers.map(b=>b.origin))].length;
+
     // Header bar
     const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-    set('hdr-avg',   avgRating.toFixed(2));
-    set('hdr-ctry',  totalCtry);
+    set('hdr-reviews', totalReviews);
+    set('hdr-avg',     avgRating.toFixed(2));
+    set('hdr-ctry',    totalCtry);
+    set('hdr-brands',  totalBrands);
+    set('hdr-hitrate', hitRate+'%');
 
-    // Overview KPI tiles
+    // Month section heading
+    const moHead=document.getElementById('ov-month-head');
+    if(moHead) moHead.textContent=`${moLabel.toUpperCase()} ${maxYear} — MONTH IN REVIEW`;
+
+    // Overview performance KPI tiles
     set('ov-top-val',  topBeer.rating.toFixed(2));
     set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
     set('ov-avg-val',  avgRating.toFixed(2));
@@ -246,8 +266,22 @@ const STATS=(function(){
     set('ov-low-sub',  `▼ ${lowBeer.beer} · ${lowBeer.origin}`);
     set('ov-abv-val',  avgAbv.toFixed(1)+'%');
     set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
-    set('ov-brands-val', totalBrands);
-    set('ov-brands-sub', `Across ${totalCtry} countries`);
+    set('ov-hit-val',  hitRate+'%');
+    set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated ≥3.00`);
+
+    // Coverage KPI tiles
+    set('ov-cov-reviews-val', totalReviews);
+    set('ov-cov-brands-val',  totalBrands);
+    set('ov-cov-ctry-val',    totalCtry);
+    set('ov-cov-brew-val',    breweries.length);
+    set('ov-cov-sty-val',     uniqueStyles);
+
+    // Monthly KPI tiles
+    set('ov-mo-reviews-val', moBeers.length);
+    set('ov-mo-reviews-sub', `Sessions in ${moLabel}`);
+    set('ov-mo-avg-val',     moBeers.length ? moAvg.toFixed(2) : '—');
+    set('ov-mo-new-val',     moNew);
+    set('ov-mo-ctry-val',    moCtry);
 
     // BEERS tab
     set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
@@ -1043,11 +1077,11 @@ function initChoropleth(){
       'spark-avg': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?avg(rs):null; }),
       'spark-low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
       'spark-abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
-      'spark-brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
+      'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
     };
     const sparkColors={
       'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#cc3366'
+      'spark-abv':'#00f5ff','spark-hit':'#00ff55'
     };
 
     Object.entries(sparkData).forEach(([id,data])=>{
@@ -1089,13 +1123,19 @@ function initChoropleth(){
     const lowBeer=STATS.sorted[STATS.sorted.length-1];
     const avgAbv=beers.reduce((s,b)=>s+b.abv,0)/beers.length;
     const totalBrands=Object.keys(STATS.brandMap).length;
+    const hitPct=beers.filter(b=>b.rating>=3).length/beers.length*100;
 
     const animate=(id,val,dec,suf)=>{ const e=document.getElementById(id); if(e) animateCounter(e,val,dec,suf); };
     animate('ov-top-val',topBeer.rating,2);
     animate('ov-avg-val',STATS.globalAvg,2);
     animate('ov-low-val',lowBeer.rating,2);
     animate('ov-abv-val',avgAbv,1,'%');
-    animate('ov-brands-val',totalBrands,0);
+    animate('ov-hit-val',hitPct,0,'%');
+    animate('ov-cov-reviews-val',beers.length,0);
+    animate('ov-cov-brands-val',totalBrands,0);
+    animate('ov-cov-ctry-val',Object.keys(STATS.countryMap).length,0);
+    animate('ov-cov-brew-val',breweries.length,0);
+    animate('hdr-reviews',beers.length,0);
     animate('hdr-avg',STATS.globalAvg,2);
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();

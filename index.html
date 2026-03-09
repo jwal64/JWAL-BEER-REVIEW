@@ -75,12 +75,24 @@
     <div class="hdr-sub" id="hdr-subtitle">PERSONAL BREW INTELLIGENCE SYSTEM</div>
   </div>
   <div class="hdr-block hdr-stat">
+    <div class="hdr-val" id="hdr-reviews">—</div>
+    <div class="hdr-lbl">REVIEWS</div>
+  </div>
+  <div class="hdr-block hdr-stat">
     <div class="hdr-val" style="color:var(--orange)" id="hdr-avg">—</div>
     <div class="hdr-lbl">AVG RATING</div>
   </div>
   <div class="hdr-block hdr-stat">
     <div class="hdr-val" style="color:var(--amber)" id="hdr-ctry">—</div>
     <div class="hdr-lbl">COUNTRIES</div>
+  </div>
+  <div class="hdr-block hdr-stat">
+    <div class="hdr-val" style="color:var(--cyan)" id="hdr-brands">—</div>
+    <div class="hdr-lbl">BRANDS</div>
+  </div>
+  <div class="hdr-block hdr-stat" style="border-right:none">
+    <div class="hdr-val" style="color:var(--green2)" id="hdr-hitrate">—</div>
+    <div class="hdr-lbl">HIT RATE</div>
   </div>
 </div>
 
@@ -105,13 +117,34 @@
 <!-- ══════════════ OVERVIEW ══════════════ -->
 
 <div id="overview" class="panel active">
+
+  <div class="section-head">PERFORMANCE</div>
   <div class="g5" style="margin-bottom:8px">
     <div class="kpi"><div class="kpi-val up" id="ov-top-val">—</div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top" height="24"></canvas></div></div>
     <div class="kpi"><div class="kpi-val fl" id="ov-avg-val">—</div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg" height="24"></canvas></div></div>
     <div class="kpi"><div class="kpi-val dn" id="ov-low-val">—</div><div class="kpi-label">LOWEST</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low" height="24"></canvas></div></div>
     <div class="kpi"><div class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv" height="24"></canvas></div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--amber)" id="ov-brands-val">—</div><div class="kpi-label">BRANDS TRIED</div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands" height="24"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green2)" id="ov-hit-val">—</div><div class="kpi-label">HIT RATE</div><div class="kpi-sub" id="ov-hit-sub">Rated ≥3.00</div><div class="kpi-sparkline-wrap"><canvas id="spark-hit" height="24"></canvas></div></div>
   </div>
+
+  <div class="section-head">COVERAGE</div>
+  <div class="g5" style="margin-bottom:8px">
+    <div class="kpi kpi-sm"><div class="kpi-val" id="ov-cov-reviews-val">—</div><div class="kpi-label">TOTAL REVIEWS</div><div class="kpi-sub" id="ov-cov-reviews-sub">Sessions logged</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val" style="color:var(--amber)" id="ov-cov-brands-val">—</div><div class="kpi-label">UNIQUE BRANDS</div><div class="kpi-sub" id="ov-cov-brands-sub">Beer brands tried</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val" style="color:var(--orange)" id="ov-cov-ctry-val">—</div><div class="kpi-label">ORIGIN COUNTRIES</div><div class="kpi-sub" id="ov-cov-ctry-sub">Brewery nations</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val" style="color:var(--cyan)" id="ov-cov-brew-val">—</div><div class="kpi-label">BREWERIES</div><div class="kpi-sub" id="ov-cov-brew-sub">Profiled</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val" style="color:var(--dim)" id="ov-cov-sty-val">—</div><div class="kpi-label">STYLE CATEGORIES</div><div class="kpi-sub" id="ov-cov-sty-sub">Distinct styles</div></div>
+  </div>
+
+  <div class="section-head" id="ov-month-head">THIS MONTH</div>
+  <div class="g4" style="margin-bottom:8px">
+    <div class="kpi kpi-sm"><div class="kpi-val" id="ov-mo-reviews-val">—</div><div class="kpi-label">MONTH REVIEWS</div><div class="kpi-sub" id="ov-mo-reviews-sub">Sessions this month</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val fl" id="ov-mo-avg-val">—</div><div class="kpi-label">MONTH AVG</div><div class="kpi-sub" id="ov-mo-avg-sub">Rating average</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val up" id="ov-mo-new-val">—</div><div class="kpi-label">NEW BEERS</div><div class="kpi-sub">First-time reviews</div></div>
+    <div class="kpi kpi-sm"><div class="kpi-val" style="color:var(--cyan)" id="ov-mo-ctry-val">—</div><div class="kpi-label">NEW ORIGINS</div><div class="kpi-sub">Countries sampled</div></div>
+  </div>
+
+  <div class="section-head">ANALYTICS</div>
   <div class="g2">
     <div class="bb-panel">
       <div class="bb-panel-head">RATING BY STYLE<span class="ph-right">AVG/5.00</span></div>
@@ -140,7 +173,7 @@
       <div class="bb-body" id="latestPanel"></div>
     </div>
   </div>
-  <!-- ══ SERVING METHOD DETAIL ══ -->
+  <div class="section-head">SERVING METHODS</div>
   <div class="g4" style="margin-bottom:8px" id="methodCards"></div>
   <div class="bb-panel">
     <div class="bb-panel-head">SERVING METHOD — RATING COMPARISON<span class="ph-right">AVG RATING BY METHOD</span></div>
