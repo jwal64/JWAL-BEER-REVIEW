@@ -166,7 +166,7 @@ Object.entries(BRAND_SVGS).forEach(([n,s])=>{LOGO_URIS[n]='data:image/svg+xml;ch
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
-const sC={"Wheat Beer-Hefeweizen":"#ff2d78","Belgian Strong Golden Ale":"#ffae00","Stout-Irish Dry":"#9966ff","Lager-Pale":"#00f5ff","Lager-Mexican":"#00c4d4","Pilsner-Other":"#ff6ba8","Belgian Tripel":"#bb44ff","Lager-Munich Dunkel":"#ff4400","Lager-American":"#555","Lager-American Light":"#444","Lager-Helles":"#39ff14","Belgian Strong Dark Ale":"#8b0000","Witbier":"#f0c040","Brown Ale-English":"#8b4513","IPA-New England Hazy":"#ffae00"};
+const sC={"Wheat Beer-Hefeweizen":"#cc3366","Belgian Strong Golden Ale":"#ffae00","Stout-Irish Dry":"#9966ff","Lager-Pale":"#00f5ff","Lager-Mexican":"#00c4d4","Pilsner-Other":"#bb5580","Belgian Tripel":"#bb44ff","Lager-Munich Dunkel":"#ff4400","Lager-American":"#555","Lager-American Light":"#444","Lager-Helles":"#39ff14","Belgian Strong Dark Ale":"#8b0000","Witbier":"#f0c040","Brown Ale-English":"#8b4513","IPA-New England Hazy":"#ffae00"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
 function rC(r){return r>=4.5?"#00cc44":r>=4?"#22dd55":r>=3.5?"#aacc00":r>=3?"#ffaa00":r>=2.5?"#ff6600":"#ff2222";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
@@ -311,7 +311,7 @@ const STATS=(function(){
     '1':'overview','2':'beers','3':'rankings','4':'countries',
     '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
     '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit'
+    'q':'contrarian','w':'ipo','e':'audit','r':'choropleth'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -352,7 +352,7 @@ try {
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
   Chart.defaults.font.size=10;
 } catch(e){ console.error('Chart.defaults error:',e); }
-const TT={backgroundColor:'#0a0a12',borderColor:'#ff2d78',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
+const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
 
 // ══════════════════════════════════════════════════════════════
 // OVERVIEW
@@ -977,7 +977,7 @@ function drawTemporal(){
 
   // ── Bump Chart — Country Rankings Over Time
   try {
-    const BUMP_COLORS=['#ff2d78','#00f5ff','#39ff14','#ffae00','#bb44ff','#ff6ba8','#00c4d4','#ff4400','#80ff44','#9966ff'];
+    const BUMP_COLORS=['#cc3366','#00f5ff','#39ff14','#ffae00','#bb44ff','#bb5580','#00c4d4','#ff4400','#80ff44','#9966ff'];
     // Get all countries that appear in at least 2 months
     const countriesByMonth = {};
     months.forEach(m => {
@@ -1039,7 +1039,7 @@ function drawTemporal(){
               grid: { color: '#1a1a2e' },
               title: { display: true, text: 'RANK (1 = BEST)', color: '#4a4a6a' }
             },
-            x: { grid: { display: false }, ticks: { color: '#ff2d78' } }
+            x: { grid: { display: false }, ticks: { color: '#cc3366' } }
           }
         }
       });
@@ -1105,14 +1105,16 @@ function drawContrarian(){
   document.getElementById('ciUnderSub').textContent=`${underrater.delta.toFixed(2)} below world`;
 
   const sorted=rows.slice().sort((a,b)=>b.delta-a.delta);
-  new Chart(document.getElementById('contrarianChart'),{type:'bar',
+  const contrarianCanvas=document.getElementById('contrarianChart');
+  contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
+  new Chart(contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Jwal vs World (Δ)',data:sorted.map(r=>+r.delta.toFixed(2)),
       backgroundColor:sorted.map(r=>r.delta>0?'rgba(0,204,68,0.7)':'rgba(255,34,34,0.7)'),
       borderColor:sorted.map(r=>r.delta>0?'#00cc44':'#ff2222'),borderWidth:1.5}]},
-    options:{indexAxis:'y',
+    options:{indexAxis:'y',maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`Δ${c.raw>=0?'+':''}${c.raw} · Jwal: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
       scales:{x:{min:-2,max:2,grid:{color:'#1a1a1a'},ticks:{color:'#444'},title:{display:true,text:'DELTA (+ = JWAL RATES HIGHER)',color:'#555'}},
-              y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
+              y:{grid:{display:false},ticks:{color:'#aaa',font:{size:9}}}}}
   });
 
   document.getElementById('contrarianBody').innerHTML=rows.map(r=>{
@@ -1416,7 +1418,7 @@ function drawFutures(){
 // ══════════════════════════════════════════════════════════════
 // DATA INTEGRITY VALIDATOR
 // Runs on every page load. Catches broken updates before they
-// become visible bugs. Access via G4 · AUDIT nav tab.
+// become visible bugs. Access via G3 · AUDIT nav tab.
 // ══════════════════════════════════════════════════════════════
 (function runIntegrityChecks(){
   const REQUIRED_BEER_FIELDS = ['beer','style','origin','abv','method','city','region','country','cc','rating','isNew','month','monthN','year'];
@@ -1774,7 +1776,7 @@ function openBreweryDrawer(name){
       }
       _drawerMap.setView([brewery.lat,brewery.lng],7);
       _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});
-      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#ff2d78',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
+      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#cc3366',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
       _drawerMap.invalidateSize();
     },120);
   } catch(e){ console.error('Brewery drawer error:',e); }
@@ -1826,9 +1828,9 @@ function initChoropleth(){
       if(avgRating>=4.5) h='#39ff14';
       else if(avgRating>=4.0) h='#80ff44';
       else if(avgRating>=3.5) h='#ffae00';
-      else if(avgRating>=3.0) h='#ff6ba8';
-      else if(avgRating>=2.5) h='#ff2d78';
-      else h='#cc0055';
+      else if(avgRating>=3.0) h='#bb5580';
+      else if(avgRating>=2.5) h='#cc3366';
+      else h='#8f1a44';
       // Apply opacity based on count (1 review = 0.6, max = 1.0)
       const op=Math.min(1,0.55+opacity*0.09);
       const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
@@ -1838,15 +1840,13 @@ function initChoropleth(){
     // world-atlas countries-110m uses ISO 3166-1 numeric IDs
     // Map numeric ID → ISO alpha-2 for our beer origins
     const NUM_TO_A2={
-      '840':'US','276':'DE','528':'NL','056':'BE','392':'JP','250':'FR','372':'IE',
-      '208':'DK','124':'CA','484':'MX','380':'IT','826':'GB','036':'AU','752':'SE',
-      '203':'CZ','620':'PT','032':'AR','076':'BR','156':'CN','710':'ZA','300':'GR',
-      '578':'NO','616':'PL','764':'TH','702':'SG','388':'JM','724':'ES','840':'US',
-      '040':'AT','756':'CH','356':'IN','566':'NG','410':'KR','643':'RU','804':'UA',
-      '156':'CN','100':'BG','191':'HR','203':'CZ','208':'DK','246':'FI','300':'GR',
-      '348':'HU','372':'IE','352':'IS','380':'IT','428':'LV','440':'LT','442':'LU',
-      '470':'MT','528':'NL','578':'NO','616':'PL','620':'PT','642':'RO','703':'SK',
-      '705':'SI','724':'ES','752':'SE','756':'CH','826':'GB','792':'TR'
+      '032':'AR','036':'AU','040':'AT','056':'BE','076':'BR','100':'BG','124':'CA',
+      '156':'CN','191':'HR','203':'CZ','208':'DK','246':'FI','250':'FR','276':'DE',
+      '300':'GR','348':'HU','352':'IS','356':'IN','372':'IE','380':'IT','388':'JM',
+      '392':'JP','410':'KR','428':'LV','440':'LT','442':'LU','470':'MT','484':'MX',
+      '528':'NL','566':'NG','578':'NO','616':'PL','620':'PT','642':'RO','643':'RU',
+      '702':'SG','703':'SK','705':'SI','710':'ZA','724':'ES','752':'SE','756':'CH',
+      '764':'TH','792':'TR','804':'UA','826':'GB','840':'US'
     };
     // Also handle as string padded (world-atlas may give "840" or 840)
     const A3_to_A2=id=>NUM_TO_A2[String(id)]||NUM_TO_A2[String(id).padStart(3,'0')]||null;
@@ -1901,7 +1901,7 @@ function initChoropleth(){
             tooltip.innerHTML=cd
               ? `<span style="color:var(--orange)">${FLAGS[a2]||''} ${CNAMES[a2]||a2}</span><br>Avg: <span style="color:var(--cyan)">${cd.avg.toFixed(2)}</span> · ${cd.count} review${cd.count>1?'s':''}<br>Best: ${cd.best?cd.best.beer:'—'}`
               : `<span style="color:var(--dim)">${a2?CNAMES[a2]||a2:'—'}</span><br><span style="color:#333">No reviews yet</span>`;
-            d3.select(this).attr('stroke','#ff2d78').attr('stroke-width',1.5);
+            d3.select(this).attr('stroke','#cc3366').attr('stroke-width',1.5);
           })
           .on('mousemove',function(event){
             if(!tooltip) return;
@@ -1967,13 +1967,13 @@ function initChoropleth(){
     };
     const sparkColors={
       'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#ff2d78'
+      'spark-abv':'#00f5ff','spark-brands':'#cc3366'
     };
 
     Object.entries(sparkData).forEach(([id,data])=>{
       const canvas=document.getElementById(id);
       if(!canvas) return;
-      const color=sparkColors[id]||'#ff2d78';
+      const color=sparkColors[id]||'#cc3366';
       new Chart(canvas,{
         type:'line',
         data:{
