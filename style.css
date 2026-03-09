@@ -7,9 +7,9 @@
 --panel2:   #0f0f1a;
 --border:   #1a1a2e;
 --border2:  #252540;
---orange:   #ff2d78;
---orange2:  #ff6ba8;
---orange3:  #cc0055;
+--orange:   #cc3366;
+--orange2:  #bb5580;
+--orange3:  #8f1a44;
 --amber:    #ffae00;
 --green:    #39ff14;
 --green2:   #80ff44;
@@ -24,11 +24,11 @@
 --mono:     'IBM Plex Mono', 'Courier New', monospace;
 --sans:     'IBM Plex Sans', sans-serif;
 --glass-bg: rgba(5, 5, 8, 0.88);
---glass-border: rgba(255, 45, 120, 0.08);
+--glass-border: rgba(200, 45, 100, 0.07);
 --glass-blur: 12px;
 --cyan-glow: rgba(0, 245, 255, 0.15);
---orange-glow: rgba(255, 45, 120, 0.2);
---pink-glow: rgba(255, 45, 120, 0.25);
+--orange-glow: rgba(200, 45, 100, 0.15);
+--pink-glow: rgba(200, 45, 100, 0.18);
 --transition-fast: 0.15s ease;
 --transition-med: 0.25s ease;
 }
@@ -292,8 +292,8 @@ text-transform: uppercase;
 display: flex;
 align-items: center;
 justify-content: space-between;
+transition: box-shadow var(--transition-fast);
 }
-.bb-panel-head { transition: box-shadow var(--transition-fast); }
 .bb-panel-head:hover { box-shadow: 0 2px 8px var(--orange-glow); }
 .bb-panel-head .ph-right { font-size: 8px; font-weight: 400; color: var(--orange3); }
 .bb-body { padding: 8px; }
@@ -380,7 +380,7 @@ letter-spacing: 0.5px;
 .r5  { color: var(--green2); border-color: var(--green2); background: rgba(0,255,85,0.08); }
 .r4  { color: #55dd77; border-color: #55dd77; background: rgba(85,221,119,0.08); }
 .r35 { color: var(--amber); border-color: var(--amber); background: rgba(255,170,0,0.08); }
-.r3  { color: var(--orange); border-color: var(--orange); background: rgba(255,102,0,0.08); }
+.r3  { color: var(--orange); border-color: var(--orange); background: rgba(200,45,100,0.08); }
 .r25 { color: #ff8844; border-color: #ff8844; background: rgba(255,136,68,0.08); }
 .r2  { color: var(--red); border-color: var(--red); background: rgba(255,34,34,0.08); }
 
@@ -932,15 +932,15 @@ BUMP CHART
 NEON GLOW ENHANCEMENTS
 ═══════════════════════════════════════════ */
 .bb-panel-head {
-  text-shadow: 0 0 6px rgba(255,45,120,0.3);
+  text-shadow: 0 0 5px rgba(180,30,80,0.18);
 }
 .hdr-title {
-  text-shadow: 0 0 12px rgba(255,45,120,0.4);
+  text-shadow: 0 0 10px rgba(180,30,80,0.22);
 }
 .mb-logo {
-  text-shadow: 0 0 8px rgba(255,45,120,0.5);
+  text-shadow: 0 0 7px rgba(180,30,80,0.22);
 }
-.up { text-shadow: 0 0 6px rgba(128,255,68,0.4); }
-.dn { text-shadow: 0 0 6px rgba(255,45,85,0.4); }
+.up { text-shadow: 0 0 6px rgba(128,255,68,0.35); }
+.dn { text-shadow: 0 0 6px rgba(255,45,85,0.35); }
 .sb-dot { box-shadow: 0 0 6px var(--cyan), 0 0 12px rgba(0,245,255,0.4); }
 
