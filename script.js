@@ -258,13 +258,13 @@ const STATS=(function(){
 })();
 
 
-// ── KEYBOARD SHORTCUTS (1-5 for tabs; Esc for modal)
+// ── KEYBOARD SHORTCUTS (1-5 / F1-F5 for tabs; Esc for modal)
 (function(){
-  const tabMap={'1':'overview','2':'beers','3':'mapdrunk','4':'mapbrewed','5':'choropleth'};
+  const tabMap={'1':'overview','2':'beers','3':'mapdrunk','4':'mapbrewed','5':'choropleth','F1':'overview','F2':'beers','F3':'mapdrunk','F4':'mapbrewed','F5':'choropleth'};
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
     if(ev.key==='Escape'){closeBeerModal();return;}
-    const tab=tabMap[ev.key.toLowerCase()];
+    const tab=tabMap[ev.key]||tabMap[ev.key.toLowerCase()];
     if(tab&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ev.preventDefault();showTab(tab);}
   });
 })();
@@ -713,11 +713,11 @@ function initBrewedMap(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',   label:'OVERVIEW',      icon:'◈', key:'1'},
-    {id:'beers',      label:'ALL BEERS',     icon:'◉', key:'2'},
-    {id:'mapdrunk',   label:'CONSUMED MAP',  icon:'◉', key:'3'},
-    {id:'mapbrewed',  label:'BREWERIES MAP', icon:'◎', key:'4'},
-    {id:'choropleth', label:'WORLD MAP',     icon:'◈', key:'5'},
+    {id:'overview',   label:'OVERVIEW',      icon:'◈', key:'F1'},
+    {id:'beers',      label:'ALL BEERS',     icon:'◉', key:'F2'},
+    {id:'mapdrunk',   label:'CONSUMED MAP',  icon:'◉', key:'F3'},
+    {id:'mapbrewed',  label:'BREWERIES MAP', icon:'◎', key:'F4'},
+    {id:'choropleth', label:'WORLD MAP',     icon:'◈', key:'F5'},
   ];
 
   function openPalette(){
