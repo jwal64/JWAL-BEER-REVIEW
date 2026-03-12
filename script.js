@@ -43,12 +43,13 @@ const beers=[
   {beer:"Coors Light",     style:"Lager-American",           origin:"US",abv:4.2,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   // MAR 2026
   {beer:"Estrella Galicia",style:"Lager-Helles",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Pilsner Urquell", style:"Pilsner-Other",             origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Pilsner Urquell", style:"Pilsner-Czech/Bohemian",     origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Wrench",         style:"IPA-New England Hazy",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"La Fin Du Monde",style:"Belgian Tripel",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Żywiec",         style:"Lager-Pale",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Corona Extra",   style:"Lager-Mexican",             origin:"MX",abv:4.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Peroni",         style:"Lager-Pale",                origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Damm",  style:"Lager-Pale",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -96,6 +97,7 @@ const breweries=[
   {name:"Industrial Arts Brewing",location:"Beacon, New York",          country:"USA",         cc:"US", lang:"en", beers:"Wrench",                                             lat:41.5048,lng:-73.9690,  ratings:[4.00]},
   {name:"Żywiec Brewery (Grupa Żywiec)", location:"Żywiec, Silesia",   country:"Poland",      cc:"PL", lang:"pl", beers:"Żywiec",                                             lat:49.6853,lng:19.1925,  ratings:[2.75]},
   {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni",                                              lat:41.8902,lng:12.4922,  ratings:[2.50]},
+  {name:"S.A. Damm",                  location:"Barcelona, Catalonia",  country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Damm",                                           lat:41.3897,lng:2.1540,   ratings:[3.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
