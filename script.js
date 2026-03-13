@@ -1833,8 +1833,8 @@ function initChoropleth(){
       else if(avgRating>=3.0) h='#bb5580';
       else if(avgRating>=2.5) h='#cc3366';
       else h='#8f1a44';
-      // Apply opacity based on count (1 review = 0.6, max = 1.0)
-      const op=Math.min(1,0.55+opacity*0.09);
+      // Apply opacity based on count — logarithmic scale for better visual spread
+      const op=Math.min(1,0.45+0.55*(1-1/(1+opacity*0.5)));
       const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
       return `rgba(${r},${g},${b},${op})`;
     }
@@ -1900,8 +1900,9 @@ function initChoropleth(){
             const cd=a2?countryData[a2]:null;
             if(!tooltip) return;
             tooltip.style.display='block';
+            const brCount=a2?breweries.filter(b=>b.cc===a2).length:0;
             tooltip.innerHTML=cd
-              ? `<span style="color:var(--orange)">${FLAGS[a2]||''} ${CNAMES[a2]||a2}</span><br>Avg: <span style="color:var(--cyan)">${cd.avg.toFixed(2)}</span> · ${cd.count} review${cd.count>1?'s':''}<br>Best: ${cd.best?cd.best.beer:'—'}`
+              ? `<span style="color:var(--orange)">${FLAGS[a2]||''} ${CNAMES[a2]||a2}</span><br>Avg: <span style="color:var(--cyan)">${cd.avg.toFixed(2)}</span> · ${cd.count} review${cd.count>1?'s':''} · ${brCount} brewer${brCount>1?'ies':'y'}<br>Best: ${cd.best?cd.best.beer:'—'}${brCount>1?'<br><span style="color:var(--dim);font-size:8px">CLICK TO SELECT BREWERY</span>':''}`
               : `<span style="color:var(--dim)">${a2?CNAMES[a2]||a2:'—'}</span><br><span style="color:#333">No reviews yet</span>`;
             d3.select(this).attr('stroke','#cc3366').attr('stroke-width',1.5);
           })
@@ -1916,8 +1917,36 @@ function initChoropleth(){
           })
           .on('click',function(event,d){
             const a2=A3_to_A2(d.id);
-            const br=a2?breweries.find(b=>b.cc===a2):null;
-            if(br) openBreweryDrawer(br.name);
+            if(!a2) return;
+            const matches=breweries.filter(b=>b.cc===a2);
+            if(matches.length===0) return;
+            if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
+            // Multiple breweries — show picker popup
+            let old=document.getElementById('choro-brewery-picker');
+            if(old) old.remove();
+            const picker=document.createElement('div');
+            picker.id='choro-brewery-picker';
+            picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
+            picker.style.left=(event.clientX+10)+'px';
+            picker.style.top=(event.clientY-10)+'px';
+            const hdr=document.createElement('div');
+            hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
+            hdr.textContent=(FLAGS[a2]||'')+' '+(CNAMES[a2]||a2)+' — SELECT BREWERY';
+            picker.appendChild(hdr);
+            matches.forEach(br=>{
+              const row=document.createElement('div');
+              row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
+              const avgR=avg(br.ratings);
+              row.innerHTML=`${br.name} <span class="rb ${rbC(avgR)}" style="font-size:9px;margin-left:4px">${avgR.toFixed(2)}</span>`;
+              row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
+              row.addEventListener('mouseleave',()=>row.style.background='none');
+              row.addEventListener('click',e=>{e.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
+              picker.appendChild(row);
+            });
+            document.body.appendChild(picker);
+            // Close picker on outside click
+            const closePicker=ev=>{if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',closePicker,true);}};
+            setTimeout(()=>document.addEventListener('click',closePicker,true),10);
           });
       })
       .catch(()=>{
@@ -1929,18 +1958,21 @@ function initChoropleth(){
     const tbody=document.getElementById('choro-table-body');
     const maxCount=Math.max(...ranked.map(r=>r[1].count));
     if(tbody){
-      tbody.innerHTML=ranked.map(([cc,d])=>`
-        <tr>
+      tbody.innerHTML=ranked.map(([cc,d])=>{
+        const brs=breweries.filter(b=>b.cc===cc);
+        const brNames=brs.map(b=>b.name).join(', ');
+        return `
+        <tr style="cursor:pointer" onclick="(function(cc){var m=breweries.filter(function(b){return b.cc===cc});if(m.length===1)openBreweryDrawer(m[0].name);else if(m.length>1){var e=event;var p=document.createElement('div');p.id='choro-brewery-picker';p.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';p.style.left=(e.clientX+10)+'px';p.style.top=(e.clientY-10)+'px';var h=document.createElement('div');h.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';h.textContent='SELECT BREWERY';p.appendChild(h);m.forEach(function(b){var r=document.createElement('div');r.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;';r.textContent=b.name;r.onclick=function(ev){ev.stopPropagation();p.remove();openBreweryDrawer(b.name)};p.appendChild(r)});document.body.appendChild(p);setTimeout(function(){document.addEventListener('click',function cl(ev){if(!p.contains(ev.target)){p.remove();document.removeEventListener('click',cl,true)}},true)},10)}})('${cc}')">
           <td style="font-weight:600">${FLAGS[cc]||''} ${CNAMES[cc]||cc}</td>
           <td>${d.count}</td>
           <td><span class="rb ${rbC(d.avg)}">${d.avg.toFixed(2)}</span></td>
-          <td style="color:#4a4a6a;font-size:9px">${d.best?d.best.beer:'—'}</td>
+          <td style="color:var(--white);font-size:9px" title="${brNames}">${d.best?d.best.beer:'—'}</td>
           <td style="min-width:80px">
             <div class="bb-bar-bg" style="width:${Math.round(d.count/maxCount*120)}px">
               <div class="bb-bar-fill" style="width:${Math.round(d.count/maxCount*100)}%;background:${choroColor(d.avg,d.count)}"></div>
             </div>
           </td>
-        </tr>`).join('');
+        </tr>`;}).join('');
     }
   } catch(e){ console.error('Choropleth error:',e); }
 }
