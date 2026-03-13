@@ -50,6 +50,7 @@ const beers=[
   {beer:"Corona Extra",   style:"Lager-Mexican",             origin:"MX",abv:4.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Peroni",         style:"Lager-Pale",                origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Estrella Damm",  style:"Lager-Pale",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Heineken",       style:"Lager-Pale",                origin:"NL",abv:5.0,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -70,6 +71,7 @@ const drunkLocs=[
   {city:"Amsterdam",   region:"Noord-Holland",        country:"Netherlands", cc:"NL", lat:52.3676,lng:4.9041},
   {city:"Hengelo",     region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.2660,lng:6.7930},
   {city:"Uncassville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
+  {city:"Queens",      region:"New York",             country:"USA",         cc:"US", lat:40.7282,lng:-73.7949},
 ];
 
 const breweries=[
@@ -78,7 +80,7 @@ const breweries=[
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
-  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25]},
+  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25,3.25]},
   {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch",                                           lat:52.2215,lng:6.8937,  ratings:[3.50]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
