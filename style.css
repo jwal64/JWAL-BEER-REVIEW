@@ -875,11 +875,12 @@ CHOROPLETH MAP
 .choro-country {
   stroke: var(--border);
   stroke-width: 0.5;
-  cursor: pointer;
-  transition: stroke 0.15s, stroke-width 0.15s;
+  cursor: default;
+  transition: stroke 0.15s, stroke-width 0.15s, fill 0.15s;
 }
-.choro-country:hover { stroke: var(--cyan); stroke-width: 1.5; }
-.choro-country.has-data:hover { stroke: var(--orange); stroke-width: 2; }
+.choro-country.has-data { cursor: pointer; }
+.choro-country:hover { stroke: #555; stroke-width: 1; }
+.choro-country.has-data:hover { stroke: var(--orange); stroke-width: 2.5; filter: brightness(1.3); }
 #choro-tooltip {
   position: fixed;
   background: var(--panel);
