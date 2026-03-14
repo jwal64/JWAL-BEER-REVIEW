@@ -51,6 +51,7 @@ const beers=[
   {beer:"Peroni",         style:"Lager-Pale",                origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Estrella Damm",  style:"Lager-Pale",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Heineken",       style:"Lager-Pale",                origin:"NL",abv:5.0,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Grolsch Puur Weizen",style:"Wheat Beer-Hefeweizen",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -72,6 +73,7 @@ const drunkLocs=[
   {city:"Hengelo",     region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.2660,lng:6.7930},
   {city:"Uncassville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
   {city:"Queens",      region:"New York",             country:"USA",         cc:"US", lat:40.7282,lng:-73.7949},
+  {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
 ];
 
 const breweries=[
@@ -81,7 +83,7 @@ const breweries=[
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
   {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25,3.25]},
-  {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch",                                           lat:52.2215,lng:6.8937,  ratings:[3.50]},
+  {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch · Grolsch Puur Weizen",                     lat:52.2215,lng:6.8937,  ratings:[3.50,5.00]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
   {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00,2.75]},
@@ -120,6 +122,7 @@ const BRAND_SVGS = {
 "Sapporo":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#000066"/><polygon points="30,8 34,22 48,22 37,30 41,44 30,36 19,44 23,30 12,22 26,22" fill="#c9a84c"/><text x="120" y="38" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle">SAPPORO</text></svg>`,
 "Ichiban":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">SAPPORO</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle">ICHIBAN</text></svg>`,
 "Grolsch":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="44" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#1a7b1a" text-anchor="middle">Grolsch</text></svg>`,
+"Grolsch Puur Weizen":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="24" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#1a7b1a" text-anchor="middle">Grolsch</text><line x1="20" y1="32" x2="180" y2="32" stroke="#1a7b1a" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="1">PUUR WEIZEN</text></svg>`,
 "Duvel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="46" font-family="Georgia,serif" font-size="40" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">DUVEL</text></svg>`,
 "La Fin Du Monde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#5a2d00"/><text x="100" y="22" font-family="Georgia,serif" font-size="11" fill="#f0e68c" text-anchor="middle" letter-spacing="2">LA FIN DU MONDE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.5"/><text x="100" y="45" font-family="Georgia,serif" font-size="10" fill="#d4a84c" text-anchor="middle" letter-spacing="1">UNIBROUE · QUÉBEC</text></svg>`,
 "1664":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002366"/><text x="100" y="46" font-family="Georgia,serif" font-size="42" font-weight="bold" fill="#c9a84c" text-anchor="middle">1664</text></svg>`,
