@@ -4,7 +4,24 @@
 const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬"};
 const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore"};
 
-const beers=[
+// ══════════════════════════════════════════════════════════════
+// GOOGLE SHEETS INTEGRATION
+// ══════════════════════════════════════════════════════════════
+// To use: 1) Create a Google Sheet with 3 tabs: "Beers", "Breweries", "Locations"
+//         2) Publish it: File → Share → Publish to web → Entire Document → CSV
+//         3) Paste the sheet ID below (the long string in the URL between /d/ and /edit)
+//         4) Data loads live from the sheet — no PRs needed to add beers!
+//         If the sheet is unavailable, the hardcoded data below is used as fallback.
+const SHEETS_CONFIG = {
+  enabled: false,            // Set to true once you've set up your Google Sheet
+  sheetId: '',               // Paste your Google Sheet ID here
+  // Tab names in your Google Sheet (must match exactly):
+  beersTab: 'Beers',
+  breweriesTab: 'Breweries',
+  locationsTab: 'Locations'
+};
+
+let beers=[
   // JAN 2026 (17 beers)
   {beer:"Grolsch",         style:"Pilsner-Other",            origin:"NL",abv:5.0,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Hertog Jan",      style:"Pilsner-Other",            origin:"NL",abv:5.1,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:2.00,isNew:false,month:"Jan",monthN:1,year:2026},
@@ -62,7 +79,7 @@ const beers=[
   } catch(e){ console.error('Failed to load user beers:',e); }
 })();
 
-const drunkLocs=[
+let drunkLocs=[
   {city:"New York",    region:"New York",             country:"USA",         cc:"US", lat:40.7128,lng:-74.0060},
   {city:"New Rochelle",region:"New York",             country:"USA",         cc:"US", lat:40.9115,lng:-73.7826},
   {city:"White Plains",region:"New York",             country:"USA",         cc:"US", lat:41.0340,lng:-73.7629},
@@ -76,7 +93,7 @@ const drunkLocs=[
   {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
 ];
 
-const breweries=[
+let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner · Münchner Weisse · Munchen Dunkel", nativeName:"Weihenstephaner · Münchner Weiße · Münchner Dunkel", lat:48.3953,lng:11.7291, ratings:[4.50,4.75,2.75]},
   {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
@@ -190,9 +207,9 @@ function cardLogo(name){
 }
 
 // ══════════════════════════════════════════════════════════════
-// PRE-COMPUTED STATISTICS — computed once at startup, reused everywhere
+// PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
 // ══════════════════════════════════════════════════════════════
-const STATS=(function(){
+function computeStats(){
   const styleMap={};
   beers.forEach(b=>{if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;});
   const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
@@ -219,7 +236,8 @@ const STATS=(function(){
   const globalAvg=avg(beers.map(b=>b.rating));
 
   return {styleMap,styleRanked,METHOD_ORDER,methodMap,methodAvgs,methodCounts,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,sorted,globalAvg};
-})();
+}
+let STATS=computeStats();
 
 // ══════════════════════════════════════════════════════════════
 // DYNAMIC STATS — update header, overview KPIs, and BEERS tab
@@ -269,6 +287,151 @@ const STATS=(function(){
     // Status bar
     set('sb-stats', `RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
   } catch(e){ console.error('Live stats error:',e); }
+})();
+
+// ══════════════════════════════════════════════════════════════
+// GOOGLE SHEETS LOADER — fetches live data and refreshes the dashboard
+// ══════════════════════════════════════════════════════════════
+(function loadFromGoogleSheets(){
+  if(!SHEETS_CONFIG.enabled || !SHEETS_CONFIG.sheetId) return;
+
+  const base=`https://docs.google.com/spreadsheets/d/${SHEETS_CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=`;
+
+  function parseCSV(text){
+    const rows=[];
+    const lines=text.split('\n');
+    if(lines.length<2) return rows;
+    const headers=parseCSVLine(lines[0]);
+    for(let i=1;i<lines.length;i++){
+      const line=lines[i].trim();
+      if(!line) continue;
+      const vals=parseCSVLine(line);
+      const obj={};
+      headers.forEach((h,j)=>{ obj[h.trim()]=vals[j]||''; });
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function parseCSVLine(line){
+    const result=[];
+    let current='';
+    let inQuotes=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(inQuotes){
+        if(ch==='"'&&line[i+1]==='"'){current+='"';i++;}
+        else if(ch==='"'){inQuotes=false;}
+        else{current+=ch;}
+      } else {
+        if(ch==='"'){inQuotes=true;}
+        else if(ch===','){result.push(current);current='';}
+        else{current+=ch;}
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function toNum(v,fallback){const n=parseFloat(v);return isNaN(n)?fallback:n;}
+  function toBool(v){return v==='true'||v==='TRUE'||v==='1'||v==='yes'||v==='YES';}
+
+  function parseBeerRow(r){
+    return {
+      beer:r.beer||'',style:r.style||'',origin:r.origin||'',
+      abv:toNum(r.abv,0),method:r.method||'Bottle',
+      city:r.city||'',region:r.region||'',country:r.country||'',cc:r.cc||'',
+      rating:toNum(r.rating,0),isNew:toBool(r.isNew),
+      month:r.month||'',monthN:toNum(r.monthN,1),year:toNum(r.year,2026)
+    };
+  }
+
+  function parseBreweryRow(r){
+    const obj={
+      name:r.name||'',location:r.location||'',country:r.country||'',
+      cc:r.cc||'',lang:r.lang||'en',beers:r.beers||'',
+      lat:toNum(r.lat,0),lng:toNum(r.lng,0),
+      ratings:(r.ratings||'').split(',').map(v=>toNum(v.trim(),0)).filter(v=>v>0)
+    };
+    if(r.nativeName) obj.nativeName=r.nativeName;
+    return obj;
+  }
+
+  function parseLocationRow(r){
+    return {
+      city:r.city||'',region:r.region||'',country:r.country||'',cc:r.cc||'',
+      lat:toNum(r.lat,0),lng:toNum(r.lng,0)
+    };
+  }
+
+  function refreshUI(){
+    STATS=computeStats();
+    // Reset all lazy-loaded tab flags so they re-render with new data
+    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_chorD','_langD']
+      .forEach(f=>window[f]=false);
+    // Re-run live stats
+    try {
+      const totalReviews=beers.length;
+      const totalMarkets=Object.keys(STATS.cityMap).length;
+      const totalBrands=Object.keys(STATS.brandMap).length;
+      const totalCtry=Object.keys(STATS.countryMap).length;
+      const topBeer=STATS.sorted[0];
+      const lowBeer=STATS.sorted[STATS.sorted.length-1];
+      const avgRating=STATS.globalAvg;
+      const avgAbv=(beers.reduce((s,b)=>s+b.abv,0)/beers.length);
+      const minAbv=Math.min(...beers.map(b=>b.abv));
+      const maxAbv=Math.max(...beers.map(b=>b.abv));
+      const newCount=beers.filter(b=>b.isNew).length;
+      const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+      const sub=document.getElementById('hdr-subtitle');
+      if(sub)sub.textContent=`PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+      set('hdr-top',topBeer.rating.toFixed(2));set('hdr-avg',avgRating.toFixed(2));
+      set('hdr-low',lowBeer.rating.toFixed(2));set('hdr-abv',avgAbv.toFixed(1)+'%');
+      set('hdr-ctry',totalCtry);
+      set('ov-top-val',topBeer.rating.toFixed(2));set('ov-top-sub',`▲ ${topBeer.beer} · ${topBeer.origin}`);
+      set('ov-avg-val',avgRating.toFixed(2));set('ov-avg-sub',`${totalReviews} total reviews`);
+      set('ov-low-val',lowBeer.rating.toFixed(2));set('ov-low-sub',`▼ ${lowBeer.beer} · ${lowBeer.origin}`);
+      set('ov-abv-val',avgAbv.toFixed(1)+'%');set('ov-abv-sub',`Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
+      set('ov-brands-val',totalBrands);set('ov-brands-sub',`Across ${totalCtry} countries`);
+      set('beers-count',`${totalReviews} ENTRIES · +${newCount} NEW`);
+      set('brands-count',`${totalBrands} UNIQUE BRANDS`);
+      const newTag=document.getElementById('beers-new-tag');if(newTag)newTag.textContent=`+${newCount} NEW`;
+      set('sb-stats',`RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
+    } catch(e){console.error('Sheets refresh error:',e);}
+    // Re-render the currently active tab
+    const activePanel=document.querySelector('.panel.active');
+    if(activePanel) showTab(activePanel.id);
+    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#00ff88');
+  }
+
+  // Fetch all 3 sheets in parallel
+  Promise.all([
+    fetch(base+encodeURIComponent(SHEETS_CONFIG.beersTab)).then(r=>r.text()),
+    fetch(base+encodeURIComponent(SHEETS_CONFIG.breweriesTab)).then(r=>r.text()),
+    fetch(base+encodeURIComponent(SHEETS_CONFIG.locationsTab)).then(r=>r.text())
+  ]).then(([beersCSV,brewCSV,locsCSV])=>{
+    const sheetBeers=parseCSV(beersCSV).map(parseBeerRow);
+    const sheetBreweries=parseCSV(brewCSV).map(parseBreweryRow);
+    const sheetLocs=parseCSV(locsCSV).map(parseLocationRow);
+    // Only replace if we got valid data
+    if(sheetBeers.length>0){
+      beers.length=0;
+      sheetBeers.forEach(b=>beers.push(b));
+      // Re-merge localStorage user beers
+      try{const saved=JSON.parse(localStorage.getItem('brewUserBeers')||'[]');saved.forEach(b=>beers.push(b));}catch(e){}
+    }
+    if(sheetBreweries.length>0){
+      breweries.length=0;
+      sheetBreweries.forEach(b=>breweries.push(b));
+    }
+    if(sheetLocs.length>0){
+      drunkLocs.length=0;
+      sheetLocs.forEach(l=>drunkLocs.push(l));
+    }
+    refreshUI();
+  }).catch(err=>{
+    console.warn('[SHEETS] Could not load from Google Sheets, using hardcoded data.',err);
+  });
 })();
 
 // ══════════════════════════════════════════════════════════════
