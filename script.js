@@ -69,6 +69,8 @@ let beers=[
   {beer:"Estrella Damm",  style:"Lager-Pale",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Heineken",       style:"Lager-Pale",                origin:"NL",abv:5.0,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer-Hefeweizen",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Leffe Blonde",      style:"Belgian Blonde",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Texels Skuumkoppe", style:"Wheat Beer-Dunkelweizen",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -91,6 +93,7 @@ let drunkLocs=[
   {city:"Uncassville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
   {city:"Queens",      region:"New York",             country:"USA",         cc:"US", lat:40.7282,lng:-73.7949},
   {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
+  {city:"Nijmegen",    region:"Gelderland",           country:"Netherlands", cc:"NL", lat:51.8426,lng:5.8528},
 ];
 
 let breweries=[
@@ -119,6 +122,8 @@ let breweries=[
   {name:"Żywiec Brewery (Grupa Żywiec)", location:"Żywiec, Silesia",   country:"Poland",      cc:"PL", lang:"pl", beers:"Żywiec",                                             lat:49.6853,lng:19.1925,  ratings:[2.75]},
   {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni",                                              lat:41.8902,lng:12.4922,  ratings:[2.50]},
   {name:"S.A. Damm",                  location:"Barcelona, Catalonia",  country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Damm",                                           lat:41.3897,lng:2.1540,   ratings:[3.50]},
+  {name:"Abbaye de Leffe (AB InBev)", location:"Dinant, Namur",          country:"Belgium",     cc:"BE", lang:"fr", beers:"Leffe Blonde",                                            lat:50.2611,lng:4.9122,   ratings:[4.75]},
+  {name:"Texelse Bierbrouwerij",      location:"Oudeschild, North Holland",country:"Netherlands",cc:"NL", lang:"nl", beers:"Texels Skuumkoppe",                                       lat:53.0385,lng:4.8510,   ratings:[3.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -180,6 +185,7 @@ const BRAND_SVGS = {
 "Tiger Beer":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#ff8c00" text-anchor="middle" letter-spacing="3">ASIA PACIFIC</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="26" font-weight="900" fill="#ff8c00" text-anchor="middle" letter-spacing="2">TIGER</text></svg>`,
 "Erdinger Weissbier":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="2">ERDINGER</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">WEISSBIER</text></svg>`,
 "Wrench":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#d48a9a"/><text x="100" y="20" font-family="Arial,sans-serif" font-size="8" fill="#2a2a2a" text-anchor="middle" letter-spacing="2">INDUSTRIAL ARTS</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="26" font-weight="900" fill="#2a2a2a" text-anchor="middle" letter-spacing="2">WRENCH</text><line x1="20" y1="55" x2="180" y2="55" stroke="#2a2a2a" stroke-width="0.6"/></svg>`,
+"Texels Skuumkoppe":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">TEXELS</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">SKUUMKOPPE</text></svg>`,
 "Smithwick's":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#8b0000"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="2">IRISH ALE</text><text x="100" y="48" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">Smithwick's</text></svg>`,
 "Tennent's":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#fff" text-anchor="middle" letter-spacing="3">SCOTLAND</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">TENNENT'S</text></svg>`,
 };
