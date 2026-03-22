@@ -71,6 +71,10 @@ let beers=[
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer-Hefeweizen",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Leffe Blonde",      style:"Belgian Blonde",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Texels Skuumkoppe", style:"Wheat Beer-Dunkelweizen",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Guinness",          style:"Stout-Irish Dry",          origin:"IE",abv:4.25,method:"Nitro", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Affligem Tripel",   style:"Belgian Tripel",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Bolleke De Koninck",style:"Pale Ale-Belgian",         origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"IJwit",             style:"Wheat Beer-Witbier/Blanche",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -94,11 +98,12 @@ let drunkLocs=[
   {city:"Queens",      region:"New York",             country:"USA",         cc:"US", lat:40.7282,lng:-73.7949},
   {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
   {city:"Nijmegen",    region:"Gelderland",           country:"Netherlands", cc:"NL", lat:51.8426,lng:5.8528},
+  {city:"Antwerp",     region:"Antwerp",              country:"Belgium",     cc:"BE", lat:51.2194,lng:4.4025},
 ];
 
 let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner · Münchner Weisse · Munchen Dunkel", nativeName:"Weihenstephaner · Münchner Weiße · Münchner Dunkel", lat:48.3953,lng:11.7291, ratings:[4.50,4.75,2.75]},
-  {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00]},
+  {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00,3.75]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
@@ -124,6 +129,9 @@ let breweries=[
   {name:"S.A. Damm",                  location:"Barcelona, Catalonia",  country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Damm",                                           lat:41.3897,lng:2.1540,   ratings:[3.50]},
   {name:"Abbaye de Leffe (AB InBev)", location:"Dinant, Namur",          country:"Belgium",     cc:"BE", lang:"fr", beers:"Leffe Blonde",                                            lat:50.2611,lng:4.9122,   ratings:[4.75]},
   {name:"Texelse Bierbrouwerij",      location:"Oudeschild, North Holland",country:"Netherlands",cc:"NL", lang:"nl", beers:"Texels Skuumkoppe",                                       lat:53.0385,lng:4.8510,   ratings:[3.00]},
+  {name:"Affligem Brewery (Heineken)",location:"Opwijk, Flemish Brabant", country:"Belgium",     cc:"BE", lang:"nl", beers:"Affligem Tripel",                                          lat:50.9786,lng:4.1868,   ratings:[3.75]},
+  {name:"De Koninck Brewery",         location:"Antwerp, Antwerp",        country:"Belgium",     cc:"BE", lang:"nl", beers:"Bolleke De Koninck",                                       lat:51.2157,lng:4.4156,   ratings:[2.75]},
+  {name:"Brouwerij 't IJ",            location:"Amsterdam, Noord-Holland",country:"Netherlands", cc:"NL", lang:"nl", beers:"IJwit",                                                    lat:52.3657,lng:4.9196,   ratings:[3.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
