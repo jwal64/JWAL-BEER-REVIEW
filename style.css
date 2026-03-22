@@ -545,11 +545,13 @@ STATUS BAR
 #statusbar {
 position: fixed;
 bottom: 0; left: 0; right: 0;
-height: 16px;
+height: calc(16px + env(safe-area-inset-bottom, 0px));
+padding-bottom: env(safe-area-inset-bottom, 0px);
 background: var(--orange);
 display: flex;
 align-items: center;
-padding: 0 8px;
+padding-left: 8px;
+padding-right: 8px;
 gap: 20px;
 font-size: 8px;
 font-weight: 700;
@@ -582,8 +584,9 @@ z-index: 100;
 .g3, .g5 { grid-template-columns: 1fr; }
 .panel { padding: 6px; }
 .bb-body { padding: 6px; }
-#statusbar { gap: 10px; font-size: 7px; }
+#statusbar { gap: 10px; font-size: 7px; background: var(--panel); border-top: 1px solid var(--orange); color: var(--dim); }
 .sb-item:nth-child(3), .sb-item:nth-child(4) { display: none; }
+body { overscroll-behavior: none; }
 .beer-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .kpi-val { font-size: 15px; }
 .bb-body div[style*="overflow-x"] { overflow-x: auto; }
