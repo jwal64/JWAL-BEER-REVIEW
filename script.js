@@ -208,8 +208,8 @@ const sC={"Wheat Beer-Hefeweizen":"#cc3366","Belgian Strong Golden Ale":"#ffae00
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
 function rC(r){return r>=4.5?"#00cc44":r>=4?"#22dd55":r>=3.5?"#aacc00":r>=3?"#ffaa00":r>=2.5?"#ff6600":"#ff2222";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
-const avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
-const std=a=>{const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
+const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
+const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
 function logoImg(name,size=24){
   const u=LOGO_URIS[name];
@@ -586,7 +586,7 @@ document.getElementById('mktPanel').innerHTML=`
   <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>`;
 
 // Dynamic latest activity panel
-const latestTwo=[...beers].sort((a,b)=>b.monthN-a.monthN||b.year-a.year).slice(0,2);
+const latestTwo=[...beers].sort((a,b)=>b.year-a.year||b.monthN-a.monthN).slice(0,2);
 const hitRate=(beers.filter(b=>b.rating>=3).length/beers.length*100).toFixed(0);
 const last5=beers.slice(-5).map(b=>b.rating);
 const prev5=beers.slice(-10,-5).map(b=>b.rating);
@@ -651,7 +651,7 @@ function applyBeerFilter(){
   data.sort((a,b)=>sk==='rating'?b.rating-a.rating:sk==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv);
   renderTable(data);
 }
-function sortTable(k){applyBeerFilter();}
+function sortTable(){applyBeerFilter();}
 try {
   // Populate filter dropdowns
   const styles=[...new Set(beers.map(b=>b.style))].sort();
@@ -664,7 +664,9 @@ try {
 } catch(e){ console.error('renderTable init:',e); }
 
 try {
-const unique=[...new Map(beers.map(b=>[b.beer,b])).values()].sort((a,b)=>b.rating-a.rating);
+const _beerBest={};
+beers.forEach(b=>{if(!_beerBest[b.beer]||b.rating>_beerBest[b.beer].rating)_beerBest[b.beer]=b;});
+const unique=Object.values(_beerBest).sort((a,b)=>b.rating-a.rating);
 document.getElementById('beerGrid').innerHTML=unique.map(b=>`
   <div class="beer-card" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
     ${b.isNew?'<span class="bc-new">NEW</span>':''}
@@ -744,7 +746,7 @@ function drawRankings(){
       </div>
     </div>`).join('');
   document.getElementById('top10').innerHTML=mkList(sr.slice(0,10),0);
-  document.getElementById('bot10').innerHTML=mkList([...sr].reverse().slice(0,10),sr.length-10);
+  document.getElementById('bot10').innerHTML=mkList([...sr].reverse().slice(0,10),Math.max(0,sr.length-10));
 
   const bList=STATS.brandList;
   document.getElementById('brandBody').innerHTML=bList.map((b,i)=>`
@@ -884,15 +886,16 @@ function drawInsights(){
     <span class="insight-val ${c}">${n} <span style="color:#555;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
   </div>`).join('');
 
+  const profAvg=fn=>{const m=beers.filter(fn);return m.length?avg(m.map(b=>b.rating)):0;};
   const profile=[
-    {l:'WHEAT/HEFEWEIZEN BIAS',v:4.63,color:'#ff6600'},
-    {l:'DARK BEER TOLERANCE',v:2.67,color:'#444'},
-    {l:'LAGER APPRECIATION',v:3.23,color:'#00cc44'},
-    {l:'GERMAN BEER PREMIUM',v:4.00,color:'#ff6600'},
-    {l:'AMERICAN BEER DISCOUNT',v:2.83,color:'#ff2222'},
-    {l:'ARTISAN vs MACRO',v:3.80,color:'#bb44ff'},
-    {l:'HIGH ABV PREFERENCE',v:3.38,color:'#00aaff'},
-    {l:'DRAFT/NITRO PREMIUM',v:3.70,color:'#00aaff'},
+    {l:'WHEAT/HEFEWEIZEN BIAS',v:profAvg(b=>b.style.includes('Wheat')||b.style.includes('Hefeweizen')||b.style.includes('Witbier')),color:'#ff6600'},
+    {l:'DARK BEER TOLERANCE',v:profAvg(b=>b.style.includes('Stout')||b.style.includes('Dark')||b.style.includes('Dunkel')||b.style.includes('Brown')),color:'#444'},
+    {l:'LAGER APPRECIATION',v:profAvg(b=>b.style.includes('Lager')),color:'#00cc44'},
+    {l:'GERMAN BEER PREMIUM',v:profAvg(b=>b.origin==='DE'),color:'#ff6600'},
+    {l:'AMERICAN BEER DISCOUNT',v:profAvg(b=>b.origin==='US'),color:'#ff2222'},
+    {l:'ARTISAN vs MACRO',v:profAvg(b=>b.style.includes('Belgian')||b.style.includes('IPA')||b.style.includes('Wheat')),color:'#bb44ff'},
+    {l:'HIGH ABV PREFERENCE',v:profAvg(b=>b.abv>=6.0),color:'#00aaff'},
+    {l:'DRAFT/NITRO PREMIUM',v:profAvg(b=>b.method==='Draft'||b.method==='Nitro'),color:'#00aaff'},
   ];
   document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
     <div class="bb-bar-row">
@@ -932,11 +935,15 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const LANG_MAP={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱"};
+const LANG_NAMES={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans"};
+const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
+const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
+const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
+// Build beer→lang lookup from breweries data (uses actual brewery lang field)
+const beerLangLookup={};
+breweries.forEach(br=>{br.beers.split(' · ').forEach(n=>{beerLangLookup[n.trim()]=LANG_NAMES[br.lang]||br.lang;});});
 const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
-const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:LANG_MAP[b.origin]||b.origin,rating:b.rating}));
+const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:beerLangLookup[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
 const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
@@ -1410,7 +1417,7 @@ function drawIPO(){
     document.getElementById('ipoPricedBody').innerHTML='<tr><td colspan="9" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr>';
     document.getElementById('ipo-priced-count').textContent='0 BEERS';
   } else {
-    document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length>1?'S':'');
+    document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length!==1?'S':'');
     document.getElementById('ipoPricedBody').innerHTML=priced.map(w=>{
       const target=analystTarget(w.beer,w.style,w.origin,w.untappd,w.method);
       const revd=beers.filter(b=>b.beer===w.beer);
@@ -2144,7 +2151,7 @@ function initChoropleth(){
         const brs=breweries.filter(b=>b.cc===cc);
         const brNames=brs.map(b=>b.name).join(', ');
         return `
-        <tr style="cursor:pointer" onclick="(function(cc){var m=breweries.filter(function(b){return b.cc===cc});if(m.length===1)openBreweryDrawer(m[0].name);else if(m.length>1){var e=event;var p=document.createElement('div');p.id='choro-brewery-picker';p.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';p.style.left=(e.clientX+10)+'px';p.style.top=(e.clientY-10)+'px';var h=document.createElement('div');h.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';h.textContent='SELECT BREWERY';p.appendChild(h);m.forEach(function(b){var r=document.createElement('div');r.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;';r.textContent=b.name;r.onclick=function(ev){ev.stopPropagation();p.remove();openBreweryDrawer(b.name)};p.appendChild(r)});document.body.appendChild(p);setTimeout(function(){document.addEventListener('click',function cl(ev){if(!p.contains(ev.target)){p.remove();document.removeEventListener('click',cl,true)}},true)},10)}})('${cc}')">
+        <tr style="cursor:pointer" data-cc="${cc}">
           <td style="font-weight:600">${FLAGS[cc]||''} ${CNAMES[cc]||cc}</td>
           <td>${d.count}</td>
           <td><span class="rb ${rbC(d.avg)}">${d.avg.toFixed(2)}</span></td>
@@ -2155,6 +2162,38 @@ function initChoropleth(){
             </div>
           </td>
         </tr>`;}).join('');
+      // Event delegation for choropleth table rows
+      tbody.addEventListener('click',function(event){
+        const tr=event.target.closest('tr[data-cc]');
+        if(!tr) return;
+        const cc=tr.dataset.cc;
+        const matches=breweries.filter(b=>b.cc===cc);
+        if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
+        if(matches.length>1){
+          let old=document.getElementById('choro-brewery-picker');
+          if(old) old.remove();
+          const picker=document.createElement('div');
+          picker.id='choro-brewery-picker';
+          picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
+          picker.style.left=(event.clientX+10)+'px';
+          picker.style.top=(event.clientY-10)+'px';
+          const hdr=document.createElement('div');
+          hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
+          hdr.textContent='SELECT BREWERY';
+          picker.appendChild(hdr);
+          matches.forEach(br=>{
+            const row=document.createElement('div');
+            row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
+            row.textContent=br.name;
+            row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
+            row.addEventListener('mouseleave',()=>row.style.background='none');
+            row.addEventListener('click',ev=>{ev.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
+            picker.appendChild(row);
+          });
+          document.body.appendChild(picker);
+          setTimeout(()=>document.addEventListener('click',function cl(ev){if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',cl,true);}},true),10);
+        }
+      });
     }
   } catch(e){ console.error('Choropleth error:',e); }
 }
