@@ -570,7 +570,9 @@ z-index: 100;
 #main { width: 100%; }
 #hdr { flex-wrap: wrap; height: auto; padding: 6px 0; }
 .hdr-block.wide { min-width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-.hdr-block.hdr-stat { display: none; }
+.hdr-block.hdr-stat { min-width: auto; padding: 2px 8px; border-right: none; flex: 1; }
+.hdr-block.hdr-stat .stat-label { font-size: 6px; letter-spacing: 0.5px; }
+.hdr-block.hdr-stat .stat-val { font-size: 11px; }
 #clock-block { min-width: 100%; border-top: 1px solid var(--border); padding: 4px 14px; flex-direction: row; justify-content: space-between; align-items: center; }
 #clock-time { font-size: 13px; }
 #clock-date { font-size: 9px; margin-top: 0; }
@@ -592,6 +594,14 @@ body { overscroll-behavior: none; }
 .bb-body div[style*="overflow-x"] { overflow-x: auto; }
 .bb-table { min-width: 420px; }
 .insight-key { width: 100px; font-size: 8px; }
+}
+
+@media (max-width: 1024px) and (min-width: 701px) {
+#sidebar { width: 140px; }
+.sidebar-label { font-size: 9px; }
+.sidebar-key { display: none; }
+.g4, .g5 { grid-template-columns: 1fr 1fr; }
+.beer-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ═══════════════════════════════════════════
