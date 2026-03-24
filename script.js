@@ -513,7 +513,7 @@ function showTab(id,btn){
   document.getElementById(id).classList.add('active');
   // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
-    [...document.querySelectorAll('.nav-item')].find(n=>(n.getAttribute('onclick')||'').includes(`'${id}'`));
+    [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
   if(navEl) navEl.classList.add('active');
   if(id==='countries'&&!window._cD) drawCountry();
   if(id==='city'&&!window._ciD) drawCity();
@@ -536,6 +536,12 @@ try {
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
   Chart.defaults.font.size=10;
 } catch(e){ console.error('Chart.defaults error:',e); }
+const _charts={};
+function safeChart(key,ctx,cfg){
+  if(_charts[key]) _charts[key].destroy();
+  _charts[key]=new Chart(ctx,cfg);
+  return _charts[key];
+}
 const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
 
 // ══════════════════════════════════════════════════════════════
@@ -544,18 +550,18 @@ const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleCol
 try {
 // Use pre-computed statistics
 const sA=STATS.styleRanked;
-new Chart(document.getElementById('styleChart'),{type:'bar',
+safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
   data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
   options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
 });
 
 const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
-new Chart(document.getElementById('methodChart'),{type:'bar',
+safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
   data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
 });
 
-new Chart(document.getElementById('scatterChart'),{type:'scatter',
+safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
   data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#ff6600'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
     scales:{x:{title:{display:true,text:'ABV (%)',color:'#444'},min:3.5,max:10,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},
@@ -626,7 +632,7 @@ function renderTable(data){
     const countEl=document.getElementById('beerFilterCount');
     if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
     document.getElementById('beerBody').innerHTML=data.map(b=>`
-      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
+      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
         <td>${logoImg(b.beer,22)}</td>
         <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
@@ -658,8 +664,8 @@ try {
   const origins=[...new Set(beers.map(b=>b.origin))].sort();
   const styleEl=document.getElementById('beerStyleFilter');
   const origEl=document.getElementById('beerOriginFilter');
-  styles.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;styleEl.appendChild(o);});
-  origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=`${FLAGS[o]||''} ${o}`;origEl.appendChild(el);});
+  const sf=document.createDocumentFragment();styles.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sf.appendChild(o);});styleEl.appendChild(sf);
+  const of=document.createDocumentFragment();origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=`${FLAGS[o]||''} ${o}`;of.appendChild(el);});origEl.appendChild(of);
   applyBeerFilter();
 } catch(e){ console.error('renderTable init:',e); }
 
@@ -668,7 +674,7 @@ const _beerBest={};
 beers.forEach(b=>{if(!_beerBest[b.beer]||b.rating>_beerBest[b.beer].rating)_beerBest[b.beer]=b;});
 const unique=Object.values(_beerBest).sort((a,b)=>b.rating-a.rating);
 document.getElementById('beerGrid').innerHTML=unique.map(b=>`
-  <div class="beer-card" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}')">
+  <div class="beer-card" data-beer="${b.beer.replace(/"/g,'&quot;')}">
     ${b.isNew?'<span class="bc-new">NEW</span>':''}
     <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
     <div class="bc-ticker">${b.beer}</div>
@@ -771,7 +777,7 @@ function drawRankings(){
     else if(b.rating<4.5)buckets['4.0']++;
     else buckets['4.5-4.75']++;
   });
-  new Chart(document.getElementById('distChart'),{type:'bar',
+  safeChart('distChart',document.getElementById('distChart'),{type:'bar',
     data:{labels:Object.keys(buckets),datasets:[{data:Object.values(buckets),backgroundColor:['#ff2222','#ff6600','#ffaa00','#aacc00','#00cc44','#00ff55'],borderWidth:0}]},
     options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
   });
@@ -783,7 +789,7 @@ function drawRankings(){
 function drawCountry(){
   window._cD=true;
   const cD=STATS.countryRanked;
-  new Chart(document.getElementById('countryChart'),{type:'bar',
+  safeChart('countryChart',document.getElementById('countryChart'),{type:'bar',
     data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:0}]},
     options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
   });
@@ -792,7 +798,7 @@ function drawCountry(){
       <div class="bb-bar-label"><span class="name">${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x</span></div>
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${rC(d.a)}"></div></div>
     </div>`).join('');
-  new Chart(document.getElementById('countryPieChart'),{type:'doughnut',
+  safeChart('countryPieChart',document.getElementById('countryPieChart'),{type:'doughnut',
     data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>d.c),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:1,borderColor:'#111'}]},
     options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.raw} reviews`}}}}
   });
@@ -807,7 +813,7 @@ const mColors=['#ff6600','#00aaff','#bb44ff','#555'];
 const mO=STATS.METHOD_ORDER;
 const mA=STATS.methodAvgs;
 const mCt=STATS.methodCounts;
-new Chart(document.getElementById('methodDetailChart'),{type:'bar',
+safeChart('methodDetailChart',document.getElementById('methodDetailChart'),{type:'bar',
   data:{labels:mO.map((m,i)=>`${m} (${mCt[i]})`),datasets:[{data:mA,backgroundColor:mColors,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
 });
@@ -841,7 +847,7 @@ document.getElementById('methodDetailBody').innerHTML=mO.map((m,i)=>{
 function drawCity(){
   window._ciD=true;
   const cD=STATS.cityRanked;
-  new Chart(document.getElementById('cityChart'),{type:'bar',
+  safeChart('cityChart',document.getElementById('cityChart'),{type:'bar',
     data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:0}]},
     options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
   });
@@ -850,7 +856,7 @@ function drawCity(){
       <div><div style="font-size:10px;color:#ff6600;font-weight:600">${d.city}</div><div style="font-size:8px;color:#555">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
-  new Chart(document.getElementById('cityPieChart'),{type:'doughnut',
+  safeChart('cityPieChart',document.getElementById('cityPieChart'),{type:'doughnut',
     data:{labels:cD.map(d=>`${d.city}, ${d.region}`),datasets:[{data:cD.map(d=>d.c),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:1,borderColor:'#111'}]},
     options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.raw} reviews`}}}}
   });
@@ -903,7 +909,7 @@ function drawInsights(){
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${p.v/5*100}%;background:${p.color}"></div></div>
     </div>`).join('');
 
-  new Chart(document.getElementById('timelineChart'),{type:'line',
+  safeChart('timelineChart',document.getElementById('timelineChart'),{type:'line',
     data:{
       labels:beers.map((_,i)=>`#${i+1}`),
       datasets:[
@@ -947,7 +953,7 @@ const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
 const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
-new Chart(document.getElementById('langChart'),{type:'bar',
+safeChart('langChart',document.getElementById('langChart'),{type:'bar',
   data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
   options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
 });
@@ -1009,7 +1015,7 @@ function initBrewedMap(){
     const firstBeer=b.beers.split(' · ')[0];
     return `<tr>
       <td>${logoImg(firstBeer,22)}</td>
-      <td style="font-weight:600"><span class="brewery-clickable" onclick="openBreweryDrawer('${b.name.replace(/'/g,"\\'")}');event.stopPropagation()">${b.name}</span></td>
+      <td style="font-weight:600"><span class="brewery-clickable" data-brewery="${b.name.replace(/"/g,'&quot;')}">${b.name}</span></td>
       <td style="color:#555;font-size:9px">${b.location}</td>
       <td style="color:#aaa">${FLAGS[b.cc]||''} ${b.country}</td>
       <td style="color:#555;font-size:9px">${b.beers}</td>
@@ -1061,7 +1067,7 @@ function drawTemporal(){
   </div>`;
 
   // ── Monthly volume + avg rating chart
-  new Chart(document.getElementById('monthlyChart'), {
+  safeChart('monthlyChart',document.getElementById('monthlyChart'), {
     data: {
       labels: monthLabels,
       datasets: [
@@ -1106,7 +1112,7 @@ function drawTemporal(){
   // ── Rating distribution (all months side-by-side)
   const bucketKeys = ['2.0-2.4','2.5-2.9','3.0-3.4','3.5-3.9','4.0-4.4','4.5+'];
   const bucketFn = r => r>=4.5?5:r>=4?4:r>=3.5?3:r>=3?2:r>=2.5?1:0;
-  new Chart(document.getElementById('monthDistChart'),{type:'bar',
+  safeChart('monthDistChart',document.getElementById('monthDistChart'),{type:'bar',
     data:{labels:bucketKeys,datasets:months.map((m,i)=>{
       const bkts=[0,0,0,0,0,0];
       byMonth[m].forEach(b=>bkts[bucketFn(b.rating)]++);
@@ -1127,7 +1133,7 @@ function drawTemporal(){
     const sm={};
     byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
     const labels=Object.keys(sm),data=Object.values(sm);
-    new Chart(document.getElementById(`styleChart_${m}`),{type:'doughnut',
+    safeChart(`styleChart_${m}`,document.getElementById(`styleChart_${m}`),{type:'doughnut',
       data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
       options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
     });
@@ -1135,7 +1141,7 @@ function drawTemporal(){
 
   // ── Country exposure — all months
   const allCountries=[...new Set(beers.map(b=>b.origin))].sort();
-  new Chart(document.getElementById('monthCountryChart'),{type:'bar',
+  safeChart('monthCountryChart',document.getElementById('monthCountryChart'),{type:'bar',
     data:{labels:allCountries.map(c=>`${FLAGS[c]||''} ${c}`),datasets:months.map((m,i)=>({
       label:m,
       data:allCountries.map(c=>byMonth[m].filter(b=>b.origin===c).length),
@@ -1197,7 +1203,7 @@ function drawTemporal(){
 
     const bumpCtx = document.getElementById('bumpChart');
     if(bumpCtx) {
-      new Chart(bumpCtx, {
+      safeChart('bumpChart', bumpCtx, {
         type: 'line',
         data: {
           labels: monthLabels,
@@ -1298,7 +1304,7 @@ function drawContrarian(){
   const sorted=rows.slice().sort((a,b)=>b.delta-a.delta);
   const contrarianCanvas=document.getElementById('contrarianChart');
   contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
-  new Chart(contrarianCanvas,{type:'bar',
+  safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Jwal vs World (Δ)',data:sorted.map(r=>+r.delta.toFixed(2)),
       backgroundColor:sorted.map(r=>r.delta>0?'rgba(0,204,68,0.7)':'rgba(255,34,34,0.7)'),
       borderColor:sorted.map(r=>r.delta>0?'#00cc44':'#ff2222'),borderWidth:1.5}]},
@@ -1856,7 +1862,7 @@ function toggleScanlines(){
     if(matchedTabs.length){
       html+=`<div class="cmd-section">NAVIGATE</div>`;
       html+=matchedTabs.slice(0,7).map(t=>`
-        <div class="cmd-item" onclick="showTab('${t.id}');closePalette()">
+        <div class="cmd-item" data-tab="${t.id}" data-action="tab">
           <span class="cmd-item-icon">${t.icon}</span>
           <span class="cmd-item-main">${t.label}</span>
           <span class="cmd-item-badge">${t.key}</span>
@@ -1872,7 +1878,7 @@ function toggleScanlines(){
       if(matchedBeers.length){
         html+=`<div class="cmd-section">BEERS</div>`;
         html+=matchedBeers.map(b=>`
-          <div class="cmd-item" onclick="openBeerModal('${b.beer.replace(/'/g,"\\'")}');closePalette()">
+          <div class="cmd-item" data-beer="${b.beer.replace(/"/g,'&quot;')}" data-action="beer">
             <span class="cmd-item-icon">🍺</span>
             <span class="cmd-item-main">${b.beer}</span>
             <span class="cmd-item-meta">${b.style} · ${FLAGS[b.origin]||''} ${b.origin}</span>
@@ -1887,7 +1893,7 @@ function toggleScanlines(){
       if(matchedBrew.length){
         html+=`<div class="cmd-section">BREWERIES</div>`;
         html+=matchedBrew.map(b=>`
-          <div class="cmd-item" onclick="openBreweryDrawer('${b.name.replace(/'/g,"\\'")}');closePalette()">
+          <div class="cmd-item" data-brewery="${b.name.replace(/"/g,'&quot;')}" data-action="brewery">
             <span class="cmd-item-icon">🏭</span>
             <span class="cmd-item-main">${b.name}</span>
             <span class="cmd-item-meta">${b.location} · ${FLAGS[b.cc]||''}</span>
@@ -2229,7 +2235,7 @@ function initChoropleth(){
       const canvas=document.getElementById(id);
       if(!canvas) return;
       const color=sparkColors[id]||'#cc3366';
-      new Chart(canvas,{
+      safeChart(id,canvas,{
         type:'line',
         data:{
           labels:months,
@@ -2276,3 +2282,66 @@ function initChoropleth(){
     animate('hdr-low',lowBeer.rating,2);
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();
+
+// ══════════════════════════════════════════════════════════════
+// EVENT DELEGATION (replaces inline onclick handlers)
+// ══════════════════════════════════════════════════════════════
+try {
+  // Menu bar tab navigation
+  document.getElementById('menubar').addEventListener('click', function(e) {
+    const item = e.target.closest('.mb-item[data-tab]');
+    if (item) showTab(item.dataset.tab, item);
+  });
+
+  // Sidebar tab navigation
+  document.getElementById('sidebar').addEventListener('click', function(e) {
+    const item = e.target.closest('.nav-item[data-tab]');
+    if (item) showTab(item.dataset.tab, item);
+  });
+
+  // Beer modal — close on backdrop click
+  document.getElementById('beerModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBeerModal();
+  });
+
+  // Beer modal — close button
+  document.getElementById('beerModalClose').addEventListener('click', closeBeerModal);
+
+  // Command palette — close on backdrop click
+  document.getElementById('cmd-palette').addEventListener('click', function(e) {
+    if (e.target === this) closePalette();
+  });
+
+  // Brewery drawer — close button
+  document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
+
+  // Scanline toggle
+  document.getElementById('scanline-toggle').addEventListener('click', toggleScanlines);
+
+  // Beer table rows
+  document.getElementById('beerBody').addEventListener('click', function(e) {
+    const row = e.target.closest('tr[data-beer]');
+    if (row) openBeerModal(row.dataset.beer);
+  });
+
+  // Beer grid cards
+  document.getElementById('beerGrid').addEventListener('click', function(e) {
+    const card = e.target.closest('.beer-card[data-beer]');
+    if (card) openBeerModal(card.dataset.beer);
+  });
+
+  // Brewery table clickable names
+  document.getElementById('brewedTbody').addEventListener('click', function(e) {
+    const el = e.target.closest('.brewery-clickable[data-brewery]');
+    if (el) { openBreweryDrawer(el.dataset.brewery); e.stopPropagation(); }
+  });
+
+  // Command palette results
+  document.getElementById('cmd-results').addEventListener('click', function(e) {
+    const item = e.target.closest('.cmd-item');
+    if (!item) return;
+    if (item.dataset.action === 'beer') { openBeerModal(item.dataset.beer); closePalette(); }
+    else if (item.dataset.action === 'brewery') { openBreweryDrawer(item.dataset.brewery); closePalette(); }
+    else if (item.dataset.action === 'tab') { showTab(item.dataset.tab); closePalette(); }
+  });
+} catch(e) { console.error('Event delegation setup error:', e); }

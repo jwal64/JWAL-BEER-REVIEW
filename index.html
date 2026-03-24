@@ -16,29 +16,31 @@
 <meta name="twitter:title" content="Jwal's Brew Reviews">
 <meta name="twitter:description" content="Bloomberg Terminal-style beer review dashboard — ratings, trends, and analytics.">
 <meta name="twitter:image" content="og-image.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
 <link rel="stylesheet" href="style.css"/>
 
 </head>
 <body>
 
 <!-- BEER DETAIL MODAL -->
-<div id="beerModal" onclick="if(event.target===this)closeBeerModal()">
+<div id="beerModal">
   <div id="beerModalBox">
     <div id="beerModalHead">
       <span id="beerModalTitle">BEER DETAIL</span>
-      <button id="beerModalClose" onclick="closeBeerModal()">✕</button>
+      <button id="beerModalClose">✕</button>
     </div>
     <div id="beerModalBody"></div>
   </div>
 </div>
 
 <!-- COMMAND PALETTE -->
-<div id="cmd-palette" onclick="if(event.target===this)closePalette()">
+<div id="cmd-palette">
   <div id="cmd-box">
     <div id="cmd-input-wrap">
       <span id="cmd-prompt">⌘</span>
@@ -58,7 +60,7 @@
 <div id="brewery-drawer">
   <div id="drawer-head">
     <span id="drawer-title">BREWERY DETAIL</span>
-    <button id="drawer-close" onclick="closeBreweryDrawer()">✕</button>
+    <button id="drawer-close">✕</button>
   </div>
   <div id="drawer-map"></div>
   <div id="drawer-body"></div>
@@ -71,20 +73,20 @@
 
 <div id="menubar">
   <div class="mb-logo">JWAL'S</div>
-  <div class="mb-item" onclick="showTab('overview',this)"><span class="fkey">F1</span>OVRVW</div>
-  <div class="mb-item" onclick="showTab('beers',this)"><span class="fkey">F2</span>BEERS</div>
-  <div class="mb-item" onclick="showTab('rankings',this)"><span class="fkey">F3</span>RANK</div>
-  <div class="mb-item" onclick="showTab('countries',this)"><span class="fkey">F4</span>GEO</div>
-  <div class="mb-item" onclick="showTab('city',this)"><span class="fkey">F5</span>MKT</div>
-  <div class="mb-item" onclick="showTab('insights',this)"><span class="fkey">F6</span>INTEL</div>
-  <div class="mb-item" onclick="showTab('temporal',this)"><span class="fkey">F7</span>TIME</div>
-  <div class="mb-item" onclick="showTab('mapdrunk',this)"><span class="fkey">F8</span>MAP1</div>
-  <div class="mb-item" onclick="showTab('mapbrewed',this)"><span class="fkey">F9</span>MAP2</div>
-  <div class="mb-item" onclick="showTab('language',this)"><span class="fkey">F10</span>LANG</div>
-  <div class="mb-item" onclick="showTab('contrarian',this)"><span class="fkey">G1</span>CNTRN</div>
-  <div class="mb-item" onclick="showTab('ipo',this)"><span class="fkey">G2</span>IPO/FT</div>
-  <div class="mb-item" onclick="showTab('audit',this)"><span class="fkey">G3</span>AUDIT</div>
-  <div class="mb-item" onclick="showTab('choropleth',this)"><span class="fkey">G4</span>CHORO</div>
+  <div class="mb-item" data-tab="overview"><span class="fkey">F1</span>OVRVW</div>
+  <div class="mb-item" data-tab="beers"><span class="fkey">F2</span>BEERS</div>
+  <div class="mb-item" data-tab="rankings"><span class="fkey">F3</span>RANK</div>
+  <div class="mb-item" data-tab="countries"><span class="fkey">F4</span>GEO</div>
+  <div class="mb-item" data-tab="city"><span class="fkey">F5</span>MKT</div>
+  <div class="mb-item" data-tab="insights"><span class="fkey">F6</span>INTEL</div>
+  <div class="mb-item" data-tab="temporal"><span class="fkey">F7</span>TIME</div>
+  <div class="mb-item" data-tab="mapdrunk"><span class="fkey">F8</span>MAP1</div>
+  <div class="mb-item" data-tab="mapbrewed"><span class="fkey">F9</span>MAP2</div>
+  <div class="mb-item" data-tab="language"><span class="fkey">F10</span>LANG</div>
+  <div class="mb-item" data-tab="contrarian"><span class="fkey">G1</span>CNTRN</div>
+  <div class="mb-item" data-tab="ipo"><span class="fkey">G2</span>IPO/FT</div>
+  <div class="mb-item" data-tab="audit"><span class="fkey">G3</span>AUDIT</div>
+  <div class="mb-item" data-tab="choropleth"><span class="fkey">G4</span>CHORO</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -142,23 +144,23 @@
 
 <div id="sidebar">
   <div class="nav-section-head">ANALYTICS</div>
-  <div class="nav-item active" onclick="showTab('overview',this)"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F1</span></div>
-  <div class="nav-item" onclick="showTab('beers',this)"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
-  <div class="nav-item" onclick="showTab('rankings',this)"><span class="nav-icon">▲</span>RANKINGS<span class="nkey">F3</span></div>
+  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F1</span></div>
+  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
+  <div class="nav-item" data-tab="rankings"><span class="nav-icon">▲</span>RANKINGS<span class="nkey">F3</span></div>
   <div class="nav-section-head">MARKETS</div>
-  <div class="nav-item" onclick="showTab('countries',this)"><span class="nav-icon">◎</span>GEO / COUNTRY<span class="nkey">F4</span></div>
-  <div class="nav-item" onclick="showTab('city',this)"><span class="nav-icon">□</span>CITIES<span class="nkey">F5</span></div>
+  <div class="nav-item" data-tab="countries"><span class="nav-icon">◎</span>GEO / COUNTRY<span class="nkey">F4</span></div>
+  <div class="nav-item" data-tab="city"><span class="nav-icon">□</span>CITIES<span class="nkey">F5</span></div>
   <div class="nav-section-head">INTELLIGENCE</div>
-  <div class="nav-item" onclick="showTab('insights',this)"><span class="nav-icon">◈</span>INSIGHTS<span class="nkey">F6</span></div>
-  <div class="nav-item" onclick="showTab('temporal',this)"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F7</span></div>
-  <div class="nav-item" onclick="showTab('contrarian',this)"><span class="nav-icon">◆</span>CONTRARIAN IDX<span class="nkey">G1</span></div>
-  <div class="nav-item" onclick="showTab('ipo',this)"><span class="nav-icon">◈</span>IPO / FUTURES<span class="nkey">G2</span></div>
-  <div class="nav-item" onclick="showTab('audit',this)"><span class="nav-icon">⬡</span>DATA AUDIT<span class="nkey">G3</span></div>
-  <div class="nav-item" onclick="showTab('language',this)"><span class="nav-icon">◑</span>LANGUAGE<span class="nkey">F10</span></div>
+  <div class="nav-item" data-tab="insights"><span class="nav-icon">◈</span>INSIGHTS<span class="nkey">F6</span></div>
+  <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F7</span></div>
+  <div class="nav-item" data-tab="contrarian"><span class="nav-icon">◆</span>CONTRARIAN IDX<span class="nkey">G1</span></div>
+  <div class="nav-item" data-tab="ipo"><span class="nav-icon">◈</span>IPO / FUTURES<span class="nkey">G2</span></div>
+  <div class="nav-item" data-tab="audit"><span class="nav-icon">⬡</span>DATA AUDIT<span class="nkey">G3</span></div>
+  <div class="nav-item" data-tab="language"><span class="nav-icon">◑</span>LANGUAGE<span class="nkey">F10</span></div>
   <div class="nav-section-head">MAPS</div>
-  <div class="nav-item" onclick="showTab('mapdrunk',this)"><span class="nav-icon">◉</span>CONSUMED<span class="nkey">F8</span></div>
-  <div class="nav-item" onclick="showTab('mapbrewed',this)"><span class="nav-icon">◎</span>BREWERIES<span class="nkey">F9</span></div>
-  <div class="nav-item" onclick="showTab('choropleth',this)"><span class="nav-icon">◈</span>CHOROPLETH<span class="nkey">G4</span></div>
+  <div class="nav-item" data-tab="mapdrunk"><span class="nav-icon">◉</span>CONSUMED<span class="nkey">F8</span></div>
+  <div class="nav-item" data-tab="mapbrewed"><span class="nav-icon">◎</span>BREWERIES<span class="nkey">F9</span></div>
+  <div class="nav-item" data-tab="choropleth"><span class="nav-icon">◈</span>CHOROPLETH<span class="nkey">G4</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -761,7 +763,7 @@
   <div class="sb-item">SYS: JWAL'S BREW TERMINAL v2.7</div>
   <div class="sb-item">USER: JWAL</div>
   <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
-  <div class="sb-item" style="cursor:pointer" onclick="toggleScanlines()" id="scanline-toggle">CRT: <span id="scanline-status">ON</span></div>
+  <div class="sb-item" style="cursor:pointer" id="scanline-toggle">CRT: <span id="scanline-status">ON</span></div>
   <div class="sb-spacer"></div>
   <div class="sb-item" id="sb-time">--:--:--</div>
 </div>
