@@ -534,7 +534,13 @@ try {
   Chart.defaults.color='#555';
   Chart.defaults.borderColor='#222';
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
-  Chart.defaults.font.size=10;
+  Chart.defaults.font.size=11;
+  Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
+  Chart.defaults.elements.point.radius=3;
+  Chart.defaults.elements.point.hoverRadius=5;
+  Chart.defaults.elements.line.borderWidth=2;
+  Chart.defaults.elements.bar.borderWidth=0;
+  Chart.defaults.animation.duration=400;
 } catch(e){ console.error('Chart.defaults error:',e); }
 const _charts={};
 function safeChart(key,ctx,cfg){
@@ -970,8 +976,8 @@ document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-
 // MAPS
 // ══════════════════════════════════════════════════════════════
 const cityColors={"New York":"#ff6600","New Rochelle":"#bb44ff","White Plains":"#00cc44","Eastchester":"#00aaff","Hartsdale":"#ff2222","Montreal":"#ff8800","Amsterdam":"#00cccc","Hengelo":"#6666ff","Uncassville":"#ff44aa"};
-function addTiles(map){L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);}
-function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.6">${h}</div>`;}
+function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
+function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.7;letter-spacing:0.2px;-webkit-font-smoothing:antialiased">${h}</div>`;}
 function circleM(map,lat,lng,color,r,html){L.circleMarker([lat,lng],{radius:r,fillColor:color,color:'#222',weight:1,opacity:.8,fillOpacity:.75}).addTo(map).bindPopup(popHtml(html),{className:'dpop'});}
 
 function initDrunkMap(){
@@ -1969,7 +1975,7 @@ function openBreweryDrawer(name){
       if(!mapEl) return;
       if(!_drawerMap){
         _drawerMap=L.map('drawer-map',{zoomControl:false,attributionControl:false,scrollWheelZoom:false,dragging:false});
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(_drawerMap);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',detectRetina:true}).addTo(_drawerMap);
       }
       _drawerMap.setView([brewery.lat,brewery.lng],7);
       _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});
@@ -2057,7 +2063,7 @@ function initChoropleth(){
     wrap.style.height=H+'px';
 
     // Fetch world atlas topojson
-    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
       .then(r=>r.json())
       .then(world=>{
         wrap.innerHTML='';
