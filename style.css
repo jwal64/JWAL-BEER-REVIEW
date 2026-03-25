@@ -480,7 +480,7 @@ MAPS
 width: 100%;
 height: 500px;
 border: 1px solid var(--border2);
-filter: grayscale(30%) brightness(0.55) contrast(1.15) saturate(0.7);
+filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7);
 }
 .map-leg { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 .map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--dim); letter-spacing: 0.2px; }
@@ -832,7 +832,7 @@ BREWERY DRAWER
   flex-shrink: 0;
   background: var(--black);
   border-bottom: 1px solid var(--border);
-  filter: grayscale(30%) brightness(0.55) contrast(1.15) saturate(0.7);
+  filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7);
 }
 #drawer-body {
   flex: 1;
