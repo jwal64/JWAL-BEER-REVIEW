@@ -527,10 +527,6 @@ font-size: 10px;
 /* ═══════════════════════════════════════════
 SCROLLBARS
 ═══════════════════════════════════════════ */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--black); }
-::-webkit-scrollbar-thumb { background: var(--orange3); }
-::-webkit-scrollbar-thumb:hover { background: var(--cyan2); }
 
 /* ═══════════════════════════════════════════
 MINI-ROW
@@ -578,10 +574,9 @@ z-index: 100;
 .hdr-block.hdr-stat { min-width: auto; padding: 2px 8px; border-right: none; flex: 1; }
 .hdr-block.hdr-stat .stat-label { font-size: 6px; letter-spacing: 0.5px; }
 .hdr-block.hdr-stat .stat-val { font-size: 11px; }
-#clock-block { min-width: 100%; border-top: 1px solid var(--border); padding: 4px 14px; flex-direction: row; justify-content: space-between; align-items: center; }
-#clock-time { font-size: 13px; }
-#clock-date { font-size: 9px; margin-top: 0; }
-#menubar { overflow-x: auto; overflow-y: hidden; }
+#clock-block { display: none; }
+#menubar { overflow-x: auto; overflow-y: hidden; height: 36px; position: relative; }
+#menubar::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 24px; background: linear-gradient(to right, transparent, var(--orange)); pointer-events: none; z-index: 1; }
 #menubar::-webkit-scrollbar { display: none; }
 .mb-item { padding: 0 7px; font-size: 9px; flex-shrink: 0; }
 .mb-logo { padding: 0 8px; font-size: 10px; flex-shrink: 0; }
@@ -961,8 +956,7 @@ BUMP CHART
 HD / RETINA ENHANCEMENTS
 ═══════════════════════════════════════════ */
 canvas {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  image-rendering: auto;
 }
 
 /* Sharper SVG rendering for choropleth */
@@ -988,10 +982,10 @@ canvas {
   border-color: var(--border) !important;
 }
 
-/* Crisp scrollbar styling */
-::-webkit-scrollbar { width: 6px; }
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); }
-::-webkit-scrollbar-thumb:hover { background: var(--dim2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--dim); }
 
 
