@@ -223,34 +223,46 @@ function cardLogo(name){
   return u?`<img src="${u}" class="bc-logo" alt="${name}">`:`<span class="bc-emoji">🍺</span>`;
 }
 
+const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
+const MONTH_COLORS = ['#ff6600','#00aaff','#00cc44','#bb44ff','#ffdd00','#ff2222','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
+
+function getMonthlyData(){
+  const monthNMap={};
+  beers.forEach(b=>{ if(!monthNMap[b.month]) monthNMap[b.month]=b.monthN; });
+  const months=Object.keys(monthNMap).sort((a,b)=>monthNMap[a]-monthNMap[b]);
+  const byMonth={};
+  months.forEach(m=>{ byMonth[m]=beers.filter(b=>b.month===m); });
+  const monthColors=months.map((_,i)=>MONTH_COLORS[i%MONTH_COLORS.length]);
+  const monthLabels=months.map(m=>`${MONTH_FULL[m]||m} ${beers.find(b=>b.month===m)?.year||''}`);
+  return {months,byMonth,monthColors,monthLabels};
+}
+
 // ══════════════════════════════════════════════════════════════
 // PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
 // ══════════════════════════════════════════════════════════════
 function computeStats(){
-  const styleMap={};
-  beers.forEach(b=>{if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;});
-  const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+  const styleMap={},methodMap={},countryMap={},cityMap={},brandMap={};
+  let ratingSum=0;
 
+  // Single pass over beers to build all aggregation maps
+  beers.forEach(b=>{
+    ratingSum+=b.rating;
+    if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;
+    if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;
+    if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;
+    if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;
+    if(!brandMap[b.beer])brandMap[b.beer]=[];brandMap[b.beer].push(b.rating);
+  });
+
+  const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
   const METHOD_ORDER=['Draft','Nitro','Bottle','Can'];
-  const methodMap={};
-  beers.forEach(b=>{if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;});
   const methodAvgs=METHOD_ORDER.map(m=>methodMap[m]?+(methodMap[m].t/methodMap[m].c).toFixed(2):0);
   const methodCounts=METHOD_ORDER.map(m=>methodMap[m]?methodMap[m].c:0);
-
-  const countryMap={};
-  beers.forEach(b=>{if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;});
   const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-
-  const cityMap={};
-  beers.forEach(b=>{if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;});
   const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-
-  const brandMap={};
-  beers.forEach(b=>{if(!brandMap[b.beer])brandMap[b.beer]=[];brandMap[b.beer].push(b.rating);});
   const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:Math.max(...rs),worst:Math.min(...rs),std:std(rs)})).sort((a,b)=>b.avg-a.avg);
-
   const sorted=[...beers].sort((a,b)=>b.rating-a.rating);
-  const globalAvg=avg(beers.map(b=>b.rating));
+  const globalAvg=beers.length?ratingSum/beers.length:0;
 
   return {styleMap,styleRanked,METHOD_ORDER,methodMap,methodAvgs,methodCounts,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,sorted,globalAvg};
 }
@@ -260,51 +272,48 @@ let STATS=computeStats();
 // DYNAMIC STATS — update header, overview KPIs, and BEERS tab
 // from live data so they never go stale when new beers are added
 // ══════════════════════════════════════════════════════════════
-(function updateLiveStats(){
-  try {
-    const totalReviews = beers.length;
-    const totalMarkets = Object.keys(STATS.cityMap).length;
-    const totalBrands  = Object.keys(STATS.brandMap).length;
-    const totalCtry    = Object.keys(STATS.countryMap).length;
-    const topBeer      = STATS.sorted[0];
-    const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
-    const avgRating    = STATS.globalAvg;
-    const avgAbv       = (beers.reduce((s,b)=>s+b.abv,0)/beers.length);
-    const minAbv       = Math.min(...beers.map(b=>b.abv));
-    const maxAbv       = Math.max(...beers.map(b=>b.abv));
-    const newCount     = beers.filter(b=>b.isNew).length;
+function updateLiveStats(){
+  const totalReviews = beers.length;
+  const totalMarkets = Object.keys(STATS.cityMap).length;
+  const totalBrands  = Object.keys(STATS.brandMap).length;
+  const totalCtry    = Object.keys(STATS.countryMap).length;
+  const topBeer      = STATS.sorted[0];
+  const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
+  const avgRating    = STATS.globalAvg;
+  const avgAbv       = (beers.reduce((s,b)=>s+b.abv,0)/beers.length);
+  const minAbv       = Math.min(...beers.map(b=>b.abv));
+  const maxAbv       = Math.max(...beers.map(b=>b.abv));
+  const newCount     = beers.filter(b=>b.isNew).length;
 
-    // Header bar
-    const sub = document.getElementById('hdr-subtitle');
-    if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
-    const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-    set('hdr-top',   topBeer.rating.toFixed(2));
-    set('hdr-avg',   avgRating.toFixed(2));
-    set('hdr-low',   lowBeer.rating.toFixed(2));
-    set('hdr-abv',   avgAbv.toFixed(1)+'%');
-    set('hdr-ctry',  totalCtry);
-
-    // Overview KPI tiles
-    set('ov-top-val',  topBeer.rating.toFixed(2));
-    set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
-    set('ov-avg-val',  avgRating.toFixed(2));
-    set('ov-avg-sub',  `${totalReviews} total reviews`);
-    set('ov-low-val',  lowBeer.rating.toFixed(2));
-    set('ov-low-sub',  `▼ ${lowBeer.beer} · ${lowBeer.origin}`);
-    set('ov-abv-val',  avgAbv.toFixed(1)+'%');
-    set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
-    set('ov-brands-val', totalBrands);
-    set('ov-brands-sub', `Across ${totalCtry} countries`);
-
-    // BEERS tab
-    set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
-    set('brands-count', `${totalBrands} UNIQUE BRANDS`);
-    const newTag = document.getElementById('beers-new-tag');
-    if(newTag) newTag.textContent = `+${newCount} NEW`;
-    // Status bar
-    set('sb-stats', `RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
-  } catch(e){ console.error('Live stats error:',e); }
-})();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  // Header bar
+  const sub = document.getElementById('hdr-subtitle');
+  if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+  set('hdr-top',   topBeer.rating.toFixed(2));
+  set('hdr-avg',   avgRating.toFixed(2));
+  set('hdr-low',   lowBeer.rating.toFixed(2));
+  set('hdr-abv',   avgAbv.toFixed(1)+'%');
+  set('hdr-ctry',  totalCtry);
+  // Overview KPI tiles
+  set('ov-top-val',  topBeer.rating.toFixed(2));
+  set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
+  set('ov-avg-val',  avgRating.toFixed(2));
+  set('ov-avg-sub',  `${totalReviews} total reviews`);
+  set('ov-low-val',  lowBeer.rating.toFixed(2));
+  set('ov-low-sub',  `▼ ${lowBeer.beer} · ${lowBeer.origin}`);
+  set('ov-abv-val',  avgAbv.toFixed(1)+'%');
+  set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
+  set('ov-brands-val', totalBrands);
+  set('ov-brands-sub', `Across ${totalCtry} countries`);
+  // BEERS tab
+  set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
+  set('brands-count', `${totalBrands} UNIQUE BRANDS`);
+  const newTag = document.getElementById('beers-new-tag');
+  if(newTag) newTag.textContent = `+${newCount} NEW`;
+  // Status bar
+  set('sb-stats', `RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
+}
+try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS LOADER — fetches live data and refreshes the dashboard
@@ -387,34 +396,7 @@ let STATS=computeStats();
     ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_chorD','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
-    try {
-      const totalReviews=beers.length;
-      const totalMarkets=Object.keys(STATS.cityMap).length;
-      const totalBrands=Object.keys(STATS.brandMap).length;
-      const totalCtry=Object.keys(STATS.countryMap).length;
-      const topBeer=STATS.sorted[0];
-      const lowBeer=STATS.sorted[STATS.sorted.length-1];
-      const avgRating=STATS.globalAvg;
-      const avgAbv=(beers.reduce((s,b)=>s+b.abv,0)/beers.length);
-      const minAbv=Math.min(...beers.map(b=>b.abv));
-      const maxAbv=Math.max(...beers.map(b=>b.abv));
-      const newCount=beers.filter(b=>b.isNew).length;
-      const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-      const sub=document.getElementById('hdr-subtitle');
-      if(sub)sub.textContent=`PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
-      set('hdr-top',topBeer.rating.toFixed(2));set('hdr-avg',avgRating.toFixed(2));
-      set('hdr-low',lowBeer.rating.toFixed(2));set('hdr-abv',avgAbv.toFixed(1)+'%');
-      set('hdr-ctry',totalCtry);
-      set('ov-top-val',topBeer.rating.toFixed(2));set('ov-top-sub',`▲ ${topBeer.beer} · ${topBeer.origin}`);
-      set('ov-avg-val',avgRating.toFixed(2));set('ov-avg-sub',`${totalReviews} total reviews`);
-      set('ov-low-val',lowBeer.rating.toFixed(2));set('ov-low-sub',`▼ ${lowBeer.beer} · ${lowBeer.origin}`);
-      set('ov-abv-val',avgAbv.toFixed(1)+'%');set('ov-abv-sub',`Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
-      set('ov-brands-val',totalBrands);set('ov-brands-sub',`Across ${totalCtry} countries`);
-      set('beers-count',`${totalReviews} ENTRIES · +${newCount} NEW`);
-      set('brands-count',`${totalBrands} UNIQUE BRANDS`);
-      const newTag=document.getElementById('beers-new-tag');if(newTag)newTag.textContent=`+${newCount} NEW`;
-      set('sb-stats',`RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
-    } catch(e){console.error('Sheets refresh error:',e);}
+    try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
     // Re-render the currently active tab
     const activePanel=document.querySelector('.panel.active');
     if(activePanel) showTab(activePanel.id);
@@ -1045,20 +1027,7 @@ function initBrewedMap(){
 function drawTemporal(){
   window._tmpD = true;
 
-  // Auto-detect all months present in data, sorted chronologically
-  const MONTH_ORDER = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const MONTH_COLORS = ['#ff6600','#00aaff','#00cc44','#bb44ff','#ffdd00','#ff2222','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
-  const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-
-  // Build sorted list of months that have data
-  const monthNMap = {};
-  beers.forEach(b=>{ if(!monthNMap[b.month]) monthNMap[b.month]=b.monthN; });
-  const months = Object.keys(monthNMap).sort((a,b)=>monthNMap[a]-monthNMap[b]);
-  const monthColors = months.map((_,i)=>MONTH_COLORS[i % MONTH_COLORS.length]);
-  const monthLabels = months.map(m=>`${MONTH_FULL[m]||m} ${beers.find(b=>b.month===m)?.year||''}`);
-
-  const byMonth = {};
-  months.forEach(m => { byMonth[m] = beers.filter(b => b.month === m); });
+  const {months,byMonth,monthColors,monthLabels} = getMonthlyData();
 
   const counts     = months.map(m => byMonth[m].length);
   const avgRatings = months.map(m => {
@@ -2002,6 +1971,33 @@ function closeBreweryDrawer(){
 window.openBreweryDrawer=openBreweryDrawer;
 window.closeBreweryDrawer=closeBreweryDrawer;
 
+function showBreweryPicker(matches,event,headerText){
+  let old=document.getElementById('choro-brewery-picker');
+  if(old) old.remove();
+  const picker=document.createElement('div');
+  picker.id='choro-brewery-picker';
+  picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
+  picker.style.left=(event.clientX+10)+'px';
+  picker.style.top=(event.clientY-10)+'px';
+  const hdr=document.createElement('div');
+  hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
+  hdr.textContent=headerText||'SELECT BREWERY';
+  picker.appendChild(hdr);
+  matches.forEach(br=>{
+    const row=document.createElement('div');
+    row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
+    const avgR=avg(br.ratings);
+    row.innerHTML=`${br.name} <span class="rb ${rbC(avgR)}" style="font-size:9px;margin-left:4px">${avgR.toFixed(2)}</span>`;
+    row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
+    row.addEventListener('mouseleave',()=>row.style.background='none');
+    row.addEventListener('click',e=>{e.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
+    picker.appendChild(row);
+  });
+  document.body.appendChild(picker);
+  const closePicker=ev=>{if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',closePicker,true);}};
+  setTimeout(()=>document.addEventListener('click',closePicker,true),10);
+}
+
 // ══════════════════════════════════════════════════════════════
 // CHOROPLETH MAP (D3 + TopoJSON)
 // ══════════════════════════════════════════════════════════════
@@ -2131,32 +2127,7 @@ function initChoropleth(){
             const matches=breweries.filter(b=>b.cc===a2);
             if(matches.length===0) return;
             if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
-            // Multiple breweries — show picker popup
-            let old=document.getElementById('choro-brewery-picker');
-            if(old) old.remove();
-            const picker=document.createElement('div');
-            picker.id='choro-brewery-picker';
-            picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
-            picker.style.left=(event.clientX+10)+'px';
-            picker.style.top=(event.clientY-10)+'px';
-            const hdr=document.createElement('div');
-            hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
-            hdr.textContent=(FLAGS[a2]||'')+' '+(CNAMES[a2]||a2)+' — SELECT BREWERY';
-            picker.appendChild(hdr);
-            matches.forEach(br=>{
-              const row=document.createElement('div');
-              row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
-              const avgR=avg(br.ratings);
-              row.innerHTML=`${br.name} <span class="rb ${rbC(avgR)}" style="font-size:9px;margin-left:4px">${avgR.toFixed(2)}</span>`;
-              row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
-              row.addEventListener('mouseleave',()=>row.style.background='none');
-              row.addEventListener('click',e=>{e.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
-              picker.appendChild(row);
-            });
-            document.body.appendChild(picker);
-            // Close picker on outside click
-            const closePicker=ev=>{if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',closePicker,true);}};
-            setTimeout(()=>document.addEventListener('click',closePicker,true),10);
+            showBreweryPicker(matches,event,(FLAGS[a2]||'')+' '+(CNAMES[a2]||a2)+' — SELECT BREWERY');
           });
       })
       .catch(()=>{
@@ -2190,30 +2161,7 @@ function initChoropleth(){
         const cc=tr.dataset.cc;
         const matches=breweries.filter(b=>b.cc===cc);
         if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
-        if(matches.length>1){
-          let old=document.getElementById('choro-brewery-picker');
-          if(old) old.remove();
-          const picker=document.createElement('div');
-          picker.id='choro-brewery-picker';
-          picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
-          picker.style.left=(event.clientX+10)+'px';
-          picker.style.top=(event.clientY-10)+'px';
-          const hdr=document.createElement('div');
-          hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
-          hdr.textContent='SELECT BREWERY';
-          picker.appendChild(hdr);
-          matches.forEach(br=>{
-            const row=document.createElement('div');
-            row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
-            row.textContent=br.name;
-            row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
-            row.addEventListener('mouseleave',()=>row.style.background='none');
-            row.addEventListener('click',ev=>{ev.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
-            picker.appendChild(row);
-          });
-          document.body.appendChild(picker);
-          setTimeout(()=>document.addEventListener('click',function cl(ev){if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',cl,true);}},true),10);
-        }
+        if(matches.length>1) showBreweryPicker(matches,event,'SELECT BREWERY');
       });
     }
   } catch(e){ console.error('Choropleth error:',e); }
@@ -2225,14 +2173,8 @@ function initChoropleth(){
 (function initKPISparklines(){
   try {
     // Compute per-month data for sparklines
-    const MONTH_ORDER=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const monthNMap={};
-    beers.forEach(b=>{ if(!monthNMap[b.month]) monthNMap[b.month]=b.monthN; });
-    const months=Object.keys(monthNMap).sort((a,b)=>monthNMap[a]-monthNMap[b]);
+    const {months,byMonth} = getMonthlyData();
     if(months.length<2) return; // need 2+ months for sparklines
-
-    const byMonth={};
-    months.forEach(m=>{ byMonth[m]=beers.filter(b=>b.month===m); });
 
     const sparkData={
       'spark-top': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.max(...rs):null; }),
