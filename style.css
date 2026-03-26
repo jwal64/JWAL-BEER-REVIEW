@@ -93,6 +93,8 @@ white-space: nowrap;
 transition: background 0.08s;
 }
 .mb-item:hover { background: rgba(0,0,0,0.15); }
+.mb-item.active { background: rgba(0,0,0,0.28); }
+.mb-item.active .fkey { background: var(--orange); color: #000; }
 .mb-item .fkey {
 background: #000;
 color: var(--orange);

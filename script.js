@@ -515,8 +515,11 @@ let STATS=computeStats();
 function showTab(id,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelectorAll('.mb-item').forEach(m=>m.style.background='');
+  document.querySelectorAll('.mb-item').forEach(m=>m.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Sync menubar
+  const mbEl=document.querySelector(`.mb-item[data-tab="${id}"]`);
+  if(mbEl) mbEl.classList.add('active');
   // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
