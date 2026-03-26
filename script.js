@@ -492,13 +492,16 @@ let STATS=computeStats();
   } catch(e){ console.error('Ticker error:',e); }
 })();
 
-// ── KEYBOARD SHORTCUTS (1-9, 0, q-r for tabs; Esc for modal)
+// ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
     '1':'overview','2':'beers','3':'rankings','4':'countries',
     '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
     '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit','r':'choropleth'
+    'q':'contrarian','w':'ipo','e':'audit','r':'choropleth',
+    'f1':'overview','f2':'beers','f3':'rankings','f4':'countries',
+    'f5':'city','f6':'insights','f7':'temporal','f8':'mapdrunk',
+    'f9':'mapbrewed','f10':'language'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
