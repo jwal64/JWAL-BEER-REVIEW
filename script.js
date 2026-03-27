@@ -269,6 +269,12 @@ function computeStats(){
 let STATS=computeStats();
 
 // ══════════════════════════════════════════════════════════════
+// "NEW" DISPLAY — only show NEW tag for beers reviewed in the current month
+// ══════════════════════════════════════════════════════════════
+const _now=new Date(), _curMonth=_now.getMonth()+1, _curYear=_now.getFullYear();
+function isDisplayNew(b){ return b.isNew && b.monthN===_curMonth && b.year===_curYear; }
+
+// ══════════════════════════════════════════════════════════════
 // DYNAMIC STATS — update header, overview KPIs, and BEERS tab
 // from live data so they never go stale when new beers are added
 // ══════════════════════════════════════════════════════════════
@@ -283,7 +289,7 @@ function updateLiveStats(){
   const avgAbv       = (beers.reduce((s,b)=>s+b.abv,0)/beers.length);
   const minAbv       = Math.min(...beers.map(b=>b.abv));
   const maxAbv       = Math.max(...beers.map(b=>b.abv));
-  const newCount     = beers.filter(b=>b.isNew).length;
+  const newCount     = beers.filter(b=>isDisplayNew(b)).length;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Header bar
@@ -629,9 +635,9 @@ function renderTable(data){
     const countEl=document.getElementById('beerFilterCount');
     if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
     document.getElementById('beerBody').innerHTML=data.map(b=>`
-      <tr${b.isNew?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
+      <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
         <td>${logoImg(b.beer,22)}</td>
-        <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?`<span class="new-tag">NEW</span>`:''}</td>
+        <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
         <td>${FLAGS[b.origin]||''} ${b.origin}</td>
         <td style="color:#00aaff">${b.abv.toFixed(1)}%</td>
@@ -672,7 +678,7 @@ beers.forEach(b=>{if(!_beerBest[b.beer]||b.rating>_beerBest[b.beer].rating)_beer
 const unique=Object.values(_beerBest).sort((a,b)=>b.rating-a.rating);
 document.getElementById('beerGrid').innerHTML=unique.map(b=>`
   <div class="beer-card" data-beer="${b.beer.replace(/"/g,'&quot;')}">
-    ${b.isNew?'<span class="bc-new">NEW</span>':''}
+    ${isDisplayNew(b)?'<span class="bc-new">NEW</span>':''}
     <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
     <div class="bc-ticker">${b.beer}</div>
     <div class="bc-style">${b.style}</div>
@@ -1234,7 +1240,7 @@ function drawTemporal(){
     <tr>
       <td><span style="color:${mColor[b.month]||'#888'};font-weight:700;font-size:9px">${b.month.toUpperCase()} 2026</span></td>
       <td>${logoImg(b.beer,20)}</td>
-      <td style="color:#ff6600;font-weight:600">${b.beer}${b.isNew?'<span class="new-tag">NEW</span>':''}</td>
+      <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</td>
       <td style="color:#555;font-size:9px">${b.style}</td>
       <td>${FLAGS[b.origin]||''} ${b.origin}</td>
       <td style="color:#00aaff">${b.abv.toFixed(1)}%</td>
