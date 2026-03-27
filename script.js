@@ -2360,3 +2360,12 @@ try {
     else if (item.dataset.action === 'tab') { showTab(item.dataset.tab); closePalette(); }
   });
 } catch(e) { console.error('Event delegation setup error:', e); }
+
+// ── INIT: mark the initially-active tab in the menubar
+(function(){
+  const activePanel=document.querySelector('.panel.active');
+  if(activePanel){
+    const mbEl=document.querySelector(`.mb-item[data-tab="${activePanel.id}"]`);
+    if(mbEl) mbEl.classList.add('active');
+  }
+})();
