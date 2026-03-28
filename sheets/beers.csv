@@ -9,6 +9,7 @@ Stella Artois,Lager-Pale,BE,5.0,Bottle,Eastchester,New York,USA,US,2.75,false,Ja
 Duvel,Belgian Strong Golden Ale,BE,8.5,Bottle,White Plains,New York,USA,US,4.00,false,Jan,1,2026
 Duvel,Belgian Strong Golden Ale,BE,8.5,Bottle,Amsterdam,Noord-Holland,Netherlands,NL,4.25,false,Jan,1,2026
 Carlsberg,Pilsner-Other,DK,5.0,Can,New Rochelle,New York,USA,US,2.75,false,Jan,1,2026
+Carlsberg,Pilsner-Other,DK,5.0,Draft,Montreal,Quebec,Canada,CA,3.00,false,Jan,1,2026
 Harp,Lager-Pale,IE,4.5,Draft,Montreal,Quebec,Canada,CA,4.25,false,Jan,1,2026
 La Fin Du Monde,Belgian Tripel,CA,9.0,Can,Montreal,Quebec,Canada,CA,2.75,false,Jan,1,2026
 1664,Lager-Pale,FR,5.5,Draft,Montreal,Quebec,Canada,CA,3.00,false,Jan,1,2026
@@ -27,14 +28,13 @@ Bud Light,Lager-American Light,US,4.2,Bottle,New York,New York,USA,US,3.00,true,
 Budweiser,Lager-American,US,5.0,Bottle,New York,New York,USA,US,3.00,true,Feb,2,2026
 Corona Extra,Lager-Mexican,MX,4.5,Bottle,New Rochelle,New York,USA,US,3.00,true,Feb,2,2026
 Corona Extra,Lager-Mexican,MX,4.5,Bottle,New Rochelle,New York,USA,US,3.75,false,Feb,2,2026
-Carlsberg,Lager-Pale,DK,5.0,Draft,Montreal,Quebec,Canada,CA,3.00,false,Jan,1,2026
-Estrella Galicia,Lager-Helles,ES,5.5,Bottle,New Rochelle,New York,USA,US,4.25,true,Feb,2,2026
-Pilsner Urquell,Pilsner-Czech/Bohemian,CZ,4.4,Bottle,New Rochelle,New York,USA,US,3.25,true,Feb,2,2026
 Heineken,Lager-Pale,NL,5.0,Bottle,Uncassville,Connecticut,USA,US,3.25,false,Feb,2,2026
 Moretti,Lager-Pale,IT,4.6,Bottle,New Rochelle,New York,USA,US,3.75,true,Feb,2,2026
 Erdinger Weissbier,Wheat Beer-Hefeweizen,DE,5.3,Bottle,New Rochelle,New York,USA,US,3.25,true,Feb,2,2026
 Sapporo,Lager-Pale,JP,4.9,Bottle,Eastchester,New York,USA,US,3.00,false,Feb,2,2026
 Coors Light,Lager-American,US,4.2,Bottle,Eastchester,New York,USA,US,2.75,false,Feb,2,2026
+Estrella Galicia,Lager-Helles,ES,5.5,Bottle,New Rochelle,New York,USA,US,4.25,true,Mar,3,2026
+Pilsner Urquell,Pilsner-Czech/Bohemian,CZ,4.4,Bottle,New Rochelle,New York,USA,US,3.25,true,Mar,3,2026
 Wrench,IPA-New England Hazy,US,7.1,Can,New Rochelle,New York,USA,US,4.00,true,Mar,3,2026
 La Fin Du Monde,Belgian Tripel,CA,9.0,Bottle,New Rochelle,New York,USA,US,3.75,false,Mar,3,2026
 Żywiec,Lager-Pale,PL,5.5,Bottle,New Rochelle,New York,USA,US,2.75,true,Mar,3,2026
@@ -43,3 +43,11 @@ Peroni,Lager-Pale,IT,5.1,Bottle,New York,New York,USA,US,2.50,true,Mar,3,2026
 Estrella Damm,Lager-Pale,ES,5.4,Bottle,New Rochelle,New York,USA,US,3.50,true,Mar,3,2026
 Heineken,Lager-Pale,NL,5.0,Draft,Queens,New York,USA,US,3.25,false,Mar,3,2026
 Grolsch Puur Weizen,Wheat Beer-Hefeweizen,NL,5.1,Draft,Oldenzaal,Overijssel,Netherlands,NL,5.00,true,Mar,3,2026
+Leffe Blonde,Belgian Blonde,BE,6.6,Draft,Nijmegen,Gelderland,Netherlands,NL,4.75,false,Mar,3,2026
+Texels Skuumkoppe,Wheat Beer-Dunkelweizen,NL,6.0,Bottle,Nijmegen,Gelderland,Netherlands,NL,3.00,true,Mar,3,2026
+Guinness,Stout-Irish Dry,IE,4.2,Nitro,Nijmegen,Gelderland,Netherlands,NL,3.75,false,Mar,3,2026
+Affligem Tripel,Belgian Tripel,BE,9.0,Draft,Antwerp,Antwerp,Belgium,BE,3.75,true,Mar,3,2026
+Bolleke De Koninck,Pale Ale-Belgian,BE,5.2,Draft,Antwerp,Antwerp,Belgium,BE,2.75,true,Mar,3,2026
+IJwit,Wheat Beer-Witbier/Blanche,NL,6.5,Draft,Antwerp,Antwerp,Belgium,BE,3.75,true,Mar,3,2026
+La Chouffe Blonde,Belgian Strong Golden Ale,BE,8.0,Bottle,New Rochelle,New York,USA,US,4.25,true,Mar,3,2026
+Stiegl Goldbräu,Lager-Helles,AT,5.0,Bottle,New Rochelle,New York,USA,US,2.75,true,Mar,3,2026
