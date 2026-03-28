@@ -77,6 +77,7 @@ let beers=[
   {beer:"IJwit",             style:"Wheat Beer-Witbier/Blanche",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"La Chouffe Blonde", style:"Belgian Strong Golden Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Stiegl Goldbräu",  style:"Lager-Helles",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Modelo Oro",       style:"Lager-Mexican",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -114,7 +115,7 @@ let breweries=[
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
   {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00,2.75]},
-  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo · Modelo Negra · Corona Extra",              lat:19.4274,lng:-99.1677, ratings:[3.25,2.25,3.00,3.00,3.75,3.50]},
+  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo · Modelo Negra · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,2.25,3.00,3.00,3.75,3.50,3.00]},
   {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg",                                         lat:55.6614,lng:12.5361,  ratings:[2.75,3.00]},
   {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", lang:"fr", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[2.75,3.75]},
   {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"1664",                  nativeName:"Kronenbourg 1664", lat:48.4637,lng:7.4845,  ratings:[3.00]},
