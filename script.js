@@ -1611,7 +1611,7 @@ function drawFutures(){
 // ══════════════════════════════════════════════════════════════
 // DATA INTEGRITY VALIDATOR
 // Runs on every page load. Catches broken updates before they
-// become visible bugs. Access via G3 · AUDIT nav tab.
+// become visible bugs. Access via E · AUDIT nav tab.
 // ══════════════════════════════════════════════════════════════
 (function runIntegrityChecks(){
   const REQUIRED_BEER_FIELDS = ['beer','style','origin','abv','method','city','region','country','cc','rating','isNew','month','monthN','year'];
@@ -1827,10 +1827,10 @@ function toggleScanlines(){
     {id:'mapdrunk',label:'MAP CONSUMED',icon:'◉',key:'F8'},
     {id:'mapbrewed',label:'MAP BREWERY',icon:'◎',key:'F9'},
     {id:'language',label:'LANGUAGE',icon:'◑',key:'F10'},
-    {id:'contrarian',label:'CONTRARIAN IDX',icon:'◆',key:'G1'},
-    {id:'ipo',label:'IPO / FUTURES',icon:'◈',key:'G2'},
-    {id:'audit',label:'DATA AUDIT',icon:'⬡',key:'G3'},
-    {id:'choropleth',label:'CHOROPLETH MAP',icon:'◎',key:'G4'},
+    {id:'contrarian',label:'CONTRARIAN IDX',icon:'◆',key:'Q'},
+    {id:'ipo',label:'IPO / FUTURES',icon:'◈',key:'W'},
+    {id:'audit',label:'DATA AUDIT',icon:'⬡',key:'E'},
+    {id:'choropleth',label:'CHOROPLETH MAP',icon:'◎',key:'R'},
   ];
 
   function openPalette(){
