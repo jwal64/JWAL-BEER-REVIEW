@@ -206,10 +206,19 @@ const BRAND_SVGS = {
 "IJwit":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="2">BROUWERIJ 'T IJ</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">IJWIT</text></svg>`,
 "La Chouffe Blonde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BRASSERIE D'ACHOUFFE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="1">LA CHOUFFE</text></svg>`,
 "Stiegl Goldbräu":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="3">STIEGL</text><line x1="20" y1="28" x2="180" y2="28" stroke="#ffd700" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="1">GOLDBRÄU</text></svg>`,
+"Modelo Oro":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8a200"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="30" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">ORO</text></svg>`,
 };
 
 const LOGO_URIS={};
 Object.entries(BRAND_SVGS).forEach(([n,s])=>{LOGO_URIS[n]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);});
+
+// SVG validation: warn about any beer entries missing a brand SVG
+(function validateBeerSVGs(){
+  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_SVGS[name]);
+  if(missing.length){
+    console.warn(`[SVG CHECK] ${missing.length} beer(s) missing brand SVG:\n  - ${missing.join('\n  - ')}`);
+  }
+})();
 
 // ══════════════════════════════════════════════════════════════
 // HELPERS
