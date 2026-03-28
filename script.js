@@ -153,6 +153,7 @@ const BRAND_SVGS = {
 "Carlsberg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="42" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#1a6b1a" text-anchor="middle">Carlsberg</text></svg>`,
 "Modelo":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">ESPECIAL</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle">Modelo</text></svg>`,
 "Modelo Negra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a0900"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="24" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">NEGRA</text></svg>`,
+"Modelo Oro":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a1200"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#ffd700" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="28" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="4">ORO</text></svg>`,
 "Corona Extra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="26" font-family="Times New Roman,serif" font-size="18" font-weight="bold" fill="#f4e04d" text-anchor="middle" letter-spacing="1">CORONA</text><line x1="20" y1="32" x2="180" y2="32" stroke="#f4e04d" stroke-width="0.8"/><text x="100" y="50" font-family="Times New Roman,serif" font-size="12" fill="#f4e04d" text-anchor="middle" letter-spacing="3">EXTRA</text></svg>`,
 "Sapporo":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#000066"/><polygon points="30,8 34,22 48,22 37,30 41,44 30,36 19,44 23,30 12,22 26,22" fill="#c9a84c"/><text x="120" y="38" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle">SAPPORO</text></svg>`,
 "Ichiban":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">SAPPORO</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle">ICHIBAN</text></svg>`,
@@ -1649,14 +1650,14 @@ function drawFutures(){
   const badRatings = beers.filter(b=>b.rating<1||b.rating>5);
   if(!badRatings.length) pass('All beer ratings within 1.0–5.0 range');
 
-  // ── 3. BRAND LOGO COVERAGE
+  // ── 3. BRAND LOGO COVERAGE (every beer entry must have an SVG)
   const logoNames = Object.keys(BRAND_SVGS);
   const uniqueBeers = [...new Set(beers.map(b=>b.beer))];
   uniqueBeers.forEach(name=>{
-    if(!logoNames.includes(name)) warn(`No SVG logo for beer: "${name}"`);
+    if(!logoNames.includes(name)) fail(`Missing SVG logo for beer: "${name}" — add an entry to BRAND_SVGS`);
   });
   const coveredCount = uniqueBeers.filter(n=>logoNames.includes(n)).length;
-  pass(`${coveredCount}/${uniqueBeers.length} beer brands have SVG logos`);
+  if(coveredCount===uniqueBeers.length) pass(`All ${uniqueBeers.length} beer brands have SVG logos`);
 
   // ── 4. BREWERY ARRAY VALIDATION
   REQUIRED_BREWERY_FIELDS.forEach(f=>{
