@@ -1,6 +1,6 @@
 name,location,country,cc,lang,beers,lat,lng,ratings,nativeName
 Weihenstephaner,"Freising, Bavaria",Germany,DE,de,Weihenstephaner · Münchner Weisse · Munchen Dunkel,48.3953,11.7291,"4.50,4.75,2.75",Weihenstephaner · Münchner Weiße · Münchner Dunkel
-Guinness (St. James's Gate),"Dublin, Leinster",Ireland,IE,en,Guinness,53.3418,-6.2868,"3.25,4.00",
+Guinness (St. James's Gate),"Dublin, Leinster",Ireland,IE,en,Guinness,53.3418,-6.2868,"3.25,4.00,3.75",
 Harp / Diageo,"Dundalk, County Louth",Ireland,IE,en,Harp,54.0039,-6.3703,4.25,
 Duvel Moortgat,"Puurs-Sint-Amands, Antwerp",Belgium,BE,nl,Duvel,51.0727,4.2897,"4.00,4.25",
 AB InBev (Stella),"Leuven, Flemish Brabant",Belgium,BE,nl,Stella Artois,50.8798,4.7005,"2.75,2.75",
@@ -14,7 +14,7 @@ Carlsberg,"Copenhagen, Capital Region",Denmark,DK,da,Carlsberg,55.6614,12.5361,"
 Unibroue,"Chambly, Quebec",Canada,CA,fr,La Fin Du Monde,45.4412,-73.2615,"2.75,3.75",
 Kronenbourg,"Obernai, Alsace",France,FR,fr,1664,48.4637,7.4845,3.00,Kronenbourg 1664
 Sapporo Brewery,"Sapporo, Hokkaido",Japan,JP,ja,Sapporo,43.0685,141.3544,"3.50,3.00",サッポロビール
-Kirin Brewery,"Yokohama, Kanagawa",Japan,JP,ja,Ichiban (Kirin Ichiban),35.4634,139.6220,3.00,キリン一番搾り
+Kirin Brewery,"Yokohama, Kanagawa",Japan,JP,ja,Ichiban,35.4634,139.6220,3.00,キリン一番搾り
 Red Stripe (D&G),"Kingston, Surrey",Jamaica,JM,en,Red Stripe,17.9972,-76.7939,3.75,
 Estrella Galicia,"A Coruña, Galicia",Spain,ES,es,Estrella Galicia,43.3623,-8.4115,4.25,
 Pilsner Urquell,"Pilsen, Bohemia",Czech Republic,CZ,cs,Pilsner Urquell,49.7479,13.3756,3.25,Plzeňský Prazdroj
@@ -24,3 +24,10 @@ Industrial Arts Brewing,"Beacon, New York",USA,US,en,Wrench,41.5048,-73.9690,4.0
 Żywiec Brewery (Grupa Żywiec),"Żywiec, Silesia",Poland,PL,pl,Żywiec,49.6853,19.1925,2.75,
 Birra Peroni,"Rome, Lazio",Italy,IT,it,Peroni,41.8902,12.4922,2.50,
 S.A. Damm,"Barcelona, Catalonia",Spain,ES,es,Estrella Damm,41.3897,2.1540,3.50,
+Abbaye de Leffe (AB InBev),"Dinant, Namur",Belgium,BE,fr,Leffe Blonde,50.2611,4.9122,4.75,
+Texelse Bierbrouwerij,"Oudeschild, North Holland",Netherlands,NL,nl,Texels Skuumkoppe,53.0385,4.8510,3.00,
+Affligem Brewery (Heineken),"Opwijk, Flemish Brabant",Belgium,BE,nl,Affligem Tripel,50.9786,4.1868,3.75,
+De Koninck Brewery,"Antwerp, Antwerp",Belgium,BE,nl,Bolleke De Koninck,51.2157,4.4156,2.75,
+Brouwerij 't IJ,"Amsterdam, Noord-Holland",Netherlands,NL,nl,IJwit,52.3657,4.9196,3.75,
+Brasserie d'Achouffe,"Achouffe, Luxembourg",Belgium,BE,fr,La Chouffe Blonde,50.1283,5.7981,4.25,
+Stieglbrauerei zu Salzburg,"Salzburg, Salzburg",Austria,AT,de,Stiegl Goldbräu,47.8095,13.0550,2.75,

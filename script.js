@@ -75,8 +75,8 @@ let beers=[
   {beer:"Affligem Tripel",   style:"Belgian Tripel",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Bolleke De Koninck",style:"Pale Ale-Belgian",         origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"IJwit",             style:"Wheat Beer-Witbier/Blanche",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"La Chouffe Blonde", style:"Belgian Strong Golden Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"United States of America",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Stiegl Goldbräu",  style:"Lager-Helles",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"United States of America",cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"La Chouffe Blonde", style:"Belgian Strong Golden Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Stiegl Goldbräu",  style:"Lager-Helles",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
