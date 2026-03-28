@@ -203,6 +203,8 @@ const BRAND_SVGS = {
 "Affligem Tripel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#3d1c02"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ABBAYE D'AFFLIGEM</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="2">TRIPEL</text></svg>`,
 "Bolleke De Koninck":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#8b1a1a"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">DE KONINCK</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">BOLLEKE</text></svg>`,
 "IJwit":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="2">BROUWERIJ 'T IJ</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">IJWIT</text></svg>`,
+"La Chouffe Blonde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BRASSERIE D'ACHOUFFE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="1">LA CHOUFFE</text></svg>`,
+"Stiegl Goldbräu":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="3">STIEGL</text><line x1="20" y1="28" x2="180" y2="28" stroke="#ffd700" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="1">GOLDBRÄU</text></svg>`,
 };
 
 const LOGO_URIS={};
@@ -1819,7 +1821,7 @@ function toggleScanlines(){
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
     {id:'rankings',label:'RANKINGS',icon:'▲',key:'F3'},
     {id:'countries',label:'GEO / COUNTRY',icon:'◎',key:'F4'},
-    {id:'city',label:'CITIES',icon:'□',key:'F5'},
+    {id:'city',label:'CITIES',icon:'▣',key:'F5'},
     {id:'insights',label:'INSIGHTS',icon:'◈',key:'F6'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F7'},
     {id:'mapdrunk',label:'MAP CONSUMED',icon:'◉',key:'F8'},
