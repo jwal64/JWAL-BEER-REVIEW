@@ -11,7 +11,7 @@ Each entry in the `beers[]` array requires these fields:
 ```js
 {
   beer: "BeerName",           // Marketed/displayed beer name
-  style: "Category-Style",   // e.g. "Lager-Pale", "Stout-Irish Dry"
+  style: "Category",          // One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale
   origin: "XX",              // ISO 3166-1 alpha-2 country code of the BREWERY's home country
   abv: 5.0,                  // Alcohol by volume (number)
   method: "Bottle",          // "Bottle", "Can", "Draft", or "Nitro"
