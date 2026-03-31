@@ -385,6 +385,10 @@
     <div class="bb-body">
       <div id="drunkMap"></div>
       <div class="map-leg" id="drunkLeg"></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <button id="journeyToggle" style="font-size:9px;padding:3px 10px;cursor:pointer;background:#1a1a1a;border:1px solid #ff6600;color:#ff6600;font-family:var(--mono);letter-spacing:0.5px">JOURNEY PATH: ON</button>
+        <span id="journeyInfo" style="font-size:9px;color:#555;letter-spacing:0.3px"></span>
+      </div>
     </div>
   </div>
   <div class="bb-panel">
@@ -458,6 +462,11 @@
 
   <!-- Dynamic style-mix doughnut charts — filled by drawTemporal() -->
   <div id="temporal-style-charts"></div>
+
+  <div class="bb-panel">
+    <div class="bb-panel-head">SEASONAL TASTE PROFILE<span class="ph-right">STYLE × MONTH · COLOR = AVG RATING</span></div>
+    <div class="bb-body" id="seasonalHeatmap"></div>
+  </div>
 
   <div class="g2">
     <div class="bb-panel">
