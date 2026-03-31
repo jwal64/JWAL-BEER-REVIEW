@@ -1008,6 +1008,30 @@ function initDrunkMap(){
     circleM(map,l.lat,l.lng,cityColors[l.city]||'#ff6600',r,
       `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
   });
+
+  // ── Journey Path: chronological polyline + numbered markers
+  const cityOrder=drunkLocs.filter(l=>cM[l.city]).map(l=>{
+    const earliest=beers.filter(b=>b.city===l.city).reduce((min,b)=>Math.min(min,b.year*12+b.monthN),Infinity);
+    return {city:l.city,lat:l.lat,lng:l.lng,firstTime:earliest};
+  }).sort((a,b)=>a.firstTime-b.firstTime);
+  const journeyGroup=L.layerGroup();
+  if(cityOrder.length>1){
+    const coords=cityOrder.map(c=>[c.lat,c.lng]);
+    const journeyLine=L.polyline(coords,{color:'#ff6600',weight:2.5,opacity:0.6,dashArray:'8,6'}).addTo(journeyGroup);
+    setTimeout(()=>{const el=journeyLine.getElement();if(el)el.classList.add('journey-line');},50);
+  }
+  cityOrder.forEach((c,i)=>{
+    L.marker([c.lat,c.lng],{icon:L.divIcon({className:'journey-num',html:`<div>${i+1}</div>`,iconSize:[20,20],iconAnchor:[10,10]}),zIndexOffset:1000+i}).addTo(journeyGroup);
+  });
+  journeyGroup.addTo(map);
+  document.getElementById('journeyInfo').textContent=cityOrder.map((c,i)=>`${i+1}→${c.city}`).join('  ');
+  let journeyVisible=true;
+  document.getElementById('journeyToggle').addEventListener('click',()=>{
+    journeyVisible=!journeyVisible;
+    if(journeyVisible)journeyGroup.addTo(map);else map.removeLayer(journeyGroup);
+    document.getElementById('journeyToggle').textContent='JOURNEY PATH: '+(journeyVisible?'ON':'OFF');
+  });
+
   document.getElementById('drunkLeg').innerHTML=drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
@@ -1144,6 +1168,43 @@ function drawTemporal(){
       options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
     });
   });
+
+  // ── Seasonal Taste Profile — style × month heatmap
+  const allStyles=Object.keys(sC);
+  const heatData={};
+  allStyles.forEach(style=>{
+    heatData[style]={};
+    months.forEach(m=>{
+      const matching=byMonth[m].filter(b=>b.style===style);
+      if(matching.length){
+        const avgR=matching.reduce((s,b)=>s+b.rating,0)/matching.length;
+        heatData[style][m]={avg:avgR,count:matching.length};
+      }
+    });
+  });
+  function heatColor(a){
+    if(a>=4.5)return'rgba(0,204,68,0.5)';if(a>=4.0)return'rgba(0,204,68,0.3)';
+    if(a>=3.5)return'rgba(170,204,0,0.25)';if(a>=3.0)return'rgba(255,170,0,0.22)';
+    if(a>=2.5)return'rgba(255,102,0,0.25)';return'rgba(255,34,34,0.3)';
+  }
+  let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">STYLE</th>';
+  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${m.toUpperCase()}</th>`;});
+  heatHtml+='</tr></thead><tbody>';
+  allStyles.forEach(style=>{
+    heatHtml+=`<tr><td style="text-align:left;color:${sC[style]};font-weight:600;font-size:9px;white-space:nowrap">${style}</td>`;
+    months.forEach(m=>{
+      const cell=heatData[style][m];
+      if(cell){
+        heatHtml+=`<td style="background:${heatColor(cell.avg)};color:#e8e8e8;font-size:10px;font-weight:700;padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:8px;color:#666;font-weight:400">${cell.count}×</span></td>`;
+      }else{
+        heatHtml+='<td style="color:#333;font-size:9px">—</td>';
+      }
+    });
+    heatHtml+='</tr>';
+  });
+  heatHtml+='</tbody></table>';
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#555"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #222"><div style="flex:1;background:rgba(255,34,34,0.4)"></div><div style="flex:1;background:rgba(255,102,0,0.35)"></div><div style="flex:1;background:rgba(255,170,0,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(0,204,68,0.4)"></div></div><span>HIGH</span></div>`;
+  document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Country exposure — all months
   const allCountries=[...new Set(beers.map(b=>b.origin))].sort();
