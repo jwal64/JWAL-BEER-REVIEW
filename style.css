@@ -465,6 +465,11 @@ box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 .dpop .leaflet-popup-close-button { color: var(--dim) !important; font-family: var(--sans); }
 .dpop .leaflet-popup-content { margin: 10px 14px; font-family: var(--sans); font-size: 13px; color: var(--white); line-height: 1.7; letter-spacing: 0.1px; }
 
+/* Journey Map */
+.journey-num div { width:20px; height:20px; line-height:20px; text-align:center; background:var(--orange); color:#fff; font-family:var(--sans); font-size:9px; font-weight:700; border-radius:50%; border:2px solid var(--panel); box-shadow:0 1px 4px rgba(0,0,0,0.15); }
+@keyframes dash-flow { to { stroke-dashoffset: -100; } }
+.journey-line { animation: dash-flow 4s linear infinite; }
+
 /* ═══════════════════════════════════════════
 INLINE LOGO
 ═══════════════════════════════════════════ */
