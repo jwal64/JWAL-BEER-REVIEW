@@ -1396,6 +1396,62 @@ function drawContrarian(){
 }
 
 // ══════════════════════════════════════════════════════════════
+// SHARED CONSTANTS — IPO & FUTURES
+// ══════════════════════════════════════════════════════════════
+// 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
+const IPO_WATCHLIST=[
+  // User-specified
+  {beer:'Moretti',         style:'Pilsner',     origin:'IT', abv:4.6, region:'Udine, Friuli',         untappd:3.58, method:'Bottle'},
+  {beer:'Peroni',          style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
+  {beer:'Blue Moon',       style:'Wheat Beer',   origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
+  {beer:'Miller Lite',     style:'Lager',        origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
+  {beer:'Estrella Damm',   style:'Lager',        origin:'ES', abv:5.4, region:'Barcelona, Catalonia',  untappd:3.61, method:'Bottle'},
+  {beer:'Estrella Galicia',style:'Lager',        origin:'ES', abv:5.5, region:'A Coruña, Galicia',     untappd:3.65, method:'Bottle'},
+  // Claude picks — one per country not yet covered
+  {beer:'Brahma',          style:'Lager',        origin:'BR', abv:4.8, region:'São Paulo, SP',         untappd:3.18, method:'Can'},
+  {beer:'Quilmes',         style:'Lager',        origin:'AR', abv:4.9, region:'Buenos Aires, BA',      untappd:3.22, method:'Bottle'},
+  {beer:'Tsingtao',        style:'Lager',        origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
+  {beer:'Castle Lager',    style:'Lager',        origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
+  {beer:'Pilsner Urquell', style:'Pilsner',      origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',       untappd:3.80, method:'Bottle'},
+  {beer:'Super Bock',      style:'Pilsner',      origin:'PT', abv:5.2, region:'Porto, Norte',          untappd:3.41, method:'Bottle'},
+  {beer:'Mythos',          style:'Lager',        origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
+  {beer:'Victoria Bitter', style:'Lager',        origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
+  {beer:'Norrlands Guld',  style:'Lager',        origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
+  // Additional picks
+  {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
+  {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
+  {beer:'Kronenbourg',     style:'Lager',        origin:'FR', abv:5.0, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
+  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
+  {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
+  // Pipeline promotions
+  {beer:'Żywiec',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
+  {beer:'Tyskie',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Tychy, Silesia',        untappd:3.28, method:'Can'},
+  {beer:'Chimay Blue',     style:'Belgian Ale',  origin:'BE', abv:9.0, region:'Chimay, Hainaut',       untappd:4.05, method:'Bottle'},
+  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Leuven',                untappd:3.75, method:'Bottle'},
+  {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
+  {beer:'Sam Adams',       style:'Lager',        origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
+];
+
+const FUTURES_BEERS=['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
+const UNTAPPD_FT={'Bud Light':2.30,'Coors Light':2.84,'Heineken':3.00,'Stella Artois':3.30,'Corona Extra':3.47,'Modelo':3.55,'Miller Lite':2.51,'Budweiser':2.60,'Michelob Ultra':2.84,'Guinness':3.80};
+
+// Recommendation candidates — only beers NOT already on IPO_WATCHLIST
+const IPO_CANDIDATES=[
+  {beer:'Paulaner Hefe',    style:'Wheat Beer',   origin:'DE', abv:5.5, region:'Munich',              untappd:3.87, method:'Bottle'},
+  {beer:'Augustiner Helles',style:'Lager',        origin:'DE', abv:5.2, region:'Munich',              untappd:4.10, method:'Draft'},
+  {beer:'Nastro Azzurro',   style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',         untappd:3.56, method:'Bottle'},
+  {beer:"Smithwick's",      style:'Red Ale',      origin:'IE', abv:4.5, region:'Kilkenny',            untappd:3.45, method:'Draft'},
+  {beer:"Tennent's",        style:'Lager',        origin:'GB', abv:4.0, region:'Glasgow, Scotland',   untappd:2.95, method:'Can'},
+  {beer:'Orion',            style:'Lager',        origin:'JP', abv:5.0, region:'Naha, Okinawa',       untappd:3.42, method:'Can'},
+  {beer:'Menabrea',         style:'Lager',        origin:'IT', abv:4.8, region:'Biella, Piedmont',    untappd:3.55, method:'Bottle'},
+  {beer:'Tuborg',           style:'Pilsner',      origin:'DK', abv:4.6, region:'Copenhagen',          untappd:3.10, method:'Can'},
+  {beer:'Sol',              style:'Lager',        origin:'MX', abv:4.5, region:'Mexico City',         untappd:3.15, method:'Bottle'},
+  {beer:'Singha',           style:'Lager',        origin:'TH', abv:5.0, region:'Bangkok',             untappd:3.25, method:'Bottle'},
+  {beer:'Tiger Beer',       style:'Lager',        origin:'SG', abv:5.0, region:'Singapore',           untappd:3.18, method:'Can'},
+  {beer:'Erdinger Weissbier',style:'Wheat Beer',  origin:'DE', abv:5.3, region:'Erding, Bavaria',     untappd:3.78, method:'Bottle'},
+];
+
+// ══════════════════════════════════════════════════════════════
 // IPO WATCHLIST
 // ══════════════════════════════════════════════════════════════
 function drawIPO(){
@@ -1422,54 +1478,26 @@ function drawIPO(){
     return Math.min(5.0,Math.max(1.0,target));
   }
 
-  // 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
-  const watchlist=[
-    // User-specified
-    {beer:'Moretti',         style:'Pilsner',         origin:'IT', abv:4.6, region:'Udine, Friuli',         untappd:3.58, method:'Bottle'},
-    {beer:'Peroni',          style:'Lager',            origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
-    {beer:'Blue Moon',       style:'Wheat Beer', origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
-    {beer:'Miller Lite',     style:'Lager',  origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
-    {beer:'Estrella Damm',   style:'Lager',            origin:'ES', abv:5.4, region:'Barcelona, Catalonia',  untappd:3.61, method:'Bottle'},
-    {beer:'Estrella Galicia',style:'Lager',          origin:'ES', abv:5.5, region:'A Coruña, Galicia',     untappd:3.65, method:'Bottle'},
-    // Claude picks — one per country not yet covered
-    {beer:'Brahma',          style:'Lager',            origin:'BR', abv:4.8, region:'São Paulo, SP',         untappd:3.18, method:'Can'},
-    {beer:'Quilmes',         style:'Lager',            origin:'AR', abv:4.9, region:'Buenos Aires, BA',        untappd:3.22, method:'Bottle'},
-    {beer:'Tsingtao',        style:'Lager',            origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
-    {beer:'Castle Lager',    style:'Lager',            origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
-    {beer:'Pilsner Urquell', style:'Pilsner',         origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',          untappd:3.80, method:'Bottle'},
-    {beer:'Super Bock',      style:'Pilsner',         origin:'PT', abv:5.2, region:'Porto, Norte',              untappd:3.41, method:'Bottle'},
-    {beer:'Mythos',          style:'Lager',            origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
-    {beer:'Victoria Bitter', style:'Lager',            origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
-    {beer:'Norrlands Guld',  style:'Lager',            origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
-    // Additional picks
-    {beer:'Asahi Super Dry', style:'Lager',            origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
-    {beer:'Hoegaarden',      style:'Wheat Beer',               origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
-    {beer:'Kronenbourg',     style:'Lager',            origin:'FR', abv:5.0, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
-    {beer:'Newcastle Brown', style:'Brown Ale',     origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
-    {beer:'Ringnes',         style:'Lager',            origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
-    // Pipeline promotions
-    {beer:'Żywiec',          style:'Pilsner',         origin:'PL', abv:5.6, region:'Żywiec, Silesia',      untappd:3.35, method:'Bottle'},
-    {beer:'Tyskie',          style:'Pilsner',         origin:'PL', abv:5.6, region:'Tychy, Silesia',       untappd:3.28, method:'Can'},
-    {beer:'Chimay Blue',     style:'Belgian Ale',origin:'BE',abv:9.0, region:'Chimay, Hainaut',      untappd:4.05, method:'Bottle'},
-    {beer:'Leffe Blonde',    style:'Belgian Ale',      origin:'BE', abv:6.6, region:'Leuven',               untappd:3.75, method:'Bottle'},
-    {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',         untappd:3.72, method:'Bottle'},
-    {beer:'Sam Adams',       style:'Lager',          origin:'US', abv:5.0, region:'Boston, MA',           untappd:3.48, method:'Bottle'},
-  ];
+  // Pre-compute all analyst targets (cached in a Map)
+  const targetCache=new Map();
+  IPO_WATCHLIST.forEach(w=>{
+    targetCache.set(w.beer,analystTarget(w.beer,w.style,w.origin,w.untappd,w.method));
+  });
 
   const reviewed=new Set(beers.map(b=>b.beer));
-  const pending=watchlist.filter(w=>!reviewed.has(w.beer));
-  const priced=watchlist.filter(w=>reviewed.has(w.beer));
+  const pending=IPO_WATCHLIST.filter(w=>!reviewed.has(w.beer));
+  const priced=IPO_WATCHLIST.filter(w=>reviewed.has(w.beer));
 
   document.getElementById('ipo-pending').textContent=pending.length;
   document.getElementById('ipo-priced').textContent=priced.length;
   document.getElementById('ipo-watch-count').textContent=pending.length+' BEER'+(pending.length!==1?'S':'')+' QUEUED';
 
-  const allTargets=watchlist.map(w=>analystTarget(w.beer,w.style,w.origin,w.untappd,w.method));
+  const allTargets=[...targetCache.values()];
   document.getElementById('ipo-avg-analyst').textContent=(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2);
-  document.getElementById('ipo-avg-market').textContent=(watchlist.reduce((s,w)=>s+w.untappd,0)/watchlist.length).toFixed(2);
+  document.getElementById('ipo-avg-market').textContent=(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2);
 
   document.getElementById('ipoWatchBody').innerHTML=pending.map(w=>{
-    const target=analystTarget(w.beer,w.style,w.origin,w.untappd,w.method);
+    const target=targetCache.get(w.beer);
     const upside=target-w.untappd;
     const uClass=upside>0.2?'up':upside<-0.2?'dn':'fl';
     const signal=target>=4.0?'STRONG BUY':target>=3.5?'BUY':target>=3.0?'HOLD':target>=2.5?'SELL':'STRONG SELL';
@@ -1492,7 +1520,7 @@ function drawIPO(){
   } else {
     document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length!==1?'S':'');
     document.getElementById('ipoPricedBody').innerHTML=priced.map(w=>{
-      const target=analystTarget(w.beer,w.style,w.origin,w.untappd,w.method);
+      const target=targetCache.get(w.beer);
       const revd=beers.filter(b=>b.beer===w.beer);
       const jwalPrice=avg(revd.map(b=>b.rating));
       const vsAnalyst=jwalPrice-target;
@@ -1515,30 +1543,10 @@ function drawIPO(){
 
   // ── RECOMMENDATIONS
   if(priced.length>0){
-    const coveredBeerNames=new Set([...beers.map(b=>b.beer),...watchlist.map(w=>w.beer)]);
-    const coveredOrigins=new Set([...beers.map(b=>b.origin),...watchlist.map(w=>w.origin)]);
-    const coveredStyles=new Set([...beers.map(b=>b.style),...watchlist.map(w=>w.style)]);
-    const candidates=[
-      {beer:'Leffe Blonde',     style:'Belgian Ale',         origin:'BE',abv:6.6,region:'Leuven',              untappd:3.75,method:'Bottle'},
-      {beer:'Chimay Blue',      style:'Belgian Ale',  origin:'BE',abv:9.0,region:'Chimay, Hainaut',     untappd:4.05,method:'Bottle'},
-      {beer:'Paulaner Hefe',    style:'Wheat Beer',    origin:'DE',abv:5.5,region:'Munich',              untappd:3.87,method:'Bottle'},
-      {beer:'Augustiner Helles',style:'Lager',             origin:'DE',abv:5.2,region:'Munich',              untappd:4.10,method:'Draft'},
-      {beer:'Nastro Azzurro',   style:'Lager',               origin:'IT',abv:5.1,region:'Rome, Lazio',         untappd:3.56,method:'Bottle'},
-      {beer:'Sam Adams',        style:'Lager',             origin:'US',abv:5.0,region:'Boston, MA',          untappd:3.48,method:'Bottle'},
-      {beer:"Smithwick's",      style:'Red Ale',            origin:'IE',abv:4.5,region:'Kilkenny',            untappd:3.45,method:'Draft'},
-      {beer:"Tennent's",        style:'Lager',               origin:'GB',abv:4.0,region:'Glasgow, Scotland',   untappd:2.95,method:'Can'},
-      {beer:'Tyskie',           style:'Pilsner',            origin:'PL',abv:5.6,region:'Tychy, Silesia',      untappd:3.28,method:'Can'},
-      {beer:'Żywiec',           style:'Pilsner',            origin:'PL',abv:5.6,region:'Żywiec, Silesia',     untappd:3.35,method:'Bottle'},
-      {beer:'Orion',            style:'Lager',               origin:'JP',abv:5.0,region:'Naha, Okinawa',       untappd:3.42,method:'Can'},
-      {beer:'Menabrea',         style:'Lager',               origin:'IT',abv:4.8,region:'Biella, Piedmont',    untappd:3.55,method:'Bottle'},
-      {beer:'Tuborg',           style:'Pilsner',            origin:'DK',abv:4.6,region:'Copenhagen',          untappd:3.10,method:'Can'},
-      {beer:'Sol',              style:'Lager',            origin:'MX',abv:4.5,region:'Mexico City',         untappd:3.15,method:'Bottle'},
-      {beer:'Coopers Pale Ale', style:'Pale Ale',        origin:'AU',abv:4.5,region:'Adelaide, SA',        untappd:3.72,method:'Bottle'},
-      {beer:'Singha',           style:'Lager',              origin:'TH',abv:5.0,region:'Bangkok',             untappd:3.25,method:'Bottle'},
-      {beer:'Tiger Beer',       style:'Lager',              origin:'SG',abv:5.0,region:'Singapore',           untappd:3.18,method:'Can'},
-      {beer:'Erdinger Weissbier',style:'Wheat Beer',  origin:'DE',abv:5.3,region:'Erding, Bavaria',     untappd:3.78,method:'Bottle'},
-    ];
-    const recs=candidates
+    const coveredBeerNames=new Set([...beers.map(b=>b.beer),...IPO_WATCHLIST.map(w=>w.beer)]);
+    const coveredOrigins=new Set([...beers.map(b=>b.origin),...IPO_WATCHLIST.map(w=>w.origin)]);
+    const coveredStyles=new Set([...beers.map(b=>b.style),...IPO_WATCHLIST.map(w=>w.style)]);
+    const recs=IPO_CANDIDATES
       .filter(c=>!coveredBeerNames.has(c.beer))
       .sort((a,b)=>{
         const aS=(!coveredOrigins.has(a.origin)?2:0)+(!coveredStyles.has(a.style)?1:0);
@@ -1576,19 +1584,16 @@ function drawFutures(){
   window._ftD=true;
   try {
 
-  const untappdFt={'Bud Light':2.30,'Coors Light':2.84,'Heineken':3.00,'Stella Artois':3.30,'Corona Extra':3.47,'Modelo':3.55,'Miller Lite':2.51,'Budweiser':2.60,'Michelob Ultra':2.84,'Guinness':3.80};
-  const futuresBeers=['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
-
   // Futures price formula:
   // 55% JWAL historical weighted avg
   // 15% most recent review (momentum)
   // 30% Untappd global avg (mean reversion)
   // + dominant serving method adjustment
-  function futuresPrice(beerName){
-    const history=beers.filter(b=>b.beer===beerName);
+  function futuresPrice(beerName,subset){
+    const history=subset||beers.filter(b=>b.beer===beerName);
     if(!history.length) return null;
     const jwalAvg=avg(history.map(b=>b.rating));
-    const untappd=untappdFt[beerName]||jwalAvg;
+    const untappd=UNTAPPD_FT[beerName]||jwalAvg;
     const recent=history[history.length-1].rating;
     const weighted=jwalAvg*0.55+recent*0.15+untappd*0.30;
     const methodCount={};
@@ -1600,15 +1605,12 @@ function drawFutures(){
 
   // Detect executed contracts: beers with 2+ reviews (prior reviews set the price, latest = execution)
   const executed=[];
-  futuresBeers.forEach(name=>{
+  FUTURES_BEERS.forEach(name=>{
     const history=beers.filter(b=>b.beer===name);
     if(history.length>1){
       const prior=history.slice(0,-1);
       const last=history[history.length-1];
-      const priorAvg=avg(prior.map(b=>b.rating));
-      const untappd=untappdFt[name]||priorAvg;
-      const recent=prior[prior.length-1].rating;
-      const ft=Math.min(5.0,Math.max(1.0,priorAvg*0.55+recent*0.15+untappd*0.30));
+      const ft=futuresPrice(name,prior);
       executed.push({name,date:last.month+' '+last.year,futures:ft,actual:last.rating,spread:last.rating-ft});
     }
   });
@@ -1616,16 +1618,16 @@ function drawFutures(){
   const beats=executed.filter(e=>e.spread>=0).length;
   const misses=executed.filter(e=>e.spread<0).length;
 
-  document.getElementById('ft-contracts').textContent=futuresBeers.length;
+  document.getElementById('ft-contracts').textContent=FUTURES_BEERS.length;
   document.getElementById('ft-executed').textContent=executed.length;
   document.getElementById('ft-beat').textContent=beats;
   document.getElementById('ft-miss').textContent=misses;
   document.getElementById('ft-exec-count').textContent=executed.length+' EXECUTED';
 
-  document.getElementById('ftContractBody').innerHTML=futuresBeers.map(name=>{
+  document.getElementById('ftContractBody').innerHTML=FUTURES_BEERS.map(name=>{
     const history=beers.filter(b=>b.beer===name);
     const ft=futuresPrice(name);
-    const untappd=untappdFt[name]||0;
+    const untappd=UNTAPPD_FT[name]||0;
 
     if(!history.length){
       return `<tr>
@@ -1690,7 +1692,7 @@ function drawFutures(){
   const REQUIRED_LOC_FIELDS = ['city','region','country','cc','lat','lng'];
   const VALID_METHODS = ['Draft','Nitro','Bottle','Can'];
   const VALID_MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const FUTURES_BEERS = ['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
+  // FUTURES_BEERS defined at module level as shared constant
 
   const errors=[], warnings=[], passes=[];
   const pass=(msg)=>passes.push(msg);
@@ -1775,14 +1777,12 @@ function drawFutures(){
   const coveredFutures = FUTURES_BEERS.filter(n=>beers.some(b=>b.beer===n));
   pass(`${coveredFutures.length}/${FUTURES_BEERS.length} futures contracts have review data`);
 
-  // ── 7. IPO WATCHLIST INTEGRITY
-  const ipoBeers = ['Moretti','Peroni','Blue Moon','Miller Lite','Estrella Damm','Estrella Galicia',
-    'Brahma','Quilmes','Tsingtao','Castle Lager','Pilsner Urquell','Mythos','Victoria Bitter','Norrlands Guld','Super Bock',
-    'Asahi Super Dry','Hoegaarden','Kronenbourg','Newcastle Brown','Ringnes'];
+  // ── 7. IPO WATCHLIST INTEGRITY (uses shared IPO_WATCHLIST constant)
+  const ipoNames = IPO_WATCHLIST.map(w=>w.beer);
   const reviewedSet = new Set(beers.map(b=>b.beer));
-  const ipoReviewed = ipoBeers.filter(n=>reviewedSet.has(n));
-  const ipoPending  = ipoBeers.filter(n=>!reviewedSet.has(n));
-  ipoBeers.forEach(name=>{
+  const ipoReviewed = ipoNames.filter(n=>reviewedSet.has(n));
+  const ipoPending  = ipoNames.filter(n=>!reviewedSet.has(n));
+  ipoNames.forEach(name=>{
     if(!Object.keys(BRAND_SVGS).includes(name)) warn(`IPO beer "${name}" has no SVG logo`);
   });
   pass(`IPO watchlist: ${ipoPending.length} pending, ${ipoReviewed.length} priced`);
