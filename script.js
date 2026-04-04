@@ -79,7 +79,8 @@ let beers=[
   {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Modelo Oro",       style:"Lager",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Estrella Jalisco", style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -140,6 +141,7 @@ let breweries=[
   {name:"Brasserie d'Achouffe",       location:"Achouffe, Luxembourg",    country:"Belgium",     cc:"BE", lang:"fr", beers:"La Chouffe Blonde",                                           lat:50.1283,lng:5.7981,   ratings:[4.25]},
   {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Salzburg",      country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
   {name:"Super Bock Group",          location:"Matosinhos, Porto",         country:"Portugal",    cc:"PT", lang:"pt", beers:"Super Bock",                                                    lat:41.1817,lng:-8.6895,  ratings:[3.00]},
+  {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
 ];
 
 // ══════════════════════════════════════════════════════════════
