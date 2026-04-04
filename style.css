@@ -1063,4 +1063,51 @@ canvas {
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
 
+/* Beer search input — replaces inline styles + handlers */
+.beer-search-input {
+  background: var(--border2);
+  border: 1px solid var(--border);
+  color: var(--orange);
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 6px;
+  outline: none;
+  width: 130px;
+}
+.beer-search-input:focus {
+  border-color: var(--orange);
+}
+
+/* Brewery picker — replaces inline cssText */
+.brewery-picker {
+  position: fixed;
+  z-index: 3500;
+  background: var(--panel);
+  border: 1px solid var(--orange);
+  padding: 6px 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  box-shadow: 0 0 20px rgba(255,102,0,0.3);
+  max-height: 260px;
+  overflow-y: auto;
+  min-width: 180px;
+}
+.brewery-picker-hdr {
+  padding: 4px 10px 6px;
+  color: var(--orange);
+  font-size: 8px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 2px;
+}
+.brewery-picker-row {
+  padding: 5px 10px;
+  color: var(--white);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.brewery-picker-row:hover {
+  background: rgba(255,102,0,0.15);
+}
+
 
