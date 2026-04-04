@@ -81,6 +81,7 @@ let beers=[
   {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -121,7 +122,7 @@ let breweries=[
   {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00,2.75]},
   {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo Especial · Modelo Negra · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,2.25,3.00,3.00,3.75,3.50,3.00]},
   {name:"Cervecería Estrella Jalisco", location:"Guadalajara, Jalisco",country:"Mexico",      cc:"MX", lang:"es", beers:"Estrella Jalisco",                                    lat:20.6597,lng:-103.3496, ratings:[3.75]},
-  {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg",                                         lat:55.6614,lng:12.5361,  ratings:[2.75,3.00]},
+  {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg · Carlsberg Elephant",                    lat:55.6614,lng:12.5361,  ratings:[2.75,3.00,3.50]},
   {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", lang:"fr", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[2.75,3.75]},
   {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"Kronenbourg",           nativeName:"Kronenbourg 1664", lat:48.4637,lng:7.4845,  ratings:[3.00]},
   {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", lang:"ja", beers:"Sapporo",               nativeName:"サッポロビール",     lat:43.0685,lng:141.3544, ratings:[3.50,3.00]},
@@ -158,6 +159,7 @@ const BRAND_SVGS = {
 "Coors Light":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="100" y="28" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">COORS</text><text x="100" y="50" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#a8d8f0" text-anchor="middle" letter-spacing="3">LIGHT</text></svg>`,
 "Michelob Ultra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#001233"/><text x="100" y="24" font-family="Arial,sans-serif" font-size="9" fill="#6ba3d6" text-anchor="middle" letter-spacing="4">MICHELOB</text><text x="100" y="50" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="3">ULTRA</text></svg>`,
 "Carlsberg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="42" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#1a6b1a" text-anchor="middle">Carlsberg</text></svg>`,
+"Carlsberg Elephant":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="24" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#1a6b1a" text-anchor="middle">Carlsberg</text><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ELEPHANT</text></svg>`,
 "Modelo Especial":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">ESPECIAL</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle">Modelo</text></svg>`,
 "Modelo Negra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a0900"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="24" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">NEGRA</text></svg>`,
 "Corona Extra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="26" font-family="Times New Roman,serif" font-size="18" font-weight="bold" fill="#f4e04d" text-anchor="middle" letter-spacing="1">CORONA</text><line x1="20" y1="32" x2="180" y2="32" stroke="#f4e04d" stroke-width="0.8"/><text x="100" y="50" font-family="Times New Roman,serif" font-size="12" fill="#f4e04d" text-anchor="middle" letter-spacing="3">EXTRA</text></svg>`,
@@ -1344,7 +1346,7 @@ function drawContrarian(){
   const globalAvgs={
     'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
     'Sapporo':3.51,'Ichiban':3.43,'Modelo':3.55,
-    'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,
+    'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
     'Harp':3.42,'La Fin Du Monde':4.07,'1664':3.21,
     'Michelob Ultra':2.84,'Guinness':3.80,'Red Stripe':3.31,
     'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
