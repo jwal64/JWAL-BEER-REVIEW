@@ -78,10 +78,13 @@ let beers=[
   {beer:"La Chouffe Blonde", style:"Belgian Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Modelo Oro",       style:"Lager",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  // APR 2026
+  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Münchner Weiße",   style:"Wheat Beer",         origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Apr",monthN:4,year:2026},
+  {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -110,7 +113,7 @@ let drunkLocs=[
 
 let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner",                                    lat:48.3953,lng:11.7291, ratings:[4.50]},
-  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel", nativeName:"Münchner Weiße · Münchner Dunkel", lat:48.1351,lng:11.5820, ratings:[4.75,2.75]},
+  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel", nativeName:"Münchner Weiße · Münchner Dunkel", lat:48.1351,lng:11.5820, ratings:[4.75,2.75,4.00]},
   {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00,3.75]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
@@ -145,6 +148,7 @@ let breweries=[
   {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Salzburg",      country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
   {name:"Super Bock Group",          location:"Leça do Balio, Porto",      country:"Portugal",    cc:"PT", lang:"pt", beers:"Super Bock",                                                    lat:41.2142,lng:-8.6254,  ratings:[3.00]},
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
+  {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -217,6 +221,7 @@ const BRAND_SVGS = {
 "La Chouffe Blonde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BRASSERIE D'ACHOUFFE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="1">LA CHOUFFE</text></svg>`,
 "Stiegl Goldbräu":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="3">STIEGL</text><line x1="20" y1="28" x2="180" y2="28" stroke="#ffd700" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="1">GOLDBRÄU</text></svg>`,
 "Modelo Oro":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8a200"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="30" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">ORO</text></svg>`,
+"Dos Equis Lager Especial":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">DOS EQUIS</text><text x="85" y="48" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#c9a84c" text-anchor="middle">XX</text><text x="150" y="48" font-family="Georgia,serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="1">ESPECIAL</text></svg>`,
 };
 
 const LOGO_URIS={};
@@ -1352,6 +1357,7 @@ function drawContrarian(){
     'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
     'Münchner Weisse':3.80,'Munchen Dunkel':3.55,
     'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
+    'Dos Equis Lager Especial':3.25,
   };
 
   const jwalByBeer={};
