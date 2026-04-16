@@ -258,13 +258,15 @@ const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'Ma
 const MONTH_COLORS = ['#ff6600','#00aaff','#00cc44','#bb44ff','#ffdd00','#ff2222','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
 
 function getMonthlyData(){
-  const monthNMap={};
-  beers.forEach(b=>{ if(!monthNMap[b.month]) monthNMap[b.month]=b.monthN; });
+  // Single pass: group beers by month and record monthN + representative year
+  const monthNMap={},monthYearMap={},byMonth={};
+  beers.forEach(b=>{
+    if(!(b.month in monthNMap)){monthNMap[b.month]=b.monthN;monthYearMap[b.month]=b.year;byMonth[b.month]=[];}
+    byMonth[b.month].push(b);
+  });
   const months=Object.keys(monthNMap).sort((a,b)=>monthNMap[a]-monthNMap[b]);
-  const byMonth={};
-  months.forEach(m=>{ byMonth[m]=beers.filter(b=>b.month===m); });
   const monthColors=months.map((_,i)=>MONTH_COLORS[i%MONTH_COLORS.length]);
-  const monthLabels=months.map(m=>`${MONTH_FULL[m]||m} ${beers.find(b=>b.month===m)?.year||''}`);
+  const monthLabels=months.map(m=>`${MONTH_FULL[m]||m} ${monthYearMap[m]||''}`);
   return {months,byMonth,monthColors,monthLabels};
 }
 
@@ -317,10 +319,15 @@ function updateLiveStats(){
   const topBeer      = STATS.sorted[0];
   const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
   const avgRating    = STATS.globalAvg;
-  const avgAbv       = (beers.reduce((s,b)=>s+b.abv,0)/beers.length);
-  const minAbv       = Math.min(...beers.map(b=>b.abv));
-  const maxAbv       = Math.max(...beers.map(b=>b.abv));
-  const newCount     = beers.filter(b=>isDisplayNew(b)).length;
+  // Single pass: sum ABV, find min/max, count new
+  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0;
+  for(const b of beers){
+    abvSum+=b.abv;
+    if(b.abv<minAbv)minAbv=b.abv;
+    if(b.abv>maxAbv)maxAbv=b.abv;
+    if(isDisplayNew(b))newCount++;
+  }
+  const avgAbv = beers.length?abvSum/beers.length:0;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Header bar
@@ -858,11 +865,19 @@ document.getElementById('methodCards').innerHTML=mO.map((m,i)=>`
     <div class="kpi-label">${m.toUpperCase()}</div>
     <div class="kpi-sub">${mCt[i]} review${mCt[i]>1?'s':''}</div>
   </div>`).join('');
-const globalAvg=avg(beers.map(b=>b.rating));
+const globalAvg=STATS.globalAvg;
+// Single pass: find best/worst per method
+const mBW={};
+for(const b of beers){
+  let e=mBW[b.method];
+  if(!e){mBW[b.method]=e={best:b,worst:b};continue;}
+  if(b.rating>e.best.rating)e.best=b;
+  if(b.rating<e.worst.rating)e.worst=b;
+}
 document.getElementById('methodDetailBody').innerHTML=mO.map((m,i)=>{
-  const mb=beers.filter(b=>b.method===m);
-  const best=mb.length?mb.reduce((a,b)=>b.rating>a.rating?b:a):{beer:'—'};
-  const worst=mb.length?mb.reduce((a,b)=>b.rating<a.rating?b:a):{beer:'—'};
+  const bw=mBW[m];
+  const best=bw?bw.best:{beer:'—'};
+  const worst=bw?bw.worst:{beer:'—'};
   const diff=mA[i]-globalAvg;
   return `<tr>
     <td style="color:#ff6600">${eM[m]} ${m}</td>
@@ -905,37 +920,62 @@ function drawInsights(){
   const sr=[...ratings].sort((a,b)=>a-b);
   const mean=avg(ratings),med=sr.length%2===0?(sr[sr.length/2-1]+sr[sr.length/2])/2:sr[Math.floor(sr.length/2)],stdD=std(ratings);
   const q1=sr[Math.floor(sr.length*.25)],q3=sr[Math.floor(sr.length*.75)];
+  const minR=sr[0]??0,maxR=sr[sr.length-1]??0;
+
+  // Single pass bucket count for quintiles
+  const qb=[0,0,0,0,0,0];
+  for(const r of ratings){
+    if(r>=4.5)qb[0]++;
+    else if(r>=4)qb[1]++;
+    else if(r>=3.5)qb[2]++;
+    else if(r>=3)qb[3]++;
+    else if(r>=2.5)qb[4]++;
+    else qb[5]++;
+  }
 
   document.getElementById('statSummary').innerHTML=[
     ['MEAN',mean.toFixed(4),'fl'],['MEDIAN',med.toFixed(2),''],
-    ['STD DEV',stdD.toFixed(4),''],['MIN',Math.min(...ratings).toFixed(2),'dn'],
-    ['MAX',Math.max(...ratings).toFixed(2),'up'],['RANGE',(Math.max(...ratings)-Math.min(...ratings)).toFixed(2),''],
+    ['STD DEV',stdD.toFixed(4),''],['MIN',minR.toFixed(2),'dn'],
+    ['MAX',maxR.toFixed(2),'up'],['RANGE',(maxR-minR).toFixed(2),''],
     ['Q1 (25th)',q1.toFixed(2),''],['Q3 (75th)',q3.toFixed(2),''],
     ['IQR',(q3-q1).toFixed(2),''],['N',ratings.length,''],
   ].map(([l,v,c])=>`<div class="insight-row"><span class="insight-key">${l}</span><span class="insight-val ${c}" style="font-family:var(--mono)">${v}</span></div>`).join('');
 
   document.getElementById('quintiles').innerHTML=[
-    ['▲▲ EXCELLENT (4.5–5.0)',ratings.filter(r=>r>=4.5).length,'up'],
-    ['▲  GOOD (4.0–4.4)',ratings.filter(r=>r>=4&&r<4.5).length,'up'],
-    ['→  SOLID (3.5–3.9)',ratings.filter(r=>r>=3.5&&r<4).length,'fl'],
-    ['→  AVERAGE (3.0–3.4)',ratings.filter(r=>r>=3&&r<3.5).length,'fl'],
-    ['▼  BELOW (2.5–2.9)',ratings.filter(r=>r>=2.5&&r<3).length,'dn'],
-    ['▼▼ POOR (<2.5)',ratings.filter(r=>r<2.5).length,'dn'],
+    ['▲▲ EXCELLENT (4.5–5.0)',qb[0],'up'],
+    ['▲  GOOD (4.0–4.4)',qb[1],'up'],
+    ['→  SOLID (3.5–3.9)',qb[2],'fl'],
+    ['→  AVERAGE (3.0–3.4)',qb[3],'fl'],
+    ['▼  BELOW (2.5–2.9)',qb[4],'dn'],
+    ['▼▼ POOR (<2.5)',qb[5],'dn'],
   ].map(([l,n,c])=>`<div class="insight-row">
     <span class="insight-key">${l}</span>
     <span class="insight-val ${c}">${n} <span style="color:#555;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
   </div>`).join('');
 
-  const profAvg=fn=>{const m=beers.filter(fn);return m.length?avg(m.map(b=>b.rating)):0;};
+  const profKeys=['wheat','dark','lager','de','us','artisan','highAbv','draftNitro'];
+  const profAcc={};profKeys.forEach(k=>profAcc[k]={t:0,c:0});
+  beers.forEach(b=>{
+    const r=b.rating;
+    if(b.style==='Wheat Beer'){profAcc.wheat.t+=r;profAcc.wheat.c++;}
+    if(b.style==='Stout'||b.style==='Brown Ale'){profAcc.dark.t+=r;profAcc.dark.c++;}
+    if(b.style.includes('Lager')){profAcc.lager.t+=r;profAcc.lager.c++;}
+    if(b.origin==='DE'){profAcc.de.t+=r;profAcc.de.c++;}
+    if(b.origin==='US'){profAcc.us.t+=r;profAcc.us.c++;}
+    if(b.style.includes('Belgian')||b.style.includes('IPA')||b.style.includes('Wheat')){profAcc.artisan.t+=r;profAcc.artisan.c++;}
+    if(b.abv>=6.0){profAcc.highAbv.t+=r;profAcc.highAbv.c++;}
+    if(b.method==='Draft'||b.method==='Nitro'){profAcc.draftNitro.t+=r;profAcc.draftNitro.c++;}
+  });
+  const pv=k=>profAcc[k].c?profAcc[k].t/profAcc[k].c:0;
   const profile=[
-    {l:'WHEAT BEER BIAS',v:profAvg(b=>b.style==='Wheat Beer'),color:'#ff6600'},
-    {l:'DARK BEER TOLERANCE',v:profAvg(b=>b.style==='Stout'||b.style==='Brown Ale'),color:'#444'},
-    {l:'LAGER APPRECIATION',v:profAvg(b=>b.style.includes('Lager')),color:'#00cc44'},
-    {l:'GERMAN BEER PREMIUM',v:profAvg(b=>b.origin==='DE'),color:'#ff6600'},
-    {l:'AMERICAN BEER DISCOUNT',v:profAvg(b=>b.origin==='US'),color:'#ff2222'},
-    {l:'ARTISAN vs MACRO',v:profAvg(b=>b.style.includes('Belgian')||b.style.includes('IPA')||b.style.includes('Wheat')),color:'#bb44ff'},
-    {l:'HIGH ABV PREFERENCE',v:profAvg(b=>b.abv>=6.0),color:'#00aaff'},
-    {l:'DRAFT/NITRO PREMIUM',v:profAvg(b=>b.method==='Draft'||b.method==='Nitro'),color:'#00aaff'},
+    {l:'WHEAT BEER BIAS',v:pv('wheat'),color:'#ff6600'},
+    {l:'DARK BEER TOLERANCE',v:pv('dark'),color:'#444'},
+    {l:'LAGER APPRECIATION',v:pv('lager'),color:'#00cc44'},
+    {l:'GERMAN BEER PREMIUM',v:pv('de'),color:'#ff6600'},
+    {l:'AMERICAN BEER DISCOUNT',v:pv('us'),color:'#ff2222'},
+    {l:'ARTISAN vs MACRO',v:pv('artisan'),color:'#bb44ff'},
+    {l:'HIGH ABV PREFERENCE',v:pv('highAbv'),color:'#00aaff'},
+    {l:'DRAFT/NITRO PREMIUM',v:pv('draftNitro'),color:'#00aaff'},
   ];
   document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
     <div class="bb-bar-row">
@@ -943,12 +983,24 @@ function drawInsights(){
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${p.v/5*100}%;background:${p.color}"></div></div>
     </div>`).join('');
 
+  // Single pass build of labels, rating data, point colors, and rolling 5-pt avg (O(n))
+  const tlLabels=new Array(beers.length),tlData=new Array(beers.length),tlColors=new Array(beers.length),tlRoll=new Array(beers.length);
+  let rollSum=0;
+  for(let i=0;i<beers.length;i++){
+    const r=beers[i].rating;
+    tlLabels[i]=`#${i+1}`;
+    tlData[i]=r;
+    tlColors[i]=rC(r);
+    rollSum+=r;
+    if(i>=5)rollSum-=beers[i-5].rating;
+    tlRoll[i]=(rollSum/Math.min(i+1,5)).toFixed(2);
+  }
   safeChart('timelineChart',document.getElementById('timelineChart'),{type:'line',
     data:{
-      labels:beers.map((_,i)=>`#${i+1}`),
+      labels:tlLabels,
       datasets:[
-        {label:'Rating',data:beers.map(b=>b.rating),borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:beers.map(b=>rC(b.rating)),pointBorderColor:'#000',pointBorderWidth:1},
-        {label:'5-Pt Avg',data:beers.map((_,i,a)=>avg(a.slice(Math.max(0,i-4),i+1).map(b=>b.rating)).toFixed(2)),borderColor:'#00aaff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
+        {label:'Rating',data:tlData,borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
+        {label:'5-Pt Avg',data:tlRoll,borderColor:'#00aaff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
     options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#444',maxTicksLimit:12}}}}
@@ -979,10 +1031,16 @@ const LANG_NAMES={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
 const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
 const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
-// Build beer→lang lookup from breweries data (uses actual brewery lang field)
-const beerLangLookup={};
-breweries.forEach(br=>{br.beers.split(' · ').forEach(n=>{beerLangLookup[n.trim()]=LANG_NAMES[br.lang]||br.lang;});});
-const brewLoc={};breweries.forEach(b=>{b.beers.split(' · ').forEach(n=>{if(!brewLoc[n.trim()])brewLoc[n.trim()]=b.location;});});
+// Build beer→lang and beer→location lookups from breweries data in a single pass
+const beerLangLookup={},brewLoc={};
+breweries.forEach(br=>{
+  const langName=LANG_NAMES[br.lang]||br.lang;
+  br.beers.split(' · ').forEach(raw=>{
+    const n=raw.trim();
+    beerLangLookup[n]=langName;
+    if(!brewLoc[n])brewLoc[n]=br.location;
+  });
+});
 const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:beerLangLookup[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
@@ -1009,26 +1067,31 @@ function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;l
 function circleM(map,lat,lng,color,r,html){L.circleMarker([lat,lng],{radius:r,fillColor:color,color:'#222',weight:1,opacity:.8,fillOpacity:.75}).addTo(map).bindPopup(popHtml(html),{className:'dpop'});}
 
 function initDrunkMap(){
+  // Single pass: aggregate totals, collect unique beer names, full review list, and earliest date per city
   const cM={};
   beers.forEach(b=>{
-    if(!cM[b.city])cM[b.city]={t:0,c:0,bs:[],region:b.region,country:b.country,cc:b.cc};
-    cM[b.city].t+=b.rating;cM[b.city].c++;
-    if(!cM[b.city].bs.includes(b.beer))cM[b.city].bs.push(b.beer);
+    let e=cM[b.city];
+    if(!e){e=cM[b.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:b.region,country:b.country,cc:b.cc};}
+    e.t+=b.rating;e.c++;
+    if(!e.bs.includes(b.beer))e.bs.push(b.beer);
+    e.reviews.push(b);
+    const t=b.year*12+b.monthN;
+    if(t<e.earliest)e.earliest=t;
   });
   const map=L.map('drunkMap',{scrollWheelZoom:false}).setView([46,-20],3);
   addTiles(map);
   drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
     const d=cM[l.city],a=(d.t/d.c).toFixed(2),r=Math.max(5,Math.min(14,4+d.c*1.5));
-    const beerRows=beers.filter(b=>b.city===l.city).map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
+    const beerRows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
     circleM(map,l.lat,l.lng,cityColors[l.city]||'#ff6600',r,
       `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
   });
 
   // ── Journey Path: chronological polyline + numbered markers
-  const cityOrder=drunkLocs.filter(l=>cM[l.city]).map(l=>{
-    const earliest=beers.filter(b=>b.city===l.city).reduce((min,b)=>Math.min(min,b.year*12+b.monthN),Infinity);
-    return {city:l.city,lat:l.lat,lng:l.lng,firstTime:earliest};
-  }).sort((a,b)=>a.firstTime-b.firstTime);
+  const cityOrder=drunkLocs
+    .filter(l=>cM[l.city])
+    .map(l=>({city:l.city,lat:l.lat,lng:l.lng,firstTime:cM[l.city].earliest}))
+    .sort((a,b)=>a.firstTime-b.firstTime);
   const journeyGroup=L.layerGroup();
   if(cityOrder.length>1){
     const coords=cityOrder.map(c=>[c.lat,c.lng]);
