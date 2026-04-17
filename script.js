@@ -274,17 +274,22 @@ function getMonthlyData(){
 // PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
 // ══════════════════════════════════════════════════════════════
 function computeStats(){
-  const styleMap={},methodMap={},countryMap={},cityMap={},brandMap={};
+  const styleMap={},methodMap={},countryMap={},cityMap={},brandMap={},brandStats={};
   let ratingSum=0;
 
-  // Single pass over beers to build all aggregation maps
+  // Single pass over beers — build aggregation maps AND track per-brand min/max
+  // so brandList doesn't need Math.max(...rs) / Math.min(...rs) (which spread every rating array)
   beers.forEach(b=>{
     ratingSum+=b.rating;
     if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;
     if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;
     if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;
     if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;
-    if(!brandMap[b.beer])brandMap[b.beer]=[];brandMap[b.beer].push(b.rating);
+    if(!brandMap[b.beer]){brandMap[b.beer]=[];brandStats[b.beer]={best:b.rating,worst:b.rating};}
+    brandMap[b.beer].push(b.rating);
+    const bs=brandStats[b.beer];
+    if(b.rating>bs.best)bs.best=b.rating;
+    if(b.rating<bs.worst)bs.worst=b.rating;
   });
 
   const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
@@ -293,13 +298,48 @@ function computeStats(){
   const methodCounts=METHOD_ORDER.map(m=>methodMap[m]?methodMap[m].c:0);
   const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
   const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-  const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:Math.max(...rs),worst:Math.min(...rs),std:std(rs)})).sort((a,b)=>b.avg-a.avg);
+  const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:brandStats[n].best,worst:brandStats[n].worst,std:std(rs)})).sort((a,b)=>b.avg-a.avg);
   const sorted=[...beers].sort((a,b)=>b.rating-a.rating);
   const globalAvg=beers.length?ratingSum/beers.length:0;
 
   return {styleMap,styleRanked,METHOD_ORDER,methodMap,methodAvgs,methodCounts,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,sorted,globalAvg};
 }
+
+// ── Lookup indexes — replace O(n) .filter/.find on hot paths
+// Rebuild alongside STATS whenever the data arrays mutate.
+const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans"};
+let BEER_REVIEWS=new Map();       // beer name → [reviews]
+let BREWERY_BY_NAME=new Map();    // brewery name → brewery
+let BREWERIES_BY_CC=new Map();    // country code → [breweries]
+let BEER_LANG_LOOKUP={};          // beer name → language label
+let BREW_LOC={};                  // beer name → brewery location string
+function buildIndexes(){
+  BEER_REVIEWS=new Map();
+  for(const b of beers){
+    let arr=BEER_REVIEWS.get(b.beer);
+    if(!arr){arr=[];BEER_REVIEWS.set(b.beer,arr);}
+    arr.push(b);
+  }
+  BREWERY_BY_NAME=new Map();
+  BREWERIES_BY_CC=new Map();
+  BEER_LANG_LOOKUP={};
+  BREW_LOC={};
+  for(const br of breweries){
+    BREWERY_BY_NAME.set(br.name,br);
+    let ccArr=BREWERIES_BY_CC.get(br.cc);
+    if(!ccArr){ccArr=[];BREWERIES_BY_CC.set(br.cc,ccArr);}
+    ccArr.push(br);
+    const langName=LANG_NAMES_IDX[br.lang]||br.lang;
+    for(const raw of br.beers.split(' · ')){
+      const n=raw.trim();
+      BEER_LANG_LOOKUP[n]=langName;
+      if(!BREW_LOC[n])BREW_LOC[n]=br.location;
+    }
+  }
+}
+function refreshStats(){ STATS=computeStats(); buildIndexes(); }
 let STATS=computeStats();
+buildIndexes();
 
 // ══════════════════════════════════════════════════════════════
 // "NEW" DISPLAY — only show NEW tag for beers reviewed in the current month
@@ -435,7 +475,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   }
 
   function refreshUI(){
-    STATS=computeStats();
+    refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
     ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_chorD','_langD']
       .forEach(f=>window[f]=false);
@@ -481,17 +521,20 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // CLOCK & TICKER — isolated first, cannot be killed by downstream errors
 // ══════════════════════════════════════════════════════════════
 (function initClockAndTicker(){
-  // CLOCK
+  // CLOCK — cache DOM refs once so the 1-Hz tick isn't 4 getElementById lookups/sec
+  const clockTimeEl=document.getElementById('clock-time');
+  const clockDateEl=document.getElementById('clock-date');
+  const mbClockEl=document.getElementById('mb-clock');
+  const sbTimeEl=document.getElementById('sb-time');
   function updateClock(){
     try {
       const n=new Date();
       const t=n.toLocaleTimeString('en-US',{hour12:false});
       const d=n.toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-      const el=id=>document.getElementById(id);
-      if(el('clock-time'))el('clock-time').textContent=t;
-      if(el('clock-date'))el('clock-date').textContent=d;
-      if(el('mb-clock'))el('mb-clock').textContent=t;
-      if(el('sb-time'))el('sb-time').textContent=t;
+      if(clockTimeEl) clockTimeEl.textContent=t;
+      if(clockDateEl) clockDateEl.textContent=d;
+      if(mbClockEl) mbClockEl.textContent=t;
+      if(sbTimeEl) sbTimeEl.textContent=t;
     } catch(e){ /* never let clock throw */ }
   }
   setInterval(updateClock,1000);
@@ -698,6 +741,9 @@ function applyBeerFilter(){
   data.sort((a,b)=>sk==='rating'?b.rating-a.rating:sk==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv);
   renderTable(data);
 }
+// Debounced version for keystroke-driven search input — select changes stay instant via applyBeerFilter()
+const applyBeerFilterDebounced=(()=>{let t;return ()=>{clearTimeout(t);t=setTimeout(applyBeerFilter,160);};})();
+window.applyBeerFilterDebounced=applyBeerFilterDebounced;
 function sortTable(){applyBeerFilter();}
 try {
   // Populate filter dropdowns
@@ -732,7 +778,7 @@ document.getElementById('beerGrid').innerHTML=unique.map(b=>`
 // BEER DETAIL MODAL
 // ══════════════════════════════════════════════════════════════
 function openBeerModal(name){
-  const reviews=beers.filter(b=>b.beer===name);
+  const reviews=BEER_REVIEWS.get(name)||[];
   if(!reviews.length) return;
   const ratings=reviews.map(b=>b.rating);
   const avgR=avg(ratings),bestR=Math.max(...ratings),worstR=Math.min(...ratings);
@@ -1027,21 +1073,10 @@ function drawInsights(){
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
 try {
-const LANG_NAMES={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans"};
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
 const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
 const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
-// Build beer→lang and beer→location lookups from breweries data in a single pass
-const beerLangLookup={},brewLoc={};
-breweries.forEach(br=>{
-  const langName=LANG_NAMES[br.lang]||br.lang;
-  br.beers.split(' · ').forEach(raw=>{
-    const n=raw.trim();
-    beerLangLookup[n]=langName;
-    if(!brewLoc[n])brewLoc[n]=br.location;
-  });
-});
-const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:brewLoc[b.beer]||'',lang:beerLangLookup[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
+const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:BREW_LOC[b.beer]||'',lang:BEER_LANG_LOOKUP[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
 const lA={};
 lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
 const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
@@ -1577,7 +1612,7 @@ function drawIPO(){
     document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length!==1?'S':'');
     document.getElementById('ipoPricedBody').innerHTML=priced.map(w=>{
       const target=targetCache.get(w.beer);
-      const revd=beers.filter(b=>b.beer===w.beer);
+      const revd=BEER_REVIEWS.get(w.beer)||[];
       const jwalPrice=avg(revd.map(b=>b.rating));
       const vsAnalyst=jwalPrice-target;
       const vsMkt=jwalPrice-w.untappd;
@@ -1646,7 +1681,7 @@ function drawFutures(){
   // 30% Untappd global avg (mean reversion)
   // + dominant serving method adjustment
   function futuresPrice(beerName,subset){
-    const history=subset||beers.filter(b=>b.beer===beerName);
+    const history=subset||BEER_REVIEWS.get(beerName)||[];
     if(!history.length) return null;
     const jwalAvg=avg(history.map(b=>b.rating));
     const untappd=UNTAPPD_FT[beerName]||jwalAvg;
@@ -1662,7 +1697,7 @@ function drawFutures(){
   // Detect executed contracts: beers with 2+ reviews (prior reviews set the price, latest = execution)
   const executed=[];
   FUTURES_BEERS.forEach(name=>{
-    const history=beers.filter(b=>b.beer===name);
+    const history=BEER_REVIEWS.get(name)||[];
     if(history.length>1){
       const prior=history.slice(0,-1);
       const last=history[history.length-1];
@@ -1681,7 +1716,7 @@ function drawFutures(){
   document.getElementById('ft-exec-count').textContent=executed.length+' EXECUTED';
 
   document.getElementById('ftContractBody').innerHTML=FUTURES_BEERS.map(name=>{
-    const history=beers.filter(b=>b.beer===name);
+    const history=BEER_REVIEWS.get(name)||[];
     const ft=futuresPrice(name);
     const untappd=UNTAPPD_FT[name]||0;
 
@@ -2055,7 +2090,7 @@ let _drawerMap=null;
 
 function openBreweryDrawer(name){
   try {
-    const brewery=breweries.find(b=>b.name===name);
+    const brewery=BREWERY_BY_NAME.get(name);
     if(!brewery) return;
 
     const drawer=document.getElementById('brewery-drawer');
@@ -2245,7 +2280,7 @@ function initChoropleth(){
             const cd=a2?countryData[a2]:null;
             if(!tooltip) return;
             tooltip.style.display='block';
-            const brCount=a2?breweries.filter(b=>b.cc===a2).length:0;
+            const brCount=a2?(BREWERIES_BY_CC.get(a2)||[]).length:0;
             tooltip.innerHTML=cd
               ? `<span style="color:var(--orange)">${FLAGS[a2]||''} ${CNAMES[a2]||a2}</span><br>Avg: <span style="color:var(--cyan)">${cd.avg.toFixed(2)}</span> · ${cd.count} review${cd.count>1?'s':''} · ${brCount} brewer${brCount>1?'ies':'y'}<br>Best: ${cd.best?cd.best.beer:'—'}${brCount>1?'<br><span style="color:var(--dim);font-size:8px">CLICK TO SELECT BREWERY</span>':''}`
               : `<span style="color:var(--dim)">${a2?CNAMES[a2]||a2:'—'}</span><br><span style="color:#333">No reviews yet</span>`;
@@ -2263,7 +2298,7 @@ function initChoropleth(){
           .on('click',function(event,d){
             const a2=A3_to_A2(d.id);
             if(!a2) return;
-            const matches=breweries.filter(b=>b.cc===a2);
+            const matches=BREWERIES_BY_CC.get(a2)||[];
             if(matches.length===0) return;
             if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
             showBreweryPicker(matches,event,(FLAGS[a2]||'')+' '+(CNAMES[a2]||a2)+' — SELECT BREWERY');
@@ -2279,7 +2314,7 @@ function initChoropleth(){
     const maxCount=Math.max(...ranked.map(r=>r[1].count));
     if(tbody){
       tbody.innerHTML=ranked.map(([cc,d])=>{
-        const brs=breweries.filter(b=>b.cc===cc);
+        const brs=BREWERIES_BY_CC.get(cc)||[];
         const brNames=brs.map(b=>b.name).join(', ');
         return `
         <tr style="cursor:pointer" data-cc="${cc}">
@@ -2298,7 +2333,7 @@ function initChoropleth(){
         const tr=event.target.closest('tr[data-cc]');
         if(!tr) return;
         const cc=tr.dataset.cc;
-        const matches=breweries.filter(b=>b.cc===cc);
+        const matches=BREWERIES_BY_CC.get(cc)||[];
         if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
         if(matches.length>1) showBreweryPicker(matches,event,'SELECT BREWERY');
       });

@@ -18,9 +18,9 @@
 <meta name="twitter:image" content="og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
 <link rel="stylesheet" href="style.css"/>
@@ -231,7 +231,7 @@
       <div class="bb-ctrl" style="flex-wrap:wrap;gap:6px">
         <span class="bb-ctrl-title">BEER INDEX <span class="new-tag" id="beers-new-tag"></span></span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-          <input id="beerSearch" type="text" placeholder="SEARCH..." oninput="applyBeerFilter()" style="background:var(--border2);border:1px solid var(--border);color:var(--orange);font-family:var(--mono);font-size:9px;padding:3px 6px;outline:none;width:130px" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='var(--border)'">
+          <input id="beerSearch" type="text" placeholder="SEARCH..." oninput="applyBeerFilterDebounced()" style="background:var(--border2);border:1px solid var(--border);color:var(--orange);font-family:var(--mono);font-size:9px;padding:3px 6px;outline:none;width:130px" onfocus="this.style.borderColor='#ff6600'" onblur="this.style.borderColor='var(--border)'">
           <select id="beerStyleFilter" class="bb-select" onchange="applyBeerFilter()"><option value="">ALL STYLES</option></select>
           <select id="beerOriginFilter" class="bb-select" onchange="applyBeerFilter()"><option value="">ALL ORIGINS</option></select>
           <select id="beerSortSel" class="bb-select" onchange="applyBeerFilter()">
@@ -773,7 +773,7 @@
   <div class="sb-item" id="sb-time">--:--:--</div>
 </div>
 
-<script src="script.js"></script>
+<script defer src="script.js"></script>
 
 </body>
 </html>
