@@ -581,18 +581,31 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 })();
 
 // ── TAB
+(function initTabA11y(){
+  try{
+    const mb=document.getElementById('menubar'); if(mb) mb.setAttribute('role','tablist');
+    const sb=document.querySelector('.sidebar nav,#sidebar nav,nav'); if(sb) sb.setAttribute('role','tablist');
+    document.querySelectorAll('.nav-item,.mb-item').forEach(el=>{
+      const tab=el.dataset.tab; if(!tab) return;
+      el.setAttribute('role','tab');
+      el.setAttribute('tabindex','0');
+      el.setAttribute('aria-selected',el.classList.contains('active')?'true':'false');
+      if(!el.getAttribute('aria-label')) el.setAttribute('aria-label',tab.replace(/^./,c=>c.toUpperCase())+' tab');
+    });
+  }catch(e){}
+})();
 function showTab(id,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelectorAll('.mb-item').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
+  document.querySelectorAll('.mb-item').forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
   document.getElementById(id).classList.add('active');
   // Sync menubar
   const mbEl=document.querySelector(`.mb-item[data-tab="${id}"]`);
-  if(mbEl) mbEl.classList.add('active');
+  if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
   // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
-  if(navEl) navEl.classList.add('active');
+  if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
   if(id==='countries'&&!window._cD) drawCountry();
   if(id==='city'&&!window._ciD) drawCity();
   if(id==='rankings'&&!window._rkD) drawRankings();
@@ -814,10 +827,12 @@ function openBeerModal(name){
         </tr>`).join('')}
       </tbody>
     </table>`;
-  document.getElementById('beerModal').classList.add('open');
+  const bm=document.getElementById('beerModal');
+  bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
 }
 function closeBeerModal(){
-  document.getElementById('beerModal').classList.remove('open');
+  const bm=document.getElementById('beerModal');
+  bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2120,6 +2135,7 @@ function openBreweryDrawer(name){
     `;
 
     drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden','false');
 
     // Mini map inside drawer
     setTimeout(()=>{
@@ -2139,7 +2155,7 @@ function openBreweryDrawer(name){
 
 function closeBreweryDrawer(){
   const drawer=document.getElementById('brewery-drawer');
-  if(drawer) drawer.classList.remove('open');
+  if(drawer){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
 }
 
 window.openBreweryDrawer=openBreweryDrawer;
@@ -2175,7 +2191,31 @@ function showBreweryPicker(matches,event,headerText){
 // ══════════════════════════════════════════════════════════════
 // CHOROPLETH MAP (D3 + TopoJSON)
 // ══════════════════════════════════════════════════════════════
+function _loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src; s.async=false;
+    s.onload=()=>res(); s.onerror=()=>rej(new Error('load '+src));
+    document.head.appendChild(s);
+  });
+}
+let _choroLibs=null;
+function _ensureChoroLibs(){
+  if(_choroLibs) return _choroLibs;
+  if(typeof d3!=='undefined'&&typeof topojson!=='undefined'){ _choroLibs=Promise.resolve(); return _choroLibs; }
+  _choroLibs=_loadScript('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js')
+    .then(()=>_loadScript('https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js'));
+  return _choroLibs;
+}
 function initChoropleth(){
+  const wrap0=document.getElementById('choropleth-svg-wrap');
+  if(wrap0) wrap0.innerHTML='<div style="text-align:center;padding:40px;font-size:10px;color:var(--dim)">Loading map libraries…</div>';
+  _ensureChoroLibs().then(_initChoroplethImpl).catch(e=>{
+    if(wrap0) wrap0.innerHTML='<div style="text-align:center;padding:40px;font-size:10px;color:var(--red)">Failed to load map libraries</div>';
+    console.error(e);
+  });
+}
+function _initChoroplethImpl(){
   try {
     // Build country data from beers (origin = brewery country)
     const cm={};

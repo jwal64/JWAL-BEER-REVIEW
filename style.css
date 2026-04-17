@@ -449,13 +449,16 @@ font-weight: 700;
 font-family: var(--mono);
 border-left: 3px solid;
 letter-spacing: 0.5px;
+color: var(--rb-c);
+border-color: var(--rb-c);
+background: var(--rb-bg);
 }
-.r5  { color: var(--green2); border-color: var(--green2); background: rgba(0,255,85,0.08); }
-.r4  { color: #55dd77; border-color: #55dd77; background: rgba(85,221,119,0.08); }
-.r35 { color: var(--amber); border-color: var(--amber); background: rgba(255,170,0,0.08); }
-.r3  { color: var(--orange); border-color: var(--orange); background: rgba(255,102,0,0.08); }
-.r25 { color: #ff8844; border-color: #ff8844; background: rgba(255,136,68,0.08); }
-.r2  { color: var(--red); border-color: var(--red); background: rgba(255,34,34,0.08); }
+.r5  { --rb-c: var(--green2); --rb-bg: rgba(0,255,85,0.08); }
+.r4  { --rb-c: #55dd77;       --rb-bg: rgba(85,221,119,0.08); }
+.r35 { --rb-c: var(--amber);  --rb-bg: rgba(255,170,0,0.08); }
+.r3  { --rb-c: var(--orange); --rb-bg: rgba(255,102,0,0.08); }
+.r25 { --rb-c: #ff8844;       --rb-bg: rgba(255,136,68,0.08); }
+.r2  { --rb-c: var(--red);    --rb-bg: rgba(255,34,34,0.08); }
 
 /* ═══════════════════════════════════════════
 PROGRESS BARS

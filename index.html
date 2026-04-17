@@ -21,19 +21,17 @@
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js"></script>
 <link rel="stylesheet" href="style.css"/>
 
 </head>
 <body>
 
 <!-- BEER DETAIL MODAL -->
-<div id="beerModal">
+<div id="beerModal" role="dialog" aria-modal="true" aria-labelledby="beerModalTitle" aria-hidden="true">
   <div id="beerModalBox">
     <div id="beerModalHead">
       <span id="beerModalTitle">BEER DETAIL</span>
-      <button id="beerModalClose">✕</button>
+      <button id="beerModalClose" aria-label="Close beer detail">✕</button>
     </div>
     <div id="beerModalBody"></div>
   </div>
@@ -57,10 +55,10 @@
 </div>
 
 <!-- BREWERY DRAWER -->
-<div id="brewery-drawer">
+<div id="brewery-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
   <div id="drawer-head">
     <span id="drawer-title">BREWERY DETAIL</span>
-    <button id="drawer-close">✕</button>
+    <button id="drawer-close" aria-label="Close brewery detail">✕</button>
   </div>
   <div id="drawer-map"></div>
   <div id="drawer-body"></div>
