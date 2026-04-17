@@ -1087,29 +1087,6 @@ function initDrunkMap(){
       `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
   });
 
-  // ── Journey Path: chronological polyline + numbered markers
-  const cityOrder=drunkLocs
-    .filter(l=>cM[l.city])
-    .map(l=>({city:l.city,lat:l.lat,lng:l.lng,firstTime:cM[l.city].earliest}))
-    .sort((a,b)=>a.firstTime-b.firstTime);
-  const journeyGroup=L.layerGroup();
-  if(cityOrder.length>1){
-    const coords=cityOrder.map(c=>[c.lat,c.lng]);
-    const journeyLine=L.polyline(coords,{color:'#ff6600',weight:2.5,opacity:0.6,dashArray:'8,6'}).addTo(journeyGroup);
-    setTimeout(()=>{const el=journeyLine.getElement();if(el)el.classList.add('journey-line');},50);
-  }
-  cityOrder.forEach((c,i)=>{
-    L.marker([c.lat,c.lng],{icon:L.divIcon({className:'journey-num',html:`<div>${i+1}</div>`,iconSize:[20,20],iconAnchor:[10,10]}),zIndexOffset:1000+i}).addTo(journeyGroup);
-  });
-  journeyGroup.addTo(map);
-  document.getElementById('journeyInfo').textContent=cityOrder.map((c,i)=>`${i+1}→${c.city}`).join('  ');
-  let journeyVisible=true;
-  document.getElementById('journeyToggle').addEventListener('click',()=>{
-    journeyVisible=!journeyVisible;
-    if(journeyVisible)journeyGroup.addTo(map);else map.removeLayer(journeyGroup);
-    document.getElementById('journeyToggle').textContent='JOURNEY PATH: '+(journeyVisible?'ON':'OFF');
-  });
-
   document.getElementById('drunkLeg').innerHTML=drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
