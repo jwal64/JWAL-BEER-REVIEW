@@ -225,9 +225,8 @@ const BRAND_SVGS = {
 };
 
 // ══════════════════════════════════════════════════════════════
-// BRAND DOMAINS (for Brandfetch logo API)
+// BRAND DOMAINS (for Google favicon logo API — no account needed)
 // ══════════════════════════════════════════════════════════════
-const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
 const BRAND_DOMAINS = {
   "Heineken":"heineken.com",
   "Guinness":"guinness.com",
@@ -282,7 +281,7 @@ Object.entries(BRAND_SVGS).forEach(([n,s])=>{SVG_FALLBACK_URIS[n]='data:image/sv
 
 function logoURL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://cdn.brandfetch.io/${d}?c=${BRANDFETCH_CLIENT_ID}`:null;
+  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=256`:null;
 }
 
 // Domain validation: warn about any beer entries missing a brand domain mapping
