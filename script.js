@@ -224,14 +224,72 @@ const BRAND_SVGS = {
 "Dos Equis Lager Especial":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">DOS EQUIS</text><text x="85" y="48" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#c9a84c" text-anchor="middle">XX</text><text x="150" y="48" font-family="Georgia,serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="1">ESPECIAL</text></svg>`,
 };
 
-const LOGO_URIS={};
-Object.entries(BRAND_SVGS).forEach(([n,s])=>{LOGO_URIS[n]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);});
+// ══════════════════════════════════════════════════════════════
+// BRAND DOMAINS (for Brandfetch logo API)
+// ══════════════════════════════════════════════════════════════
+const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
+const BRAND_DOMAINS = {
+  "Heineken":"heineken.com",
+  "Guinness":"guinness.com",
+  "Stella Artois":"stellaartois.com",
+  "Budweiser":"budweiser.com",
+  "Bud Light":"budlight.com",
+  "Coors Light":"coorslight.com",
+  "Michelob Ultra":"michelobultra.com",
+  "Carlsberg":"carlsberg.com",
+  "Carlsberg Elephant":"carlsberg.com",
+  "Modelo Especial":"modelousa.com",
+  "Modelo Negra":"modelousa.com",
+  "Modelo Oro":"modelousa.com",
+  "Corona Extra":"coronausa.com",
+  "Sapporo":"sapporobeer.com",
+  "Kirin Ichiban":"kirin.co.jp",
+  "Grolsch":"grolsch.com",
+  "Grolsch Puur Weizen":"grolsch.com",
+  "Duvel":"duvel.com",
+  "La Fin Du Monde":"unibroue.com",
+  "Kronenbourg":"kronenbourg1664.com",
+  "Red Stripe":"redstripebeer.com",
+  "Harp":"harplager.com",
+  "Weihenstephaner":"weihenstephaner.de",
+  "Münchner Weiße":"hofbraeu-muenchen.de",
+  "Münchner Dunkel":"hofbraeu-muenchen.de",
+  "Hertog Jan":"hertogjan.nl",
+  "Birra Moretti":"birramoretti.com",
+  "Nastro Azzurro":"nastroazzurro.com",
+  "Estrella Damm":"estrelladamm.com",
+  "Estrella Galicia":"estrellagalicia.com",
+  "Estrella Jalisco":"estrellajalisco.com",
+  "Pilsner Urquell":"pilsnerurquell.com",
+  "Super Bock":"superbock.pt",
+  "Erdinger Weißbier":"erdinger.de",
+  "Wrench":"industrialartsbrewing.com",
+  "Texels Skuumkoppe":"texels.nl",
+  "Smithwick's":"smithwicks.com",
+  "Tennent's":"tennents.com",
+  "Affligem Tripel":"affligembeer.be",
+  "Bolleke De Koninck":"dekoninck.be",
+  "IJwit":"brouwerijhetij.nl",
+  "La Chouffe Blonde":"achouffe.be",
+  "Stiegl Goldbräu":"stiegl.at",
+  "Leffe Blonde":"leffe.com",
+  "Dos Equis Lager Especial":"dosequis.com",
+  "Rolling Rock Extra Pale":"rollingrock.com",
+};
 
-// SVG validation: warn about any beer entries missing a brand SVG
-(function validateBeerSVGs(){
-  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_SVGS[name]);
+const SVG_FALLBACK_URIS={};
+Object.entries(BRAND_SVGS).forEach(([n,s])=>{SVG_FALLBACK_URIS[n]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s).replace(/'/g,'%27');});
+
+function logoURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://cdn.brandfetch.io/${d}?c=${BRANDFETCH_CLIENT_ID}`:null;
+}
+
+// Domain validation: warn about any beer entries missing a brand domain mapping
+(function validateBeerDomains(){
+  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_DOMAINS[name]);
   if(missing.length){
-    console.warn(`[SVG CHECK] ${missing.length} beer(s) missing brand SVG:\n  - ${missing.join('\n  - ')}`);
+    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing brand domain:\n  - ${missing.join('\n  - ')}`);
   }
 })();
 
@@ -246,12 +304,18 @@ const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
 function logoImg(name,size=24){
-  const u=LOGO_URIS[name];
-  return u?`<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}">`:`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const u=logoURL(name);
+  if(!u)return `<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const fb=SVG_FALLBACK_URIS[name];
+  const onerr=fb?` onerror="this.onerror=null;this.src='${fb}';"`:` onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));"`;
+  return `<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
 }
 function cardLogo(name){
-  const u=LOGO_URIS[name];
-  return u?`<img src="${u}" class="bc-logo" alt="${name}">`:`<span class="bc-emoji">🍺</span>`;
+  const u=logoURL(name);
+  if(!u)return `<span class="bc-emoji">🍺</span>`;
+  const fb=SVG_FALLBACK_URIS[name];
+  const onerr=fb?` onerror="this.onerror=null;this.src='${fb}';"`:` onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));"`;
+  return `<img src="${u}" class="bc-logo" alt="${name}"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -1155,7 +1219,10 @@ function initBrewedMap(){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
     const firstBeer=b.beers.split(' · ')[0];
-    const logoHtml=LOGO_URIS[firstBeer]?`<img src="${LOGO_URIS[firstBeer]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0">`:'';
+    const logoSrc=logoURL(firstBeer);
+    const logoFb=SVG_FALLBACK_URIS[firstBeer];
+    const logoOnerr=logoFb?` onerror="this.onerror=null;this.src='${logoFb}';"`:` onerror="this.onerror=null;this.remove();"`;
+    const logoHtml=logoSrc?`<img src="${logoSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0"${logoOnerr}>`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
