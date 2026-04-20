@@ -175,7 +175,6 @@ const BRAND_DOMAINS = {
 "Corona Extra":"coronausa.com",
 "Dos Equis Lager Especial":"dosequis.com",
 "Duvel":"duvel.com",
-"Erdinger Weissbier":"erdinger.de",
 "Erdinger Weißbier":"erdinger.de",
 "Estrella Damm":"estrelladamm.com",
 "Estrella Galicia":"estrellagalicia.com",
@@ -189,7 +188,7 @@ const BRAND_DOMAINS = {
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
 "Kirin Ichiban":"kirin.co.jp",
-"Kronenbourg":"kronenbourg1664.com",
+"Kronenbourg":"1664.com",
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
@@ -210,7 +209,7 @@ const BRAND_DOMAINS = {
 "Orion":"orionbeer.co.jp",
 "Paulaner Hefe":"paulaner.com",
 "Peroni":"peroni.it",
-"Pilsner Urquell":"pilsnerurquell.com",
+"Pilsner Urquell":"prazdroj.cz",
 "Quilmes":"quilmes.com.ar",
 "Red Stripe":"redstripebeer.com",
 "Ringnes":"ringnes.no",
@@ -237,11 +236,18 @@ const BRAND_DOMAINS = {
 
 // Brandfetch's public dev client ID — embedded so users never need an account.
 const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
+// Tiered logo sources: primary (Brandfetch full logo) → fallback 1 (Google, larger
+// favicons, works for nearly every public site) → fallback 2 (DuckDuckGo). Emoji
+// is rendered inline if every remote source fails.
 function logoURL(name){
   const d=BRAND_DOMAINS[name];
   return d?`https://cdn.brandfetch.io/${d}/w/200/h/200?c=${BRANDFETCH_CLIENT_ID}`:null;
 }
 function logoFallbackURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=128`:null;
+}
+function logoFallback2URL(name){
   const d=BRAND_DOMAINS[name];
   return d?`https://icons.duckduckgo.com/ip3/${d}.ico`:null;
 }
@@ -264,18 +270,23 @@ function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½"
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
+// Walk fallback chain via dataset.f counter; each failure bumps to the next src,
+// the last failure replaces the <img> with an emoji span.
 function logoImg(name,size=24){
   const u=logoURL(name);
-  if(!u)return `<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
-  const fb=logoFallbackURL(name);
-  const onerr=` onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${fb}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));}"`;
+  const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  if(!u)return emojiSpan;
+  const fb1=logoFallbackURL(name);
+  const fb2=logoFallback2URL(name);
+  const onerr=` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${fb1}';}else if(f===1){this.src='${fb2}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));}"`;
   return `<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
 }
 function cardLogo(name){
   const u=logoURL(name);
   if(!u)return `<span class="bc-emoji">🍺</span>`;
-  const fb=logoFallbackURL(name);
-  const onerr=` onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${fb}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));}"`;
+  const fb1=logoFallbackURL(name);
+  const fb2=logoFallback2URL(name);
+  const onerr=` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${fb1}';}else if(f===1){this.src='${fb2}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));}"`;
   return `<img src="${u}" class="bc-logo" alt="${name}"${onerr}>`;
 }
 
@@ -1180,8 +1191,8 @@ function initBrewedMap(){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
     const firstBeer=b.beers.split(' · ')[0];
-    const _bSrc=logoURL(firstBeer),_bFb=logoFallbackURL(firstBeer);
-    const logoHtml=_bSrc?`<img src="${_bSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${_bFb}';}else{this.onerror=null;this.remove();}">`:'';
+    const _bSrc=logoURL(firstBeer),_bFb1=logoFallbackURL(firstBeer),_bFb2=logoFallback2URL(firstBeer);
+    const logoHtml=_bSrc?`<img src="${_bSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${_bFb1}';}else if(f===1){this.src='${_bFb2}';}else{this.onerror=null;this.remove();}">`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
@@ -1463,15 +1474,16 @@ function drawTemporal(){
 // ══════════════════════════════════════════════════════════════
 function drawContrarian(){
   window._ciX=true;
-  // Global Untappd averages — verified Feb 2026 directly from untappd.com
+  // Global Untappd averages — verified Feb 2026 directly from untappd.com.
+  // Keys MUST match the exact beer names in beers[] (case + diacritics).
   const globalAvgs={
     'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
-    'Sapporo':3.51,'Ichiban':3.43,'Modelo':3.55,
+    'Sapporo':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
     'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
-    'Harp':3.42,'La Fin Du Monde':4.07,'1664':3.21,
+    'Harp':3.42,'La Fin Du Monde':4.07,'Kronenbourg':3.21,
     'Michelob Ultra':2.84,'Guinness':3.80,'Red Stripe':3.31,
     'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
-    'Münchner Weisse':3.80,'Munchen Dunkel':3.55,
+    'Münchner Weiße':3.80,'Münchner Dunkel':3.55,
     'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
     'Dos Equis Lager Especial':3.25,
   };
@@ -1564,8 +1576,8 @@ const IPO_WATCHLIST=[
   {beer:'Sam Adams',       style:'Lager',        origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
 ];
 
-const FUTURES_BEERS=['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
-const UNTAPPD_FT={'Bud Light':2.30,'Coors Light':2.84,'Heineken':3.00,'Stella Artois':3.30,'Corona Extra':3.47,'Modelo':3.55,'Miller Lite':2.51,'Budweiser':2.60,'Michelob Ultra':2.84,'Guinness':3.80};
+const FUTURES_BEERS=['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo Especial','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
+const UNTAPPD_FT={'Bud Light':2.30,'Coors Light':2.84,'Heineken':3.00,'Stella Artois':3.30,'Corona Extra':3.47,'Modelo Especial':3.55,'Miller Lite':2.51,'Budweiser':2.60,'Michelob Ultra':2.84,'Guinness':3.80};
 
 // Recommendation candidates — only beers NOT already on IPO_WATCHLIST
 const IPO_CANDIDATES=[
@@ -1580,7 +1592,7 @@ const IPO_CANDIDATES=[
   {beer:'Sol',              style:'Lager',        origin:'MX', abv:4.5, region:'Mexico City',         untappd:3.15, method:'Bottle'},
   {beer:'Singha',           style:'Lager',        origin:'TH', abv:5.0, region:'Bangkok',             untappd:3.25, method:'Bottle'},
   {beer:'Tiger Beer',       style:'Lager',        origin:'SG', abv:5.0, region:'Singapore',           untappd:3.18, method:'Can'},
-  {beer:'Erdinger Weissbier',style:'Wheat Beer',  origin:'DE', abv:5.3, region:'Erding, Bavaria',     untappd:3.78, method:'Bottle'},
+  {beer:'Erdinger Weißbier',style:'Wheat Beer',  origin:'DE', abv:5.3, region:'Erding, Bavaria',     untappd:3.78, method:'Bottle'},
 ];
 
 // ══════════════════════════════════════════════════════════════
