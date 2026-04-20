@@ -236,20 +236,21 @@ const BRAND_DOMAINS = {
 
 // Brandfetch's public dev client ID — embedded so users never need an account.
 const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
-// Tiered logo sources: primary (Brandfetch full logo) → fallback 1 (Google, larger
-// favicons, works for nearly every public site) → fallback 2 (DuckDuckGo). Emoji
-// is rendered inline if every remote source fails.
+// Tiered logo sources: primary (Brandfetch HD logo) → fallback 1 (Google HD
+// favicons) → fallback 2 (Icon Horse, 256px PNG). Emoji renders inline if every
+// remote source fails. All endpoints requested at 2–4× the display size so
+// logos stay crisp on high-DPR screens.
 function logoURL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://cdn.brandfetch.io/${d}/w/512/h/512?c=${BRANDFETCH_CLIENT_ID}`:null;
+  return d?`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`:null;
 }
 function logoFallbackURL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=256`:null;
+  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=512`:null;
 }
 function logoFallback2URL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://icons.duckduckgo.com/ip3/${d}.ico`:null;
+  return d?`https://icon.horse/icon/${d}`:null;
 }
 
 // Coverage warning: any beer entry without a brand domain mapping
