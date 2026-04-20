@@ -241,11 +241,11 @@ const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
 // is rendered inline if every remote source fails.
 function logoURL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://cdn.brandfetch.io/${d}/w/200/h/200?c=${BRANDFETCH_CLIENT_ID}`:null;
+  return d?`https://cdn.brandfetch.io/${d}/w/512/h/512?c=${BRANDFETCH_CLIENT_ID}`:null;
 }
 function logoFallbackURL(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=128`:null;
+  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=256`:null;
 }
 function logoFallback2URL(name){
   const d=BRAND_DOMAINS[name];
@@ -513,7 +513,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   function refreshUI(){
     refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_chorD','_langD']
+    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
     try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
@@ -603,7 +603,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
     '1':'overview','2':'beers','3':'rankings','4':'countries',
     '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
     '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit','r':'choropleth',
+    'q':'contrarian','w':'ipo','e':'audit',
     'f1':'overview','f2':'beers','f3':'rankings','f4':'countries',
     'f5':'city','f6':'insights','f7':'temporal','f8':'mapdrunk',
     'f9':'mapbrewed','f10':'language'
@@ -652,7 +652,6 @@ function showTab(id,btn){
   if(id==='audit'&&!window._auditD) drawAudit();
 if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
-  if(id==='choropleth'&&!window._chorD){window._chorD=true;setTimeout(initChoropleth,100);}
   if(id==='language'&&!window._langD) drawLanguage();
 }
 
@@ -2045,7 +2044,6 @@ function toggleScanlines(){
     {id:'contrarian',label:'CONTRARIAN IDX',icon:'◆',key:'Q'},
     {id:'ipo',label:'IPO / FUTURES',icon:'◈',key:'W'},
     {id:'audit',label:'DATA AUDIT',icon:'⬡',key:'E'},
-    {id:'choropleth',label:'CHOROPLETH MAP',icon:'◎',key:'R'},
   ];
 
   function openPalette(){
@@ -2198,226 +2196,6 @@ function closeBreweryDrawer(){
 
 window.openBreweryDrawer=openBreweryDrawer;
 window.closeBreweryDrawer=closeBreweryDrawer;
-
-function showBreweryPicker(matches,event,headerText){
-  let old=document.getElementById('choro-brewery-picker');
-  if(old) old.remove();
-  const picker=document.createElement('div');
-  picker.id='choro-brewery-picker';
-  picker.style.cssText='position:fixed;z-index:3500;background:var(--panel);border:1px solid var(--orange);padding:6px 0;font-family:var(--mono);font-size:10px;box-shadow:0 0 20px rgba(255,102,0,0.3);max-height:260px;overflow-y:auto;min-width:180px;';
-  picker.style.left=(event.clientX+10)+'px';
-  picker.style.top=(event.clientY-10)+'px';
-  const hdr=document.createElement('div');
-  hdr.style.cssText='padding:4px 10px 6px;color:var(--orange);font-size:8px;letter-spacing:1px;border-bottom:1px solid var(--border2);margin-bottom:2px;';
-  hdr.textContent=headerText||'SELECT BREWERY';
-  picker.appendChild(hdr);
-  matches.forEach(br=>{
-    const row=document.createElement('div');
-    row.style.cssText='padding:5px 10px;color:var(--white);cursor:pointer;transition:background 0.1s;';
-    const avgR=avg(br.ratings);
-    row.innerHTML=`${br.name} <span class="rb ${rbC(avgR)}" style="font-size:9px;margin-left:4px">${avgR.toFixed(2)}</span>`;
-    row.addEventListener('mouseenter',()=>row.style.background='rgba(255,102,0,0.15)');
-    row.addEventListener('mouseleave',()=>row.style.background='none');
-    row.addEventListener('click',e=>{e.stopPropagation();picker.remove();openBreweryDrawer(br.name);});
-    picker.appendChild(row);
-  });
-  document.body.appendChild(picker);
-  const closePicker=ev=>{if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',closePicker,true);}};
-  setTimeout(()=>document.addEventListener('click',closePicker,true),10);
-}
-
-// ══════════════════════════════════════════════════════════════
-// CHOROPLETH MAP (D3 + TopoJSON)
-// ══════════════════════════════════════════════════════════════
-function _loadScript(src){
-  return new Promise((res,rej)=>{
-    const s=document.createElement('script');
-    s.src=src; s.async=false;
-    s.onload=()=>res(); s.onerror=()=>rej(new Error('load '+src));
-    document.head.appendChild(s);
-  });
-}
-let _choroLibs=null;
-function _ensureChoroLibs(){
-  if(_choroLibs) return _choroLibs;
-  if(typeof d3!=='undefined'&&typeof topojson!=='undefined'){ _choroLibs=Promise.resolve(); return _choroLibs; }
-  _choroLibs=_loadScript('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js')
-    .then(()=>_loadScript('https://cdn.jsdelivr.net/npm/topojson@3/dist/topojson.min.js'));
-  return _choroLibs;
-}
-function initChoropleth(){
-  const wrap0=document.getElementById('choropleth-svg-wrap');
-  if(wrap0) wrap0.innerHTML='<div style="text-align:center;padding:40px;font-size:10px;color:var(--dim)">Loading map libraries…</div>';
-  _ensureChoroLibs().then(_initChoroplethImpl).catch(e=>{
-    if(wrap0) wrap0.innerHTML='<div style="text-align:center;padding:40px;font-size:10px;color:var(--red)">Failed to load map libraries</div>';
-    console.error(e);
-  });
-}
-function _initChoroplethImpl(){
-  try {
-    // Build country data from beers (origin = brewery country)
-    const cm={};
-    beers.forEach(b=>{
-      if(!cm[b.origin]) cm[b.origin]={t:0,c:0,best:null};
-      cm[b.origin].t+=b.rating;
-      cm[b.origin].c++;
-      if(!cm[b.origin].best||b.rating>cm[b.origin].best.rating) cm[b.origin].best=b;
-    });
-    const countryData={};
-    Object.entries(cm).forEach(([cc,v])=>{ countryData[cc]={avg:v.t/v.c,count:v.c,best:v.best}; });
-
-    // Update KPI tiles
-    const ranked=Object.entries(countryData).sort((a,b)=>b[1].avg-a[1].avg);
-    const el=id=>document.getElementById(id);
-    const set=(id,v)=>{const e=el(id);if(e)e.textContent=v;};
-    set('choro-countries',ranked.length);
-    if(ranked.length){
-      const top=ranked[0],low=ranked[ranked.length-1];
-      set('choro-top',(top[1].avg).toFixed(2));
-      if(el('choro-top')) el('choro-top').className='kpi-val up';
-      set('choro-top-sub',(FLAGS[top[0]]||'')+' '+CNAMES[top[0]]+' · '+top[1].count+' reviews');
-      set('choro-low',(low[1].avg).toFixed(2));
-      if(el('choro-low')) el('choro-low').className='kpi-val dn';
-      set('choro-low-sub',(FLAGS[low[0]]||'')+' '+CNAMES[low[0]]+' · '+low[1].count+' reviews');
-      set('choro-avg',STATS.globalAvg.toFixed(2));
-    }
-
-    // Choropleth color scale
-    function choroColor(avgRating,opacity){
-      let h;
-      if(avgRating>=4.5) h='#39ff14';
-      else if(avgRating>=4.0) h='#80ff44';
-      else if(avgRating>=3.5) h='#ffae00';
-      else if(avgRating>=3.0) h='#bb5580';
-      else if(avgRating>=2.5) h='#cc3366';
-      else h='#8f1a44';
-      // Apply opacity based on count — logarithmic scale for better visual spread
-      const op=Math.min(1,0.45+0.55*(1-1/(1+opacity*0.5)));
-      const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
-      return `rgba(${r},${g},${b},${op})`;
-    }
-
-    // world-atlas countries-110m uses ISO 3166-1 numeric IDs
-    // Map numeric ID → ISO alpha-2 for our beer origins
-    const NUM_TO_A2={
-      '032':'AR','036':'AU','040':'AT','056':'BE','076':'BR','100':'BG','124':'CA',
-      '156':'CN','191':'HR','203':'CZ','208':'DK','246':'FI','250':'FR','276':'DE',
-      '300':'GR','348':'HU','352':'IS','356':'IN','372':'IE','380':'IT','388':'JM',
-      '392':'JP','410':'KR','428':'LV','440':'LT','442':'LU','470':'MT','484':'MX',
-      '528':'NL','566':'NG','578':'NO','616':'PL','620':'PT','642':'RO','643':'RU',
-      '702':'SG','703':'SK','705':'SI','710':'ZA','724':'ES','752':'SE','756':'CH',
-      '764':'TH','792':'TR','804':'UA','826':'GB','840':'US'
-    };
-    // Also handle as string padded (world-atlas may give "840" or 840)
-    const A3_to_A2=id=>NUM_TO_A2[String(id)]||NUM_TO_A2[String(id).padStart(3,'0')]||null;
-
-    const wrap=document.getElementById('choropleth-svg-wrap');
-    if(!wrap) return;
-    wrap.innerHTML='<div style="text-align:center;padding:40px;font-size:10px;color:var(--dim)">Loading world map…</div>';
-
-    const tooltip=document.getElementById('choro-tooltip');
-    const W=wrap.clientWidth||900, H=Math.round(W*0.5);
-    wrap.style.height=H+'px';
-
-    // Fetch world atlas topojson
-    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
-      .then(r=>r.json())
-      .then(world=>{
-        wrap.innerHTML='';
-        const countries=topojson.feature(world,world.objects.countries);
-
-        const svg=d3.select(wrap).append('svg')
-          .attr('viewBox',`0 0 ${W} ${H}`)
-          .attr('width','100%')
-          .attr('height',H);
-
-        const projection=d3.geoNaturalEarth1()
-          .scale(W/6.28)
-          .translate([W/2,H/2]);
-        const path=d3.geoPath().projection(projection);
-
-        svg.append('rect').attr('width',W).attr('height',H).attr('fill','#050508');
-
-        svg.selectAll('.choro-country')
-          .data(countries.features)
-          .enter().append('path')
-          .attr('class',d=>{
-            const a2=A3_to_A2(d.id);
-            return 'choro-country'+(a2&&countryData[a2]?' has-data':'');
-          })
-          .attr('d',path)
-          .attr('fill',d=>{
-            const a2=A3_to_A2(d.id);
-            if(!a2||!countryData[a2]) return '#1a1a2e';
-            return choroColor(countryData[a2].avg,countryData[a2].count);
-          })
-          .attr('stroke','#252540')
-          .attr('stroke-width',0.5)
-          .on('mouseover',function(event,d){
-            const a2=A3_to_A2(d.id);
-            const cd=a2?countryData[a2]:null;
-            if(!tooltip) return;
-            tooltip.style.display='block';
-            const brCount=a2?(BREWERIES_BY_CC.get(a2)||[]).length:0;
-            tooltip.innerHTML=cd
-              ? `<span style="color:var(--orange)">${FLAGS[a2]||''} ${CNAMES[a2]||a2}</span><br>Avg: <span style="color:var(--cyan)">${cd.avg.toFixed(2)}</span> · ${cd.count} review${cd.count>1?'s':''} · ${brCount} brewer${brCount>1?'ies':'y'}<br>Best: ${cd.best?cd.best.beer:'—'}${brCount>1?'<br><span style="color:var(--dim);font-size:8px">CLICK TO SELECT BREWERY</span>':''}`
-              : `<span style="color:var(--dim)">${a2?CNAMES[a2]||a2:'—'}</span><br><span style="color:#333">No reviews yet</span>`;
-            d3.select(this).attr('stroke','#cc3366').attr('stroke-width',1.5);
-          })
-          .on('mousemove',function(event){
-            if(!tooltip) return;
-            tooltip.style.left=(event.clientX+14)+'px';
-            tooltip.style.top=(event.clientY-10)+'px';
-          })
-          .on('mouseout',function(){
-            if(tooltip) tooltip.style.display='none';
-            d3.select(this).attr('stroke','#252540').attr('stroke-width',0.5);
-          })
-          .on('click',function(event,d){
-            const a2=A3_to_A2(d.id);
-            if(!a2) return;
-            const matches=BREWERIES_BY_CC.get(a2)||[];
-            if(matches.length===0) return;
-            if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
-            showBreweryPicker(matches,event,(FLAGS[a2]||'')+' '+(CNAMES[a2]||a2)+' — SELECT BREWERY');
-          });
-      })
-      .catch(()=>{
-        wrap.innerHTML=`<div style="text-align:center;padding:30px;font-size:10px;color:var(--dim)">
-          Map unavailable offline — country data shown in table below.</div>`;
-      });
-
-    // Table
-    const tbody=document.getElementById('choro-table-body');
-    const maxCount=Math.max(...ranked.map(r=>r[1].count));
-    if(tbody){
-      tbody.innerHTML=ranked.map(([cc,d])=>{
-        const brs=BREWERIES_BY_CC.get(cc)||[];
-        const brNames=brs.map(b=>b.name).join(', ');
-        return `
-        <tr style="cursor:pointer" data-cc="${cc}">
-          <td style="font-weight:600">${FLAGS[cc]||''} ${CNAMES[cc]||cc}</td>
-          <td>${d.count}</td>
-          <td><span class="rb ${rbC(d.avg)}">${d.avg.toFixed(2)}</span></td>
-          <td style="color:var(--white);font-size:9px" title="${brNames}">${d.best?d.best.beer:'—'}</td>
-          <td style="min-width:80px">
-            <div class="bb-bar-bg" style="width:${Math.round(d.count/maxCount*120)}px">
-              <div class="bb-bar-fill" style="width:${Math.round(d.count/maxCount*100)}%;background:${choroColor(d.avg,d.count)}"></div>
-            </div>
-          </td>
-        </tr>`;}).join('');
-      // Event delegation for choropleth table rows
-      tbody.addEventListener('click',function(event){
-        const tr=event.target.closest('tr[data-cc]');
-        if(!tr) return;
-        const cc=tr.dataset.cc;
-        const matches=BREWERIES_BY_CC.get(cc)||[];
-        if(matches.length===1){ openBreweryDrawer(matches[0].name); return; }
-        if(matches.length>1) showBreweryPicker(matches,event,'SELECT BREWERY');
-      });
-    }
-  } catch(e){ console.error('Choropleth error:',e); }
-}
 
 // ══════════════════════════════════════════════════════════════
 // KPI ANIMATED COUNTERS + SPARKLINES

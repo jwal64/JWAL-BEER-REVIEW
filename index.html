@@ -64,9 +64,6 @@
   <div id="drawer-body"></div>
 </div>
 
-<!-- CHOROPLETH TOOLTIP -->
-<div id="choro-tooltip"></div>
-
 <!-- MENU BAR -->
 
 <div id="menubar">
@@ -84,7 +81,6 @@
   <div class="mb-item" data-tab="contrarian"><span class="fkey">Q</span>CNTRN</div>
   <div class="mb-item" data-tab="ipo"><span class="fkey">W</span>IPO/FT</div>
   <div class="mb-item" data-tab="audit"><span class="fkey">E</span>AUDIT</div>
-  <div class="mb-item" data-tab="choropleth"><span class="fkey">R</span>CHORO</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -158,7 +154,6 @@
   <div class="nav-section-head">MAPS</div>
   <div class="nav-item" data-tab="mapdrunk"><span class="nav-icon">◉</span>CONSUMED<span class="nkey">F8</span></div>
   <div class="nav-item" data-tab="mapbrewed"><span class="nav-icon">◎</span>BREWERIES<span class="nkey">F9</span></div>
-  <div class="nav-item" data-tab="choropleth"><span class="nav-icon">◈</span>CHOROPLETH<span class="nkey">R</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -651,42 +646,6 @@
             <th></th><th>BEER</th><th>DATE</th><th style="color:#ff6600">FUTURES PRICE</th><th>ACTUAL</th><th>SPREAD</th><th>RESULT</th>
           </tr></thead>
           <tbody id="ftExecBody"><tr><td colspan="7" style="color:#333;text-align:center;padding:20px">NO CONTRACTS EXECUTED — FUTURES PRICE ON NEXT REVIEW</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ CHOROPLETH ══════════════ -->
-<div id="choropleth" class="panel">
-  <div class="g4" style="margin-bottom:8px" id="choro-kpis">
-    <div class="kpi"><div class="kpi-val" style="color:var(--orange)" id="choro-countries">—</div><div class="kpi-label">ORIGIN COUNTRIES</div></div>
-    <div class="kpi"><div class="kpi-val up" id="choro-top">—</div><div class="kpi-label">BEST COUNTRY</div><div class="kpi-sub" id="choro-top-sub">—</div></div>
-    <div class="kpi"><div class="kpi-val dn" id="choro-low">—</div><div class="kpi-label">LOWEST COUNTRY</div><div class="kpi-sub" id="choro-low-sub">—</div></div>
-    <div class="kpi"><div class="kpi-val fl" id="choro-avg">—</div><div class="kpi-label">GLOBAL AVG</div><div class="kpi-sub">All beers reviewed</div></div>
-  </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">CHOROPLETH — BREWERY ORIGIN MAP<span class="ph-right">COLOR = AVG RATING · OPACITY = VOLUME</span></div>
-    <div class="bb-body">
-      <div id="choropleth-svg-wrap"></div>
-      <div class="choro-legend" id="choro-legend">
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#39ff14"></div>4.5+</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#80ff44"></div>4.0–4.4</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#ffae00"></div>3.5–3.9</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#bb5580"></div>3.0–3.4</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#cc3366"></div>2.5–2.9</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#8f1a44"></div>&lt;2.5</div>
-        <div class="choro-legend-item"><div class="choro-legend-dot" style="background:#1a1a2e"></div>NO DATA</div>
-      </div>
-    </div>
-  </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">COUNTRY DETAIL — SORTED BY AVG RATING</div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table">
-          <thead><tr><th>COUNTRY</th><th>REVIEWS</th><th>AVG RATING</th><th>BEST BEER</th><th>COVERAGE BAR</th></tr></thead>
-          <tbody id="choro-table-body"></tbody>
         </table>
       </div>
     </div>
