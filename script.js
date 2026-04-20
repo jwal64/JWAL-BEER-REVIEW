@@ -152,88 +152,105 @@ let breweries=[
 ];
 
 // ══════════════════════════════════════════════════════════════
-// BRAND SVGS
+// BRAND DOMAINS — every beer maps to its brewery's domain
+// Real logos load via Brandfetch's public CDN (no account required
+// by end users); DuckDuckGo's icon service is the no-auth fallback.
 // ══════════════════════════════════════════════════════════════
-const BRAND_SVGS = {
-"Heineken":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="10" y="43" font-family="Arial Black,sans-serif" font-size="38" font-weight="900" fill="#00862E" letter-spacing="-1">Heineken</text><polygon points="178,4 182,16 194,16 184,23 188,35 178,28 168,35 172,23 162,16 174,16" fill="#FF0000"/></svg>`,
-"Guinness":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><rect x="2" y="2" width="196" height="56" rx="0" fill="none" stroke="#c9a84c" stroke-width="1"/><text x="100" y="37" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">GUINNESS</text><text x="100" y="52" font-family="Georgia,serif" font-size="8" fill="#555" text-anchor="middle" letter-spacing="3">EXTRA STOUT</text></svg>`,
-"Stella Artois":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="26" font-family="Times New Roman,serif" font-size="17" font-weight="bold" fill="#1a3a8f" text-anchor="middle" letter-spacing="2">STELLA ARTOIS</text><line x1="10" y1="32" x2="190" y2="32" stroke="#c9a84c" stroke-width="1"/><text x="100" y="48" font-family="Times New Roman,serif" font-size="12" fill="#c9a84c" text-anchor="middle" letter-spacing="4">LAGER</text></svg>`,
-"Budweiser":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="42" font-family="Arial,sans-serif" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="0.5">Budweiser</text></svg>`,
-"Bud Light":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0055A5"/><text x="100" y="28" font-family="Arial,sans-serif" font-size="20" font-weight="900" fill="#fff" text-anchor="middle">BUD</text><text x="100" y="52" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#c9a84c" text-anchor="middle" letter-spacing="2">LIGHT</text></svg>`,
-"Coors Light":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="100" y="28" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">COORS</text><text x="100" y="50" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#a8d8f0" text-anchor="middle" letter-spacing="3">LIGHT</text></svg>`,
-"Michelob Ultra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#001233"/><text x="100" y="24" font-family="Arial,sans-serif" font-size="9" fill="#6ba3d6" text-anchor="middle" letter-spacing="4">MICHELOB</text><text x="100" y="50" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="3">ULTRA</text></svg>`,
-"Carlsberg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="42" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#1a6b1a" text-anchor="middle">Carlsberg</text></svg>`,
-"Carlsberg Elephant":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="24" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#1a6b1a" text-anchor="middle">Carlsberg</text><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ELEPHANT</text></svg>`,
-"Modelo Especial":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">ESPECIAL</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle">Modelo</text></svg>`,
-"Modelo Negra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a0900"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="24" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">NEGRA</text></svg>`,
-"Corona Extra":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="26" font-family="Times New Roman,serif" font-size="18" font-weight="bold" fill="#f4e04d" text-anchor="middle" letter-spacing="1">CORONA</text><line x1="20" y1="32" x2="180" y2="32" stroke="#f4e04d" stroke-width="0.8"/><text x="100" y="50" font-family="Times New Roman,serif" font-size="12" fill="#f4e04d" text-anchor="middle" letter-spacing="3">EXTRA</text></svg>`,
-"Sapporo":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#000066"/><polygon points="30,8 34,22 48,22 37,30 41,44 30,36 19,44 23,30 12,22 26,22" fill="#c9a84c"/><text x="120" y="38" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle">SAPPORO</text></svg>`,
-"Kirin Ichiban":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">KIRIN</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle">ICHIBAN</text></svg>`,
-"Grolsch":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="44" font-family="Georgia,serif" font-size="34" font-weight="bold" fill="#1a7b1a" text-anchor="middle">Grolsch</text></svg>`,
-"Grolsch Puur Weizen":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="24" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#1a7b1a" text-anchor="middle">Grolsch</text><line x1="20" y1="32" x2="180" y2="32" stroke="#1a7b1a" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="1">PUUR WEIZEN</text></svg>`,
-"Duvel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="46" font-family="Georgia,serif" font-size="40" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">DUVEL</text></svg>`,
-"La Fin Du Monde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#5a2d00"/><text x="100" y="22" font-family="Georgia,serif" font-size="11" fill="#f0e68c" text-anchor="middle" letter-spacing="2">LA FIN DU MONDE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.5"/><text x="100" y="45" font-family="Georgia,serif" font-size="10" fill="#d4a84c" text-anchor="middle" letter-spacing="1">UNIBROUE · QUÉBEC</text></svg>`,
-"Kronenbourg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002366"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">KRONENBOURG</text><text x="100" y="50" font-family="Georgia,serif" font-size="36" font-weight="bold" fill="#c9a84c" text-anchor="middle">1664</text></svg>`,
-"Red Stripe":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#CC0000"/><text x="100" y="24" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">RED</text><text x="100" y="50" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">STRIPE</text></svg>`,
-"Harp":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002868"/><text x="85" y="42" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">HARP</text><text x="165" y="22" font-family="Georgia,serif" font-size="32" fill="#c9a84c">♦</text></svg>`,
-"Weihenstephaner":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="26" font-family="Georgia,serif" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="0.5">WEIHENSTEPHANER</text><line x1="10" y1="32" x2="190" y2="32" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ANNO 1040</text></svg>`,
-"Münchner Weiße":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="26" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">MÜNCHNER</text><line x1="20" y1="34" x2="180" y2="34" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">WEISSE</text></svg>`,
-"Münchner Dunkel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#2a1400"/><text x="100" y="26" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">MÜNCHNER</text><line x1="20" y1="34" x2="180" y2="34" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#e8d49a" text-anchor="middle" letter-spacing="1">DUNKEL</text></svg>`,
-"Hertog Jan":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#6b0000"/><text x="100" y="22" font-family="Georgia,serif" font-size="11" fill="#c9a84c" text-anchor="middle" letter-spacing="2">HERTOG</text><line x1="30" y1="28" x2="170" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="52" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="3">JAN</text></svg>`,
-// IPO BEERS
-"Birra Moretti":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003399"/><text x="100" y="20" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">BIRRA</text><text x="100" y="46" font-family="Georgia,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">Moretti</text></svg>`,
-"Nastro Azzurro":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003399"/><text x="100" y="20" font-family="Arial,sans-serif" font-size="8" fill="#fff" text-anchor="middle" letter-spacing="3">NASTRO AZZURRO</text><text x="100" y="48" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">PERONI</text></svg>`,
-"Blue Moon":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a1a2e"/><circle cx="28" cy="30" r="18" fill="#f5a623" opacity="0.85"/><text x="115" y="27" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#f5a623" text-anchor="middle">BLUE</text><text x="115" y="48" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" text-anchor="middle">MOON</text></svg>`,
-"Miller Lite":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="26" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">MILLER</text><text x="100" y="50" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#c9a84c" text-anchor="middle" letter-spacing="3">LITE</text></svg>`,
-"Estrella Damm":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="24" font-family="Arial,sans-serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="3">ESTRELLA</text><text x="100" y="50" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#f5d76e" text-anchor="middle" letter-spacing="3">DAMM</text></svg>`,
-"Estrella Galicia":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#f5d76e" text-anchor="middle" letter-spacing="2">ESTRELLA</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f5d76e" text-anchor="middle" letter-spacing="1">GALICIA</text></svg>`,
-"Estrella Jalisco":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a1a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#f5d76e" text-anchor="middle" letter-spacing="2">ESTRELLA</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f5d76e" text-anchor="middle" letter-spacing="1">JALISCO</text></svg>`,
-"Brahma":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#ffd700"/><text x="100" y="42" font-family="Arial Black,sans-serif" font-size="30" font-weight="900" fill="#003087" text-anchor="middle" letter-spacing="2">BRAHMA</text></svg>`,
-"Quilmes":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="20" font-family="Arial,sans-serif" font-size="8" fill="#c9a84c" text-anchor="middle" letter-spacing="3">CERVEZA</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">QUILMES</text></svg>`,
-"Tsingtao":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="42" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">TSINGTAO</text></svg>`,
-"Castle Lager":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#ffd700" text-anchor="middle" letter-spacing="2">SOUTH AFRICAN</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="2">CASTLE LAGER</text></svg>`,
-"Pilsner Urquell":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="21" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">PILSNER</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">URQUELL</text></svg>`,
-"Super Bock":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="22" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">SUPER</text><text x="100" y="50" font-family="Arial Black,sans-serif" font-size="20" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="3">BOCK</text></svg>`,
-"Mythos":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="42" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">MYTHOS</text></svg>`,
-"Victoria Bitter":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#ffd700" text-anchor="middle">VB</text><text x="100" y="48" font-family="Arial,sans-serif" font-size="11" fill="#fff" text-anchor="middle" letter-spacing="1">VICTORIA BITTER</text></svg>`,
-"Norrlands Guld":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006AA7"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#FECC02" text-anchor="middle" letter-spacing="2">NORRLANDS</text><text x="100" y="48" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#FECC02" text-anchor="middle" letter-spacing="2">GULD</text></svg>`,
-"Asahi Super Dry":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">ASAHI</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="20" font-weight="900" fill="#c0c0c0" text-anchor="middle" letter-spacing="2">SUPER DRY</text></svg>`,
-"Hoegaarden":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a6b"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#f0e68c" text-anchor="middle" letter-spacing="3">BROUWERIJ</text><text x="100" y="48" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">Hoegaarden</text></svg>`,
-"Kronenbourg":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">BIÈRE DE</text><text x="100" y="48" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">KRONENBOURG</text></svg>`,
-"Newcastle Brown":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#3d1c02"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">NEWCASTLE</text><polygon points="100,26 104,36 114,36 106,42 109,52 100,46 91,52 94,42 86,36 96,36" fill="#00aaff"/><text x="100" y="58" font-family="Arial Black,sans-serif" font-size="8" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BROWN ALE</text></svg>`,
-"Ringnes":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="42" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">RINGNES</text></svg>`,
-"Żywiec":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#ffd700" text-anchor="middle" letter-spacing="3">PIWO</text><text x="100" y="48" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">ŻYWIEC</text></svg>`,
-"Tyskie":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#c9a84c" text-anchor="middle" letter-spacing="3">GRONIE</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="24" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="2">TYSKIE</text></svg>`,
-"Chimay Blue":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#002366"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">CHIMAY</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#4a90d9" text-anchor="middle" letter-spacing="3">GRANDE RÉSERVE</text></svg>`,
-"Leffe Blonde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a0a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="3">ABBAYE DE</text><text x="100" y="48" font-family="Georgia,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">LEFFE</text></svg>`,
-"Coopers Pale Ale":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#006633"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="3">COOPERS</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#c9a84c" text-anchor="middle" letter-spacing="1">PALE ALE</text></svg>`,
-"Sam Adams":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#8b0000"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">SAMUEL ADAMS</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">BOSTON LAGER</text></svg>`,
-"Singha":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a0a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">THAI PREMIUM</text><text x="100" y="48" font-family="Georgia,serif" font-size="28" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">SINGHA</text></svg>`,
-"Tiger Beer":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003087"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#ff8c00" text-anchor="middle" letter-spacing="3">ASIA PACIFIC</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="26" font-weight="900" fill="#ff8c00" text-anchor="middle" letter-spacing="2">TIGER</text></svg>`,
-"Erdinger Weißbier":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="2">ERDINGER</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="1">WEISSBIER</text></svg>`,
-"Wrench":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#d48a9a"/><text x="100" y="20" font-family="Arial,sans-serif" font-size="8" fill="#2a2a2a" text-anchor="middle" letter-spacing="2">INDUSTRIAL ARTS</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="26" font-weight="900" fill="#2a2a2a" text-anchor="middle" letter-spacing="2">WRENCH</text><line x1="20" y1="55" x2="180" y2="55" stroke="#2a2a2a" stroke-width="0.6"/></svg>`,
-"Texels Skuumkoppe":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">TEXELS</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">SKUUMKOPPE</text></svg>`,
-"Smithwick's":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#8b0000"/><text x="100" y="22" font-family="Georgia,serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="2">IRISH ALE</text><text x="100" y="48" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">Smithwick's</text></svg>`,
-"Tennent's":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="8" fill="#fff" text-anchor="middle" letter-spacing="3">SCOTLAND</text><text x="100" y="48" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="1">TENNENT'S</text></svg>`,
-"Affligem Tripel":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#3d1c02"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">ABBAYE D'AFFLIGEM</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="2">TRIPEL</text></svg>`,
-"Bolleke De Koninck":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#8b1a1a"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">DE KONINCK</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">BOLLEKE</text></svg>`,
-"IJwit":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#003d8f"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="2">BROUWERIJ 'T IJ</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="2">IJWIT</text></svg>`,
-"La Chouffe Blonde":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a3a00"/><text x="100" y="22" font-family="Georgia,serif" font-size="10" fill="#c9a84c" text-anchor="middle" letter-spacing="2">BRASSERIE D'ACHOUFFE</text><line x1="20" y1="28" x2="180" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#f0e68c" text-anchor="middle" letter-spacing="1">LA CHOUFFE</text></svg>`,
-"Stiegl Goldbräu":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8102e"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="10" fill="#fff" text-anchor="middle" letter-spacing="3">STIEGL</text><line x1="20" y1="28" x2="180" y2="28" stroke="#ffd700" stroke-width="0.8"/><text x="100" y="50" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#ffd700" text-anchor="middle" letter-spacing="1">GOLDBRÄU</text></svg>`,
-"Modelo Oro":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#c8a200"/><text x="100" y="22" font-family="Times New Roman,serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="3">MODELO</text><text x="100" y="50" font-family="Times New Roman,serif" font-size="30" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">ORO</text></svg>`,
-"Dos Equis Lager Especial":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#0a0a0a"/><text x="100" y="22" font-family="Arial,sans-serif" font-size="9" fill="#c9a84c" text-anchor="middle" letter-spacing="3">DOS EQUIS</text><text x="85" y="48" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#c9a84c" text-anchor="middle">XX</text><text x="150" y="48" font-family="Georgia,serif" font-size="14" fill="#c9a84c" text-anchor="middle" letter-spacing="1">ESPECIAL</text></svg>`,
-"Rolling Rock Extra Pale":`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><rect width="200" height="60" fill="#1a5e1a"/><text x="100" y="22" font-family="Georgia,serif" font-size="13" font-style="italic" fill="#fff" text-anchor="middle" letter-spacing="1">Rolling Rock</text><line x1="30" y1="28" x2="170" y2="28" stroke="#c9a84c" stroke-width="0.8"/><text x="100" y="48" font-family="Georgia,serif" font-size="14" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="3">EXTRA PALE</text></svg>`,
+const BRAND_DOMAINS = {
+"Affligem Tripel":"affligembeer.be",
+"Asahi Super Dry":"asahibeer.com",
+"Augustiner Helles":"augustiner-braeu.de",
+"Birra Moretti":"birramoretti.com",
+"Blue Moon":"bluemoonbrewingcompany.com",
+"Bolleke De Koninck":"dekoninck.be",
+"Brahma":"brahma.com.br",
+"Bud Light":"budlight.com",
+"Budweiser":"budweiser.com",
+"Carlsberg":"carlsberg.com",
+"Carlsberg Elephant":"carlsberg.com",
+"Castle Lager":"castlelager.co.za",
+"Chimay Blue":"chimay.com",
+"Coopers Pale Ale":"coopers.com.au",
+"Coors Light":"coorslight.com",
+"Corona Extra":"coronausa.com",
+"Dos Equis Lager Especial":"dosequis.com",
+"Duvel":"duvel.com",
+"Erdinger Weissbier":"erdinger.de",
+"Erdinger Weißbier":"erdinger.de",
+"Estrella Damm":"estrelladamm.com",
+"Estrella Galicia":"estrellagalicia.com",
+"Estrella Jalisco":"estrellajalisco.com",
+"Grolsch":"grolsch.com",
+"Grolsch Puur Weizen":"grolsch.com",
+"Guinness":"guinness.com",
+"Harp":"harplager.com",
+"Heineken":"heineken.com",
+"Hertog Jan":"hertogjan.nl",
+"Hoegaarden":"hoegaarden.com",
+"IJwit":"brouwerijhetij.nl",
+"Kirin Ichiban":"kirin.co.jp",
+"Kronenbourg":"kronenbourg1664.com",
+"La Chouffe Blonde":"achouffe.be",
+"La Fin Du Monde":"unibroue.com",
+"Leffe Blonde":"leffe.com",
+"Menabrea":"birramenabrea.com",
+"Michelob Ultra":"michelobultra.com",
+"Miller Lite":"millerlite.com",
+"Modelo":"modelousa.com",
+"Modelo Especial":"modelousa.com",
+"Modelo Negra":"modelousa.com",
+"Modelo Oro":"modelousa.com",
+"Moretti":"birramoretti.com",
+"Mythos":"mythosbrewery.gr",
+"Münchner Dunkel":"hofbraeu-muenchen.de",
+"Münchner Weiße":"hofbraeu-muenchen.de",
+"Nastro Azzurro":"nastroazzurro.com",
+"Newcastle Brown":"newcastlebrown.com",
+"Norrlands Guld":"norrlandsguld.se",
+"Orion":"orionbeer.co.jp",
+"Paulaner Hefe":"paulaner.com",
+"Peroni":"peroni.it",
+"Pilsner Urquell":"pilsnerurquell.com",
+"Quilmes":"quilmes.com.ar",
+"Red Stripe":"redstripebeer.com",
+"Ringnes":"ringnes.no",
+"Rolling Rock Extra Pale":"rollingrock.com",
+"Sam Adams":"samueladams.com",
+"Sapporo":"sapporobeer.com",
+"Singha":"singhabeer.com",
+"Smithwick's":"smithwicks.com",
+"Sol":"solbeer.com",
+"Stella Artois":"stellaartois.com",
+"Stiegl Goldbräu":"stiegl.at",
+"Super Bock":"superbock.pt",
+"Tennent's":"tennents.com",
+"Texels Skuumkoppe":"texels.nl",
+"Tiger Beer":"tigerbeer.com",
+"Tsingtao":"tsingtaobeer.com",
+"Tuborg":"tuborg.com",
+"Tyskie":"tyskie.pl",
+"Victoria Bitter":"vb.com.au",
+"Weihenstephaner":"weihenstephaner.de",
+"Wrench":"industrialartsbrewing.com",
+"Żywiec":"zywiec.com.pl",
 };
 
-// Build inline-SVG data URIs for every beer logo. Self-contained, no network required.
-const LOGO_URIS={};
-Object.entries(BRAND_SVGS).forEach(([n,s])=>{LOGO_URIS[n]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);});
+// Brandfetch's public dev client ID — embedded so users never need an account.
+const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
+function logoURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://cdn.brandfetch.io/${d}/w/200/h/200?c=${BRANDFETCH_CLIENT_ID}`:null;
+}
+function logoFallbackURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://icons.duckduckgo.com/ip3/${d}.ico`:null;
+}
 
-// SVG validation: warn about any beer entries missing a brand SVG
-(function validateBeerSVGs(){
-  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_SVGS[name]);
+// Coverage warning: any beer entry without a brand domain mapping
+(function validateBeerDomains(){
+  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_DOMAINS[name]);
   if(missing.length){
-    console.warn(`[SVG CHECK] ${missing.length} beer(s) missing brand SVG:\n  - ${missing.join('\n  - ')}`);
+    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing brand domain:\n  - ${missing.join('\n  - ')}`);
   }
 })();
 
@@ -248,12 +265,18 @@ const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
 function logoImg(name,size=24){
-  const u=LOGO_URIS[name];
-  return u?`<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}">`:`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const u=logoURL(name);
+  if(!u)return `<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const fb=logoFallbackURL(name);
+  const onerr=` onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${fb}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));}"`;
+  return `<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
 }
 function cardLogo(name){
-  const u=LOGO_URIS[name];
-  return u?`<img src="${u}" class="bc-logo" alt="${name}">`:`<span class="bc-emoji">🍺</span>`;
+  const u=logoURL(name);
+  if(!u)return `<span class="bc-emoji">🍺</span>`;
+  const fb=logoFallbackURL(name);
+  const onerr=` onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${fb}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));}"`;
+  return `<img src="${u}" class="bc-logo" alt="${name}"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -1157,7 +1180,8 @@ function initBrewedMap(){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
     const firstBeer=b.beers.split(' · ')[0];
-    const logoHtml=LOGO_URIS[firstBeer]?`<img src="${LOGO_URIS[firstBeer]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0">`:'';
+    const _bSrc=logoURL(firstBeer),_bFb=logoFallbackURL(firstBeer);
+    const logoHtml=_bSrc?`<img src="${_bSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${_bFb}';}else{this.onerror=null;this.remove();}">`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
@@ -1830,13 +1854,13 @@ function drawFutures(){
   if(!badRatings.length) pass('All beer ratings within 1.0–5.0 range');
 
   // ── 3. BRAND LOGO COVERAGE
-  const logoNames = Object.keys(BRAND_SVGS);
+  const logoNames = Object.keys(BRAND_DOMAINS);
   const uniqueBeers = [...new Set(beers.map(b=>b.beer))];
   uniqueBeers.forEach(name=>{
-    if(!logoNames.includes(name)) warn(`No SVG logo for beer: "${name}"`);
+    if(!logoNames.includes(name)) warn(`No brand domain for beer: "${name}"`);
   });
   const coveredCount = uniqueBeers.filter(n=>logoNames.includes(n)).length;
-  pass(`${coveredCount}/${uniqueBeers.length} beer brands have SVG logos`);
+  pass(`${coveredCount}/${uniqueBeers.length} beer brands have brand domains`);
 
   // ── 4. BREWERY ARRAY VALIDATION
   REQUIRED_BREWERY_FIELDS.forEach(f=>{
@@ -1891,7 +1915,7 @@ function drawFutures(){
   const ipoReviewed = ipoNames.filter(n=>reviewedSet.has(n));
   const ipoPending  = ipoNames.filter(n=>!reviewedSet.has(n));
   ipoNames.forEach(name=>{
-    if(!Object.keys(BRAND_SVGS).includes(name)) warn(`IPO beer "${name}" has no SVG logo`);
+    if(!Object.keys(BRAND_DOMAINS).includes(name)) warn(`IPO beer "${name}" has no brand domain`);
   });
   pass(`IPO watchlist: ${ipoPending.length} pending, ${ipoReviewed.length} priced`);
 
