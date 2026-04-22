@@ -997,4 +997,175 @@ canvas {
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
 
+/* ═══════════════════════════════════════════
+   IPO / FT TAB REDESIGN
+   ═══════════════════════════════════════════ */
+
+/* Sticky sub-nav pills under the banner */
+.ipo-subnav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  margin-bottom: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.ipo-subnav-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  color: var(--orange);
+  text-decoration: none;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.ipo-subnav-pill:hover {
+  background: rgba(255, 102, 0, 0.08);
+  border-color: var(--orange);
+  box-shadow: 0 0 8px var(--orange-glow);
+}
+.ipo-subnav-right {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* Unified 8-tile KPI strip (IPO group | FT group) */
+.ipo-kpi-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+.ipo-kpi-strip .ipo-kpi-group {
+  margin-bottom: 0;
+  padding: 0;
+}
+.ipo-kpi-strip .ipo-kpi-group:first-child {
+  border-right: 1px dashed var(--border2);
+  padding-right: 8px;
+}
+
+/* Top-picks conveyor */
+.ipo-top-picks {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  scroll-snap-type: x proximity;
+}
+.ipo-top-picks::-webkit-scrollbar { height: 6px; }
+.ipo-top-pick {
+  flex: 0 0 180px;
+  scroll-snap-align: start;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-left-width: 3px;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+.ipo-top-pick:hover {
+  background: rgba(255, 102, 0, 0.04);
+  box-shadow: 0 0 8px rgba(255, 102, 0, 0.18);
+}
+.ipo-top-pick .tp-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--orange);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.ipo-top-pick .tp-style {
+  font-size: 8px;
+  color: var(--dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.ipo-top-pick .tp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  margin-top: 2px;
+}
+.ipo-top-pick .tp-upside {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 11px;
+}
+.ipo-top-pick .tp-signal {
+  font-size: 8px;
+  padding: 1px 6px;
+  border: 1px solid;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Two-column content grid (watchlist + chart, exec + donut) */
+.bb-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  .bb-grid-2 { grid-template-columns: 1fr; }
+  .ipo-kpi-strip { grid-template-columns: 1fr; }
+  .ipo-kpi-strip .ipo-kpi-group:first-child {
+    border-right: none;
+    border-bottom: 1px dashed var(--border2);
+    padding-right: 0;
+    padding-bottom: 8px;
+  }
+  .ipo-subnav-right { display: none; }
+}
+
+/* Watchlist row left-border stripe (set via inline style per signal color) */
+.bb-table.ipo-watch tbody tr { border-left: 3px solid transparent; }
+.bb-table.ipo-watch tbody td:first-child { padding-left: 6px; }
+
+/* Collapsible methodology blocks */
+.bb-collapse {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+}
+.bb-collapse > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--orange);
+  text-transform: uppercase;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bb-collapse > summary::-webkit-details-marker { display: none; }
+.bb-collapse > summary::marker { content: ''; }
+.bb-collapse[open] > summary {
+  border-bottom: 1px solid var(--border2);
+  background: rgba(255, 102, 0, 0.04);
+}
+.bb-collapse > summary:hover { background: rgba(255, 102, 0, 0.06); }
+.bb-collapse-body {
+  padding: 8px;
+  font-size: 9px;
+  color: var(--dim);
+  line-height: 1.8;
+}
 
