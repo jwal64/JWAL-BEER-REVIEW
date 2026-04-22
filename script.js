@@ -1629,7 +1629,10 @@ function drawIPO(){
   });
 
   const reviewed=new Set(beers.map(b=>b.beer));
-  const pending=IPO_WATCHLIST.filter(w=>!reviewed.has(w.beer));
+  // Enrich with target + upside, sort pending by upside descending
+  const pending=IPO_WATCHLIST.filter(w=>!reviewed.has(w.beer))
+    .map(w=>{const t=targetCache.get(w.beer);return {...w,_target:t,_upside:t-w.untappd};})
+    .sort((a,b)=>b._upside-a._upside);
   const priced=IPO_WATCHLIST.filter(w=>reviewed.has(w.beer));
 
   document.getElementById('ipo-pending').textContent=pending.length;
@@ -1640,13 +1643,18 @@ function drawIPO(){
   document.getElementById('ipo-avg-analyst').textContent=(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2);
   document.getElementById('ipo-avg-market').textContent=(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2);
 
+  // Signal helper used by table + conveyor
+  function sigOf(target){
+    const label=target>=4.0?'STRONG BUY':target>=3.5?'BUY':target>=3.0?'HOLD':target>=2.5?'SELL':'STRONG SELL';
+    const color=target>=4.0?'#00cc44':target>=3.5?'#aacc00':target>=3.0?'#ffaa00':target>=2.5?'#ff6600':'#ff2222';
+    return {label,color};
+  }
+
   document.getElementById('ipoWatchBody').innerHTML=pending.map(w=>{
-    const target=targetCache.get(w.beer);
-    const upside=target-w.untappd;
+    const target=w._target, upside=w._upside;
     const uClass=upside>0.2?'up':upside<-0.2?'dn':'fl';
-    const signal=target>=4.0?'STRONG BUY':target>=3.5?'BUY':target>=3.0?'HOLD':target>=2.5?'SELL':'STRONG SELL';
-    const sigColor=target>=4.0?'#00cc44':target>=3.5?'#aacc00':target>=3.0?'#ffaa00':target>=2.5?'#ff6600':'#ff2222';
-    return `<tr>
+    const {label:signal,color:sigColor}=sigOf(target);
+    return `<tr style="border-left-color:${sigColor}">
       <td>${logoImg(w.beer,24)}</td>
       <td style="color:#ff6600;font-weight:600">${w.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${w.style}</span></td>
       <td>${FLAGS[w.origin]||''} <span style="color:#888">${w.origin}</span></td>
@@ -1658,10 +1666,57 @@ function drawIPO(){
     </tr>`;
   }).join('');
 
+  // ── TOP-PICKS CONVEYOR (top 6 by upside)
+  const topPicksEl=document.getElementById('ipoTopPicks');
+  const topN=pending.slice(0,6);
+  const topCountEl=document.getElementById('ipo-top-count');
+  if(topCountEl) topCountEl.textContent=topN.length+' OF '+pending.length;
+  if(topPicksEl){
+    topPicksEl.innerHTML=topN.length?topN.map(w=>{
+      const {label:signal,color:sigColor}=sigOf(w._target);
+      const uClass=w._upside>0?'up':w._upside<0?'dn':'fl';
+      return `<div class="ipo-top-pick" style="border-left-color:${sigColor}">
+        <div class="tp-head">${logoImg(w.beer,20)} <span>${w.beer}</span></div>
+        <div class="tp-style">${FLAGS[w.origin]||''} ${w.style} · ${w.abv.toFixed(1)}%</div>
+        <div class="tp-row">
+          <span style="color:#00aaff">TGT ${w._target.toFixed(2)}</span>
+          <span class="tp-upside ${uClass}">${w._upside>=0?'+':''}${w._upside.toFixed(2)}</span>
+        </div>
+        <div class="tp-row" style="margin-top:6px">
+          <span style="color:#bb44ff">UNTAPPD ${w.untappd.toFixed(2)}</span>
+          <span class="tp-signal" style="border-color:${sigColor};color:${sigColor}">${signal}</span>
+        </div>
+      </div>`;
+    }).join(''):'<div style="color:#333;font-size:9px;padding:10px">WATCHLIST FULLY PRICED — NO PENDING PICKS</div>';
+  }
+
+  // ── UPSIDE DISTRIBUTION CHART
+  const upCanvas=document.getElementById('ipoUpsideChart');
+  if(upCanvas && pending.length){
+    const buckets=[
+      {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:'#ff2222'},
+      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#ff6600'},
+      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#aacc00'},
+      {lbl:'+0.5…+1',lo:0.5,hi:1,color:'#00cc44'},
+      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#00ff88'}
+    ];
+    const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
+    safeChart('ipoUpsideChart',upCanvas,{type:'bar',
+      data:{labels:buckets.map(b=>b.lbl),datasets:[{data:counts,backgroundColor:buckets.map(b=>b.color),borderWidth:0}]},
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:'#1a1a1a'},ticks:{color:'#444',precision:0}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
+    });
+  } else if(upCanvas){
+    const prev=_charts['ipoUpsideChart']; if(prev){prev.destroy();delete _charts['ipoUpsideChart'];}
+  }
+
+  // ── PRICED PANEL (hide entirely when empty)
+  const pricedPanel=document.getElementById('ipoPricedPanel');
   if(priced.length===0){
-    document.getElementById('ipoPricedBody').innerHTML='<tr><td colspan="9" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr>';
+    if(pricedPanel) pricedPanel.style.display='none';
+    document.getElementById('ipoPricedBody').innerHTML='';
     document.getElementById('ipo-priced-count').textContent='0 BEERS';
   } else {
+    if(pricedPanel) pricedPanel.style.display='';
     document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length!==1?'S':'');
     document.getElementById('ipoPricedBody').innerHTML=priced.map(w=>{
       const target=targetCache.get(w.beer);
@@ -1805,9 +1860,13 @@ function drawFutures(){
     </tr>`;
   }).join('');
 
+  const execWrap=document.getElementById('ftExecWrap');
   if(executed.length===0){
-    document.getElementById('ftExecBody').innerHTML='<tr><td colspan="7" style="color:#333;text-align:center;padding:20px">NO CONTRACTS EXECUTED — FUTURES PRICE LOCKS ON NEXT REVIEW</td></tr>';
+    if(execWrap) execWrap.style.display='none';
+    document.getElementById('ftExecBody').innerHTML='';
+    const prev=_charts['ftBeatsDonut']; if(prev){prev.destroy();delete _charts['ftBeatsDonut'];}
   } else {
+    if(execWrap) execWrap.style.display='';
     document.getElementById('ftExecBody').innerHTML=executed.map(e=>{
       const dc=e.spread>=0?'up':'dn';
       return `<tr>
@@ -1820,6 +1879,15 @@ function drawFutures(){
         <td><span style="font-size:8px;padding:1px 7px;border:1px solid;color:${e.spread>=0?'#00cc44':'#ff2222'};border-color:${e.spread>=0?'#00cc44':'#ff2222'}">${e.spread>=0?'▲ BEAT FUTURES':'▼ MISSED FUTURES'}</span></td>
       </tr>`;
     }).join('');
+
+    // Beats vs Misses donut
+    const donutEl=document.getElementById('ftBeatsDonut');
+    if(donutEl){
+      safeChart('ftBeatsDonut',donutEl,{type:'doughnut',
+        data:{labels:['BEAT','MISS'],datasets:[{data:[beats,misses],backgroundColor:['#00cc44','#ff2222'],borderColor:'#0a0a12',borderWidth:2}]},
+        options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:9,family:"'IBM Plex Mono','Courier New',monospace"},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>c.label+': '+c.raw+' ('+Math.round(c.raw/executed.length*100)+'%)'}}}}
+      });
+    }
   }
 
   } catch(e){ console.error('Futures error:',e); }

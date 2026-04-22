@@ -507,47 +507,78 @@
   </div>
 </div>
 
-<!-- ══════════════ IPO WATCHLIST ══════════════ -->
+<!-- ══════════════ IPO / FT ══════════════ -->
 <div id="ipo" class="panel">
 
-  <!-- ══ IPO WATCHLIST ══ -->
-  <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◈ IPO WATCHLIST — PRE-REVIEW ANALYST TARGETS</div>
-  <div class="g4" style="margin-bottom:8px">
-    <div class="kpi"><div class="kpi-val" id="ipo-pending" style="color:var(--orange)">15</div><div class="kpi-label">ON WATCHLIST</div></div>
-    <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">PRICED</div></div>
-    <div class="kpi"><div class="kpi-val" id="ipo-avg-analyst" style="color:#00aaff">—</div><div class="kpi-label">AVG ANALYST TARGET</div></div>
-    <div class="kpi"><div class="kpi-val" id="ipo-avg-market" style="color:#bb44ff">—</div><div class="kpi-label">AVG MARKET RATING</div></div>
+  <!-- SINGLE BANNER -->
+  <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◈ IPO / FT — PRE-REVIEW PIPELINE &amp; MASS-MARKET FUTURES</div>
+
+  <!-- SUB-NAV PILLS -->
+  <div class="ipo-subnav">
+    <a class="ipo-subnav-pill" href="#ipo-section-watch">◈ IPO WATCHLIST</a>
+    <a class="ipo-subnav-pill" href="#ipo-section-futures">◆ FUTURES</a>
+    <span class="ipo-subnav-right" id="ipo-subnav-meta">MODEL v1.0 · UNTAPPD 50 / STYLE 25 / COUNTRY 15 / METHOD 10</span>
   </div>
 
-  <!-- METHODOLOGY CALLOUT -->
-  <div style="font-size:9px;color:#444;padding:3px 0 6px;border-bottom:1px solid #1e1e1e;margin-bottom:8px">
-    <span style="color:#ff6600">MODEL v1.0:</span> Untappd 50% &nbsp;·&nbsp; JWAL style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10% &nbsp;(<span style="color:#00cc44">Draft +0.10</span> / Nitro +0.05 / Bottle ±0 / <span style="color:#ff6600">Can −0.10</span>)
+  <!-- UNIFIED 8-TILE KPI STRIP -->
+  <div class="ipo-kpi-strip" style="margin-bottom:8px">
+    <div class="g4 ipo-kpi-group">
+      <div class="kpi"><div class="kpi-val" id="ipo-pending" style="color:var(--orange)">—</div><div class="kpi-label">◈ ON WATCHLIST</div></div>
+      <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">◈ PRICED</div></div>
+      <div class="kpi"><div class="kpi-val" id="ipo-avg-analyst" style="color:#00aaff">—</div><div class="kpi-label">◈ AVG ANALYST TGT</div></div>
+      <div class="kpi"><div class="kpi-val" id="ipo-avg-market" style="color:#bb44ff">—</div><div class="kpi-label">◈ AVG MARKET RATING</div></div>
+    </div>
+    <div class="g4 ipo-kpi-group">
+      <div class="kpi"><div class="kpi-val" id="ft-contracts" style="color:var(--orange)">—</div><div class="kpi-label">◆ ACTIVE CONTRACTS</div></div>
+      <div class="kpi"><div class="kpi-val up" id="ft-executed">0</div><div class="kpi-label">◆ EXECUTED</div></div>
+      <div class="kpi"><div class="kpi-val" id="ft-beat" style="color:#00cc44">—</div><div class="kpi-label">◆ BEAT FUTURES</div></div>
+      <div class="kpi"><div class="kpi-val dn" id="ft-miss">—</div><div class="kpi-label">◆ MISSED FUTURES</div></div>
+    </div>
   </div>
 
-  <!-- WATCHLIST TABLE -->
+  <!-- IPO SECTION ANCHOR -->
+  <div id="ipo-section-watch"></div>
+
+  <!-- TOP PICKS CONVEYOR -->
   <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">15 BEERS QUEUED</span></div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table" id="ipoWatchTable">
-          <thead><tr>
-            <th style="width:36px"></th>
-            <th>BEER / STYLE</th>
-            <th>ORIGIN</th>
-            <th>ABV</th>
-            <th style="color:#bb44ff">UNTAPPD</th>
-            <th style="color:#00aaff">JWAL TARGET</th>
-            <th>UPSIDE</th>
-            <th>SIGNAL</th>
-          </tr></thead>
-          <tbody id="ipoWatchBody"></tbody>
-        </table>
+    <div class="bb-panel-head">▲ TOP PICKS — HIGHEST UPSIDE ON WATCHLIST <span class="ph-right" id="ipo-top-count">—</span></div>
+    <div class="bb-body" style="padding:6px">
+      <div class="ipo-top-picks" id="ipoTopPicks"></div>
+    </div>
+  </div>
+
+  <!-- TWO-COLUMN: WATCHLIST TABLE + UPSIDE DISTRIBUTION CHART -->
+  <div class="bb-grid-2" style="margin-bottom:8px">
+    <div class="bb-panel">
+      <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+      <div class="bb-body">
+        <div style="overflow-x:auto">
+          <table class="bb-table ipo-watch" id="ipoWatchTable">
+            <thead><tr>
+              <th style="width:36px"></th>
+              <th>BEER / STYLE</th>
+              <th>ORIGIN</th>
+              <th>ABV</th>
+              <th style="color:#bb44ff">UNTAPPD</th>
+              <th style="color:#00aaff">JWAL TGT</th>
+              <th>UPSIDE</th>
+              <th>SIGNAL</th>
+            </tr></thead>
+            <tbody id="ipoWatchBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
+      <div class="bb-body" style="height:220px">
+        <canvas id="ipoUpsideChart"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- PRICED TABLE (fills when reviewed) -->
-  <div class="bb-panel" style="margin-bottom:16px">
+  <!-- PRICED (hidden unless priced > 0) -->
+  <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
     <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
     <div class="bb-body">
       <div style="overflow-x:auto">
@@ -557,62 +588,28 @@
             <th>BEER / STYLE</th>
             <th>ORIGIN</th>
             <th style="color:#bb44ff">UNTAPPD</th>
-            <th style="color:#00aaff">JWAL TARGET</th>
+            <th style="color:#00aaff">JWAL TGT</th>
             <th style="color:#ff6600">JWAL PRICE</th>
-            <th>vs TARGET</th>
+            <th>vs TGT</th>
             <th>vs MKT</th>
             <th>VERDICT</th>
           </tr></thead>
-          <tbody id="ipoPricedBody"><tr><td colspan="9" style="color:#333;text-align:center;padding:20px">NO BEERS PRICED YET — WATCHLIST PENDING</td></tr></tbody>
+          <tbody id="ipoPricedBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- PIPELINE RECOMMENDATIONS -->
-  <div class="bb-panel" id="ipoRecsPanel" style="display:none;margin-bottom:16px">
-    <div class="bb-panel-head">◈ PIPELINE — RECOMMENDED REPLACEMENTS <span class="ph-right" id="ipo-recs-count">0 SLOTS</span></div>
-    <div class="bb-body" style="font-size:9px;color:#555;line-height:1.6;margin-bottom:6px">
-      <span style="color:#ff6600">AUTO-GENERATED</span> — one replacement recommended per priced slot &nbsp;·&nbsp;
-      ranked by <span style="color:#00cc44">new market coverage</span> first, then <span style="color:#00aaff">new style</span>, then <span style="color:#bb44ff">Untappd consensus</span>
+  <!-- IPO METHODOLOGY (collapsed) -->
+  <details class="bb-collapse" style="margin-bottom:12px">
+    <summary>▸ IPO MODEL v1.0 &nbsp;·&nbsp; Untappd 50% &nbsp;·&nbsp; style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10%</summary>
+    <div class="bb-collapse-body">
+      <span style="color:#ff6600">MODEL v1.0:</span> Untappd 50% &nbsp;·&nbsp; JWAL style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10% &nbsp;(<span style="color:#00cc44">Draft +0.10</span> / Nitro +0.05 / Bottle ±0 / <span style="color:#ff6600">Can −0.10</span>)
     </div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table">
-          <thead><tr>
-            <th style="width:36px"></th>
-            <th>BEER / STYLE</th>
-            <th>ORIGIN</th>
-            <th>ABV</th>
-            <th style="color:#bb44ff">UNTAPPD</th>
-            <th style="color:#00aaff">JWAL TARGET</th>
-            <th>RATIONALE</th>
-          </tr></thead>
-          <tbody id="ipoRecsBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  </details>
 
-  <!-- ══ FUTURES ══ -->
-  <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◆ FUTURES — MASS-MARKET PREDICTIVE PRICING</div>
-  <div class="g4" style="margin-bottom:8px">
-    <div class="kpi"><div class="kpi-val" id="ft-contracts" style="color:var(--orange)">10</div><div class="kpi-label">ACTIVE CONTRACTS</div></div>
-    <div class="kpi"><div class="kpi-val up" id="ft-executed">0</div><div class="kpi-label">CONTRACTS EXECUTED</div></div>
-    <div class="kpi"><div class="kpi-val" id="ft-beat" style="color:#00cc44">—</div><div class="kpi-label">BEAT FUTURES</div></div>
-    <div class="kpi"><div class="kpi-val dn" id="ft-miss">—</div><div class="kpi-label">MISSED FUTURES</div></div>
-  </div>
-
-  <!-- METHODOLOGY -->
-  <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">FUTURES CONTRACT METHODOLOGY <span class="ph-right">MASS-MARKET PREDICTIVE PRICING</span></div>
-    <div class="bb-body" style="font-size:9px;color:#555;line-height:1.8">
-      Futures are priced contracts on mass-market American beers with sufficient historical data to model forward price. &nbsp;·&nbsp;
-      <span style="color:#ff6600">FORMULA:</span> Weighted moving avg of all JWAL reviews + mean-reversion toward Untappd global avg (30%) + serving method adjustment &nbsp;·&nbsp;
-      <span style="color:#00aaff">CONTRACT EXECUTES</span> automatically when a new review is entered for that beer — actual JWAL rating is compared to futures price &nbsp;·&nbsp;
-      <span style="color:#00cc44">BEAT:</span> Actual ≥ Futures price &nbsp;·&nbsp; <span style="color:#ff2222">MISS:</span> Actual &lt; Futures price
-    </div>
-  </div>
+  <!-- FUTURES SECTION ANCHOR -->
+  <div id="ipo-section-futures"></div>
 
   <!-- FUTURES CONTRACTS TABLE -->
   <div class="bb-panel" style="margin-bottom:8px">
@@ -636,20 +633,64 @@
     </div>
   </div>
 
-  <!-- EXECUTED CONTRACTS -->
-  <div class="bb-panel">
-    <div class="bb-panel-head">✓ EXECUTED CONTRACTS — SETTLEMENT HISTORY <span class="ph-right" id="ft-exec-count">0 EXECUTED</span></div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table">
-          <thead><tr>
-            <th></th><th>BEER</th><th>DATE</th><th style="color:#ff6600">FUTURES PRICE</th><th>ACTUAL</th><th>SPREAD</th><th>RESULT</th>
-          </tr></thead>
-          <tbody id="ftExecBody"><tr><td colspan="7" style="color:#333;text-align:center;padding:20px">NO CONTRACTS EXECUTED — FUTURES PRICE ON NEXT REVIEW</td></tr></tbody>
-        </table>
+  <!-- SIDE-BY-SIDE: EXECUTED CONTRACTS + BEATS/MISSES DONUT (hidden unless executed > 0) -->
+  <div class="bb-grid-2" id="ftExecWrap" style="display:none;margin-bottom:8px">
+    <div class="bb-panel" id="ftExecPanel">
+      <div class="bb-panel-head">✓ EXECUTED CONTRACTS — SETTLEMENT HISTORY <span class="ph-right" id="ft-exec-count">0 EXECUTED</span></div>
+      <div class="bb-body">
+        <div style="overflow-x:auto">
+          <table class="bb-table">
+            <thead><tr>
+              <th></th><th>BEER</th><th>DATE</th><th style="color:#ff6600">FUTURES PRICE</th><th>ACTUAL</th><th>SPREAD</th><th>RESULT</th>
+            </tr></thead>
+            <tbody id="ftExecBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">◉ BEATS vs MISSES <span class="ph-right">SETTLEMENT SPREAD</span></div>
+      <div class="bb-body" style="height:220px">
+        <canvas id="ftBeatsDonut"></canvas>
       </div>
     </div>
   </div>
+
+  <!-- FUTURES METHODOLOGY (collapsed) -->
+  <details class="bb-collapse" style="margin-bottom:12px">
+    <summary>▸ FUTURES CONTRACT METHODOLOGY &nbsp;·&nbsp; JWAL weighted avg 55% &nbsp;·&nbsp; momentum 15% &nbsp;·&nbsp; mean reversion 30%</summary>
+    <div class="bb-collapse-body">
+      Futures are priced contracts on mass-market American beers with sufficient historical data to model forward price. &nbsp;·&nbsp;
+      <span style="color:#ff6600">FORMULA:</span> Weighted moving avg of all JWAL reviews + mean-reversion toward Untappd global avg (30%) + serving method adjustment &nbsp;·&nbsp;
+      <span style="color:#00aaff">CONTRACT EXECUTES</span> automatically when a new review is entered for that beer — actual JWAL rating is compared to futures price &nbsp;·&nbsp;
+      <span style="color:#00cc44">BEAT:</span> Actual ≥ Futures price &nbsp;·&nbsp; <span style="color:#ff2222">MISS:</span> Actual &lt; Futures price
+    </div>
+  </details>
+
+  <!-- PIPELINE RECOMMENDATIONS (only when priced > 0) -->
+  <details class="bb-collapse" id="ipoRecsPanel" style="display:none;margin-bottom:12px">
+    <summary>▸ PIPELINE — RECOMMENDED REPLACEMENTS &nbsp;·&nbsp; <span id="ipo-recs-count">0 SLOTS</span></summary>
+    <div class="bb-collapse-body" style="padding:0">
+      <div style="font-size:9px;color:#555;line-height:1.6;padding:6px 8px">
+        <span style="color:#ff6600">AUTO-GENERATED</span> — one replacement recommended per priced slot &nbsp;·&nbsp;
+        ranked by <span style="color:#00cc44">new market coverage</span> first, then <span style="color:#00aaff">new style</span>, then <span style="color:#bb44ff">Untappd consensus</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="bb-table">
+          <thead><tr>
+            <th style="width:36px"></th>
+            <th>BEER / STYLE</th>
+            <th>ORIGIN</th>
+            <th>ABV</th>
+            <th style="color:#bb44ff">UNTAPPD</th>
+            <th style="color:#00aaff">JWAL TGT</th>
+            <th>RATIONALE</th>
+          </tr></thead>
+          <tbody id="ipoRecsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </details>
 </div>
 
 <!-- ══════════════ DATA AUDIT ══════════════ -->
