@@ -13,8 +13,8 @@ const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:
 //         4) Data loads live from the sheet — no PRs needed to add beers!
 //         If the sheet is unavailable, the hardcoded data below is used as fallback.
 const SHEETS_CONFIG = {
-  enabled: false,            // Set to true once you've set up your Google Sheet
-  sheetId: '',               // Paste your Google Sheet ID here
+  enabled: true,             // Master data loaded live from Google Sheets
+  sheetId: '1vxm8-QfSdWzztdlKts692Zc0t-nCTojLzrL0J1yGDAM',
   // Tab names in your Google Sheet (must match exactly):
   beersTab: 'Beers',
   breweriesTab: 'Breweries',

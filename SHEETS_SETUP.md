@@ -2,6 +2,13 @@
 
 Manage your beer data from a Google Sheet instead of editing `script.js` directly. No PRs needed to add beers!
 
+## Master Data Sheet
+
+The live master data sheet is:
+https://docs.google.com/spreadsheets/d/1vxm8-QfSdWzztdlKts692Zc0t-nCTojLzrL0J1yGDAM/edit
+
+Sheet ID: `1vxm8-QfSdWzztdlKts692Zc0t-nCTojLzrL0J1yGDAM` — already wired into `SHEETS_CONFIG` in `script.js`. The sheet must have three tabs named `Beers`, `Breweries`, and `Locations`, and be published to the web (File → Share → Publish to web → Entire Document → CSV) so the gviz CSV endpoint can read it.
+
 ## Quick Start (5 minutes)
 
 ### 1. Create Your Google Sheet
