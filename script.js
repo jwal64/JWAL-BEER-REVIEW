@@ -53,7 +53,7 @@ let beers=[
   {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncassville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncasville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Erdinger Weißbier",style:"Wheat Beer",   origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Sapporo",           style:"Lager",            origin:"JP",abv:4.9,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
@@ -104,7 +104,7 @@ let drunkLocs=[
   {city:"Montreal",    region:"Quebec",               country:"Canada",      cc:"CA", lat:45.5017,lng:-73.5673},
   {city:"Amsterdam",   region:"Noord-Holland",        country:"Netherlands", cc:"NL", lat:52.3676,lng:4.9041},
   {city:"Hengelo",     region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.2660,lng:6.7930},
-  {city:"Uncassville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
+  {city:"Uncasville", region:"Connecticut",           country:"USA",         cc:"US", lat:41.4775,lng:-72.0892},
   {city:"Queens",      region:"New York",             country:"USA",         cc:"US", lat:40.7282,lng:-73.7949},
   {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
   {city:"Nijmegen",    region:"Gelderland",           country:"Netherlands", cc:"NL", lat:51.8426,lng:5.8528},
@@ -1123,31 +1123,35 @@ function drawInsights(){
 // ══════════════════════════════════════════════════════════════
 // LANGUAGE
 // ══════════════════════════════════════════════════════════════
-try {
-const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
-const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
-const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
-const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:BREW_LOC[b.beer]||'',lang:BEER_LANG_LOOKUP[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
-const lA={};
-lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
-const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
-safeChart('langChart',document.getElementById('langChart'),{type:'bar',
-  data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
-  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
-});
-document.getElementById('langCards').innerHTML=lS.map(d=>`
-  <div class="bb-bar-row">
-    <div class="bb-bar-label"><span class="name">${lF[d.l]||''} ${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x · ${d.b.join(', ')}</span></div>
-    <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${lC[d.l]}"></div></div>
-  </div>`).join('');
-document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-a.rating).map(d=>`
-  <tr><td>${logoImg(d.beer,20)}</td><td style="color:#ff6600">${d.beer}</td><td>${FLAGS[d.country]||''} ${d.country}</td><td style="color:#555;font-size:9px">${d.region}</td><td style="color:${lC[d.lang]||'#ff6600'}">${lF[d.lang]||''} ${d.lang}</td><td><span class="rb ${rbC(d.rating)}">${d.rating.toFixed(2)}</span></td></tr>`).join('');
-} catch(e){ console.error('Language init error:',e); }
+function drawLanguage(){
+  window._langD=true;
+  try {
+    const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish"};
+    const lC={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
+    const lF={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
+    const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:BREW_LOC[b.beer]||'',lang:BEER_LANG_LOOKUP[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
+    const lA={};
+    lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
+    const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
+    safeChart('langChart',document.getElementById('langChart'),{type:'bar',
+      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
+    });
+    document.getElementById('langCards').innerHTML=lS.map(d=>`
+      <div class="bb-bar-row">
+        <div class="bb-bar-label"><span class="name">${lF[d.l]||''} ${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x · ${d.b.join(', ')}</span></div>
+        <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${lC[d.l]}"></div></div>
+      </div>`).join('');
+    document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-a.rating).map(d=>`
+      <tr><td>${logoImg(d.beer,20)}</td><td style="color:#ff6600">${d.beer}</td><td>${FLAGS[d.country]||''} ${d.country}</td><td style="color:#555;font-size:9px">${d.region}</td><td style="color:${lC[d.lang]||'#ff6600'}">${lF[d.lang]||''} ${d.lang}</td><td><span class="rb ${rbC(d.rating)}">${d.rating.toFixed(2)}</span></td></tr>`).join('');
+  } catch(e){ console.error('Language init error:',e); }
+}
+drawLanguage();
 
 // ══════════════════════════════════════════════════════════════
 // MAPS
 // ══════════════════════════════════════════════════════════════
-const cityColors={"New York":"#ff6600","New Rochelle":"#bb44ff","White Plains":"#00cc44","Eastchester":"#00aaff","Hartsdale":"#ff2222","Montreal":"#ff8800","Amsterdam":"#00cccc","Hengelo":"#6666ff","Uncassville":"#ff44aa"};
+const cityColors={"New York":"#ff6600","New Rochelle":"#bb44ff","White Plains":"#00cc44","Eastchester":"#00aaff","Hartsdale":"#ff2222","Montreal":"#ff8800","Amsterdam":"#00cccc","Hengelo":"#6666ff","Uncasville":"#ff44aa"};
 function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
 function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.7;letter-spacing:0.2px;-webkit-font-smoothing:antialiased">${h}</div>`;}
 function circleM(map,lat,lng,color,r,html){L.circleMarker([lat,lng],{radius:r,fillColor:color,color:'#222',weight:1,opacity:.8,fillOpacity:.75}).addTo(map).bindPopup(popHtml(html),{className:'dpop'});}
