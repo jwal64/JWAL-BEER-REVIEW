@@ -69,6 +69,7 @@ let beers=[
   {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Heineken",       style:"Lager",                origin:"NL",abv:5.0,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Texels Skuumkoppe", style:"Wheat Beer",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Guinness",          style:"Stout",          origin:"IE",abv:4.2,method:"Nitro", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
@@ -120,7 +121,7 @@ let breweries=[
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
   {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25,3.25]},
-  {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch · Grolsch Puur Weizen",                     lat:52.2215,lng:6.8937,  ratings:[3.50,5.00]},
+  {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch · Grolsch Puur Weizen · Frisse Lentebok",   lat:52.2215,lng:6.8937,  ratings:[3.50,5.00,3.25]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
   {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00,2.75]},
@@ -183,6 +184,7 @@ const BRAND_DOMAINS = {
 "Estrella Jalisco":"estrellajalisco.com",
 "Grolsch":"grolsch.com",
 "Grolsch Puur Weizen":"grolsch.com",
+"Frisse Lentebok":"grolsch.com",
 "Guinness":"guinness.com",
 "Harp":"harplager.com",
 "Heineken":"heineken.com",
@@ -1492,6 +1494,7 @@ function drawContrarian(){
     'Münchner Weiße':3.80,'Münchner Dunkel':3.55,
     'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
     'Dos Equis Lager Especial':3.25,
+    'Frisse Lentebok':3.25,
   };
 
   const jwalByBeer={};
