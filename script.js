@@ -87,6 +87,8 @@ let beers=[
   {beer:"Münchner Weiße",   style:"Wheat Beer",         origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Apr",monthN:4,year:2026},
   {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
+  // MAY 2026
+  {beer:"Scottish Ale",     style:"Red Ale",            origin:"GB",abv:5.2,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -111,6 +113,7 @@ let drunkLocs=[
   {city:"Oldenzaal",   region:"Overijssel",           country:"Netherlands", cc:"NL", lat:52.3107,lng:6.9280},
   {city:"Nijmegen",    region:"Gelderland",           country:"Netherlands", cc:"NL", lat:51.8426,lng:5.8528},
   {city:"Antwerp",     region:"Antwerp",              country:"Belgium",     cc:"BE", lat:51.2194,lng:4.4025},
+  {city:"Boston",      region:"Massachusetts",        country:"USA",         cc:"US", lat:42.3601,lng:-71.0589},
 ];
 
 let breweries=[
@@ -152,6 +155,7 @@ let breweries=[
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
   {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
   {name:"Miller Brewing Company",    location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Miller Lite",                                              lat:43.0389,lng:-87.9065, ratings:[2.25]},
+  {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Scottish Ale",                                             lat:56.0006,lng:-2.5176,  ratings:[3.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -220,6 +224,7 @@ const BRAND_DOMAINS = {
 "Rolling Rock Extra Pale":"rollingrock.com",
 "Sam Adams":"samueladams.com",
 "Sapporo":"sapporobeer.com",
+"Scottish Ale":"belhaven.co.uk",
 "Singha":"singhabeer.com",
 "Smithwick's":"smithwicks.com",
 "Sol":"solbeer.com",
