@@ -89,6 +89,7 @@ let beers=[
   {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
   // MAY 2026
   {beer:"Scottish Ale",     style:"Stout",              origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Summer Ale",       style:"Wheat Beer",         origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -156,6 +157,7 @@ let breweries=[
   {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
   {name:"Miller Brewing Company",    location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Miller Lite",                                              lat:43.0389,lng:-87.9065, ratings:[2.25]},
   {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Scottish Ale",                                             lat:56.0006,lng:-2.5176,  ratings:[3.00]},
+  {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Summer Ale",                                              lat:42.3601,lng:-71.0589, ratings:[3.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -230,6 +232,7 @@ const BRAND_DOMAINS = {
 "Sol":"solbeer.com",
 "Stella Artois":"stellaartois.com",
 "Stiegl Goldbräu":"stiegl.at",
+"Summer Ale":"samueladams.com",
 "Super Bock":"superbock.pt",
 "Tennent's":"tennents.com",
 "Texels Skuumkoppe":"texels.nl",
