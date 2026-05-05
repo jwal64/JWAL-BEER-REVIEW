@@ -1,5 +1,33 @@
 # JWAL Beer Review - Development Guide
 
+## Screenshot-Based Beer Entry Workflow
+
+The user's preferred way of adding new beers is to share an Untappd
+check-in screenshot. Screenshots typically expose: beer name, brewery,
+style, rating, method (Bottle/Can/Draft/Nitro), and a relative
+timestamp. They do **not** expose: exact consumption city, ABV,
+`isNew` status, exact date/year, or any brewery metadata
+(location, coords, language).
+
+**Rule: never silently guess missing fields.** Before writing any
+data, ask the user to confirm each field that is not visible in the
+screenshot. Group the questions into a single message so the user
+only has to answer once. Only proceed with edits after the user has
+filled in the gaps.
+
+Fields you may still infer without asking (because they are
+deterministic lookups, not user-specific facts):
+- Brewery location, coordinates, language, country code
+- `nativeName` when the native script differs from the marketed name
+- ABV when the beer has a single canonical ABV (e.g. Corona Extra 4.5)
+
+Fields you must ALWAYS confirm with the user:
+- Consumption city / region (especially if the screenshot shows
+  "Untappd at Home" or any non-specific venue)
+- Whether the check-in is the user's first time trying that beer
+  (`isNew`)
+- The check-in date if it is not unambiguous from the screenshot
+
 ## Standard Operating Procedure: Adding New Beers
 
 When adding a new beer entry to `script.js`, **every beer must have its brewery location and language data tracked**. Follow these steps in order:
