@@ -150,7 +150,7 @@ let breweries=[
   {name:"Affligem Brewery (Heineken)",location:"Opwijk, Flemish Brabant", country:"Belgium",     cc:"BE", lang:"nl", beers:"Affligem Tripel",                                          lat:50.9786,lng:4.1868,   ratings:[3.75]},
   {name:"De Koninck Brewery",         location:"Antwerp, Antwerp",        country:"Belgium",     cc:"BE", lang:"nl", beers:"Bolleke De Koninck",                                       lat:51.2157,lng:4.4156,   ratings:[2.75]},
   {name:"Brouwerij 't IJ",            location:"Amsterdam, Noord-Holland",country:"Netherlands", cc:"NL", lang:"nl", beers:"IJwit",                                                    lat:52.3657,lng:4.9196,   ratings:[3.75]},
-  {name:"Brasserie d'Achouffe",       location:"Achouffe, Luxembourg",    country:"Belgium",     cc:"BE", lang:"fr", beers:"La Chouffe Blonde",                                           lat:50.1283,lng:5.7981,   ratings:[4.25]},
+  {name:"Brasserie d'Achouffe",       location:"Achouffe, Luxembourg Province (Wallonia)", country:"Belgium",     cc:"BE", lang:"fr", beers:"La Chouffe Blonde",                                           lat:50.1417,lng:5.8125,   ratings:[4.25]},
   {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Salzburg",      country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
   {name:"Super Bock Group",          location:"Leça do Balio, Porto",      country:"Portugal",    cc:"PT", lang:"pt", beers:"Super Bock",                                                    lat:41.2142,lng:-8.6254,  ratings:[3.00]},
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
@@ -1507,11 +1507,17 @@ function drawTemporal(){
 // ══════════════════════════════════════════════════════════════
 // CONTRARIAN INDEX
 // ══════════════════════════════════════════════════════════════
+// Bump this date whenever the Untappd ratings below are re-verified.
+// The refresh-untappd-reminder GitHub Action opens an issue every 2 weeks
+// when this stamp gets stale (>14 days old).
+const UNTAPPD_LAST_REFRESHED='2026-05-05';
+const UNTAPPD_REFRESH_INTERVAL_DAYS=14;
+
 function drawContrarian(){
   window._ciX=true;
-  // Global Untappd averages — verified Feb 2026 directly from untappd.com.
+  // Global Untappd averages — refreshed on UNTAPPD_LAST_REFRESHED above.
   // Keys MUST match the exact beer names in beers[] (case + diacritics).
-  // Refresh quarterly to keep contrarian deltas honest.
+  // Update every 2 weeks (the refresh workflow opens a reminder issue).
   const globalAvgs={
     'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
     'Sapporo':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
@@ -1544,6 +1550,16 @@ function drawContrarian(){
   const avgDelta=avg(rows.map(r=>r.delta));
   document.getElementById('ciAvgDelta').textContent=(avgDelta>=0?'+':'')+avgDelta.toFixed(2);
   document.getElementById('ciAvgDelta').className='kpi-val '+(avgDelta>0?'up':avgDelta<0?'dn':'fl');
+
+  // Freshness indicator — turns yellow once Untappd data is older than the refresh interval.
+  const freshEl=document.getElementById('ciFreshness');
+  if(freshEl){
+    const ageMs=Date.now()-new Date(UNTAPPD_LAST_REFRESHED).getTime();
+    const ageDays=Math.floor(ageMs/86400000);
+    const stale=ageDays>UNTAPPD_REFRESH_INTERVAL_DAYS;
+    freshEl.textContent=`UNTAPPD DATA · ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · REFRESH DUE':''}`;
+    freshEl.style.color=stale?'#ffaa00':'#555';
+  }
 
   const mostContr=rows.reduce((a,b)=>Math.abs(b.delta)>Math.abs(a.delta)?b:a);
   document.getElementById('ciMostContrarian').textContent=mostContr.name;
