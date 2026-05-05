@@ -90,6 +90,7 @@ let beers=[
   // MAY 2026
   {beer:"Scottish Ale",     style:"Stout",              origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Summer Ale",       style:"Wheat Beer",         origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -158,6 +159,7 @@ let breweries=[
   {name:"Miller Brewing Company",    location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Miller Lite",                                              lat:43.0389,lng:-87.9065, ratings:[2.25]},
   {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Scottish Ale",                                             lat:56.0006,lng:-2.5176,  ratings:[3.00]},
   {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Summer Ale",                                              lat:42.3601,lng:-71.0589, ratings:[3.00]},
+  {name:"Cervecería del Pacífico",   location:"Mazatlán, Sinaloa",         country:"Mexico",      cc:"MX", lang:"es", beers:"Pacífico Clara",                                            lat:23.2494,lng:-106.4111,ratings:[3.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -217,6 +219,7 @@ const BRAND_DOMAINS = {
 "Newcastle Brown":"newcastlebrown.com",
 "Norrlands Guld":"norrlandsguld.se",
 "Orion":"orionbeer.co.jp",
+"Pacífico Clara":"drinkpacifico.com",
 "Paulaner Hefe":"paulaner.com",
 "Peroni":"peroni.it",
 "Pilsner Urquell":"prazdroj.cz",
@@ -1538,6 +1541,7 @@ function drawContrarian(){
     'La Chouffe Blonde':3.85,'Stiegl Goldbräu':3.35,'Modelo Oro':3.45,
     'Super Bock':3.41,'Estrella Jalisco':3.20,'Rolling Rock Extra Pale':3.05,
     'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
+    'Pacífico Clara':3.65,
   };
 
   // STATS.brandList already has avg/cnt per beer — reuse it instead of
