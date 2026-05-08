@@ -91,6 +91,7 @@ let beers=[
   {beer:"Scottish Ale",     style:"Stout",              origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Summer Ale",       style:"Wheat Beer",         origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -160,6 +161,7 @@ let breweries=[
   {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Scottish Ale",                                             lat:56.0006,lng:-2.5176,  ratings:[3.00]},
   {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Summer Ale",                                              lat:42.3601,lng:-71.0589, ratings:[3.00]},
   {name:"Cervecería del Pacífico",   location:"Mazatlán, Sinaloa",         country:"Mexico",      cc:"MX", lang:"es", beers:"Pacífico Clara",                                            lat:23.2494,lng:-106.4111,ratings:[3.75]},
+  {name:"Narragansett Brewing Company", location:"Cranston, Rhode Island", country:"USA",         cc:"US", lang:"en", beers:"Narragansett Lager",                                        lat:41.7798,lng:-71.4373, ratings:[3.25]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -215,6 +217,7 @@ const BRAND_DOMAINS = {
 "Mythos":"mythosbrewery.gr",
 "Münchner Dunkel":"hofbraeu-muenchen.de",
 "Münchner Weiße":"hofbraeu-muenchen.de",
+"Narragansett Lager":"narragansettbeer.com",
 "Nastro Azzurro":"nastroazzurro.com",
 "Newcastle Brown":"newcastlebrown.com",
 "Norrlands Guld":"norrlandsguld.se",
@@ -1541,7 +1544,7 @@ function drawContrarian(){
     'La Chouffe Blonde':3.85,'Stiegl Goldbräu':3.35,'Modelo Oro':3.45,
     'Super Bock':3.41,'Estrella Jalisco':3.20,'Rolling Rock Extra Pale':3.05,
     'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
-    'Pacífico Clara':3.65,
+    'Pacífico Clara':3.65,'Narragansett Lager':3.23,
   };
 
   // STATS.brandList already has avg/cnt per beer — reuse it instead of
