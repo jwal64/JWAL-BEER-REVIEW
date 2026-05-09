@@ -108,7 +108,7 @@ let drunkLocs=[
 
 let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner",                                    lat:48.3953,lng:11.7291, ratings:[4.50]},
-  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel", nativeName:"Münchner Weiße · Münchner Dunkel", lat:48.1351,lng:11.5820, ratings:[4.75,2.75]},
+  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel",                                                  lat:48.1351,lng:11.5820, ratings:[4.75,2.75]},
   {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[4.00]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.25]},
@@ -128,8 +128,8 @@ let breweries=[
   {name:"Red Stripe (D&G)",       location:"Kingston, Surrey",          country:"Jamaica",     cc:"JM", lang:"en", beers:"Red Stripe",                                        lat:17.9972,lng:-76.7939, ratings:[3.75]},
   {name:"Estrella Galicia",       location:"A Coruña, Galicia",         country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Galicia",                                   lat:43.3623,lng:-8.4115,  ratings:[4.25]},
   {name:"Pilsner Urquell",        location:"Pilsen, Bohemia",           country:"Czech Republic",cc:"CZ", lang:"cs", beers:"Pilsner Urquell",    nativeName:"Plzeňský Prazdroj", lat:49.7479,lng:13.3756,  ratings:[3.25]},
-  {name:"Birra Moretti (Heineken Italia)", location:"Udine, Friuli-Venezia Giulia", country:"Italy", cc:"IT", lang:"it", beers:"Birra Moretti",   nativeName:"Birra Moretti",     lat:46.0640,lng:13.2350,  ratings:[3.75]},
-  {name:"Erdinger Weissbräu",  location:"Erding, Bavaria",             country:"Germany",     cc:"DE", lang:"de", beers:"Erdinger Weißbier",     nativeName:"Erdinger Weißbier", lat:48.3063,lng:11.9071,  ratings:[3.25]},
+  {name:"Birra Moretti (Heineken Italia)", location:"Udine, Friuli-Venezia Giulia", country:"Italy", cc:"IT", lang:"it", beers:"Birra Moretti",                                   lat:46.0640,lng:13.2350,  ratings:[3.75]},
+  {name:"Erdinger Weissbräu",  location:"Erding, Bavaria",             country:"Germany",     cc:"DE", lang:"de", beers:"Erdinger Weißbier",                                     lat:48.3063,lng:11.9071,  ratings:[3.25]},
   {name:"Industrial Arts Brewing",location:"Garnerville, New York",     country:"USA",         cc:"US", lang:"en", beers:"Wrench",                                             lat:41.2065,lng:-74.0085,  ratings:[4.00]},
   {name:"Żywiec Brewery (Grupa Żywiec)", location:"Żywiec, Silesia",   country:"Poland",      cc:"PL", lang:"pl", beers:"Żywiec",                                             lat:49.6853,lng:19.1925,  ratings:[2.75]},
   {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Nastro Azzurro",                                              lat:41.8902,lng:12.4922,  ratings:[2.50]},
@@ -140,7 +140,7 @@ let breweries=[
   {name:"De Koninck Brewery",         location:"Antwerp, Antwerp",        country:"Belgium",     cc:"BE", lang:"nl", beers:"Bolleke De Koninck",                                       lat:51.2157,lng:4.4156,   ratings:[2.75]},
   {name:"Brouwerij 't IJ",            location:"Amsterdam, Noord-Holland",country:"Netherlands", cc:"NL", lang:"nl", beers:"IJwit",                                                    lat:52.3657,lng:4.9196,   ratings:[3.75]},
   {name:"Brasserie d'Achouffe",       location:"Achouffe, Luxembourg Province (Wallonia)", country:"Belgium",     cc:"BE", lang:"fr", beers:"La Chouffe Blonde",                                           lat:50.1417,lng:5.8125,   ratings:[4.25]},
-  {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Salzburg",      country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
+  {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Land Salzburg", country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
   {name:"Super Bock Group",          location:"Leça do Balio, Porto",      country:"Portugal",    cc:"PT", lang:"pt", beers:"Super Bock",                                                    lat:41.2142,lng:-8.6254,  ratings:[3.00]},
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
   {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
@@ -202,7 +202,6 @@ const BRAND_DOMAINS = {
 "Modelo Especial":"modelousa.com",
 "Modelo Negra":"modelousa.com",
 "Modelo Oro":"modelousa.com",
-"Moretti":"birramoretti.com",
 "Mythos":"mythosbrewery.gr",
 "Münchner Dunkel":"hofbraeu-muenchen.de",
 "Münchner Weiße":"hofbraeu-muenchen.de",
@@ -219,7 +218,7 @@ const BRAND_DOMAINS = {
 "Red Stripe":"redstripebeer.com",
 "Ringnes":"ringnes.no",
 "Rolling Rock Extra Pale":"rollingrock.com",
-"Sam Adams":"samueladams.com",
+"Sam Adams Boston Lager":"samueladams.com",
 "Sapporo":"sapporobeer.com",
 "Scottish Ale":"belhaven.co.uk",
 "Singha":"singhabeer.com",
@@ -1517,7 +1516,7 @@ function drawContrarian(){
     'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
     'Sapporo':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
     'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
-    'Harp':3.42,'La Fin Du Monde':4.07,'Kronenbourg':3.21,
+    'Harp':3.42,'La Fin Du Monde':4.07,'Kronenbourg':3.30,
     'Michelob Ultra':2.84,'Guinness':3.80,'Red Stripe':3.31,
     'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
     'Münchner Weiße':3.80,'Münchner Dunkel':3.55,
@@ -1602,7 +1601,7 @@ function drawContrarian(){
 // 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
 const IPO_WATCHLIST=[
   // User-specified
-  {beer:'Moretti',         style:'Pilsner',     origin:'IT', abv:4.6, region:'Udine, Friuli',         untappd:3.58, method:'Bottle'},
+  {beer:'Birra Moretti',   style:'Lager',        origin:'IT', abv:4.6, region:'Udine, Friuli-Venezia Giulia', untappd:3.58, method:'Bottle'},
   {beer:'Peroni',          style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
   {beer:'Blue Moon',       style:'Wheat Beer',   origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
   {beer:'Miller Lite',     style:'Lager',        origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
@@ -1614,23 +1613,23 @@ const IPO_WATCHLIST=[
   {beer:'Tsingtao',        style:'Lager',        origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
   {beer:'Castle Lager',    style:'Lager',        origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
   {beer:'Pilsner Urquell', style:'Pilsner',      origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',       untappd:3.80, method:'Bottle'},
-  {beer:'Super Bock',      style:'Lager',        origin:'PT', abv:5.2, region:'Porto, Norte',          untappd:3.41, method:'Bottle'},
+  {beer:'Super Bock',      style:'Lager',        origin:'PT', abv:5.2, region:'Leça do Balio, Porto',  untappd:3.41, method:'Bottle'},
   {beer:'Mythos',          style:'Lager',        origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
   {beer:'Victoria Bitter', style:'Lager',        origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
   {beer:'Norrlands Guld',  style:'Lager',        origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
   // Additional picks
   {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
   {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
-  {beer:'Kronenbourg',     style:'Lager',        origin:'FR', abv:5.0, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
+  {beer:'Kronenbourg',     style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
   {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
   {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
   // Pipeline promotions
-  {beer:'Żywiec',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
+  {beer:'Żywiec',          style:'Lager',        origin:'PL', abv:5.5, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
   {beer:'Tyskie',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Tychy, Silesia',        untappd:3.28, method:'Can'},
   {beer:'Chimay Blue',     style:'Belgian Ale',  origin:'BE', abv:9.0, region:'Chimay, Hainaut',       untappd:4.05, method:'Bottle'},
-  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Leuven',                untappd:3.75, method:'Bottle'},
+  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Dinant, Namur',         untappd:3.75, method:'Bottle'},
   {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
-  {beer:'Sam Adams',       style:'Lager',        origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
+  {beer:'Sam Adams Boston Lager',style:'Lager',  origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
 ];
 
 // Recommendation candidates — only beers NOT already on IPO_WATCHLIST
