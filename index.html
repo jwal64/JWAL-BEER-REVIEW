@@ -148,7 +148,7 @@
   <div class="nav-item" data-tab="insights"><span class="nav-icon">◈</span>INSIGHTS<span class="nkey">F6</span></div>
   <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F7</span></div>
   <div class="nav-item" data-tab="contrarian"><span class="nav-icon">◆</span>CONTRARIAN IDX<span class="nkey">Q</span></div>
-  <div class="nav-item" data-tab="ipo"><span class="nav-icon">◈</span>IPO / FUTURES<span class="nkey">W</span></div>
+  <div class="nav-item" data-tab="ipo"><span class="nav-icon">◈</span>IPO<span class="nkey">W</span></div>
   <div class="nav-item" data-tab="audit"><span class="nav-icon">⬡</span>DATA AUDIT<span class="nkey">E</span></div>
   <div class="nav-item" data-tab="language"><span class="nav-icon">◑</span>LANGUAGE<span class="nkey">F10</span></div>
   <div class="nav-section-head">MAPS</div>
@@ -507,32 +507,25 @@
   </div>
 </div>
 
-<!-- ══════════════ IPO / FT ══════════════ -->
+<!-- ══════════════ IPO ══════════════ -->
 <div id="ipo" class="panel">
 
   <!-- SINGLE BANNER -->
-  <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◈ IPO / FT — PRE-REVIEW PIPELINE &amp; MASS-MARKET FUTURES</div>
+  <div class="bb-panel-head" style="background:var(--orange);color:#000;font-size:9px;font-weight:700;padding:3px 8px;letter-spacing:1px;margin-bottom:8px">◈ IPO — PRE-REVIEW PIPELINE</div>
 
   <!-- SUB-NAV PILLS -->
   <div class="ipo-subnav">
     <a class="ipo-subnav-pill" href="#ipo-section-watch">◈ IPO WATCHLIST</a>
-    <a class="ipo-subnav-pill" href="#ipo-section-futures">◆ FUTURES</a>
     <span class="ipo-subnav-right" id="ipo-subnav-meta">MODEL v1.0 · UNTAPPD 50 / STYLE 25 / COUNTRY 15 / METHOD 10</span>
   </div>
 
-  <!-- UNIFIED 8-TILE KPI STRIP -->
+  <!-- KPI STRIP -->
   <div class="ipo-kpi-strip" style="margin-bottom:8px">
     <div class="g4 ipo-kpi-group">
       <div class="kpi"><div class="kpi-val" id="ipo-pending" style="color:var(--orange)">—</div><div class="kpi-label">◈ ON WATCHLIST</div></div>
       <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">◈ PRICED</div></div>
       <div class="kpi"><div class="kpi-val" id="ipo-avg-analyst" style="color:#00aaff">—</div><div class="kpi-label">◈ AVG ANALYST TGT</div></div>
       <div class="kpi"><div class="kpi-val" id="ipo-avg-market" style="color:#bb44ff">—</div><div class="kpi-label">◈ AVG MARKET RATING</div></div>
-    </div>
-    <div class="g4 ipo-kpi-group">
-      <div class="kpi"><div class="kpi-val" id="ft-contracts" style="color:var(--orange)">—</div><div class="kpi-label">◆ ACTIVE CONTRACTS</div></div>
-      <div class="kpi"><div class="kpi-val up" id="ft-executed">0</div><div class="kpi-label">◆ EXECUTED</div></div>
-      <div class="kpi"><div class="kpi-val" id="ft-beat" style="color:#00cc44">—</div><div class="kpi-label">◆ BEAT FUTURES</div></div>
-      <div class="kpi"><div class="kpi-val dn" id="ft-miss">—</div><div class="kpi-label">◆ MISSED FUTURES</div></div>
     </div>
   </div>
 
@@ -608,65 +601,6 @@
     </div>
   </details>
 
-  <!-- FUTURES SECTION ANCHOR -->
-  <div id="ipo-section-futures"></div>
-
-  <!-- FUTURES CONTRACTS TABLE -->
-  <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">◆ ACTIVE FUTURES CONTRACTS <span class="ph-right">PENDING EXECUTION ON NEXT REVIEW</span></div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table" id="ftContractTable">
-          <thead><tr>
-            <th style="width:28px"></th>
-            <th>BEER</th>
-            <th>RVW</th>
-            <th>AVG</th>
-            <th style="color:#ff6600">FUTURES</th>
-            <th>52W H/L</th>
-            <th>VOL</th>
-            <th>SIGNAL</th>
-          </tr></thead>
-          <tbody id="ftContractBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIDE-BY-SIDE: EXECUTED CONTRACTS + BEATS/MISSES DONUT (hidden unless executed > 0) -->
-  <div class="bb-grid-2" id="ftExecWrap" style="display:none;margin-bottom:8px">
-    <div class="bb-panel" id="ftExecPanel">
-      <div class="bb-panel-head">✓ EXECUTED CONTRACTS — SETTLEMENT HISTORY <span class="ph-right" id="ft-exec-count">0 EXECUTED</span></div>
-      <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table">
-            <thead><tr>
-              <th></th><th>BEER</th><th>DATE</th><th style="color:#ff6600">FUTURES PRICE</th><th>ACTUAL</th><th>SPREAD</th><th>RESULT</th>
-            </tr></thead>
-            <tbody id="ftExecBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">◉ BEATS vs MISSES <span class="ph-right">SETTLEMENT SPREAD</span></div>
-      <div class="bb-body" style="height:220px">
-        <canvas id="ftBeatsDonut"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- FUTURES METHODOLOGY (collapsed) -->
-  <details class="bb-collapse" style="margin-bottom:12px">
-    <summary>▸ FUTURES CONTRACT METHODOLOGY &nbsp;·&nbsp; JWAL weighted avg 55% &nbsp;·&nbsp; momentum 15% &nbsp;·&nbsp; mean reversion 30%</summary>
-    <div class="bb-collapse-body">
-      Futures are priced contracts on mass-market American beers with sufficient historical data to model forward price. &nbsp;·&nbsp;
-      <span style="color:#ff6600">FORMULA:</span> Weighted moving avg of all JWAL reviews + mean-reversion toward Untappd global avg (30%) + serving method adjustment &nbsp;·&nbsp;
-      <span style="color:#00aaff">CONTRACT EXECUTES</span> automatically when a new review is entered for that beer — actual JWAL rating is compared to futures price &nbsp;·&nbsp;
-      <span style="color:#00cc44">BEAT:</span> Actual ≥ Futures price &nbsp;·&nbsp; <span style="color:#ff2222">MISS:</span> Actual &lt; Futures price
-    </div>
-  </details>
-
   <!-- PIPELINE RECOMMENDATIONS (only when priced > 0) -->
   <details class="bb-collapse" id="ipoRecsPanel" style="display:none;margin-bottom:12px">
     <summary>▸ PIPELINE — RECOMMENDED REPLACEMENTS &nbsp;·&nbsp; <span id="ipo-recs-count">0 SLOTS</span></summary>
@@ -718,7 +652,7 @@
     <div class="bb-panel-head">⬡ DATA INTEGRITY VALIDATOR <span class="ph-right" id="audit-ts">—</span></div>
     <div class="bb-body" style="font-size:9px;color:#555;line-height:1.8">
       <span style="color:#ff6600">RUNS AUTOMATICALLY</span> on every page load — catches bad data before it becomes a visible bug. &nbsp;·&nbsp;
-      <span style="color:#00aaff">10 CHECK CATEGORIES:</span> field completeness · rating ranges · logo coverage · brewery accuracy · map coordinates · futures contracts · IPO watchlist · flag/name symmetry · DOM presence · cc/origin mapping &nbsp;·&nbsp;
+      <span style="color:#00aaff">9 CHECK CATEGORIES:</span> field completeness · rating ranges · logo coverage · brewery accuracy · map coordinates · IPO watchlist · flag/name symmetry · DOM presence · cc/origin mapping &nbsp;·&nbsp;
       <span style="color:#00cc44">GREEN DOT</span> = all clear &nbsp;·&nbsp;
       <span style="color:#ffaa00">AMBER DOT</span> = warnings &nbsp;·&nbsp;
       <span style="color:#ff2222">RED DOT</span> = errors &nbsp;·&nbsp;
@@ -737,11 +671,10 @@
           <tr><td style="color:#ff6600">3</td><td>Brand Logo Coverage</td><td style="color:#555;font-size:9px">Beer in data with no SVG logo → shows broken 🍺 placeholder</td><td style="color:#555;font-size:9px">Adding new beer not in BRAND_SVGS</td></tr>
           <tr><td style="color:#ff6600">4</td><td>Brewery Array</td><td style="color:#555;font-size:9px">Missing fields · coordinates out of range · empty ratings array · beer name not in dataset</td><td style="color:#555;font-size:9px">Editing breweries or adding a brewer</td></tr>
           <tr><td style="color:#ff6600">5</td><td>Consumption Locations</td><td style="color:#555;font-size:9px">drunkLoc with no matching beer reviews · bad lat/lng · missing cc</td><td style="color:#555;font-size:9px">Adding new city or removing beers from a city</td></tr>
-          <tr><td style="color:#ff6600">6</td><td>Futures Coverage</td><td style="color:#555;font-size:9px">Futures contract beer with zero review history → can't price</td><td style="color:#555;font-size:9px">First review of a futures beer</td></tr>
-          <tr><td style="color:#ff6600">7</td><td>IPO Watchlist</td><td style="color:#555;font-size:9px">IPO beer with no SVG logo · tracks pending vs priced count</td><td style="color:#555;font-size:9px">Reviewing a watchlist beer or adding new ones</td></tr>
-          <tr><td style="color:#ff6600">8</td><td>FLAGS / CNAMES Symmetry</td><td style="color:#555;font-size:9px">Country code in one dict but not the other → flag shows but name missing or vice versa</td><td style="color:#555;font-size:9px">Adding a new country to either dict</td></tr>
-          <tr><td style="color:#ff6600">9</td><td>DOM Element Presence</td><td style="color:#555;font-size:9px">JS references an element that no longer exists in HTML</td><td style="color:#555;font-size:9px">Editing HTML structure</td></tr>
-          <tr><td style="color:#ff6600">10</td><td>CC / Origin Mapping</td><td style="color:#555;font-size:9px">Beer cc or origin code not in FLAGS → flag emoji missing on all tables</td><td style="color:#555;font-size:9px">Adding beer from new country</td></tr>
+          <tr><td style="color:#ff6600">6</td><td>IPO Watchlist</td><td style="color:#555;font-size:9px">IPO beer with no SVG logo · tracks pending vs priced count</td><td style="color:#555;font-size:9px">Reviewing a watchlist beer or adding new ones</td></tr>
+          <tr><td style="color:#ff6600">7</td><td>FLAGS / CNAMES Symmetry</td><td style="color:#555;font-size:9px">Country code in one dict but not the other → flag shows but name missing or vice versa</td><td style="color:#555;font-size:9px">Adding a new country to either dict</td></tr>
+          <tr><td style="color:#ff6600">8</td><td>DOM Element Presence</td><td style="color:#555;font-size:9px">JS references an element that no longer exists in HTML</td><td style="color:#555;font-size:9px">Editing HTML structure</td></tr>
+          <tr><td style="color:#ff6600">9</td><td>CC / Origin Mapping</td><td style="color:#555;font-size:9px">Beer cc or origin code not in FLAGS → flag emoji missing on all tables</td><td style="color:#555;font-size:9px">Adding beer from new country</td></tr>
         </tbody>
       </table>
     </div>

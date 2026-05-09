@@ -1038,20 +1038,16 @@ canvas {
   text-transform: uppercase;
 }
 
-/* Unified 8-tile KPI strip (IPO group | FT group) */
+/* IPO KPI strip */
 .ipo-kpi-strip {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
   align-items: stretch;
 }
 .ipo-kpi-strip .ipo-kpi-group {
   margin-bottom: 0;
   padding: 0;
-}
-.ipo-kpi-strip .ipo-kpi-group:first-child {
-  border-right: 1px dashed var(--border2);
-  padding-right: 8px;
 }
 
 /* Top-picks conveyor */
@@ -1122,13 +1118,6 @@ canvas {
 }
 @media (max-width: 900px) {
   .bb-grid-2 { grid-template-columns: 1fr; }
-  .ipo-kpi-strip { grid-template-columns: 1fr; }
-  .ipo-kpi-strip .ipo-kpi-group:first-child {
-    border-right: none;
-    border-bottom: 1px dashed var(--border2);
-    padding-right: 0;
-    padding-bottom: 8px;
-  }
   .ipo-subnav-right { display: none; }
 }
 

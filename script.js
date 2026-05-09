@@ -30,49 +30,36 @@ let beers=[
   {beer:"Kirin Ichiban",   style:"Lager",               origin:"JP",abv:5.0,method:"Bottle",city:"Hartsdale",   region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Modelo Especial", style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Stella Artois",   style:"Lager",               origin:"BE",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"Duvel",           style:"Belgian Ale",origin:"BE",abv:8.5,method:"Bottle",city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Duvel",           style:"Belgian Ale",origin:"BE",abv:8.5,method:"Bottle",city:"Amsterdam",   region:"Noord-Holland",   country:"Netherlands", cc:"NL", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"Carlsberg",       style:"Pilsner",            origin:"DK",abv:5.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Carlsberg",       style:"Pilsner",            origin:"DK",abv:5.0,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Harp",            style:"Lager",               origin:"IE",abv:4.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"La Fin Du Monde", style:"Belgian Ale",           origin:"CA",abv:9.0,method:"Can",   city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Kronenbourg",     style:"Lager",               origin:"FR",abv:5.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Michelob Ultra",  style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"Guinness",        style:"Stout",          origin:"IE",abv:4.2,method:"Nitro", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Red Stripe",      style:"Lager",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026},
-  // FEB 2026 (17 beers)
+  // FEB 2026
   {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Guinness",        style:"Stout",          origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Weihenstephaner", style:"Wheat Beer",    origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Modelo Negra",    style:"Lager",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Münchner Weiße",   style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Modelo Negra",    style:"Lager",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Stella Artois",   style:"Lager",               origin:"BE",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Münchner Dunkel",  style:"Lager",      origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
-  {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Bottle",city:"Uncasville", region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Erdinger Weißbier",style:"Wheat Beer",   origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
-  {beer:"Sapporo",           style:"Lager",            origin:"JP",abv:4.9,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Coors Light",     style:"Lager",           origin:"US",abv:4.2,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   // MAR 2026
   {beer:"Estrella Galicia",style:"Lager",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Pilsner Urquell", style:"Pilsner",     origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Wrench",         style:"IPA",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Żywiec",         style:"Lager",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Corona Extra",   style:"Lager",             origin:"MX",abv:4.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Nastro Azzurro", style:"Lager",                origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Heineken",       style:"Lager",                origin:"NL",abv:5.0,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Texels Skuumkoppe", style:"Wheat Beer",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Guinness",          style:"Stout",          origin:"IE",abv:4.2,method:"Nitro", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Affligem Tripel",   style:"Belgian Ale",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Bolleke De Koninck",style:"Pale Ale",         origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"IJwit",             style:"Wheat Beer",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
@@ -84,7 +71,6 @@ let beers=[
   {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Apr",monthN:4,year:2026},
-  {beer:"Münchner Weiße",   style:"Wheat Beer",         origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Apr",monthN:4,year:2026},
   {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
   // MAY 2026
@@ -122,22 +108,22 @@ let drunkLocs=[
 
 let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner",                                    lat:48.3953,lng:11.7291, ratings:[4.50]},
-  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel", nativeName:"Münchner Weiße · Münchner Dunkel", lat:48.1351,lng:11.5820, ratings:[4.75,2.75,4.00]},
-  {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[3.25,4.00,3.75]},
+  {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel", nativeName:"Münchner Weiße · Münchner Dunkel", lat:48.1351,lng:11.5820, ratings:[4.75,2.75]},
+  {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[4.00]},
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
-  {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.00,4.25]},
-  {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75,2.75]},
-  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25,3.25,3.25]},
+  {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.25]},
+  {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75]},
+  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25]},
   {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch · Grolsch Puur Weizen · Frisse Lentebok",   lat:52.2215,lng:6.8937,  ratings:[3.50,5.00,3.25]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
-  {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00,2.75]},
-  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo Especial · Modelo Negra · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,2.25,3.00,3.00,3.75,3.50,3.00]},
+  {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00]},
+  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo Especial · Modelo Negra · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,3.00,3.75,3.00]},
   {name:"Cervecería Estrella Jalisco", location:"Guadalajara, Jalisco",country:"Mexico",      cc:"MX", lang:"es", beers:"Estrella Jalisco",                                    lat:20.6597,lng:-103.3496, ratings:[3.75]},
-  {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg · Carlsberg Elephant",                    lat:55.6614,lng:12.5361,  ratings:[2.75,3.00,3.50]},
-  {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", lang:"fr", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[2.75,3.75]},
+  {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg · Carlsberg Elephant",                    lat:55.6614,lng:12.5361,  ratings:[3.00,3.50]},
+  {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", lang:"fr", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[3.75]},
   {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"Kronenbourg",           nativeName:"Kronenbourg 1664", lat:48.4637,lng:7.4845,  ratings:[3.00]},
-  {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", lang:"ja", beers:"Sapporo",               nativeName:"サッポロビール",     lat:43.0685,lng:141.3544, ratings:[3.50,3.00]},
+  {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", lang:"ja", beers:"Sapporo",               nativeName:"サッポロビール",     lat:43.0685,lng:141.3544, ratings:[3.50]},
   {name:"Kirin Brewery",          location:"Yokohama, Kanagawa",        country:"Japan",       cc:"JP", lang:"ja", beers:"Kirin Ichiban",nativeName:"キリン一番搾り",   lat:35.4634,lng:139.6220, ratings:[3.00]},
   {name:"Red Stripe (D&G)",       location:"Kingston, Surrey",          country:"Jamaica",     cc:"JM", lang:"en", beers:"Red Stripe",                                        lat:17.9972,lng:-76.7939, ratings:[3.75]},
   {name:"Estrella Galicia",       location:"A Coruña, Galicia",         country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Galicia",                                   lat:43.3623,lng:-8.4115,  ratings:[4.25]},
@@ -544,7 +530,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   function refreshUI(){
     refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_ftD','_auditD','_dM','_bM','_langD']
+    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_auditD','_dM','_bM','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
     try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
@@ -679,7 +665,7 @@ function showTab(id,btn){
   if(id==='insights'&&!window._inD) drawInsights();
   if(id==='temporal'&&!window._tmpD) drawTemporal();
   if(id==='contrarian'&&!window._ciX) drawContrarian();
-  if(id==='ipo'){if(!window._ipoD) drawIPO(); if(!window._ftD) drawFutures();}
+  if(id==='ipo'&&!window._ipoD) drawIPO();
   if(id==='audit'&&!window._auditD) drawAudit();
 if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
   if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
@@ -1539,7 +1525,7 @@ function drawContrarian(){
     'Dos Equis Lager Especial':3.25,
     'Frisse Lentebok':3.25,
     // Apr 2026 expansion — values mirror Untappd consensus snapshots
-    // (cross-checked against IPO_WATCHLIST/UNTAPPD_FT entries where overlap exists).
+    // (cross-checked against IPO_WATCHLIST entries where overlap exists).
     'Estrella Galicia':3.65,'Pilsner Urquell':3.80,'Wrench':3.95,
     'Żywiec':3.35,'Nastro Azzurro':3.56,'Estrella Damm':3.61,
     'Grolsch Puur Weizen':3.50,'Leffe Blonde':3.75,'Texels Skuumkoppe':3.65,
@@ -1611,7 +1597,7 @@ function drawContrarian(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// SHARED CONSTANTS — IPO & FUTURES
+// SHARED CONSTANTS — IPO
 // ══════════════════════════════════════════════════════════════
 // 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
 const IPO_WATCHLIST=[
@@ -1646,9 +1632,6 @@ const IPO_WATCHLIST=[
   {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
   {beer:'Sam Adams',       style:'Lager',        origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
 ];
-
-const FUTURES_BEERS=['Bud Light','Coors Light','Heineken','Stella Artois','Corona Extra','Modelo Especial','Miller Lite','Budweiser','Michelob Ultra','Guinness'];
-const UNTAPPD_FT={'Bud Light':2.30,'Coors Light':2.84,'Heineken':3.00,'Stella Artois':3.30,'Corona Extra':3.47,'Modelo Especial':3.55,'Miller Lite':2.51,'Budweiser':2.60,'Michelob Ultra':2.84,'Guinness':3.80};
 
 // Recommendation candidates — only beers NOT already on IPO_WATCHLIST
 const IPO_CANDIDATES=[
@@ -1847,123 +1830,6 @@ function drawIPO(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// FUTURES
-// ══════════════════════════════════════════════════════════════
-function drawFutures(){
-  window._ftD=true;
-  try {
-
-  // Futures price formula:
-  // 55% JWAL historical weighted avg
-  // 15% most recent review (momentum)
-  // 30% Untappd global avg (mean reversion)
-  // + dominant serving method adjustment
-  function futuresPrice(beerName,subset){
-    const history=subset||BEER_REVIEWS.get(beerName)||[];
-    if(!history.length) return null;
-    const jwalAvg=avg(history.map(b=>b.rating));
-    const untappd=UNTAPPD_FT[beerName]||jwalAvg;
-    const recent=history[history.length-1].rating;
-    const weighted=jwalAvg*0.55+recent*0.15+untappd*0.30;
-    const methodCount={};
-    history.forEach(b=>{methodCount[b.method]=(methodCount[b.method]||0)+1;});
-    const topMethod=Object.entries(methodCount).sort((a,b)=>b[1]-a[1])[0][0];
-    const mAdj=topMethod==='Draft'?0.05:topMethod==='Can'?-0.05:0;
-    return Math.min(5.0,Math.max(1.0,weighted+mAdj));
-  }
-
-  // Detect executed contracts: beers with 2+ reviews (prior reviews set the price, latest = execution)
-  const executed=[];
-  FUTURES_BEERS.forEach(name=>{
-    const history=BEER_REVIEWS.get(name)||[];
-    if(history.length>1){
-      const prior=history.slice(0,-1);
-      const last=history[history.length-1];
-      const ft=futuresPrice(name,prior);
-      executed.push({name,date:last.month+' '+last.year,futures:ft,actual:last.rating,spread:last.rating-ft});
-    }
-  });
-
-  const beats=executed.filter(e=>e.spread>=0).length;
-  const misses=executed.filter(e=>e.spread<0).length;
-
-  document.getElementById('ft-contracts').textContent=FUTURES_BEERS.length;
-  document.getElementById('ft-executed').textContent=executed.length;
-  document.getElementById('ft-beat').textContent=beats;
-  document.getElementById('ft-miss').textContent=misses;
-  document.getElementById('ft-exec-count').textContent=executed.length+' EXECUTED';
-
-  document.getElementById('ftContractBody').innerHTML=FUTURES_BEERS.map(name=>{
-    const history=BEER_REVIEWS.get(name)||[];
-    const ft=futuresPrice(name);
-    const untappd=UNTAPPD_FT[name]||0;
-
-    if(!history.length){
-      return `<tr>
-        <td>${logoImg(name,22)}</td>
-        <td style="color:#ff6600;font-weight:600">${name}</td>
-        <td style="color:#333;text-align:center">0</td>
-        <td style="color:#333">—</td>
-        <td style="color:#333">—</td>
-        <td colspan="2" style="color:#333;font-size:9px">NO REVIEW DATA YET</td>
-        <td></td>
-      </tr>`;
-    }
-
-    const jwalAvg=avg(history.map(b=>b.rating));
-    const ratings=history.map(b=>b.rating);
-    const hi=Math.max(...ratings), lo=Math.min(...ratings);
-    const volatility=std(ratings);
-    const volLabel=volatility<0.2?'LOW':volatility<0.4?'MOD':'HIGH';
-    const volClass=volatility<0.2?'up':volatility<0.4?'fl':'dn';
-    const signal=ft>=4.0?'STRONG BUY':ft>=3.5?'BUY':ft>=3.0?'HOLD':ft>=2.5?'SELL':'STRONG SELL';
-    const sigColor=ft>=4.0?'#00cc44':ft>=3.5?'#aacc00':ft>=3.0?'#ffaa00':ft>=2.5?'#ff6600':'#ff2222';
-    return `<tr>
-      <td>${logoImg(name,22)}</td>
-      <td style="color:#ff6600;font-weight:600">${name}</td>
-      <td style="text-align:center">${history.length}</td>
-      <td><span class="rb ${rbC(jwalAvg)}">${jwalAvg.toFixed(2)}</span></td>
-      <td style="color:#ff6600;font-family:var(--mono);font-weight:700">${ft.toFixed(2)}</td>
-      <td style="font-family:var(--mono);font-size:9px"><span class="up">${hi.toFixed(2)}</span>/<span class="dn">${lo.toFixed(2)}</span></td>
-      <td class="${volClass}" style="font-size:9px">${volLabel} <span style="font-size:8px">(σ${volatility.toFixed(2)})</span></td>
-      <td><span style="font-size:8px;padding:2px 6px;border:1px solid ${sigColor};color:${sigColor};font-weight:700">${signal}</span></td>
-    </tr>`;
-  }).join('');
-
-  const execWrap=document.getElementById('ftExecWrap');
-  if(executed.length===0){
-    if(execWrap) execWrap.style.display='none';
-    document.getElementById('ftExecBody').innerHTML='';
-    const prev=_charts['ftBeatsDonut']; if(prev){prev.destroy();delete _charts['ftBeatsDonut'];}
-  } else {
-    if(execWrap) execWrap.style.display='';
-    document.getElementById('ftExecBody').innerHTML=executed.map(e=>{
-      const dc=e.spread>=0?'up':'dn';
-      return `<tr>
-        <td>${logoImg(e.name,20)}</td>
-        <td style="color:#ff6600;font-weight:600">${e.name}</td>
-        <td style="color:#555">${e.date}</td>
-        <td style="color:#ff6600;font-family:var(--mono);font-weight:700">${e.futures.toFixed(2)}</td>
-        <td><span class="rb ${rbC(e.actual)}">${e.actual.toFixed(2)}</span></td>
-        <td class="${dc}" style="font-family:var(--mono);font-weight:700">${e.spread>=0?'+':''}${e.spread.toFixed(2)}</td>
-        <td><span style="font-size:8px;padding:1px 7px;border:1px solid;color:${e.spread>=0?'#00cc44':'#ff2222'};border-color:${e.spread>=0?'#00cc44':'#ff2222'}">${e.spread>=0?'▲ BEAT FUTURES':'▼ MISSED FUTURES'}</span></td>
-      </tr>`;
-    }).join('');
-
-    // Beats vs Misses donut
-    const donutEl=document.getElementById('ftBeatsDonut');
-    if(donutEl){
-      safeChart('ftBeatsDonut',donutEl,{type:'doughnut',
-        data:{labels:['BEAT','MISS'],datasets:[{data:[beats,misses],backgroundColor:['#00cc44','#ff2222'],borderColor:'#0a0a12',borderWidth:2}]},
-        options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:9,family:"'IBM Plex Mono','Courier New',monospace"},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>c.label+': '+c.raw+' ('+Math.round(c.raw/executed.length*100)+'%)'}}}}
-      });
-    }
-  }
-
-  } catch(e){ console.error('Futures error:',e); }
-}
-
-// ══════════════════════════════════════════════════════════════
 // DATA INTEGRITY VALIDATOR
 // Runs on every page load. Catches broken updates before they
 // become visible bugs. Access via E · AUDIT nav tab.
@@ -1974,7 +1840,6 @@ function drawFutures(){
   const REQUIRED_LOC_FIELDS = ['city','region','country','cc','lat','lng'];
   const VALID_METHODS = ['Draft','Nitro','Bottle','Can'];
   const VALID_MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  // FUTURES_BEERS defined at module level as shared constant
 
   const errors=[], warnings=[], passes=[];
   const pass=(msg)=>passes.push(msg);
@@ -2051,15 +1916,7 @@ function drawFutures(){
   });
   pass(`All ${drunkLocs.length} consumption locations validated`);
 
-  // ── 6. FUTURES CONTRACT COVERAGE
-  FUTURES_BEERS.forEach(name=>{
-    const hasData = beers.some(b=>b.beer===name);
-    if(!hasData) warn(`Futures contract "${name}" has no review data yet`);
-  });
-  const coveredFutures = FUTURES_BEERS.filter(n=>beers.some(b=>b.beer===n));
-  pass(`${coveredFutures.length}/${FUTURES_BEERS.length} futures contracts have review data`);
-
-  // ── 7. IPO WATCHLIST INTEGRITY (uses shared IPO_WATCHLIST constant)
+  // ── 6. IPO WATCHLIST INTEGRITY (uses shared IPO_WATCHLIST constant)
   const ipoNames = IPO_WATCHLIST.map(w=>w.beer);
   const reviewedSet = new Set(beers.map(b=>b.beer));
   const ipoReviewed = ipoNames.filter(n=>reviewedSet.has(n));
@@ -2069,23 +1926,23 @@ function drawFutures(){
   });
   pass(`IPO watchlist: ${ipoPending.length} pending, ${ipoReviewed.length} priced`);
 
-  // ── 8. FLAG & CNAMES SYMMETRY
+  // ── 7. FLAG & CNAMES SYMMETRY
   const flagKeys  = Object.keys(FLAGS);
   const cnameKeys = Object.keys(CNAMES);
   flagKeys.forEach(k=>{ if(!cnameKeys.includes(k)) warn(`FLAGS has "${k}" but CNAMES does not`); });
   cnameKeys.forEach(k=>{ if(!flagKeys.includes(k)) warn(`CNAMES has "${k}" but FLAGS does not`); });
   pass(`FLAGS and CNAMES both define ${flagKeys.length} country codes`);
 
-  // ── 9. DOM ELEMENT PRESENCE (runtime check)
+  // ── 8. DOM ELEMENT PRESENCE (runtime check)
   const criticalIds = ['ticker-scroll','clock-time','clock-date','mb-clock','sb-time',
     'beerBody','beerGrid','styleChart','scatterChart','brewedMap','drunkMap',
-    'ipoWatchBody','ipoPricedBody','ftContractBody','ftExecBody'];
+    'ipoWatchBody','ipoPricedBody'];
   criticalIds.forEach(id=>{
     if(!document.getElementById(id)) fail(`Critical DOM element missing: #${id}`);
   });
   pass(`All ${criticalIds.length} critical DOM elements present`);
 
-  // ── 10. DATA CONSISTENCY: beer cc matches origin where expected
+  // ── 9. DATA CONSISTENCY: beer cc matches origin where expected
   const ccOriginMismatches = beers.filter(b=>{
     // For non-US-consumed beers, origin and cc can differ legitimately (e.g. Japanese beer drunk in US)
     // Just flag if cc itself is invalid
@@ -2181,7 +2038,7 @@ function toggleScanlines(){
     {id:'mapbrewed',label:'MAP BREWERY',icon:'◎',key:'F9'},
     {id:'language',label:'LANGUAGE',icon:'◑',key:'F10'},
     {id:'contrarian',label:'CONTRARIAN IDX',icon:'◆',key:'Q'},
-    {id:'ipo',label:'IPO / FUTURES',icon:'◈',key:'W'},
+    {id:'ipo',label:'IPO',icon:'◈',key:'W'},
     {id:'audit',label:'DATA AUDIT',icon:'⬡',key:'E'},
   ];
 
