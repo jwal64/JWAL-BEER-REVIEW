@@ -529,7 +529,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   function refreshUI(){
     refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_auditD','_dM','_bM','_langD']
+    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_dM','_bM','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
     try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
@@ -616,13 +616,8 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'beers','3':'rankings','4':'countries',
-    '5':'city','6':'insights','7':'temporal','8':'mapdrunk',
-    '9':'mapbrewed','0':'language',
-    'q':'contrarian','w':'ipo','e':'audit',
-    'f1':'overview','f2':'beers','f3':'rankings','f4':'countries',
-    'f5':'city','f6':'insights','f7':'temporal','f8':'mapdrunk',
-    'f9':'mapbrewed','f10':'language'
+    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'temporal','6':'markets',
+    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -658,17 +653,21 @@ function showTab(id,btn){
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
-  if(id==='countries'&&!window._cD) drawCountry();
-  if(id==='city'&&!window._ciD) drawCity();
-  if(id==='rankings'&&!window._rkD) drawRankings();
-  if(id==='insights'&&!window._inD) drawInsights();
-  if(id==='temporal'&&!window._tmpD) drawTemporal();
-  if(id==='contrarian'&&!window._ciX) drawContrarian();
-  if(id==='ipo'&&!window._ipoD) drawIPO();
-  if(id==='audit'&&!window._auditD) drawAudit();
-if(id==='mapdrunk'&&!window._dM){window._dM=true;setTimeout(initDrunkMap,80);}
-  if(id==='mapbrewed'&&!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
-  if(id==='language'&&!window._langD) drawLanguage();
+  const renderers = {
+    analysis: [['_rkD',drawRankings], ['_inD',drawInsights]],
+    geo: [
+      ['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage],
+      ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
+      ['_bM',()=>{window._bM=true;setTimeout(initBrewedMap,80);}],
+    ],
+    temporal: [['_tmpD',drawTemporal]],
+    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
+  };
+  (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
+  if(id==='geo'){
+    if(_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
+    if(_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
+  }
 }
 
 // ── CHART DEFAULTS
@@ -1828,179 +1827,6 @@ function drawIPO(){
   } catch(e){ console.error('IPO error:',e); }
 }
 
-// ══════════════════════════════════════════════════════════════
-// DATA INTEGRITY VALIDATOR
-// Runs on every page load. Catches broken updates before they
-// become visible bugs. Access via E · AUDIT nav tab.
-// ══════════════════════════════════════════════════════════════
-(function runIntegrityChecks(){
-  const REQUIRED_BEER_FIELDS = ['beer','style','origin','abv','method','city','region','country','cc','rating','isNew','month','monthN','year'];
-  const REQUIRED_BREWERY_FIELDS = ['name','location','country','cc','beers','lat','lng','ratings'];
-  const REQUIRED_LOC_FIELDS = ['city','region','country','cc','lat','lng'];
-  const VALID_METHODS = ['Draft','Nitro','Bottle','Can'];
-  const VALID_MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  const errors=[], warnings=[], passes=[];
-  const pass=(msg)=>passes.push(msg);
-  const warn=(msg)=>warnings.push('⚠ '+msg);
-  const fail=(msg)=>errors.push('✗ '+msg);
-
-  // ── 1. BEER ARRAY FIELD COMPLETENESS
-  beers.forEach((b,i)=>{
-    REQUIRED_BEER_FIELDS.forEach(f=>{
-      if(b[f]===undefined||b[f]===null||b[f]==='') fail(`Beer[${i}] "${b.beer||'?'}" missing field: ${f}`);
-    });
-  });
-  if(!errors.length) pass(`All ${beers.length} beer entries have required fields`);
-
-  // ── 2. BEER DATA RANGE VALIDATION
-  beers.forEach((b,i)=>{
-    if(b.rating<1||b.rating>5)        fail(`Beer[${i}] "${b.beer}" rating out of range: ${b.rating}`);
-    if(b.abv<1||b.abv>20)             fail(`Beer[${i}] "${b.beer}" suspicious ABV: ${b.abv}`);
-    if(!VALID_METHODS.includes(b.method)) fail(`Beer[${i}] "${b.beer}" unknown method: "${b.method}" (valid: ${VALID_METHODS.join('/')})`);
-    if(!VALID_MONTHS.includes(b.month))   fail(`Beer[${i}] "${b.beer}" unknown month: "${b.month}"`);
-    if(b.monthN<1||b.monthN>12)       fail(`Beer[${i}] "${b.beer}" monthN out of range: ${b.monthN}`);
-    if(typeof b.isNew !== 'boolean')   warn(`Beer[${i}] "${b.beer}" isNew is not boolean: ${b.isNew}`);
-    if(!FLAGS[b.origin])               warn(`Beer[${i}] "${b.beer}" origin "${b.origin}" has no FLAG emoji`);
-    if(!FLAGS[b.cc])                   warn(`Beer[${i}] "${b.beer}" cc "${b.cc}" has no FLAG emoji`);
-  });
-  const badRatings = beers.filter(b=>b.rating<1||b.rating>5);
-  if(!badRatings.length) pass('All beer ratings within 1.0–5.0 range');
-
-  // ── 3. BRAND LOGO COVERAGE
-  const logoNames = Object.keys(BRAND_DOMAINS);
-  const uniqueBeers = [...new Set(beers.map(b=>b.beer))];
-  uniqueBeers.forEach(name=>{
-    if(!logoNames.includes(name)) warn(`No brand domain for beer: "${name}"`);
-  });
-  const coveredCount = uniqueBeers.filter(n=>logoNames.includes(n)).length;
-  pass(`${coveredCount}/${uniqueBeers.length} beer brands have brand domains`);
-
-  // ── 4. BREWERY ARRAY VALIDATION
-  REQUIRED_BREWERY_FIELDS.forEach(f=>{
-    breweries.forEach((b,i)=>{
-      if(b[f]===undefined||b[f]===null||b[f]==='') fail(`Brewery[${i}] "${b.name||'?'}" missing field: ${f}`);
-    });
-  });
-  breweries.forEach((b,i)=>{
-    if(b.lat<-90||b.lat>90||b.lng<-180||b.lng>180)
-      fail(`Brewery[${i}] "${b.name}" has invalid coordinates: lat=${b.lat} lng=${b.lng}`);
-    if(!Array.isArray(b.ratings)||b.ratings.length===0)
-      fail(`Brewery[${i}] "${b.name}" has empty ratings array`);
-    b.ratings.forEach((r,ri)=>{
-      if(r<1||r>5) fail(`Brewery[${i}] "${b.name}" ratings[${ri}] out of range: ${r}`);
-    });
-    if(!FLAGS[b.cc]) warn(`Brewery[${i}] "${b.name}" cc "${b.cc}" has no FLAG emoji`);
-    // Check brewery beer names don't include beers not in our dataset (warn only)
-    const brewBeerNames = b.beers.split(' · ').map(s=>s.trim());
-    brewBeerNames.forEach(bn=>{
-      const cleanName = bn.replace(/\s*\([^)]+\)/,'').trim(); // strip parenthetical like "(Kirin Ichiban)"
-      const inData = beers.some(beer=>beer.beer===cleanName||beer.beer===bn);
-      if(!inData) warn(`Brewery "${b.name}" lists beer "${bn}" not found in beers data`);
-    });
-  });
-  if(!errors.filter(e=>e.includes('Brewery')).length) pass(`All ${breweries.length} brewery entries have required fields and valid coordinates`);
-
-  // ── 5. DRUNK LOCS VALIDATION
-  drunkLocs.forEach((l,i)=>{
-    REQUIRED_LOC_FIELDS.forEach(f=>{
-      if(l[f]===undefined||l[f]===null||l[f]==='') fail(`drunkLoc[${i}] "${l.city||'?'}" missing field: ${f}`);
-    });
-    if(l.lat<-90||l.lat>90||l.lng<-180||l.lng>180)
-      fail(`drunkLoc[${i}] "${l.city}" has invalid coordinates: lat=${l.lat} lng=${l.lng}`);
-    if(!FLAGS[l.cc]) warn(`drunkLoc[${i}] "${l.city}" cc "${l.cc}" has no FLAG emoji`);
-    // Verify each drunkLoc has at least one beer reviewed there
-    const beersThere = beers.filter(b=>b.city===l.city);
-    if(!beersThere.length) warn(`drunkLoc "${l.city}" has no beers in data`);
-  });
-  pass(`All ${drunkLocs.length} consumption locations validated`);
-
-  // ── 6. IPO WATCHLIST INTEGRITY (uses shared IPO_WATCHLIST constant)
-  const ipoNames = IPO_WATCHLIST.map(w=>w.beer);
-  const reviewedSet = new Set(beers.map(b=>b.beer));
-  const ipoReviewed = ipoNames.filter(n=>reviewedSet.has(n));
-  const ipoPending  = ipoNames.filter(n=>!reviewedSet.has(n));
-  ipoNames.forEach(name=>{
-    if(!Object.keys(BRAND_DOMAINS).includes(name)) warn(`IPO beer "${name}" has no brand domain`);
-  });
-  pass(`IPO watchlist: ${ipoPending.length} pending, ${ipoReviewed.length} priced`);
-
-  // ── 7. FLAG & CNAMES SYMMETRY
-  const flagKeys  = Object.keys(FLAGS);
-  const cnameKeys = Object.keys(CNAMES);
-  flagKeys.forEach(k=>{ if(!cnameKeys.includes(k)) warn(`FLAGS has "${k}" but CNAMES does not`); });
-  cnameKeys.forEach(k=>{ if(!flagKeys.includes(k)) warn(`CNAMES has "${k}" but FLAGS does not`); });
-  pass(`FLAGS and CNAMES both define ${flagKeys.length} country codes`);
-
-  // ── 8. DOM ELEMENT PRESENCE (runtime check)
-  const criticalIds = ['ticker-scroll','clock-time','clock-date','mb-clock','sb-time',
-    'beerBody','beerGrid','styleChart','scatterChart','brewedMap','drunkMap',
-    'ipoWatchBody','ipoPricedBody'];
-  criticalIds.forEach(id=>{
-    if(!document.getElementById(id)) fail(`Critical DOM element missing: #${id}`);
-  });
-  pass(`All ${criticalIds.length} critical DOM elements present`);
-
-  // ── 9. DATA CONSISTENCY: beer cc matches origin where expected
-  const ccOriginMismatches = beers.filter(b=>{
-    // For non-US-consumed beers, origin and cc can differ legitimately (e.g. Japanese beer drunk in US)
-    // Just flag if cc itself is invalid
-    return !FLAGS[b.cc] || !FLAGS[b.origin];
-  });
-  if(ccOriginMismatches.length) ccOriginMismatches.forEach(b=>fail(`Beer "${b.beer}" has unmapped cc/origin`));
-  else pass('All beer cc and origin codes map to valid FLAGS entries');
-
-  // ── REPORT
-  const totalIssues = errors.length + warnings.length;
-  const status = errors.length ? 'FAIL' : warnings.length ? 'WARN' : 'PASS';
-  const statusColor = errors.length ? 'color:#ff2222' : warnings.length ? 'color:#ffaa00' : 'color:#00cc44';
-
-  console.group('%c🍺 BREW TERMINAL — DATA INTEGRITY REPORT', 'font-weight:bold;color:#ff6600');
-  console.log(`Status: %c${status}`, statusColor);
-  console.log(`${passes.length} checks passed · ${warnings.length} warnings · ${errors.length} errors`);
-  if(errors.length)   { console.group('ERRORS'); errors.forEach(e=>console.error(e)); console.groupEnd(); }
-  if(warnings.length) { console.group('WARNINGS'); warnings.forEach(w=>console.warn(w)); console.groupEnd(); }
-  if(!totalIssues)    console.log('%c✓ All integrity checks passed — data is clean', 'color:#00cc44');
-  console.groupEnd();
-
-  // Store results for the audit panel
-  window._auditResults = { status, passes, warnings, errors, ts: new Date().toLocaleTimeString() };
-
-  // Update status bar dot color if there are errors
-  if(errors.length) {
-    const dot = document.querySelector('.sb-dot');
-    if(dot) dot.style.background='#ff2222';
-  } else if(warnings.length) {
-    const dot = document.querySelector('.sb-dot');
-    if(dot) dot.style.background='#ffaa00';
-  }
-})();
-
-function drawAudit(){
-  window._auditD=true;
-  try {
-    const r=window._auditResults;
-    if(!r){ document.getElementById('auditBody').innerHTML='<p style="color:#555">No results.</p>'; return; }
-    const statusColor=r.errors.length?'#ff2222':r.warnings.length?'#ffaa00':'#00cc44';
-    document.getElementById('audit-status').textContent=r.status;
-    document.getElementById('audit-status').style.color=statusColor;
-    document.getElementById('audit-pass').textContent=r.passes.length;
-    document.getElementById('audit-warn').textContent=r.warnings.length;
-    document.getElementById('audit-fail').textContent=r.errors.length;
-    document.getElementById('audit-ts').textContent='Last run: '+r.ts;
-
-    const mkRows=(arr,cls,icon)=>arr.map(msg=>`
-      <div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid #1a1a1a">
-        <span style="color:${cls};font-size:10px;flex-shrink:0;width:12px">${icon}</span>
-        <span style="font-size:9px;color:${cls};font-family:var(--mono);line-height:1.5">${msg.replace(/^[✗⚠✓]\s*/,'')}</span>
-      </div>`).join('');
-
-    document.getElementById('auditBody').innerHTML=`
-      ${r.errors.length?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;color:#ff2222;letter-spacing:2px;margin-bottom:4px">ERRORS (${r.errors.length})</div>${mkRows(r.errors,'#ff2222','✗')}</div>`:''}
-      ${r.warnings.length?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;color:#ffaa00;letter-spacing:2px;margin-bottom:4px">WARNINGS (${r.warnings.length})</div>${mkRows(r.warnings,'#ffaa00','⚠')}</div>`:''}
-      <div><div style="font-size:9px;font-weight:700;color:#00cc44;letter-spacing:2px;margin-bottom:4px">PASSED (${r.passes.length})</div>${mkRows(r.passes,'#00cc44','✓')}</div>`;
-  } catch(e){ console.error('Audit panel error:',e); }
-}
 
 // ══════════════════════════════════════════════════════════════
 // SCANLINE TOGGLE
@@ -2028,17 +1854,10 @@ function toggleScanlines(){
   const TABS=[
     {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
-    {id:'rankings',label:'RANKINGS',icon:'▲',key:'F3'},
-    {id:'countries',label:'GEO / COUNTRY',icon:'◎',key:'F4'},
-    {id:'city',label:'CITIES',icon:'▣',key:'F5'},
-    {id:'insights',label:'INSIGHTS',icon:'◈',key:'F6'},
-    {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F7'},
-    {id:'mapdrunk',label:'MAP CONSUMED',icon:'◉',key:'F8'},
-    {id:'mapbrewed',label:'MAP BREWERY',icon:'◎',key:'F9'},
-    {id:'language',label:'LANGUAGE',icon:'◑',key:'F10'},
-    {id:'contrarian',label:'CONTRARIAN IDX',icon:'◆',key:'Q'},
-    {id:'ipo',label:'IPO',icon:'◈',key:'W'},
-    {id:'audit',label:'DATA AUDIT',icon:'⬡',key:'E'},
+    {id:'analysis',label:'ANALYSIS',icon:'▲',key:'F3'},
+    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
+    {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
+    {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
   ];
 
   function openPalette(){
