@@ -616,8 +616,8 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'temporal','6':'markets',
-    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'temporal','6':'markets','7':'maps',
+    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'temporal','f6':'markets','f7':'maps'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -655,16 +655,16 @@ function showTab(id,btn){
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
   const renderers = {
     analysis: [['_rkD',drawRankings], ['_inD',drawInsights]],
-    geo: [
-      ['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage],
+    geo:      [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
+    temporal: [['_tmpD',drawTemporal]],
+    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
+    maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
       ['_bM',()=>{window._bM=true;setTimeout(initBrewedMap,80);}],
     ],
-    temporal: [['_tmpD',drawTemporal]],
-    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
-  if(id==='geo'){
+  if(id==='maps'){
     if(_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
     if(_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
   }
@@ -1858,6 +1858,7 @@ function toggleScanlines(){
     {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
     {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
+    {id:'maps',label:'MAPS',icon:'◉',key:'F7'},
   ];
 
   function openPalette(){

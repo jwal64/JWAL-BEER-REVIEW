@@ -74,6 +74,7 @@
   <div class="mb-item" data-tab="geo"><span class="fkey">F4</span>GEO</div>
   <div class="mb-item" data-tab="temporal"><span class="fkey">F5</span>TIME</div>
   <div class="mb-item" data-tab="markets"><span class="fkey">F6</span>MKTS</div>
+  <div class="mb-item" data-tab="maps"><span class="fkey">F7</span>MAPS</div>
   <div class="mb-spacer"></div>
   <div class="mb-right" id="mb-clock">—</div>
 </div>
@@ -138,6 +139,8 @@
   <div class="nav-item" data-tab="geo"><span class="nav-icon">◎</span>GEOGRAPHY<span class="nkey">F4</span></div>
   <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F5</span></div>
   <div class="nav-item" data-tab="markets"><span class="nav-icon">◆</span>MARKETS<span class="nkey">F6</span></div>
+  <div class="nav-section-head">MAPS</div>
+  <div class="nav-item" data-tab="maps"><span class="nav-icon">◉</span>MAPS<span class="nkey">F7</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -336,6 +339,35 @@
     </div>
   </section>
 
+  <section class="merged-section" data-section="language">
+    <div class="merged-section-head">◑ BREWING LANGUAGE</div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
+      <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">LANGUAGE PERFORMANCE BARS</div>
+      <div class="bb-body" id="langCards"></div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">BREWERY REGION TABLE</div>
+      <div class="bb-body">
+        <div style="overflow-x:auto">
+          <table class="bb-table">
+            <thead><tr><th></th><th>BEER</th><th>CTRY</th><th>REGION</th><th>LANG</th><th>RATING</th></tr></thead>
+            <tbody id="langTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════ MAPS (consumed + brewery) ══════════════ -->
+
+<div id="maps" class="panel">
+
   <section class="merged-section" data-section="mapdrunk">
     <div class="merged-section-head">◉ PLACES CONSUMED</div>
     <div class="bb-panel">
@@ -379,29 +411,6 @@
           <table class="bb-table">
             <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>LOCATION</th><th>COUNTRY</th><th>BEER(S)</th><th>AVG</th></tr></thead>
             <tbody id="brewedTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="merged-section" data-section="language">
-    <div class="merged-section-head">◑ BREWING LANGUAGE</div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
-      <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">LANGUAGE PERFORMANCE BARS</div>
-      <div class="bb-body" id="langCards"></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BREWERY REGION TABLE</div>
-      <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table">
-            <thead><tr><th></th><th>BEER</th><th>CTRY</th><th>REGION</th><th>LANG</th><th>RATING</th></tr></thead>
-            <tbody id="langTableBody"></tbody>
           </table>
         </div>
       </div>
