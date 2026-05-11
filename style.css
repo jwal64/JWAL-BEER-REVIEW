@@ -345,6 +345,15 @@ PANELS
 .panel { display: none; padding: 8px; }
 .panel.active { display: block; }
 
+.merged-section { margin-bottom: 16px; }
+.merged-section + .merged-section { border-top: 1px solid var(--border2); padding-top: 12px; }
+.merged-section-head {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  color: var(--orange); padding: 6px 0 8px; margin-bottom: 6px;
+  border-bottom: 1px dashed var(--border2);
+}
+@media (max-width:700px){ .merged-section-head { font-size: 9px; } }
+
 /* ═══════════════════════════════════════════
 BLOOMBERG PANELS / WINDOWS
 ═══════════════════════════════════════════ */
