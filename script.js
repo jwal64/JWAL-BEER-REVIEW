@@ -32,8 +32,8 @@ let beers=[
   {beer:"Stella Artois",   style:"Lager",               origin:"BE",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Duvel",           style:"Belgian Ale",origin:"BE",abv:8.5,method:"Bottle",city:"Amsterdam",   region:"Noord-Holland",   country:"Netherlands", cc:"NL", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Carlsberg",       style:"Pilsner",            origin:"DK",abv:5.0,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"Harp",            style:"Lager",               origin:"IE",abv:4.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
-  {beer:"Kronenbourg",     style:"Lager",               origin:"FR",abv:5.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Harp Lager",      style:"Lager",               origin:"IE",abv:4.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Kronenbourg 1664",style:"Lager",               origin:"FR",abv:5.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Michelob Ultra",  style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Red Stripe",      style:"Lager",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026},
   // FEB 2026
@@ -41,7 +41,7 @@ let beers=[
   {beer:"Guinness",        style:"Stout",          origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Weihenstephaner", style:"Wheat Beer",    origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Münchner Weiße",   style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Modelo Negra",    style:"Lager",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Negra Modelo",    style:"Lager",      origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Münchner Dunkel",  style:"Lager",      origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
@@ -61,7 +61,7 @@ let beers=[
   {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Texels Skuumkoppe", style:"Wheat Beer",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Affligem Tripel",   style:"Belgian Ale",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Bolleke De Koninck",style:"Pale Ale",         origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"De Koninck",      style:"Pale Ale",            origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"IJwit",             style:"Wheat Beer",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"La Chouffe Blonde", style:"Belgian Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
@@ -74,11 +74,11 @@ let beers=[
   {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
   // MAY 2026
-  {beer:"Scottish Ale",     style:"Stout",              origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
-  {beer:"Summer Ale",       style:"Wheat Beer",         origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Belhaven Scottish Ale",style:"Stout",          origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Samuel Adams Summer Ale",style:"Wheat Beer",   origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
-  {beer:"Big Wave",         style:"Pale Ale",           origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -110,7 +110,7 @@ let breweries=[
   {name:"Weihenstephaner",        location:"Freising, Bavaria",         country:"Germany",     cc:"DE", lang:"de", beers:"Weihenstephaner",                                    lat:48.3953,lng:11.7291, ratings:[4.50]},
   {name:"Hofbräu München",        location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Münchner Weiße · Münchner Dunkel",                                                  lat:48.1351,lng:11.5820, ratings:[4.75,2.75]},
   {name:"Guinness (St. James's Gate)", location:"Dublin, Leinster",     country:"Ireland",     cc:"IE", lang:"en", beers:"Guinness",                                          lat:53.3418,lng:-6.2868, ratings:[4.00]},
-  {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp",                                              lat:54.0039,lng:-6.3703, ratings:[4.25]},
+  {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp Lager",                                        lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75]},
   {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25]},
@@ -118,11 +118,11 @@ let breweries=[
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
   {name:"Molson Coors",           location:"Golden, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Coors Light",                                       lat:39.7555,lng:-105.2211,ratings:[3.00]},
-  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo Especial · Modelo Negra · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,3.00,3.75,3.00]},
+  {name:"Grupo Modelo",           location:"Mexico City, CDMX",         country:"Mexico",      cc:"MX", lang:"es", beers:"Modelo Especial · Negra Modelo · Corona Extra · Modelo Oro", lat:19.4274,lng:-99.1677, ratings:[3.25,3.00,3.75,3.00]},
   {name:"Cervecería Estrella Jalisco", location:"Guadalajara, Jalisco",country:"Mexico",      cc:"MX", lang:"es", beers:"Estrella Jalisco",                                    lat:20.6597,lng:-103.3496, ratings:[3.75]},
   {name:"Carlsberg",              location:"Copenhagen, Capital Region",country:"Denmark",     cc:"DK", lang:"da", beers:"Carlsberg · Carlsberg Elephant",                    lat:55.6614,lng:12.5361,  ratings:[3.00,3.50]},
   {name:"Unibroue",               location:"Chambly, Quebec",           country:"Canada",      cc:"CA", lang:"fr", beers:"La Fin Du Monde",                                   lat:45.4412,lng:-73.2615, ratings:[3.75]},
-  {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"Kronenbourg",           nativeName:"Kronenbourg 1664", lat:48.4637,lng:7.4845,  ratings:[3.00]},
+  {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"Kronenbourg 1664",                                  lat:48.4637,lng:7.4845,  ratings:[3.00]},
   {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", lang:"ja", beers:"Sapporo",               nativeName:"サッポロビール",     lat:43.0685,lng:141.3544, ratings:[3.50]},
   {name:"Kirin Brewery",          location:"Yokohama, Kanagawa",        country:"Japan",       cc:"JP", lang:"ja", beers:"Kirin Ichiban",nativeName:"キリン一番搾り",   lat:35.4634,lng:139.6220, ratings:[3.00]},
   {name:"Red Stripe (D&G)",       location:"Kingston, Surrey",          country:"Jamaica",     cc:"JM", lang:"en", beers:"Red Stripe",                                        lat:17.9972,lng:-76.7939, ratings:[3.75]},
@@ -137,7 +137,7 @@ let breweries=[
   {name:"Abbaye de Leffe (AB InBev)", location:"Dinant, Namur",          country:"Belgium",     cc:"BE", lang:"fr", beers:"Leffe Blonde",                                            lat:50.2611,lng:4.9122,   ratings:[4.75]},
   {name:"Texelse Bierbrouwerij",      location:"Oudeschild, North Holland",country:"Netherlands",cc:"NL", lang:"nl", beers:"Texels Skuumkoppe",                                       lat:53.0385,lng:4.8510,   ratings:[3.00]},
   {name:"Affligem Brewery (Heineken)",location:"Opwijk, Flemish Brabant", country:"Belgium",     cc:"BE", lang:"nl", beers:"Affligem Tripel",                                          lat:50.9786,lng:4.1868,   ratings:[3.75]},
-  {name:"De Koninck Brewery",         location:"Antwerp, Antwerp",        country:"Belgium",     cc:"BE", lang:"nl", beers:"Bolleke De Koninck",                                       lat:51.2157,lng:4.4156,   ratings:[2.75]},
+  {name:"De Koninck Brewery",         location:"Antwerp, Antwerp",        country:"Belgium",     cc:"BE", lang:"nl", beers:"De Koninck",                                                lat:51.2157,lng:4.4156,   ratings:[2.75]},
   {name:"Brouwerij 't IJ",            location:"Amsterdam, Noord-Holland",country:"Netherlands", cc:"NL", lang:"nl", beers:"IJwit",                                                    lat:52.3657,lng:4.9196,   ratings:[3.75]},
   {name:"Brasserie d'Achouffe",       location:"Achouffe, Luxembourg Province (Wallonia)", country:"Belgium",     cc:"BE", lang:"fr", beers:"La Chouffe Blonde",                                           lat:50.1417,lng:5.8125,   ratings:[4.25]},
   {name:"Stieglbrauerei zu Salzburg", location:"Salzburg, Land Salzburg", country:"Austria",     cc:"AT", lang:"de", beers:"Stiegl Goldbräu",                                              lat:47.8095,lng:13.0550,  ratings:[2.75]},
@@ -145,11 +145,11 @@ let breweries=[
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
   {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
   {name:"Miller Brewing Company",    location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Miller Lite",                                              lat:43.0389,lng:-87.9065, ratings:[2.25]},
-  {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Scottish Ale",                                             lat:56.0006,lng:-2.5176,  ratings:[3.00]},
-  {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Summer Ale",                                              lat:42.3601,lng:-71.0589, ratings:[3.00]},
+  {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Belhaven Scottish Ale",                                    lat:56.0006,lng:-2.5176,  ratings:[3.00]},
+  {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Samuel Adams Summer Ale",                                  lat:42.3601,lng:-71.0589, ratings:[3.00]},
   {name:"Cervecería del Pacífico",   location:"Mazatlán, Sinaloa",         country:"Mexico",      cc:"MX", lang:"es", beers:"Pacífico Clara",                                            lat:23.2494,lng:-106.4111,ratings:[3.75]},
   {name:"Narragansett Brewing Company", location:"Cranston, Rhode Island", country:"USA",         cc:"US", lang:"en", beers:"Narragansett Lager",                                        lat:41.7798,lng:-71.4373, ratings:[3.25]},
-  {name:"Kona Brewing Company",      location:"Kailua-Kona, Hawaii",       country:"USA",         cc:"US", lang:"en", beers:"Big Wave",                                                  lat:19.6406,lng:-155.9969,ratings:[3.75]},
+  {name:"Kona Brewing Company",      location:"Kailua-Kona, Hawaii",       country:"USA",         cc:"US", lang:"en", beers:"Big Wave Golden Ale",                                       lat:19.6406,lng:-155.9969,ratings:[3.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -161,10 +161,10 @@ const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
 "Asahi Super Dry":"asahibeer.com",
 "Augustiner Helles":"augustiner-braeu.de",
-"Big Wave":"konabrewingco.com",
+"Big Wave Golden Ale":"konabrewingco.com",
 "Birra Moretti":"birramoretti.com",
 "Blue Moon":"bluemoonbrewingcompany.com",
-"Bolleke De Koninck":"dekoninck.be",
+"De Koninck":"dekoninck.be",
 "Brahma":"brahma.com.br",
 "Bud Light":"budlight.com",
 "Budweiser":"budweiser.com",
@@ -185,22 +185,21 @@ const BRAND_DOMAINS = {
 "Grolsch Puur Weizen":"grolsch.com",
 "Frisse Lentebok":"grolsch.com",
 "Guinness":"guinness.com",
-"Harp":"harplager.com",
+"Harp Lager":"harplager.com",
 "Heineken":"heineken.com",
 "Hertog Jan":"hertogjan.nl",
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
 "Kirin Ichiban":"kirin.co.jp",
-"Kronenbourg":"1664.com",
+"Kronenbourg 1664":"1664.com",
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
 "Menabrea":"birramenabrea.com",
 "Michelob Ultra":"michelobultra.com",
 "Miller Lite":"millerlite.com",
-"Modelo":"modelousa.com",
 "Modelo Especial":"modelousa.com",
-"Modelo Negra":"modelousa.com",
+"Negra Modelo":"modelousa.com",
 "Modelo Oro":"modelousa.com",
 "Mythos":"mythosbrewery.gr",
 "Münchner Dunkel":"hofbraeu-muenchen.de",
@@ -220,13 +219,13 @@ const BRAND_DOMAINS = {
 "Rolling Rock Extra Pale":"rollingrock.com",
 "Sam Adams Boston Lager":"samueladams.com",
 "Sapporo":"sapporobeer.com",
-"Scottish Ale":"belhaven.co.uk",
+"Belhaven Scottish Ale":"belhaven.co.uk",
 "Singha":"singhabeer.com",
 "Smithwick's":"smithwicks.com",
 "Sol":"solbeer.com",
 "Stella Artois":"stellaartois.com",
 "Stiegl Goldbräu":"stiegl.at",
-"Summer Ale":"samueladams.com",
+"Samuel Adams Summer Ale":"samueladams.com",
 "Super Bock":"superbock.pt",
 "Tennent's":"tennents.com",
 "Texels Skuumkoppe":"texels.nl",
@@ -616,8 +615,8 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'temporal','6':'markets',
-    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'maps','6':'temporal','7':'markets',
+    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'maps','f6':'temporal','f7':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -655,8 +654,8 @@ function showTab(id,btn){
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
   const renderers = {
     analysis: [['_rkD',drawRankings], ['_inD',drawInsights]],
-    geo: [
-      ['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage],
+    geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
+    maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
       ['_bM',()=>{window._bM=true;setTimeout(initBrewedMap,80);}],
     ],
@@ -664,7 +663,7 @@ function showTab(id,btn){
     markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
-  if(id==='geo'){
+  if(id==='maps'){
     if(_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
     if(_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
   }
@@ -1515,9 +1514,9 @@ function drawContrarian(){
     'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
     'Sapporo':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
     'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
-    'Harp':3.42,'La Fin Du Monde':4.07,'Kronenbourg':3.30,
+    'Harp Lager':3.42,'La Fin Du Monde':4.07,'Kronenbourg 1664':3.30,
     'Michelob Ultra':2.84,'Guinness':3.80,'Red Stripe':3.31,
-    'Heineken':3.00,'Weihenstephaner':3.80,'Modelo Negra':3.60,
+    'Heineken':3.00,'Weihenstephaner':3.80,'Negra Modelo':3.60,
     'Münchner Weiße':3.80,'Münchner Dunkel':3.55,
     'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
     'Dos Equis Lager Especial':3.25,
@@ -1527,11 +1526,12 @@ function drawContrarian(){
     'Estrella Galicia':3.65,'Pilsner Urquell':3.80,'Wrench':3.95,
     'Żywiec':3.35,'Nastro Azzurro':3.56,'Estrella Damm':3.61,
     'Grolsch Puur Weizen':3.50,'Leffe Blonde':3.75,'Texels Skuumkoppe':3.65,
-    'Affligem Tripel':3.80,'Bolleke De Koninck':3.55,'IJwit':3.50,
+    'Affligem Tripel':3.80,'De Koninck':3.55,'IJwit':3.50,
     'La Chouffe Blonde':3.85,'Stiegl Goldbräu':3.35,'Modelo Oro':3.45,
     'Super Bock':3.41,'Estrella Jalisco':3.20,'Rolling Rock Extra Pale':3.05,
     'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
-    'Pacífico Clara':3.65,'Narragansett Lager':3.23,'Big Wave':3.52,
+    'Pacífico Clara':3.65,'Narragansett Lager':3.23,'Big Wave Golden Ale':3.52,
+    'Belhaven Scottish Ale':3.45,'Samuel Adams Summer Ale':3.50,
   };
 
   // STATS.brandList already has avg/cnt per beer — reuse it instead of
@@ -1619,7 +1619,7 @@ const IPO_WATCHLIST=[
   // Additional picks
   {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
   {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
-  {beer:'Kronenbourg',     style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
+  {beer:'Kronenbourg 1664',style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
   {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
   {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
   // Pipeline promotions
