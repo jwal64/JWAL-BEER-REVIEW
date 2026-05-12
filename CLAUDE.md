@@ -108,12 +108,11 @@ After adding a new beer, verify:
 
 These beers have native-language names that differ from their marketed names:
 
-| Marketed Name      | Native Name          | Language |
-|--------------------|----------------------|----------|
-| Pilsner Urquell    | Plzeňský Prazdroj    | Czech    |
-| Sapporo            | サッポロビール         | Japanese |
-| Ichiban            | キリン一番搾り         | Japanese |
-| Moretti            | Birra Moretti        | Italian  |
-| Erdinger Weissbier | Erdinger Weißbier    | German   |
-| 1664               | Kronenbourg 1664     | French   |
-| Münchner Weiße     | Münchner Weiße       | German   |
+| Marketed Name           | Native Name        | Language |
+|-------------------------|--------------------|----------|
+| Pilsner Urquell         | Plzeňský Prazdroj  | Czech    |
+| Sapporo Premium         | サッポロビール        | Japanese |
+| Kirin Ichiban           | キリン一番搾り        | Japanese |
+| Birra Moretti           | Birra Moretti      | Italian  |
+| Erdinger Weißbier       | Erdinger Weißbier  | German   |
+| Hofbräu Münchner Weiße  | Hofbräu Münchner Weiße | German |
