@@ -528,7 +528,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   function refreshUI(){
     refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_rkD','_inD','_tmpD','_ciX','_ipoD','_dM','_bM','_langD']
+    ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_bM','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
     try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
@@ -653,7 +653,7 @@ function showTab(id,btn){
     [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
   const renderers = {
-    analysis: [['_rkD',drawRankings], ['_inD',drawInsights]],
+    analysis: [['_inD',drawInsights]],
     geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
@@ -900,56 +900,6 @@ function openBeerModal(name){
 function closeBeerModal(){
   const bm=document.getElementById('beerModal');
   bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
-}
-
-// ══════════════════════════════════════════════════════════════
-// RANKINGS
-// ══════════════════════════════════════════════════════════════
-function drawRankings(){
-  window._rkD=true;
-  const sr=STATS.sorted;
-  const mkList=(data,i0)=>data.map((b,i)=>`
-    <div class="mini-row">
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:8px;color:#333;width:16px;text-align:right">#${i0+i+1}</span>
-        ${logoImg(b.beer,20)}
-        <span style="color:#ff6600;font-size:10px;font-weight:600">${b.beer}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:8px;color:#555">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</span>
-        <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
-      </div>
-    </div>`).join('');
-  document.getElementById('top10').innerHTML=mkList(sr.slice(0,10),0);
-  document.getElementById('bot10').innerHTML=mkList([...sr].reverse().slice(0,10),Math.max(0,sr.length-10));
-
-  const bList=STATS.brandList;
-  document.getElementById('brandBody').innerHTML=bList.map((b,i)=>`
-    <tr>
-      <td style="color:#555;font-size:9px">${i+1}</td>
-      <td>${logoImg(b.n,20)}</td>
-      <td style="color:#ff6600;font-weight:600">${b.n}</td>
-      <td style="text-align:center">${b.cnt}</td>
-      <td><span class="rb ${rbC(b.avg)}">${b.avg.toFixed(2)}</span></td>
-      <td class="up">${b.best.toFixed(2)}</td>
-      <td class="dn">${b.worst.toFixed(2)}</td>
-      <td style="color:#aaa">${b.std.toFixed(3)}</td>
-      <td><span style="font-size:8px;padding:1px 5px;border:1px solid;color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'};border-color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'}">${b.std<.2?'CONSISTENT':b.std<.4?'MODERATE':'VARIABLE'}</span></td>
-    </tr>`).join('');
-
-  const buckets={'2.0':0,'2.5':0,'3.0':0,'3.5':0,'4.0':0,'4.5-4.75':0};
-  beers.forEach(b=>{
-    if(b.rating<2.5)buckets['2.0']++;
-    else if(b.rating<3.0)buckets['2.5']++;
-    else if(b.rating<3.5)buckets['3.0']++;
-    else if(b.rating<4.0)buckets['3.5']++;
-    else if(b.rating<4.5)buckets['4.0']++;
-    else buckets['4.5-4.75']++;
-  });
-  safeChart('distChart',document.getElementById('distChart'),{type:'bar',
-    data:{labels:Object.keys(buckets),datasets:[{data:Object.values(buckets),backgroundColor:['#ff2222','#ff6600','#ffaa00','#aacc00','#00cc44','#00ff55'],borderWidth:0}]},
-    options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-  });
 }
 
 // ══════════════════════════════════════════════════════════════

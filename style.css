@@ -915,7 +915,7 @@ select {
 /* Charts — give them a sensible height on mobile */
 canvas#styleChart, canvas#methodChart, canvas#countryChart,
 canvas#langChart, canvas#cityChart, canvas#timelineChart,
-canvas#distChart, canvas#monthlyChart, canvas#bumpChart,
+canvas#monthlyChart, canvas#bumpChart,
 canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   max-height: 260px;
 }
