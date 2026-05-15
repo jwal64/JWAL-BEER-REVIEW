@@ -568,6 +568,23 @@ filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7);
 .map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--dim); letter-spacing: 0.2px; }
 .map-leg-dot { width: 10px; height: 10px; border: 1px solid rgba(255,255,255,.25); flex-shrink: 0; }
 
+/* Subtab strip — used inside a panel to switch between sibling sub-views */
+.subtabs { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 1px solid var(--border2); }
+.subtab {
+  background: transparent; color: var(--dim);
+  border: 1px solid var(--border2); border-bottom: none;
+  border-right: none;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+  padding: 7px 14px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.subtab:last-child { border-right: 1px solid var(--border2); }
+.subtab:hover { color: var(--orange); }
+.subtab.active { background: var(--orange); color: #000; border-color: var(--orange); }
+.subpanel { display: none; }
+.subpanel.active { display: block; }
+@media (max-width:700px){ .subtab { font-size: 9px; padding: 6px 10px; letter-spacing: 1px; } }
+
 /* ═══════════════════════════════════════════
 LEAFLET DARK POPUP
 ═══════════════════════════════════════════ */
