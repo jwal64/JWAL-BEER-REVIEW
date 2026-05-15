@@ -75,15 +75,15 @@ TOP MENU BAR — Bloomberg-style function keys
 background: var(--orange);
 display: flex;
 align-items: stretch;
-height: 24px;
+height: 20px;
 border-bottom: 1px solid var(--orange3);
 user-select: none;
 }
 .mb-item {
 display: flex;
 align-items: center;
-padding: 0 10px;
-font-size: 10px;
+padding: 0 8px;
+font-size: 9px;
 font-weight: 600;
 color: #000;
 border-right: 1px solid rgba(0,0,0,0.12);
@@ -115,8 +115,8 @@ border-radius: 1px;
 }
 .mb-logo {
 font-weight: 700;
-font-size: 12px;
-padding: 0 14px;
+font-size: 11px;
+padding: 0 10px;
 border-right: 2px solid rgba(0,0,0,0.2);
 background: #000;
 color: var(--orange);
@@ -138,10 +138,10 @@ backdrop-filter: blur(var(--glass-blur));
 border-bottom: 2px solid var(--orange);
 display: flex;
 align-items: stretch;
-height: 54px;
+height: 44px;
 }
 .hdr-block {
-padding: 0 16px;
+padding: 0 10px;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -152,7 +152,7 @@ flex: 1;
 padding: 0 18px;
 }
 .hdr-title {
-font-size: 15px;
+font-size: 13px;
 font-weight: 700;
 color: var(--orange);
 letter-spacing: 0.8px;
@@ -165,7 +165,7 @@ font-size: 8px;
 color: var(--dim);
 letter-spacing: 1.8px;
 text-transform: uppercase;
-margin-top: 5px;
+margin-top: 3px;
 font-family: var(--sans);
 font-weight: 500;
 }
@@ -192,7 +192,7 @@ border-radius: 0 0 1px 1px;
 .hdr-stat:nth-child(7)::before { background: var(--cyan); box-shadow: 0 0 6px rgba(0,170,255,0.3); }
 .hdr-stat:hover { background: rgba(255,255,255,0.02); }
 .hdr-val {
-font-size: 15px;
+font-size: 14px;
 font-weight: 700;
 font-family: var(--mono);
 line-height: 1;
@@ -203,7 +203,7 @@ font-size: 7px;
 color: var(--dim);
 letter-spacing: 1.2px;
 text-transform: uppercase;
-margin-top: 4px;
+margin-top: 2px;
 font-family: var(--sans);
 font-weight: 500;
 }
@@ -241,7 +241,7 @@ background: rgba(0, 0, 0, 0.85);
 backdrop-filter: blur(8px);
 -webkit-backdrop-filter: blur(8px);
 border-bottom: 1px solid var(--border);
-height: 22px;
+height: 18px;
 overflow: hidden;
 white-space: nowrap;
 display: flex;
@@ -260,7 +260,7 @@ background: var(--orange);
 color: #000;
 font-size: 8px;
 font-weight: 700;
-padding: 0 12px;
+padding: 0 8px;
 height: 100%;
 display: flex;
 align-items: center;
@@ -280,10 +280,10 @@ LAYOUT
 ═══════════════════════════════════════════ */
 .terminal-body {
 display: flex;
-height: calc(100vh - 100px);
+height: calc(100vh - 82px);
 }
 #sidebar {
-width: 168px;
+width: 150px;
 flex-shrink: 0;
 background: var(--glass-bg);
 backdrop-filter: blur(var(--glass-blur));
@@ -305,7 +305,7 @@ SIDEBAR NAV
 ═══════════════════════════════════════════ */
 .nav-section-head {
 background: var(--border2);
-padding: 4px 8px;
+padding: 3px 6px;
 font-size: 8px;
 color: var(--dim);
 letter-spacing: 2px;
@@ -316,12 +316,12 @@ border-top: 1px solid var(--border);
 .nav-item {
 display: flex;
 align-items: center;
-padding: 5px 8px;
+padding: 4px 6px;
 cursor: pointer;
 border-bottom: 1px solid var(--border);
 transition: background var(--transition-fast), color var(--transition-fast), padding-left var(--transition-fast);
-gap: 6px;
-font-size: 10px;
+gap: 4px;
+font-size: 9px;
 color: #aaa;
 letter-spacing: 0.3px;
 }
@@ -337,19 +337,19 @@ border: 1px solid var(--border);
 flex-shrink: 0;
 }
 .nav-item.active .nkey { background: var(--orange3); color: #000; border-color: var(--orange3); }
-.nav-icon { width: 12px; text-align: center; flex-shrink: 0; font-size: 9px; }
+.nav-icon { width: 12px; text-align: center; flex-shrink: 0; font-size: 8px; }
 
 /* ═══════════════════════════════════════════
 PANELS
 ═══════════════════════════════════════════ */
-.panel { display: none; padding: 8px; }
+.panel { display: none; padding: 6px; }
 .panel.active { display: block; }
 
-.merged-section { margin-bottom: 16px; }
-.merged-section + .merged-section { border-top: 1px solid var(--border2); padding-top: 12px; }
+.merged-section { margin-bottom: 10px; }
+.merged-section + .merged-section { border-top: 1px solid var(--border2); padding-top: 8px; }
 .merged-section-head {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-  color: var(--orange); padding: 6px 0 8px; margin-bottom: 6px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+  color: var(--orange); padding: 4px 0 6px; margin-bottom: 4px;
   border-bottom: 1px dashed var(--border2);
 }
 @media (max-width:700px){ .merged-section-head { font-size: 9px; } }
@@ -360,15 +360,15 @@ BLOOMBERG PANELS / WINDOWS
 .bb-panel {
 background: var(--panel);
 border: 1px solid var(--border2);
-margin-bottom: 8px;
+margin-bottom: 6px;
 position: relative;
 }
 .bb-panel-head {
 background: var(--orange);
 color: #000;
-font-size: 9px;
+font-size: 8px;
 font-weight: 700;
-padding: 3px 8px;
+padding: 2px 6px;
 letter-spacing: 1px;
 text-transform: uppercase;
 display: flex;
@@ -378,13 +378,13 @@ transition: box-shadow var(--transition-fast);
 }
 .bb-panel-head:hover { box-shadow: 0 2px 8px var(--orange-glow); }
 .bb-panel-head .ph-right { font-size: 8px; font-weight: 400; color: var(--orange3); }
-.bb-body { padding: 8px; }
+.bb-body { padding: 6px; }
 
 /* Grid layouts */
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 8px; }
-.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 8px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 6px; }
+.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 6px; }
 
 /* ═══════════════════════════════════════════
 KPI TILES
@@ -393,12 +393,12 @@ KPI TILES
 background: var(--panel);
 border: 1px solid var(--border2);
 border-top: 2px solid var(--orange);
-padding: 8px 10px;
+padding: 6px 8px;
 transition: border-top-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .kpi:hover { border-top-color: var(--cyan); box-shadow: 0 -2px 8px var(--cyan-glow); }
 .kpi-val {
-font-size: 20px;
+font-size: 17px;
 font-weight: 700;
 font-family: var(--mono);
 line-height: 1;
@@ -419,14 +419,14 @@ text-transform: uppercase;
 /* ═══════════════════════════════════════════
 TABLES
 ═══════════════════════════════════════════ */
-.bb-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.bb-table { width: 100%; border-collapse: collapse; font-size: 9px; }
 .bb-table thead th {
 background: var(--border2);
 color: var(--orange);
 font-size: 8px;
 text-transform: uppercase;
 letter-spacing: 1px;
-padding: 4px 8px;
+padding: 3px 6px;
 text-align: left;
 border-right: 1px solid var(--border);
 border-bottom: 1px solid var(--orange3);
@@ -438,7 +438,7 @@ transition: background 0.1s ease;
 }
 .bb-table tbody tr:hover { background: rgba(0, 170, 255, 0.04); }
 .bb-table tbody td {
-padding: 5px 8px;
+padding: 3px 6px;
 color: var(--white);
 border-right: 1px solid var(--border);
 vertical-align: middle;
@@ -516,7 +516,7 @@ margin-left: 4px;
 /* ═══════════════════════════════════════════
 BEER CARDS
 ═══════════════════════════════════════════ */
-.beer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(162px, 1fr)); gap: 6px; }
+.beer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 4px; }
 .beer-card {
 background: var(--panel);
 border: 1px solid var(--border2);
@@ -651,9 +651,9 @@ padding-bottom: env(safe-area-inset-bottom, 0px);
 background: var(--orange);
 display: flex;
 align-items: center;
-padding-left: 8px;
-padding-right: 8px;
-gap: 20px;
+padding-left: 6px;
+padding-right: 6px;
+gap: 12px;
 font-size: 8px;
 font-weight: 700;
 color: #000;
@@ -974,8 +974,8 @@ BREWERY DRAWER
 KPI SPARKLINES
 ═══════════════════════════════════════════ */
 .kpi-sparkline-wrap {
-  margin-top: 4px;
-  height: 30px;
+  margin-top: 2px;
+  height: 24px;
   position: relative;
 }
 .kpi-sparkline-wrap canvas {
@@ -1140,7 +1140,7 @@ canvas {
 .bb-grid-2 {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 @media (max-width: 900px) {
   .bb-grid-2 { grid-template-columns: 1fr; }

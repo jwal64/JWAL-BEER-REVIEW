@@ -106,15 +106,6 @@
     <div class="hdr-val" style="color:var(--amber)" id="hdr-ctry">—</div>
     <div class="hdr-lbl">COUNTRIES</div>
   </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--cyan)" id="streak-days">—</div>
-    <div class="hdr-lbl">DAYS AGO</div>
-    <div class="hdr-sub" id="streak-beer" style="font-size:7px;color:var(--dim);margin-top:2px"></div>
-  </div>
-  <div id="clock-block">
-    <div id="clock-time">00:00:00</div>
-    <div id="clock-date">MON 01 JAN 2025</div>
-  </div>
 </div>
 
 <!-- TICKER -->
@@ -183,12 +174,6 @@
       <div class="bb-panel-head">LATEST ACTIVITY</div>
       <div class="bb-body" id="latestPanel"></div>
     </div>
-  </div>
-  <!-- ══ SERVING METHOD DETAIL ══ -->
-  <div class="g4" style="margin-bottom:8px" id="methodCards"></div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">SERVING METHOD — RATING COMPARISON<span class="ph-right">AVG RATING BY METHOD</span></div>
-    <div class="bb-body"><canvas id="methodDetailChart" height="140"></canvas></div>
   </div>
   <div class="bb-panel">
     <div class="bb-panel-head">METHOD DETAIL TABLE</div>
@@ -290,10 +275,6 @@
       <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
       <div class="bb-body"><canvas id="timelineChart" height="120"></canvas></div>
     </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">MULTI-REVIEW BRAND CONSISTENCY ANALYSIS<span class="ph-right">σ &lt; 0.2 = CONSISTENT</span></div>
-      <div class="bb-body" id="consistencyPanel"></div>
-    </div>
   </section>
 
 </div>
@@ -308,15 +289,9 @@
       <div class="bb-panel-head">COUNTRY PERFORMANCE INDEX<span class="ph-right">AVG RATING / REVIEWS</span></div>
       <div class="bb-body"><canvas id="countryChart" height="240"></canvas></div>
     </div>
-    <div class="g2">
-      <div class="bb-panel">
-        <div class="bb-panel-head">COUNTRY BREAKDOWN</div>
-        <div class="bb-body" id="countryCards"></div>
-      </div>
-      <div class="bb-panel">
-        <div class="bb-panel-head">REVIEWS BY COUNTRY</div>
-        <div class="bb-body"><canvas id="countryPieChart" height="200"></canvas></div>
-      </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">COUNTRY BREAKDOWN</div>
+      <div class="bb-body" id="countryCards"></div>
     </div>
   </section>
 
@@ -326,15 +301,9 @@
       <div class="bb-panel-head">MARKET PERFORMANCE BY CITY<span class="ph-right">AVG RATING</span></div>
       <div class="bb-body"><canvas id="cityChart" height="200"></canvas></div>
     </div>
-    <div class="g2">
-      <div class="bb-panel">
-        <div class="bb-panel-head">CITY STATS TABLE</div>
-        <div class="bb-body" id="cityCards"></div>
-      </div>
-      <div class="bb-panel">
-        <div class="bb-panel-head">REVIEWS BY CITY</div>
-        <div class="bb-body"><canvas id="cityPieChart" height="200"></canvas></div>
-      </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">CITY STATS TABLE</div>
+      <div class="bb-body" id="cityCards"></div>
     </div>
   </section>
 
@@ -343,10 +312,6 @@
     <div class="bb-panel">
       <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
       <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">LANGUAGE PERFORMANCE BARS</div>
-      <div class="bb-body" id="langCards"></div>
     </div>
     <div class="bb-panel">
       <div class="bb-panel-head">BREWERY REGION TABLE</div>
@@ -440,32 +405,13 @@
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head" id="temporal-dist-head">RATING DISTRIBUTION — MONTHLY COMPARISON<span class="ph-right">SIDE-BY-SIDE</span></div>
-    <div class="bb-body"><canvas id="monthDistChart" height="140"></canvas></div>
-  </div>
-
-  <div class="bb-panel">
     <div class="bb-panel-head">COUNTRY RANKINGS — BUMP CHART<span class="ph-right">RANK OVER TIME · LINE = COUNTRY</span></div>
     <div class="bb-body" id="bump-chart-wrap"><canvas id="bumpChart" height="180"></canvas></div>
   </div>
 
-  <!-- Dynamic style-mix doughnut charts — filled by drawTemporal() -->
-  <div id="temporal-style-charts"></div>
-
   <div class="bb-panel">
     <div class="bb-panel-head">SEASONAL TASTE PROFILE<span class="ph-right">STYLE × MONTH · COLOR = AVG RATING</span></div>
     <div class="bb-body" id="seasonalHeatmap"></div>
-  </div>
-
-  <div class="g2">
-    <div class="bb-panel">
-      <div class="bb-panel-head">COUNTRY EXPOSURE — BY MONTH</div>
-      <div class="bb-body"><canvas id="monthCountryChart" height="180"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">PACE &amp; RATING MOMENTUM</div>
-      <div class="bb-body" id="momentumPanel"></div>
-    </div>
   </div>
 
   <div class="bb-panel">
@@ -485,14 +431,9 @@
 
 <div id="markets" class="panel">
 
-  <section class="merged-section" data-section="contrarian">
-    <div class="merged-section-head">◆ CONTRARIAN INDEX</div>
-    <div class="g4" style="margin-bottom:8px">
-      <div class="kpi"><div class="kpi-val" id="ciAvgDelta" style="color:var(--orange)">—</div><div class="kpi-label">AVG DEVIATION</div><div class="kpi-sub" id="ciFreshness">vs global Untappd avg</div></div>
-      <div class="kpi"><div class="kpi-val up" id="ciMostContrarian">—</div><div class="kpi-label">MOST CONTRARIAN</div><div class="kpi-sub" id="ciMostSub">—</div></div>
-      <div class="kpi"><div class="kpi-val" id="ciOverrater" style="color:var(--green2)">—</div><div class="kpi-label">BIGGEST OVERRATER</div><div class="kpi-sub" id="ciOverSub">—</div></div>
-      <div class="kpi"><div class="kpi-val dn" id="ciUnderrater">—</div><div class="kpi-label">BIGGEST UNDERRATER</div><div class="kpi-sub" id="ciUnderSub">—</div></div>
-    </div>
+  <section class="merged-section" data-section="markets">
+    <div class="merged-section-head">◆ MARKETS — CONTRARIAN &amp; IPO</div>
+
     <div class="bb-panel">
       <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
       <div class="bb-body"><canvas id="contrarianChart" height="220"></canvas></div>
@@ -508,124 +449,57 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="merged-section" data-section="ipo">
-    <div class="merged-section-head">◈ IPO — PRE-REVIEW PIPELINE</div>
-
-
-  <!-- SUB-NAV PILLS -->
-  <div class="ipo-subnav">
-    <a class="ipo-subnav-pill" href="#ipo-section-watch">◈ IPO WATCHLIST</a>
-    <span class="ipo-subnav-right" id="ipo-subnav-meta">MODEL v1.0 · UNTAPPD 50 / STYLE 25 / COUNTRY 15 / METHOD 10</span>
-  </div>
-
-  <!-- KPI STRIP -->
-  <div class="ipo-kpi-strip" style="margin-bottom:8px">
-    <div class="g4 ipo-kpi-group">
-      <div class="kpi"><div class="kpi-val" id="ipo-pending" style="color:var(--orange)">—</div><div class="kpi-label">◈ ON WATCHLIST</div></div>
-      <div class="kpi"><div class="kpi-val up" id="ipo-priced">0</div><div class="kpi-label">◈ PRICED</div></div>
-      <div class="kpi"><div class="kpi-val" id="ipo-avg-analyst" style="color:#00aaff">—</div><div class="kpi-label">◈ AVG ANALYST TGT</div></div>
-      <div class="kpi"><div class="kpi-val" id="ipo-avg-market" style="color:#bb44ff">—</div><div class="kpi-label">◈ AVG MARKET RATING</div></div>
+    <div class="bb-grid-2" style="margin-bottom:8px">
+      <div class="bb-panel">
+        <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+        <div class="bb-body">
+          <div style="overflow-x:auto">
+            <table class="bb-table ipo-watch" id="ipoWatchTable">
+              <thead><tr>
+                <th style="width:36px"></th>
+                <th>BEER / STYLE</th>
+                <th>ORIGIN</th>
+                <th>ABV</th>
+                <th style="color:#bb44ff">UNTAPPD</th>
+                <th style="color:#00aaff">JWAL TGT</th>
+                <th>UPSIDE</th>
+                <th>SIGNAL</th>
+              </tr></thead>
+              <tbody id="ipoWatchBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="bb-panel">
+        <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
+        <div class="bb-body" style="height:220px">
+          <canvas id="ipoUpsideChart"></canvas>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- IPO SECTION ANCHOR -->
-  <div id="ipo-section-watch"></div>
-
-  <!-- TOP PICKS CONVEYOR -->
-  <div class="bb-panel" style="margin-bottom:8px">
-    <div class="bb-panel-head">▲ TOP PICKS — HIGHEST UPSIDE ON WATCHLIST <span class="ph-right" id="ipo-top-count">—</span></div>
-    <div class="bb-body" style="padding:6px">
-      <div class="ipo-top-picks" id="ipoTopPicks"></div>
-    </div>
-  </div>
-
-  <!-- TWO-COLUMN: WATCHLIST TABLE + UPSIDE DISTRIBUTION CHART -->
-  <div class="bb-grid-2" style="margin-bottom:8px">
-    <div class="bb-panel">
-      <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+    <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
+      <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
       <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table ipo-watch" id="ipoWatchTable">
-            <thead><tr>
-              <th style="width:36px"></th>
-              <th>BEER / STYLE</th>
-              <th>ORIGIN</th>
-              <th>ABV</th>
-              <th style="color:#bb44ff">UNTAPPD</th>
-              <th style="color:#00aaff">JWAL TGT</th>
-              <th>UPSIDE</th>
-              <th>SIGNAL</th>
-            </tr></thead>
-            <tbody id="ipoWatchBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
-      <div class="bb-body" style="height:220px">
-        <canvas id="ipoUpsideChart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- PRICED (hidden unless priced > 0) -->
-  <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
-    <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table">
-          <thead><tr>
-            <th style="width:36px"></th>
-            <th>BEER / STYLE</th>
-            <th>ORIGIN</th>
-            <th style="color:#bb44ff">UNTAPPD</th>
-            <th style="color:#00aaff">JWAL TGT</th>
-            <th style="color:#ff6600">JWAL PRICE</th>
-            <th>vs TGT</th>
-            <th>vs MKT</th>
-            <th>VERDICT</th>
-          </tr></thead>
-          <tbody id="ipoPricedBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-    <!-- IPO METHODOLOGY (collapsed) -->
-    <details class="bb-collapse" style="margin-bottom:12px">
-      <summary>▸ IPO MODEL v1.0 &nbsp;·&nbsp; Untappd 50% &nbsp;·&nbsp; style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10%</summary>
-      <div class="bb-collapse-body">
-        <span style="color:#ff6600">MODEL v1.0:</span> Untappd 50% &nbsp;·&nbsp; JWAL style 25% &nbsp;·&nbsp; country 15% &nbsp;·&nbsp; method 10% &nbsp;(<span style="color:#00cc44">Draft +0.10</span> / Nitro +0.05 / Bottle ±0 / <span style="color:#ff6600">Can −0.10</span>)
-      </div>
-    </details>
-
-    <!-- PIPELINE RECOMMENDATIONS (only when priced > 0) -->
-    <details class="bb-collapse" id="ipoRecsPanel" style="display:none;margin-bottom:12px">
-      <summary>▸ PIPELINE — RECOMMENDED REPLACEMENTS &nbsp;·&nbsp; <span id="ipo-recs-count">0 SLOTS</span></summary>
-      <div class="bb-collapse-body" style="padding:0">
-        <div style="font-size:9px;color:#555;line-height:1.6;padding:6px 8px">
-          <span style="color:#ff6600">AUTO-GENERATED</span> — one replacement recommended per priced slot &nbsp;·&nbsp;
-          ranked by <span style="color:#00cc44">new market coverage</span> first, then <span style="color:#00aaff">new style</span>, then <span style="color:#bb44ff">Untappd consensus</span>
-        </div>
         <div style="overflow-x:auto">
           <table class="bb-table">
             <thead><tr>
               <th style="width:36px"></th>
               <th>BEER / STYLE</th>
               <th>ORIGIN</th>
-              <th>ABV</th>
               <th style="color:#bb44ff">UNTAPPD</th>
               <th style="color:#00aaff">JWAL TGT</th>
-              <th>RATIONALE</th>
+              <th style="color:#ff6600">JWAL PRICE</th>
+              <th>vs TGT</th>
+              <th>vs MKT</th>
+              <th>VERDICT</th>
             </tr></thead>
-            <tbody id="ipoRecsBody"></tbody>
+            <tbody id="ipoPricedBody"></tbody>
           </table>
         </div>
       </div>
-    </details>
+    </div>
   </section>
 
 </div>
@@ -639,9 +513,7 @@
 <div id="statusbar">
   <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
   <div class="sb-item">SYS: JWAL'S BREW TERMINAL v2.7</div>
-  <div class="sb-item">USER: JWAL</div>
   <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
-  <div class="sb-item" style="cursor:pointer" id="scanline-toggle">CRT: <span id="scanline-status">ON</span></div>
   <div class="sb-spacer"></div>
   <div class="sb-item" id="sb-time">--:--:--</div>
 </div>

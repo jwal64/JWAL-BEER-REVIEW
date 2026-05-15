@@ -702,6 +702,7 @@ try {
 } catch(e){ console.error('Chart.defaults error:',e); }
 const _charts={};
 function safeChart(key,ctx,cfg){
+  if(!ctx) return null;
   if(_charts[key]) _charts[key].destroy();
   _charts[key]=new Chart(ctx,cfg);
   return _charts[key];
@@ -985,13 +986,13 @@ safeChart('methodDetailChart',document.getElementById('methodDetailChart'),{type
   data:{labels:mO.map((m,i)=>`${m} (${mCt[i]})`),datasets:[{data:mA,backgroundColor:mColors,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
 });
-document.getElementById('methodCards').innerHTML=mO.map((m,i)=>`
+{const _mc=document.getElementById('methodCards'); if(_mc) _mc.innerHTML=mO.map((m,i)=>`
   <div class="kpi">
     <div style="font-size:1.4rem;margin-bottom:4px">${eM[m]}</div>
     <div class="kpi-val" style="color:${mColors[i]}">${mA[i].toFixed(2)}</div>
     <div class="kpi-label">${m.toUpperCase()}</div>
     <div class="kpi-sub">${mCt[i]} review${mCt[i]>1?'s':''}</div>
-  </div>`).join('');
+  </div>`).join('');}
 const globalAvg=STATS.globalAvg;
 // Single pass: find best/worst per method
 const mBW={};
@@ -1136,7 +1137,7 @@ function drawInsights(){
   const brands2={};
   beers.forEach(b=>{if(!brands2[b.beer])brands2[b.beer]=[];brands2[b.beer].push(b.rating);});
   const multi=Object.entries(brands2).filter(([,rs])=>rs.length>1).map(([n,rs])=>({n,rs,avg:avg(rs),std:std(rs)})).sort((a,b)=>a.std-b.std);
-  document.getElementById('consistencyPanel').innerHTML=multi.map(b=>`
+  {const _cp=document.getElementById('consistencyPanel'); if(_cp) _cp.innerHTML=multi.map(b=>`
     <div class="mini-row" style="gap:10px">
       ${logoImg(b.n,28)}
       <div style="flex:1">
@@ -1147,7 +1148,7 @@ function drawInsights(){
         </div>
       </div>
       <span style="font-size:7px;padding:1px 5px;border:1px solid;color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'};border-color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'};flex-shrink:0">${b.std<.2?'CONSISTENT':b.std<.4?'MODERATE':'VARIABLE'}</span>
-    </div>`).join('');
+    </div>`).join('');}
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1165,11 +1166,11 @@ function drawLanguage(){
       data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
       options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
     });
-    document.getElementById('langCards').innerHTML=lS.map(d=>`
+    {const _lc=document.getElementById('langCards'); if(_lc) _lc.innerHTML=lS.map(d=>`
       <div class="bb-bar-row">
         <div class="bb-bar-label"><span class="name">${lF[d.l]||''} ${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x · ${d.b.join(', ')}</span></div>
         <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${lC[d.l]}"></div></div>
-      </div>`).join('');
+      </div>`).join('');}
     document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-a.rating).map(d=>`
       <tr><td>${logoImg(d.beer,20)}</td><td style="color:#ff6600">${d.beer}</td><td>${FLAGS[d.country]||''} ${d.country}</td><td style="color:#555;font-size:9px">${d.region}</td><td style="color:${lC[d.lang]||'#ff6600'}">${lF[d.lang]||''} ${d.lang}</td><td><span class="rb ${rbC(d.rating)}">${d.rating.toFixed(2)}</span></td></tr>`).join('');
   } catch(e){ console.error('Language init error:',e); }
@@ -1341,20 +1342,22 @@ function drawTemporal(){
 
   // ── Style-mix doughnut charts — one per month, rendered dynamically
   const styleChartsEl = document.getElementById('temporal-style-charts');
-  styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
-    <div class="bb-panel">
-      <div class="bb-panel-head">STYLE MIX — ${(MONTH_FULL[m]||m).toUpperCase()} ${monthYearMap[m]||''}<span class="ph-right">${counts[i]} REVIEWS</span></div>
-      <div class="bb-body"><canvas id="styleChart_${m}" height="180"></canvas></div>
-    </div>`).join('')}</div>`;
-  months.forEach(m=>{
-    const sm={};
-    byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
-    const labels=Object.keys(sm),data=Object.values(sm);
-    safeChart(`styleChart_${m}`,document.getElementById(`styleChart_${m}`),{type:'doughnut',
-      data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
-      options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
+  if(styleChartsEl){
+    styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
+      <div class="bb-panel">
+        <div class="bb-panel-head">STYLE MIX — ${(MONTH_FULL[m]||m).toUpperCase()} ${monthYearMap[m]||''}<span class="ph-right">${counts[i]} REVIEWS</span></div>
+        <div class="bb-body"><canvas id="styleChart_${m}" height="180"></canvas></div>
+      </div>`).join('')}</div>`;
+    months.forEach(m=>{
+      const sm={};
+      byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
+      const labels=Object.keys(sm),data=Object.values(sm);
+      safeChart(`styleChart_${m}`,document.getElementById(`styleChart_${m}`),{type:'doughnut',
+        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
+        options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
+      });
     });
-  });
+  }
 
   // ── Seasonal Taste Profile — style × month heatmap
   const allStyles=Object.keys(sC);
@@ -1424,7 +1427,7 @@ function drawTemporal(){
       momentum += mRow('REPEAT BRANDS', overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')','');
     }
   });
-  document.getElementById('momentumPanel').innerHTML = momentum;
+  {const _mp=document.getElementById('momentumPanel'); if(_mp) _mp.innerHTML = momentum;}
 
   // ── Bump Chart — Country Rankings Over Time
   try {
@@ -1560,8 +1563,10 @@ function drawContrarian(){
   }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
 
   const avgDelta=avg(rows.map(r=>r.delta));
-  document.getElementById('ciAvgDelta').textContent=(avgDelta>=0?'+':'')+avgDelta.toFixed(2);
-  document.getElementById('ciAvgDelta').className='kpi-val '+(avgDelta>0?'up':avgDelta<0?'dn':'fl');
+  const _setTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  const _setCl=(id,v)=>{const e=document.getElementById(id); if(e) e.className=v;};
+  _setTx('ciAvgDelta',(avgDelta>=0?'+':'')+avgDelta.toFixed(2));
+  _setCl('ciAvgDelta','kpi-val '+(avgDelta>0?'up':avgDelta<0?'dn':'fl'));
 
   // Freshness indicator — turns yellow once Untappd data is older than the refresh interval.
   const freshEl=document.getElementById('ciFreshness');
@@ -1574,20 +1579,20 @@ function drawContrarian(){
   }
 
   const mostContr=rows.reduce((a,b)=>Math.abs(b.delta)>Math.abs(a.delta)?b:a);
-  document.getElementById('ciMostContrarian').textContent=mostContr.name;
-  document.getElementById('ciMostSub').textContent=`Δ${mostContr.delta>=0?'+':''}${mostContr.delta.toFixed(2)}`;
+  _setTx('ciMostContrarian',mostContr.name);
+  _setTx('ciMostSub',`Δ${mostContr.delta>=0?'+':''}${mostContr.delta.toFixed(2)}`);
 
   const overrater=rows.reduce((a,b)=>b.delta>a.delta?b:a);
-  document.getElementById('ciOverrater').textContent=overrater.name;
-  document.getElementById('ciOverSub').textContent=`+${overrater.delta.toFixed(2)} above world`;
+  _setTx('ciOverrater',overrater.name);
+  _setTx('ciOverSub',`+${overrater.delta.toFixed(2)} above world`);
 
   const underrater=rows.reduce((a,b)=>b.delta<a.delta?b:a);
-  document.getElementById('ciUnderrater').textContent=underrater.name;
-  document.getElementById('ciUnderSub').textContent=`${underrater.delta.toFixed(2)} below world`;
+  _setTx('ciUnderrater',underrater.name);
+  _setTx('ciUnderSub',`${underrater.delta.toFixed(2)} below world`);
 
   const sorted=rows.slice().sort((a,b)=>b.delta-a.delta);
   const contrarianCanvas=document.getElementById('contrarianChart');
-  contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
+  if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Jwal vs World (Δ)',data:sorted.map(r=>+r.delta.toFixed(2)),
       backgroundColor:sorted.map(r=>r.delta>0?'rgba(0,204,68,0.7)':'rgba(255,34,34,0.7)'),
@@ -1704,13 +1709,14 @@ function drawIPO(){
     .sort((a,b)=>b._upside-a._upside);
   const priced=IPO_WATCHLIST.filter(w=>reviewed.has(w.beer));
 
-  document.getElementById('ipo-pending').textContent=pending.length;
-  document.getElementById('ipo-priced').textContent=priced.length;
-  document.getElementById('ipo-watch-count').textContent=pending.length+' BEER'+(pending.length!==1?'S':'')+' QUEUED';
+  const _ipoTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  _ipoTx('ipo-pending',pending.length);
+  _ipoTx('ipo-priced',priced.length);
+  _ipoTx('ipo-watch-count',pending.length+' BEER'+(pending.length!==1?'S':'')+' QUEUED');
 
   const allTargets=[...targetCache.values()];
-  document.getElementById('ipo-avg-analyst').textContent=(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2);
-  document.getElementById('ipo-avg-market').textContent=(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2);
+  _ipoTx('ipo-avg-analyst',(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2));
+  _ipoTx('ipo-avg-market',(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2));
 
   // Signal helper used by table + conveyor
   function sigOf(target){
@@ -1719,7 +1725,7 @@ function drawIPO(){
     return {label,color};
   }
 
-  document.getElementById('ipoWatchBody').innerHTML=pending.map(w=>{
+  {const _wb=document.getElementById('ipoWatchBody'); if(_wb) _wb.innerHTML=pending.map(w=>{
     const target=w._target, upside=w._upside;
     const uClass=upside>0.2?'up':upside<-0.2?'dn':'fl';
     const {label:signal,color:sigColor}=sigOf(target);
@@ -1733,7 +1739,7 @@ function drawIPO(){
       <td class="${uClass}" style="font-family:var(--mono);font-weight:700">${upside>=0?'+':''}${upside.toFixed(2)}</td>
       <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700;letter-spacing:1px">${signal}</span></td>
     </tr>`;
-  }).join('');
+  }).join('');}
 
   // ── TOP-PICKS CONVEYOR (top 6 by upside)
   const topPicksEl=document.getElementById('ipoTopPicks');
@@ -1780,14 +1786,15 @@ function drawIPO(){
 
   // ── PRICED PANEL (hide entirely when empty)
   const pricedPanel=document.getElementById('ipoPricedPanel');
+  const _pb=document.getElementById('ipoPricedBody');
   if(priced.length===0){
     if(pricedPanel) pricedPanel.style.display='none';
-    document.getElementById('ipoPricedBody').innerHTML='';
-    document.getElementById('ipo-priced-count').textContent='0 BEERS';
+    if(_pb) _pb.innerHTML='';
+    _ipoTx('ipo-priced-count','0 BEERS');
   } else {
     if(pricedPanel) pricedPanel.style.display='';
-    document.getElementById('ipo-priced-count').textContent=priced.length+' BEER'+(priced.length!==1?'S':'');
-    document.getElementById('ipoPricedBody').innerHTML=priced.map(w=>{
+    _ipoTx('ipo-priced-count',priced.length+' BEER'+(priced.length!==1?'S':''));
+    if(_pb) _pb.innerHTML=priced.map(w=>{
       const target=targetCache.get(w.beer);
       const revd=BEER_REVIEWS.get(w.beer)||[];
       const jwalPrice=avg(revd.map(b=>b.rating));
@@ -1809,39 +1816,6 @@ function drawIPO(){
     }).join('');
   }
 
-  // ── RECOMMENDATIONS
-  if(priced.length>0){
-    const coveredBeerNames=new Set([...beers.map(b=>b.beer),...IPO_WATCHLIST.map(w=>w.beer)]);
-    const coveredOrigins=new Set([...beers.map(b=>b.origin),...IPO_WATCHLIST.map(w=>w.origin)]);
-    const coveredStyles=new Set([...beers.map(b=>b.style),...IPO_WATCHLIST.map(w=>w.style)]);
-    const recs=IPO_CANDIDATES
-      .filter(c=>!coveredBeerNames.has(c.beer))
-      .sort((a,b)=>{
-        const aS=(!coveredOrigins.has(a.origin)?2:0)+(!coveredStyles.has(a.style)?1:0);
-        const bS=(!coveredOrigins.has(b.origin)?2:0)+(!coveredStyles.has(b.style)?1:0);
-        return bS!==aS?bS-aS:b.untappd-a.untappd;
-      })
-      .slice(0,priced.length);
-    document.getElementById('ipoRecsPanel').style.display='';
-    document.getElementById('ipo-recs-count').textContent=recs.length+' SLOT'+(recs.length!==1?'S':'');
-    document.getElementById('ipoRecsBody').innerHTML=recs.map(c=>{
-      const isNewMkt=!coveredOrigins.has(c.origin);
-      const isNewStyle=!coveredStyles.has(c.style);
-      const [tag,tagColor]=isNewMkt?['NEW MARKET','#00cc44']:isNewStyle?['NEW STYLE','#00aaff']:c.untappd>=3.8?['HIGH CONSENSUS','#bb44ff']:['SIMILAR PROFILE','#555'];
-      const target=analystTarget(c.beer,c.style,c.origin,c.untappd,c.method);
-      const upside=target-c.untappd;
-      return `<tr>
-        <td>${logoImg(c.beer,24)}</td>
-        <td style="color:#ff6600;font-weight:600">${c.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${c.style}</span></td>
-        <td>${FLAGS[c.origin]||''} <span style="color:#888">${c.origin}</span></td>
-        <td style="color:#00aaff">${c.abv.toFixed(1)}%</td>
-        <td style="color:#bb44ff;font-family:var(--mono)">${c.untappd.toFixed(2)}</td>
-        <td style="color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
-        <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${tagColor};color:${tagColor};font-weight:700;letter-spacing:1px">${tag}</span></td>
-      </tr>`;
-    }).join('');
-  }
-
   } catch(e){ console.error('IPO error:',e); }
 }
 
@@ -1852,7 +1826,7 @@ function drawIPO(){
 function toggleScanlines(){
   document.body.classList.toggle('no-scanlines');
   const on=!document.body.classList.contains('no-scanlines');
-  document.getElementById('scanline-status').textContent=on?'ON':'OFF';
+  const el=document.getElementById('scanline-status'); if(el) el.textContent=on?'ON':'OFF';
   try{localStorage.setItem('brewScanlines',on?'1':'0');}catch(e){}
 }
 (function(){
@@ -2141,7 +2115,7 @@ try {
   document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
 
   // Scanline toggle
-  document.getElementById('scanline-toggle').addEventListener('click', toggleScanlines);
+  {const _st=document.getElementById('scanline-toggle'); if(_st) _st.addEventListener('click', toggleScanlines);}
 
   // Beer table rows
   document.getElementById('beerBody').addEventListener('click', function(e) {
