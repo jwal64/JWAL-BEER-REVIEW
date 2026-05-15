@@ -101,7 +101,6 @@ align-items: stretch;
 height: 20px;
 border-bottom: 1px solid var(--orange3);
 user-select: none;
-padding-top: env(safe-area-inset-top, 0px);
 padding-left: env(safe-area-inset-left, 0px);
 padding-right: env(safe-area-inset-right, 0px);
 }
@@ -700,40 +699,41 @@ z-index: 100;
 #hdr {
   flex-wrap: wrap;
   height: auto;
-  padding: 8px 10px;
-  padding-left: max(10px, env(safe-area-inset-left, 0px));
-  padding-right: max(10px, env(safe-area-inset-right, 0px));
-  gap: 6px;
+  padding: 6px 8px;
+  padding-left: max(8px, env(safe-area-inset-left, 0px));
+  padding-right: max(8px, env(safe-area-inset-right, 0px));
+  gap: 4px;
   background: linear-gradient(180deg, rgba(17,17,17,0.95) 0%, rgba(13,13,13,1) 100%);
 }
 .hdr-block.wide {
   min-width: 100%;
   border-right: none;
   border-bottom: 1px solid var(--border);
-  padding: 0 0 6px 0;
+  padding: 0 0 4px 0;
 }
-.hdr-title { font-size: 14px; letter-spacing: 0.6px; }
+.hdr-title { font-size: 13px; letter-spacing: 0.6px; }
 .hdr-title span { display: none; }
-.hdr-sub { font-size: 8px; letter-spacing: 1.2px; margin-top: 4px; }
+.hdr-sub { font-size: 8px; letter-spacing: 1.2px; margin-top: 2px; }
 .hdr-block.hdr-stat {
   min-width: 0;
-  padding: 4px 6px;
+  padding: 3px 4px;
   border-right: 1px solid var(--border);
-  flex: 1 1 calc(33.333% - 4px);
+  flex: 1 1 calc(20% - 4px);
   text-align: center;
 }
-.hdr-block.hdr-stat:nth-child(3n+1) { padding-left: 2px; }
-.hdr-block.hdr-stat:nth-child(3n) { border-right: none; }
+.hdr-block.hdr-stat:nth-child(5n+1) { padding-left: 2px; }
+.hdr-block.hdr-stat:nth-child(5n) { border-right: none; }
 .hdr-block.hdr-stat::before { left: 4px; right: 4px; height: 2px; }
-.hdr-val { font-size: 13px; letter-spacing: 0.3px; }
-.hdr-lbl { font-size: 7px; letter-spacing: 0.8px; margin-top: 3px; }
+.hdr-val { font-size: 12px; letter-spacing: 0.3px; line-height: 1; }
+.hdr-lbl { font-size: 7px; letter-spacing: 0.6px; margin-top: 2px; }
 #clock-block { display: none; }
 
 /* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile */
 #menubar {
   overflow-x: auto;
   overflow-y: hidden;
-  height: calc(44px + env(safe-area-inset-top, 0px));
+  height: calc(34px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -754,19 +754,19 @@ z-index: 100;
 }
 #menubar::-webkit-scrollbar { display: none; }
 .mb-item {
-  padding: 0 12px;
+  padding: 0 10px;
   font-size: 10px;
   flex-shrink: 0;
-  min-height: 44px;
-  min-width: 56px;
+  min-height: 34px;
+  min-width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   scroll-snap-align: start;
 }
-.mb-item .fkey { font-size: 8px; padding: 1px 4px; }
-.mb-item.active::after { height: 3px; }
-.mb-logo { padding: 0 12px; font-size: 11px; flex-shrink: 0; min-height: 44px; }
+.mb-item .fkey { font-size: 9px; padding: 1px 4px; }
+.mb-item.active::after { height: 2px; }
+.mb-logo { padding: 0 10px; font-size: 11px; flex-shrink: 0; min-height: 34px; }
 .mb-right { display: none; }
 .mb-spacer { display: none; }
 
@@ -776,15 +776,15 @@ z-index: 100;
 
 .panel { padding: 8px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .bb-body { padding: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.bb-panel { margin-bottom: 8px; }
-.bb-panel-head { padding: 4px 8px; font-size: 9px; }
-.bb-panel-head .ph-right { font-size: 8px; }
+.bb-panel { margin-bottom: 6px; }
+.bb-panel-head { padding: 3px 6px; font-size: 8px; }
+.bb-panel-head .ph-right { font-size: 7px; }
 
 /* KPI TILES — readable sizes */
-.kpi { padding: 8px 10px; }
-.kpi-val { font-size: 18px; }
-.kpi-label { font-size: 9px; letter-spacing: 1.2px; }
-.kpi-sub { font-size: 10px; }
+.kpi { padding: 6px 8px; }
+.kpi-val { font-size: 16px; }
+.kpi-label { font-size: 8px; letter-spacing: 1.0px; }
+.kpi-sub { font-size: 9px; }
 
 /* STATUS BAR — fixed at bottom with safe-area, simpler info */
 #statusbar {
@@ -811,9 +811,9 @@ body { overscroll-behavior: none; }
 
 /* TABLES — wider tap zones, slightly bigger text */
 .bb-body div[style*="overflow-x"] { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.bb-table { min-width: 420px; font-size: 10px; }
-.bb-table thead th { padding: 5px 8px; font-size: 9px; }
-.bb-table tbody td { padding: 6px 8px; }
+.bb-table { min-width: 360px; font-size: 9px; }
+.bb-table thead th { padding: 3px 6px; font-size: 8px; }
+.bb-table tbody td { padding: 4px 6px; }
 
 .insight-key { width: 100px; font-size: 9px; }
 
@@ -895,14 +895,16 @@ input[type="text"],
 input[type="search"],
 select {
   font-size: 16px !important;
-  padding: 8px 10px !important;
-  min-height: 36px;
+  padding: 6px 8px !important;
+  min-height: 32px;
 }
 /* But keep the dense look in the filter bar: scale via transform-ish trick via padding */
 .bb-ctrl .bb-select, .bb-ctrl #beerSearch {
   font-size: 16px !important;
-  padding: 6px 8px !important;
+  padding: 4px 6px !important;
 }
+#beerSearch { width: auto !important; max-width: 140px; }
+.bb-ctrl { padding: 6px 8px !important; }
 
 /* IPO/MARKETS sub-nav — wraps + bigger tap targets */
 .ipo-subnav { flex-wrap: wrap; gap: 4px; padding: 6px; }
@@ -915,7 +917,7 @@ select {
 /* Charts — give them a sensible height on mobile */
 canvas#styleChart, canvas#methodChart, canvas#countryChart,
 canvas#langChart, canvas#cityChart, canvas#timelineChart,
-canvas#distChart, canvas#monthlyChart, canvas#bumpChart,
+canvas#monthlyChart, canvas#bumpChart,
 canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   max-height: 260px;
 }
@@ -923,31 +925,33 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
 
 /* iPhone Pro / narrow phones — extra polish below 430px */
 @media (max-width: 430px) {
-  .hdr-block.hdr-stat { flex: 1 1 calc(50% - 4px); }
-  .hdr-block.hdr-stat:nth-child(3n) { border-right: 1px solid var(--border); }
-  .hdr-block.hdr-stat:nth-child(2n+1) { border-right: 1px solid var(--border); }
-  .hdr-block.hdr-stat:nth-child(2n) { border-right: none; }
-  .hdr-val { font-size: 14px; }
+  .hdr-block.hdr-stat { flex: 1 1 calc(33.333% - 4px); padding: 2px 3px; }
+  .hdr-block.hdr-stat:nth-child(5n) { border-right: 1px solid var(--border); }
+  .hdr-block.hdr-stat:nth-child(3n) { border-right: none; }
+  .hdr-val { font-size: 12px; }
+  .hdr-lbl { font-size: 7px; }
   .g2, .g4 { grid-template-columns: 1fr; }
   .beer-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .beer-card { padding: 8px; min-height: 130px; }
   .bc-logo-wrap { height: 50px; }
   .panel { padding: 6px; }
-  .kpi-val { font-size: 17px; }
+  .kpi-val { font-size: 15px; }
   #drunkMap, #brewedMap { height: 320px; }
 }
 
 /* Very small / iPhone SE — keep it usable */
 @media (max-width: 360px) {
   .hdr-title { font-size: 12px; }
-  .kpi-val { font-size: 15px; }
-  .mb-item { padding: 0 10px; min-width: 50px; }
+  .hdr-val { font-size: 11px; }
+  .kpi-val { font-size: 14px; }
+  .mb-item { padding: 0 8px; min-width: 44px; }
 }
 
 /* Tall iPhone Pro screens in landscape — keep the chrome tight */
 @media (max-width: 932px) and (orientation: landscape) and (hover: none) {
-  #menubar { height: calc(36px + env(safe-area-inset-top, 0px)); }
-  .mb-item { min-height: 36px; }
+  #menubar { height: calc(30px + env(safe-area-inset-top, 0px)); }
+  .mb-item { min-height: 30px; }
+  .mb-logo { min-height: 30px; }
   #drunkMap, #brewedMap { height: 240px; }
 }
 
