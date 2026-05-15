@@ -657,15 +657,33 @@ function showTab(id,btn){
     geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
-      ['_bM',()=>{window._bM=true;setTimeout(initBrewedMap,80);}],
     ],
     temporal: [['_tmpD',drawTemporal]],
     markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
   if(id==='maps'){
-    if(_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
-    if(_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
+    const active=document.querySelector('#maps .subpanel.active');
+    if(active&&active.id==='subpanel-drunk'&&_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
+    if(active&&active.id==='subpanel-brewed'&&_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
+  }
+}
+
+// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F5)
+function showMapSubtab(name){
+  document.querySelectorAll('#maps .subtab').forEach(b=>{
+    const on=b.dataset.subtab===name;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
+  document.querySelectorAll('#maps .subpanel').forEach(p=>{
+    p.classList.toggle('active',p.id===`subpanel-${name}`);
+  });
+  if(name==='brewed'){
+    if(!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
+    else if(_brewedMap&&_brewedMap.invalidateSize) setTimeout(()=>_brewedMap.invalidateSize(),50);
+  } else if(name==='drunk'){
+    if(_drunkMap&&_drunkMap.invalidateSize) setTimeout(()=>_drunkMap.invalidateSize(),50);
   }
 }
 
@@ -2098,6 +2116,12 @@ try {
   document.getElementById('sidebar').addEventListener('click', function(e) {
     const item = e.target.closest('.nav-item[data-tab]');
     if (item) showTab(item.dataset.tab, item);
+  });
+
+  // Map sub-tab navigation
+  document.getElementById('maps').addEventListener('click', function(e) {
+    const btn = e.target.closest('.subtab[data-subtab]');
+    if (btn) showMapSubtab(btn.dataset.subtab);
   });
 
   // Beer modal — close on backdrop click

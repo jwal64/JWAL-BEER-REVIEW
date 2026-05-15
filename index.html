@@ -367,10 +367,14 @@
 
 <div id="maps" class="panel">
 
-  <section class="merged-section" data-section="mapdrunk">
-    <div class="merged-section-head">◉ PLACES CONSUMED</div>
+  <div class="subtabs" role="tablist">
+    <button class="subtab active" data-subtab="drunk" role="tab" aria-selected="true">📍 PLACES CONSUMED</button>
+    <button class="subtab" data-subtab="brewed" role="tab" aria-selected="false">🏭 BREWERY LOCATIONS</button>
+  </div>
+
+  <div id="subpanel-drunk" class="subpanel active">
     <div class="bb-panel">
-      <div class="bb-panel-head">📍 PLACES CONSUMED<span class="ph-right">CLICK PINS · SIZE = REVIEW COUNT</span></div>
+      <div class="bb-panel-head">MAP<span class="ph-right">CLICK PINS · SIZE = REVIEW COUNT</span></div>
       <div class="bb-body">
         <div id="drunkMap"></div>
         <div class="map-leg" id="drunkLeg"></div>
@@ -385,12 +389,11 @@
         </table>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="merged-section" data-section="mapbrewed">
-    <div class="merged-section-head">◎ BREWERY LOCATIONS</div>
+  <div id="subpanel-brewed" class="subpanel">
     <div class="bb-panel">
-      <div class="bb-panel-head">🏭 BREWERY LOCATIONS<span class="ph-right">COLOR = AVG RATING</span></div>
+      <div class="bb-panel-head">MAP<span class="ph-right">COLOR = AVG RATING</span></div>
       <div class="bb-body">
         <div id="brewedMap"></div>
         <div class="map-leg">
@@ -414,7 +417,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
 </div>
 
