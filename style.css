@@ -728,20 +728,16 @@ z-index: 100;
 .hdr-lbl { font-size: 7px; letter-spacing: 0.6px; margin-top: 2px; }
 #clock-block { display: none; }
 
-/* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile */
-#menubar {
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: calc(34px + env(safe-area-inset-top, 0px));
-  padding-top: env(safe-area-inset-top, 0px);
+/* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile.
+   The wrapper holds the sticky+gradient so the right-edge fade stays pinned to
+   the visible viewport instead of sliding with the scrolled content. */
+#menubar-wrap {
   position: sticky;
   top: 0;
   z-index: 50;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-#menubar::after {
+#menubar-wrap::after {
   content: '';
   position: absolute;
   right: 0;
@@ -751,6 +747,14 @@ z-index: 100;
   background: linear-gradient(to right, transparent, var(--orange));
   pointer-events: none;
   z-index: 1;
+}
+#menubar {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: calc(34px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 #menubar::-webkit-scrollbar { display: none; }
 .mb-item {
