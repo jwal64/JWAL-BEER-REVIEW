@@ -49,6 +49,22 @@ Required brewery fields:
 }
 ```
 
+### Step 2.5: Add the Beer Logo SVG (REQUIRED — no fallbacks exist)
+
+Every beer must ship with a local SVG badge in `logos/`. There is no remote fallback and no emoji safety net — if the file is missing or the slug doesn't match, the beer renders a broken image icon.
+
+1. Compute the beer's **slug** (must match `slugify()` in `script.js` and `scripts/build-logos.mjs`):
+   - NFD-normalize the name and strip combining marks (ż→z, ü→u, é→e, ñ→n).
+   - Map ß→ss, Ø→o, Æ→ae, Œ→oe, Đ→d, Ł→l, Þ→th.
+   - Lowercase, replace non-`[a-z0-9]` runs with `-`, trim leading/trailing `-`.
+   - Strip a trailing single-letter `-s` segment (e.g. `Smithwick's` → `smithwick`).
+2. Add `logo:"logos/<slug>.svg"` as the LAST field in the beer entry.
+3. Confirm the beer's `style` exists in `sC` and its `origin` country code exists in `BADGE_BG` (both near the top of `script.js`). If `BADGE_BG` lacks the code, add it; mirror the same entry in `scripts/build-logos.mjs`.
+4. Run `node scripts/build-logos.mjs` from the repo root to generate the SVG. The script fails loudly if anything is missing.
+5. Commit BOTH the `script.js` change AND the new `logos/<slug>.svg` file.
+
+Verification: reload the page with DevTools open. `[LOGO CHECK]` must be silent. Throttle Network to "Offline" and reload — every beer's badge must render.
+
 ### Step 3: Research Checklist (for each new beer)
 
 Before adding any beer, research and confirm:
@@ -81,6 +97,9 @@ After adding a new beer, verify:
 - [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
+- [ ] `logo` field added; value equals `"logos/" + slugify(beer name) + ".svg"`
+- [ ] `logos/<slug>.svg` exists in the repo (regenerated via `node scripts/build-logos.mjs`)
+- [ ] `origin` code exists in `BADGE_BG` and `style` exists in `sC`
 
 ## Language Code Reference
 
