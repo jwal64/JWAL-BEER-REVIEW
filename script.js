@@ -79,6 +79,7 @@ let beers=[
   {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -150,6 +151,7 @@ let breweries=[
   {name:"Cervecería del Pacífico",   location:"Mazatlán, Sinaloa",         country:"Mexico",      cc:"MX", lang:"es", beers:"Pacífico Clara",                                            lat:23.2494,lng:-106.4111,ratings:[3.75]},
   {name:"Narragansett Brewing Company", location:"Cranston, Rhode Island", country:"USA",         cc:"US", lang:"en", beers:"Narragansett Lager",                                        lat:41.7798,lng:-71.4373, ratings:[3.25]},
   {name:"Kona Brewing Company",      location:"Kailua-Kona, Hawaii",       country:"USA",         cc:"US", lang:"en", beers:"Big Wave Golden Ale",                                       lat:19.6406,lng:-155.9969,ratings:[3.75]},
+  {name:"Smithwick's (St. Francis Abbey)", location:"Kilkenny, Leinster",  country:"Ireland",     cc:"IE", lang:"en", beers:"Smithwick's",                                               lat:52.6541,lng:-7.2448,  ratings:[2.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
