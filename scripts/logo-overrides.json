@@ -1,0 +1,7 @@
+{
+  "_comment": "Manual logo source URLs for beers where Brandfetch (and the favicon fallbacks) don't return acceptable artwork. The fetch script tries these URLs BEFORE the Brandfetch chain. Keys are exact beer names from beers[] in script.js.",
+
+  "Estrella Jalisco": "https://pennbeer.com/app/uploads/2021/06/ynaOvePfbmJEMed-400x400-noPad-300x300.png",
+  "Dos Equis Lager Especial": "https://thebrandinquirer.wordpress.com/wp-content/uploads/2021/05/dos-equis-nueva-imagen-logo-new-design-.jpg?w=1024",
+  "Pacífico Clara": "https://upload.wikimedia.org/wikipedia/en/f/f7/Pacifico_Logo.png"
+}

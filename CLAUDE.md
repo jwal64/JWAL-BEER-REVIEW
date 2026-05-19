@@ -49,14 +49,40 @@ Required brewery fields:
 }
 ```
 
-### Step 2.5: Optional — Local Logo Override
+### Step 2.5: Hardcode the Logo (REQUIRED)
 
-Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
+Every beer's logo is committed to `logos/` and registered in
+`logos/manifest.js`. Don't ship a beer relying on the runtime Brandfetch
+chain — that's only a fallback.
 
-1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
-2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
+After adding the beer entry and its `BRAND_DOMAINS` mapping:
 
-The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
+```sh
+node scripts/fetch-logos.mjs                 # fills in anything missing
+node scripts/fetch-logos.mjs "New Beer Name" # or just the one
+```
+
+This downloads from Brandfetch (with Google favicons and Icon Horse as
+fallbacks), saves `logos/<slug>.<ext>`, and rewrites
+`logos/manifest.js`. Commit the new image **and** the regenerated
+manifest.
+
+If the script reports `FAIL` for a beer (Brandfetch doesn't recognize the
+domain, or returns a bad logo), find a usable image URL — Wikipedia,
+the brewery's press kit, the importer's site — and add it to
+`scripts/logo-overrides.json` keyed by the exact beer name:
+
+```json
+{ "New Beer Name": "https://example.com/path/to/logo.png" }
+```
+
+Then re-run the fetch script. The override URL is tried before the
+Brandfetch chain.
+
+For a one-off override (custom artwork, hand-edited SVG), drop the file in
+`logos/` and add `logo:"logos/<filename>"` as the last field of the beer's
+entry in `beers[]`. The per-beer `logo` field always wins over the
+manifest.
 
 ### Step 3: Research Checklist (for each new beer)
 
@@ -90,6 +116,8 @@ After adding a new beer, verify:
 - [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
+- [ ] `BRAND_DOMAINS` contains the new beer name → brewery domain
+- [ ] `node scripts/fetch-logos.mjs` ran successfully; new `logos/<slug>.<ext>` and updated `logos/manifest.js` are committed
 
 ## Language Code Reference
 
