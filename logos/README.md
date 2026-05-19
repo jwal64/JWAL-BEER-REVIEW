@@ -1,18 +1,48 @@
 # logos/
 
-Drop brewery/beer logo files here to override the runtime Brandfetch fetch for specific beers.
+Every beer's logo is hardcoded here as a local file. The site loads
+`logos/manifest.js` (generated, mapping beer name → file path) **before**
+`script.js`, so logos render synchronously from the repo with no runtime
+CDN dependency.
 
-## Workflow
+## Adding a logo (CI does it)
 
-1. Save a logo file in this directory, e.g. `logos/heineken.svg` (any image format browsers support works: `.svg`, `.png`, `.webp`, `.jpg`).
-2. In `script.js`, add a `logo` field to that beer's entry in `beers[]`:
-   ```js
-   {beer:"Heineken", ..., year:2026, logo:"logos/heineken.svg"},
-   ```
-3. That beer now uses your local file as the primary logo source. If the file 404s for any reason, the existing Brandfetch → Google favicons → Icon Horse → 🍺 fallback chain still kicks in.
+The `.github/workflows/fetch-beer-logos.yml` workflow watches `script.js`,
+`scripts/fetch-logos.mjs`, and `scripts/logo-overrides.json`. When you push
+a branch that adds a beer to `BRAND_DOMAINS`, the workflow runs
+`node scripts/fetch-logos.mjs` on a CI runner, downloads the new logo
+(Brandfetch → Google favicons → Icon Horse, or a manual URL from
+`scripts/logo-overrides.json`), saves it as `logos/<slug>.<ext>` (extension
+picked from the response content-type), regenerates `logos/manifest.js`,
+and commits the result back to your branch with `[skip-logo-fetch]` in the
+message.
 
-## Notes
+`git pull` after the workflow finishes to grab the new files.
 
-- Beers without a `logo` field keep using the Brandfetch chain (real brand logos online, 🍺 offline).
-- The filename is up to you. The slug suggested by the original SOP is `lowercase-with-hyphens` but anything works.
-- Files in this directory aren't auto-discovered — you must add the `logo` field on the beer entry for the override to take effect.
+If the job summary reports a beer as `FAIL`, find a working image URL
+(Wikipedia, the brewery's press kit, the importer's site), add it to
+`scripts/logo-overrides.json` keyed by the exact beer name, commit and
+push. The override is tried before the Brandfetch chain.
+
+## Local fast loop (optional)
+
+If you have Node 20+ locally and want to skip CI:
+
+```sh
+node scripts/fetch-logos.mjs                 # fill in anything missing
+node scripts/fetch-logos.mjs --force         # re-download everything
+node scripts/fetch-logos.mjs "New Beer Name" # fetch just one
+```
+
+## Manual override on a single beer
+
+You can still pin a specific file by adding `logo:"logos/<file>"` as the
+last field on that beer's entry in `beers[]`. It takes precedence over the
+manifest. Useful when the auto-fetched logo is wrong or you want to ship a
+custom asset.
+
+## Runtime fallback
+
+If a local file is missing at request time (e.g. you forgot to commit it),
+the existing Brandfetch → Google favicons → Icon Horse → 🍺 emoji chain
+still kicks in.
