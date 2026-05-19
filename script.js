@@ -23,63 +23,63 @@ const SHEETS_CONFIG = {
 
 let beers=[
   // JAN 2026 (17 beers)
-  {beer:"Grolsch",         style:"Pilsner",            origin:"NL",abv:5.0,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/grolsch.svg"},
-  {beer:"Hertog Jan",      style:"Pilsner",            origin:"NL",abv:5.1,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:2.00,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/hertog-jan.svg"},
-  {beer:"Coors Light",     style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/coors-light.svg"},
-  {beer:"Sapporo Premium", style:"Lager",               origin:"JP",abv:4.9,method:"Bottle",city:"Hartsdale",   region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/sapporo-premium.svg"},
-  {beer:"Kirin Ichiban",   style:"Lager",               origin:"JP",abv:5.0,method:"Bottle",city:"Hartsdale",   region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/kirin-ichiban.svg"},
-  {beer:"Modelo Especial", style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/modelo-especial.svg"},
-  {beer:"Stella Artois",   style:"Lager",               origin:"BE",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/stella-artois.svg"},
-  {beer:"Duvel",           style:"Belgian Ale",origin:"BE",abv:8.5,method:"Bottle",city:"Amsterdam",   region:"Noord-Holland",   country:"Netherlands", cc:"NL", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/duvel.svg"},
-  {beer:"Carlsberg",       style:"Pilsner",            origin:"DK",abv:5.0,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/carlsberg.svg"},
-  {beer:"Harp Lager",      style:"Lager",               origin:"IE",abv:4.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/harp-lager.svg"},
-  {beer:"Kronenbourg 1664",style:"Lager",               origin:"FR",abv:5.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/kronenbourg-1664.svg"},
-  {beer:"Michelob Ultra",  style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/michelob-ultra.svg"},
-  {beer:"Red Stripe",      style:"Lager",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026,logo:"logos/red-stripe.svg"},
+  {beer:"Grolsch",         style:"Pilsner",            origin:"NL",abv:5.0,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Hertog Jan",      style:"Pilsner",            origin:"NL",abv:5.1,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:2.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Coors Light",     style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Sapporo Premium", style:"Lager",               origin:"JP",abv:4.9,method:"Bottle",city:"Hartsdale",   region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Kirin Ichiban",   style:"Lager",               origin:"JP",abv:5.0,method:"Bottle",city:"Hartsdale",   region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Modelo Especial", style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Stella Artois",   style:"Lager",               origin:"BE",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Duvel",           style:"Belgian Ale",origin:"BE",abv:8.5,method:"Bottle",city:"Amsterdam",   region:"Noord-Holland",   country:"Netherlands", cc:"NL", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Carlsberg",       style:"Pilsner",            origin:"DK",abv:5.0,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Harp Lager",      style:"Lager",               origin:"IE",abv:4.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:4.25,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Kronenbourg 1664",style:"Lager",               origin:"FR",abv:5.5,method:"Draft", city:"Montreal",    region:"Quebec",          country:"Canada",      cc:"CA", rating:3.00,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Michelob Ultra",  style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026},
+  {beer:"Red Stripe",      style:"Lager",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026},
   // FEB 2026
-  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/heineken.svg"},
-  {beer:"Guinness Draught",style:"Stout",               origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/guinness-draught.svg"},
-  {beer:"Weihenstephaner Hefeweissbier",style:"Wheat Beer",origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",     country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/weihenstephaner-hefeweissbier.svg"},
-  {beer:"Hofbräu Münchner Weiße",style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/hofbrau-munchner-weisse.svg"},
-  {beer:"Negra Modelo",    style:"Lager",               origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/negra-modelo.svg"},
-  {beer:"Hofbräu Dunkel",  style:"Lager",               origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/hofbrau-dunkel.svg"},
-  {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026,logo:"logos/bud-light.svg"},
-  {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026,logo:"logos/budweiser.svg"},
-  {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026,logo:"logos/corona-extra.svg"},
-  {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026,logo:"logos/birra-moretti.svg"},
-  {beer:"Erdinger Weißbier",style:"Wheat Beer",   origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026,logo:"logos/erdinger-weissbier.svg"},
+  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Guinness Draught",style:"Stout",               origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Weihenstephaner Hefeweissbier",style:"Wheat Beer",origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",     country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Hofbräu Münchner Weiße",style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Negra Modelo",    style:"Lager",               origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Hofbräu Dunkel",  style:"Lager",               origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Erdinger Weißbier",style:"Wheat Beer",   origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
   // MAR 2026
-  {beer:"Estrella Galicia",style:"Lager",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/estrella-galicia.svg"},
-  {beer:"Pilsner Urquell", style:"Pilsner",     origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/pilsner-urquell.svg"},
-  {beer:"Wrench",         style:"IPA",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/wrench.svg"},
-  {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026,logo:"logos/la-fin-du-monde.svg"},
-  {beer:"Żywiec",         style:"Lager",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/zywiec.svg"},
-  {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/peroni-nastro-azzurro.svg"},
-  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/estrella-damm.svg"},
-  {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/grolsch-puur-weizen.svg"},
-  {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/frisse-lentebok.svg"},
-  {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026,logo:"logos/leffe-blonde.svg"},
-  {beer:"Texels Skuumkoppe", style:"Wheat Beer",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/texels-skuumkoppe.svg"},
-  {beer:"Affligem Tripel",   style:"Belgian Ale",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/affligem-tripel.svg"},
-  {beer:"De Koninck",      style:"Pale Ale",            origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/de-koninck.svg"},
-  {beer:"IJwit",             style:"Wheat Beer",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/ijwit.svg"},
-  {beer:"La Chouffe Blonde", style:"Belgian Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/la-chouffe-blonde.svg"},
-  {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/stiegl-goldbrau.svg"},
-  {beer:"Modelo Oro",       style:"Lager",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026,logo:"logos/modelo-oro.svg"},
+  {beer:"Estrella Galicia",style:"Lager",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Pilsner Urquell", style:"Pilsner",     origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Wrench",         style:"IPA",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Żywiec",         style:"Lager",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"Texels Skuumkoppe", style:"Wheat Beer",  origin:"NL",abv:6.0,method:"Bottle",city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Affligem Tripel",   style:"Belgian Ale",           origin:"BE",abv:9.0, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"De Koninck",      style:"Pale Ale",            origin:"BE",abv:5.2, method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"IJwit",             style:"Wheat Beer",origin:"NL",abv:6.5,method:"Draft", city:"Antwerp",     region:"Antwerp",         country:"Belgium",     cc:"BE", rating:3.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"La Chouffe Blonde", style:"Belgian Ale",  origin:"BE",abv:8.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Modelo Oro",       style:"Lager",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   // APR 2026
-  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/super-bock.svg"},
-  {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/estrella-jalisco.svg"},
-  {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/rolling-rock-extra-pale.svg"},
-  {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/carlsberg-elephant.svg"},
-  {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/dos-equis-lager-especial.svg"},
-  {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026,logo:"logos/miller-lite.svg"},
+  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
   // MAY 2026
-  {beer:"Belhaven Scottish Stout",style:"Stout",        origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/belhaven-scottish-stout.svg"},
-  {beer:"Samuel Adams Summer Ale",style:"Wheat Beer",   origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/samuel-adams-summer-ale.svg"},
-  {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/pacifico-clara.svg"},
-  {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/narragansett-lager.svg"},
-  {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/big-wave-golden-ale.svg"},
-  {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/smithwick.svg"},
+  {beer:"Belhaven Scottish Stout",style:"Stout",        origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Samuel Adams Summer Ale",style:"Wheat Beer",   origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -155,75 +155,173 @@ let breweries=[
 ];
 
 // ══════════════════════════════════════════════════════════════
+// BRAND DOMAINS — every beer maps to its brewery's domain
+// Real logos load via Brandfetch's public CDN (no account required by end
+// users); Google's favicon service and Icon Horse provide no-auth fallbacks.
+// ══════════════════════════════════════════════════════════════
+const BRAND_DOMAINS = {
+"Affligem Tripel":"affligembeer.be",
+"Asahi Super Dry":"asahibeer.com",
+"Augustiner Helles":"augustiner-braeu.de",
+"Big Wave Golden Ale":"konabrewingco.com",
+"Birra Moretti":"birramoretti.com",
+"Blue Moon":"bluemoonbrewingcompany.com",
+"De Koninck":"dekoninck.be",
+"Brahma":"brahma.com.br",
+"Bud Light":"budlight.com",
+"Budweiser":"budweiser.com",
+"Carlsberg":"carlsberg.com",
+"Carlsberg Elephant":"carlsberg.com",
+"Castle Lager":"castlelager.co.za",
+"Chimay Blue":"chimay.com",
+"Coopers Pale Ale":"coopers.com.au",
+"Coors Light":"coorslight.com",
+"Corona Extra":"coronausa.com",
+"Dos Equis Lager Especial":"dosequis.com",
+"Duvel":"duvel.com",
+"Erdinger Weißbier":"erdinger.de",
+"Estrella Damm":"estrelladamm.com",
+"Estrella Galicia":"estrellagalicia.com",
+"Estrella Jalisco":"estrellajalisco.com",
+"Grolsch":"grolsch.com",
+"Grolsch Puur Weizen":"grolsch.com",
+"Frisse Lentebok":"grolsch.com",
+"Guinness Draught":"guinness.com",
+"Harp Lager":"harplager.com",
+"Heineken":"heineken.com",
+"Hertog Jan":"hertogjan.nl",
+"Hoegaarden":"hoegaarden.com",
+"IJwit":"brouwerijhetij.nl",
+"Kirin Ichiban":"kirin.co.jp",
+"Kronenbourg 1664":"1664.com",
+"La Chouffe Blonde":"achouffe.be",
+"La Fin Du Monde":"unibroue.com",
+"Leffe Blonde":"leffe.com",
+"Menabrea":"birramenabrea.com",
+"Michelob Ultra":"michelobultra.com",
+"Miller Lite":"millerlite.com",
+"Modelo Especial":"modelousa.com",
+"Negra Modelo":"modelousa.com",
+"Modelo Oro":"modelousa.com",
+"Mythos":"mythosbrewery.gr",
+"Hofbräu Dunkel":"hofbraeu-muenchen.de",
+"Hofbräu Münchner Weiße":"hofbraeu-muenchen.de",
+"Narragansett Lager":"narragansettbeer.com",
+"Peroni Nastro Azzurro":"nastroazzurro.com",
+"Newcastle Brown":"newcastlebrown.com",
+"Norrlands Guld":"norrlandsguld.se",
+"Orion":"orionbeer.co.jp",
+"Pacífico Clara":"drinkpacifico.com",
+"Paulaner Hefe":"paulaner.com",
+"Peroni":"peroni.it",
+"Pilsner Urquell":"prazdroj.cz",
+"Quilmes":"quilmes.com.ar",
+"Red Stripe":"redstripebeer.com",
+"Ringnes":"ringnes.no",
+"Rolling Rock Extra Pale":"rollingrock.com",
+"Sam Adams Boston Lager":"samueladams.com",
+"Sapporo Premium":"sapporobeer.com",
+"Belhaven Scottish Stout":"belhaven.co.uk",
+"Singha":"singhabeer.com",
+"Smithwick's":"smithwicks.com",
+"Sol":"solbeer.com",
+"Stella Artois":"stellaartois.com",
+"Stiegl Goldbräu":"stiegl.at",
+"Samuel Adams Summer Ale":"samueladams.com",
+"Super Bock":"superbock.pt",
+"Tennent's":"tennents.com",
+"Texels Skuumkoppe":"texels.nl",
+"Tiger Beer":"tigerbeer.com",
+"Tsingtao":"tsingtaobeer.com",
+"Tuborg":"tuborg.com",
+"Tyskie":"tyskie.pl",
+"Victoria Bitter":"vb.com.au",
+"Weihenstephaner Hefeweissbier":"weihenstephaner.de",
+"Wrench":"industrialartsbrewing.com",
+"Żywiec":"zywiec.com.pl",
+};
+
+// Brandfetch's public dev client ID — embedded so users never need an account.
+const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
+// Tiered logo sources: primary (Brandfetch HD logo) → fallback 1 (Google HD
+// favicons) → fallback 2 (Icon Horse, 256px PNG). Emoji renders inline if every
+// remote source fails. All endpoints requested at 2–4× the display size so
+// logos stay crisp on high-DPR screens.
+function logoURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`:null;
+}
+function logoFallbackURL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=512`:null;
+}
+function logoFallback2URL(name){
+  const d=BRAND_DOMAINS[name];
+  return d?`https://icon.horse/icon/${d}`:null;
+}
+
+// Coverage warning: any beer entry without a brand domain mapping
+(function validateBeerDomains(){
+  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_DOMAINS[name]);
+  if(missing.length){
+    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing brand domain:\n  - ${missing.join('\n  - ')}`);
+  }
+})();
+
+// Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
+// entry to use a file you've placed in logos/ instead of Brandfetch. The
+// remote chain still serves as fallback if the local file is missing.
+const LOCAL_LOGOS={};
+function rebuildLocalLogos(){
+  for(const b of beers) if(b.logo) LOCAL_LOGOS[b.beer]=b.logo;
+}
+rebuildLocalLogos();
+
+// ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
 const sC={"Lager":"#00f5ff","Pilsner":"#bb5580","Wheat Beer":"#cc3366","Belgian Ale":"#bb44ff","IPA":"#ffae00","Pale Ale":"#39ff14","Stout":"#9966ff","Brown Ale":"#8b4513","Red Ale":"#ff4400"};
-// Country-code → background color used by the hard-coded SVG badges in logos/.
-// Mirror of scripts/build-logos.mjs — update both together.
-const BADGE_BG={AT:"#c8102e",AU:"#0b3d91",BE:"#000000",BR:"#009739",CA:"#d52b1e",CN:"#de2910",CZ:"#11457e",DE:"#000000",DK:"#c8102e",ES:"#aa151b",FR:"#0055a4",GB:"#1d3a8a",GR:"#0d5eaf",IE:"#169b62",IT:"#008c45",JM:"#009b3a",JP:"#bc002d",MX:"#006847",NL:"#ff6600",NO:"#ba0c2f",PL:"#dc143c",PT:"#046a38",SE:"#005ba6",SG:"#ed2939",TH:"#a51931",US:"#0a3161",ZA:"#007749"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
 function rC(r){return r>=4.5?"#00cc44":r>=4?"#22dd55":r>=3.5?"#aacc00":r>=3?"#ffaa00":r>=2.5?"#ff6600":"#ff2222";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
-// Slug rule must match scripts/build-logos.mjs exactly. Used only by the
-// validator below — the actual logo path lives on each beer entry's `logo` field.
-function slugify(name){
-  return name
-    .normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/ß/g,'ss').replace(/[Øø]/g,'o').replace(/[Ææ]/g,'ae')
-    .replace(/[Œœ]/g,'oe').replace(/[Đđ]/g,'d').replace(/[Łł]/g,'l').replace(/[Þþ]/g,'th')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/^-+|-+$/g,'')
-    .replace(/-s$/,'');
+// Source chain priority: local override → Brandfetch → Google favicons → Icon
+// Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
+// the next available source.
+function logoSources(name){
+  const local=LOCAL_LOGOS[name];
+  const sources=[];
+  if(local)sources.push(local);
+  const u=logoURL(name);if(u)sources.push(u);
+  const fb1=logoFallbackURL(name);if(fb1)sources.push(fb1);
+  const fb2=logoFallback2URL(name);if(fb2)sources.push(fb2);
+  return sources;
 }
-
-// Hard-coded per-beer logo lookup. Populated from beers[].logo so future
-// entries simply declare their own path. No remote fallback exists — if a
-// beer's logo field is missing, the validator below screams.
-const LOCAL_LOGO_BY_NAME={};
-function rebuildLocalLogos(){
-  for(const b of beers) if(b.logo) LOCAL_LOGO_BY_NAME[b.beer]=b.logo;
+function logoChainOnError(sources,replaceJS){
+  const tail=sources.slice(1);
+  let conds='';
+  for(let i=0;i<tail.length;i++){
+    conds+=`${i===0?'if':'else if'}(f===${i}){this.src='${tail[i]}';}`;
+  }
+  const elseClause=tail.length?`else{${replaceJS}}`:replaceJS;
+  return ` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;${conds}${elseClause}"`;
 }
-rebuildLocalLogos();
-
-(function validateBeerLogos(){
-  const names=[...new Set(beers.map(b=>b.beer))];
-  const byName={}; beers.forEach(b=>{ if(!byName[b.beer]) byName[b.beer]=b; });
-  const missingLogo=names.filter(n=>!byName[n].logo);
-  if(missingLogo.length){
-    console.warn(`[LOGO CHECK] ${missingLogo.length} beer(s) missing local logo field:\n  - ${missingLogo.join('\n  - ')}`);
-  }
-  const mismatched=[];
-  for(const n of names){
-    const b=byName[n]; if(!b||!b.logo) continue;
-    const expected=`logos/${slugify(n)}.svg`;
-    if(b.logo!==expected) mismatched.push(`${n} → ${b.logo} (expected ${expected})`);
-  }
-  if(mismatched.length){
-    console.warn(`[LOGO CHECK] ${mismatched.length} beer(s) with slug-mismatched logo path:\n  - ${mismatched.join('\n  - ')}`);
-  }
-  const badOrigin=names.filter(n=>!BADGE_BG[byName[n].origin]);
-  if(badOrigin.length){
-    console.warn(`[LOGO CHECK] ${badOrigin.length} beer(s) with origin missing from BADGE_BG:\n  - ${badOrigin.map(n=>`${n} (${byName[n].origin})`).join('\n  - ')}`);
-  }
-  const badStyle=names.filter(n=>!sC[byName[n].style]);
-  if(badStyle.length){
-    console.warn(`[LOGO CHECK] ${badStyle.length} beer(s) with style missing from sC:\n  - ${badStyle.map(n=>`${n} (${byName[n].style})`).join('\n  - ')}`);
-  }
-})();
-
-// One source per beer — no fallback chain. The SVG always exists because
-// scripts/build-logos.mjs generates it from the beer's origin + style + name.
 function logoImg(name,size=24){
-  const u=LOCAL_LOGO_BY_NAME[name];
-  return `<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}">`;
+  const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const sources=logoSources(name);
+  if(!sources.length)return emojiSpan;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
 }
 function cardLogo(name){
-  const u=LOCAL_LOGO_BY_NAME[name];
-  return `<img src="${u}" class="bc-logo" alt="${name}">`;
+  const sources=logoSources(name);
+  if(!sources.length)return `<span class="bc-emoji">🍺</span>`;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="bc-logo" alt="${name}"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -1114,8 +1212,9 @@ function initBrewedMap(){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
     const firstBeer=b.beers.split(' · ')[0];
-    const _bSrc=LOCAL_LOGO_BY_NAME[firstBeer];
-    const logoHtml=_bSrc?`<img src="${_bSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0">`:'';
+    const _bSources=logoSources(firstBeer);
+    const _bOnerr=_bSources.length>1?logoChainOnError(_bSources,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
+    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0"${_bOnerr}>`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
