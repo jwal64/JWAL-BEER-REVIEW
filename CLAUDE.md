@@ -49,40 +49,46 @@ Required brewery fields:
 }
 ```
 
-### Step 2.5: Hardcode the Logo (REQUIRED)
+### Step 2.5: Hardcode the Logo (handled by CI — REQUIRED)
 
 Every beer's logo is committed to `logos/` and registered in
 `logos/manifest.js`. Don't ship a beer relying on the runtime Brandfetch
 chain — that's only a fallback.
 
-After adding the beer entry and its `BRAND_DOMAINS` mapping:
+**You do not need to run anything manually.** The
+`.github/workflows/fetch-beer-logos.yml` workflow watches `script.js`,
+`scripts/fetch-logos.mjs`, and `scripts/logo-overrides.json`. When you push
+a branch that updates `BRAND_DOMAINS`, the workflow:
 
-```sh
-node scripts/fetch-logos.mjs                 # fills in anything missing
-node scripts/fetch-logos.mjs "New Beer Name" # or just the one
-```
+1. Runs `node scripts/fetch-logos.mjs` on a CI runner (where the CDNs are
+   reachable).
+2. Downloads each new beer's logo via Brandfetch → Google favicons →
+   Icon Horse (or via a URL from `scripts/logo-overrides.json`).
+3. Commits the resulting `logos/<slug>.<ext>` files and the regenerated
+   `logos/manifest.js` back to your branch with `[skip-logo-fetch]` in
+   the message.
 
-This downloads from Brandfetch (with Google favicons and Icon Horse as
-fallbacks), saves `logos/<slug>.<ext>`, and rewrites
-`logos/manifest.js`. Commit the new image **and** the regenerated
-manifest.
+After your push, `git pull` to grab the bot commit, then proceed.
 
-If the script reports `FAIL` for a beer (Brandfetch doesn't recognize the
-domain, or returns a bad logo), find a usable image URL — Wikipedia,
-the brewery's press kit, the importer's site — and add it to
+If the workflow's job summary shows `FAIL` lines (Brandfetch doesn't know
+the domain, or the result is unusable), find a working image URL —
+Wikipedia, the brewery's press kit, the importer's site — and add it to
 `scripts/logo-overrides.json` keyed by the exact beer name:
 
 ```json
 { "New Beer Name": "https://example.com/path/to/logo.png" }
 ```
 
-Then re-run the fetch script. The override URL is tried before the
-Brandfetch chain.
+Commit and push. The workflow re-runs with the override (tried before
+the Brandfetch chain) and the logo lands.
 
-For a one-off override (custom artwork, hand-edited SVG), drop the file in
-`logos/` and add `logo:"logos/<filename>"` as the last field of the beer's
-entry in `beers[]`. The per-beer `logo` field always wins over the
-manifest.
+**Local fast loop (optional):** if you have Node 20+ and want to avoid
+waiting on CI, run `node scripts/fetch-logos.mjs` yourself and commit the
+result. The workflow will no-op since everything's already up to date.
+
+**One-off custom artwork:** drop a file in `logos/` and add
+`logo:"logos/<filename>"` as the last field of the beer's entry in
+`beers[]`. The per-beer `logo` field always wins over the manifest.
 
 ### Step 3: Research Checklist (for each new beer)
 
@@ -117,7 +123,8 @@ After adding a new beer, verify:
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
 - [ ] `BRAND_DOMAINS` contains the new beer name → brewery domain
-- [ ] `node scripts/fetch-logos.mjs` ran successfully; new `logos/<slug>.<ext>` and updated `logos/manifest.js` are committed
+- [ ] After pushing, the `Fetch beer logos` workflow completed green and its commit landed on your branch (`git pull`)
+- [ ] `logos/<slug>.<ext>` and the updated `logos/manifest.js` exist for the new beer (add a URL to `scripts/logo-overrides.json` and re-push if the workflow reported FAIL)
 
 ## Language Code Reference
 

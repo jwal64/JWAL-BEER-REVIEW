@@ -5,25 +5,34 @@ Every beer's logo is hardcoded here as a local file. The site loads
 `script.js`, so logos render synchronously from the repo with no runtime
 CDN dependency.
 
-## Adding a logo (run the script)
+## Adding a logo (CI does it)
 
-When you add a new beer to `script.js` (and to `BRAND_DOMAINS`), pull its
-logo down with:
+The `.github/workflows/fetch-beer-logos.yml` workflow watches `script.js`,
+`scripts/fetch-logos.mjs`, and `scripts/logo-overrides.json`. When you push
+a branch that adds a beer to `BRAND_DOMAINS`, the workflow runs
+`node scripts/fetch-logos.mjs` on a CI runner, downloads the new logo
+(Brandfetch → Google favicons → Icon Horse, or a manual URL from
+`scripts/logo-overrides.json`), saves it as `logos/<slug>.<ext>` (extension
+picked from the response content-type), regenerates `logos/manifest.js`,
+and commits the result back to your branch with `[skip-logo-fetch]` in the
+message.
+
+`git pull` after the workflow finishes to grab the new files.
+
+If the job summary reports a beer as `FAIL`, find a working image URL
+(Wikipedia, the brewery's press kit, the importer's site), add it to
+`scripts/logo-overrides.json` keyed by the exact beer name, commit and
+push. The override is tried before the Brandfetch chain.
+
+## Local fast loop (optional)
+
+If you have Node 20+ locally and want to skip CI:
 
 ```sh
 node scripts/fetch-logos.mjs                 # fill in anything missing
 node scripts/fetch-logos.mjs --force         # re-download everything
 node scripts/fetch-logos.mjs "New Beer Name" # fetch just one
 ```
-
-The script tries, in order: a manual URL from `scripts/logo-overrides.json`,
-then Brandfetch, then Google favicons, then Icon Horse. It saves the result
-as `logos/<slug>.<ext>` (extension picked from the response content-type)
-and rewrites `logos/manifest.js`. Commit both the new image and the updated
-manifest.
-
-If the script reports a beer as FAIL, find a working logo URL, add it to
-`scripts/logo-overrides.json` keyed by the exact beer name, and re-run.
 
 ## Manual override on a single beer
 
