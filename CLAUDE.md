@@ -49,6 +49,15 @@ Required brewery fields:
 }
 ```
 
+### Step 2.5: Optional — Local Logo Override
+
+Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
+
+1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
+2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
+
+The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
+
 ### Step 3: Research Checklist (for each new beer)
 
 Before adding any beer, research and confirm:

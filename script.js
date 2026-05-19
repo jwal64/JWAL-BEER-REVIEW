@@ -268,6 +268,15 @@ function logoFallback2URL(name){
   }
 })();
 
+// Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
+// entry to use a file you've placed in logos/ instead of Brandfetch. The
+// remote chain still serves as fallback if the local file is missing.
+const LOCAL_LOGOS={};
+function rebuildLocalLogos(){
+  for(const b of beers) if(b.logo) LOCAL_LOGOS[b.beer]=b.logo;
+}
+rebuildLocalLogos();
+
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
@@ -278,24 +287,41 @@ function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½"
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
-// Walk fallback chain via dataset.f counter; each failure bumps to the next src,
-// the last failure replaces the <img> with an emoji span.
+// Source chain priority: local override → Brandfetch → Google favicons → Icon
+// Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
+// the next available source.
+function logoSources(name){
+  const local=LOCAL_LOGOS[name];
+  const sources=[];
+  if(local)sources.push(local);
+  const u=logoURL(name);if(u)sources.push(u);
+  const fb1=logoFallbackURL(name);if(fb1)sources.push(fb1);
+  const fb2=logoFallback2URL(name);if(fb2)sources.push(fb2);
+  return sources;
+}
+function logoChainOnError(sources,replaceJS){
+  const tail=sources.slice(1);
+  let conds='';
+  for(let i=0;i<tail.length;i++){
+    conds+=`${i===0?'if':'else if'}(f===${i}){this.src='${tail[i]}';}`;
+  }
+  const elseClause=tail.length?`else{${replaceJS}}`:replaceJS;
+  return ` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;${conds}${elseClause}"`;
+}
 function logoImg(name,size=24){
-  const u=logoURL(name);
   const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
-  if(!u)return emojiSpan;
-  const fb1=logoFallbackURL(name);
-  const fb2=logoFallback2URL(name);
-  const onerr=` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${fb1}';}else if(f===1){this.src='${fb2}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));}"`;
-  return `<img src="${u}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
+  const sources=logoSources(name);
+  if(!sources.length)return emojiSpan;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
 }
 function cardLogo(name){
-  const u=logoURL(name);
-  if(!u)return `<span class="bc-emoji">🍺</span>`;
-  const fb1=logoFallbackURL(name);
-  const fb2=logoFallback2URL(name);
-  const onerr=` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${fb1}';}else if(f===1){this.src='${fb2}';}else{this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));}"`;
-  return `<img src="${u}" class="bc-logo" alt="${name}"${onerr}>`;
+  const sources=logoSources(name);
+  if(!sources.length)return `<span class="bc-emoji">🍺</span>`;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="bc-logo" alt="${name}"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -385,7 +411,7 @@ function buildIndexes(){
     }
   }
 }
-function refreshStats(){ STATS=computeStats(); buildIndexes(); }
+function refreshStats(){ STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
 let STATS=computeStats();
 buildIndexes();
 
@@ -1186,8 +1212,9 @@ function initBrewedMap(){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
     const firstBeer=b.beers.split(' · ')[0];
-    const _bSrc=logoURL(firstBeer),_bFb1=logoFallbackURL(firstBeer),_bFb2=logoFallback2URL(firstBeer);
-    const logoHtml=_bSrc?`<img src="${_bSrc}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;if(f===0){this.src='${_bFb1}';}else if(f===1){this.src='${_bFb2}';}else{this.onerror=null;this.remove();}">`:'';
+    const _bSources=logoSources(firstBeer);
+    const _bOnerr=_bSources.length>1?logoChainOnError(_bSources,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
+    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0"${_bOnerr}>`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
