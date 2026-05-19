@@ -156,8 +156,8 @@ let breweries=[
 
 // ══════════════════════════════════════════════════════════════
 // BRAND DOMAINS — every beer maps to its brewery's domain
-// Real logos load via Brandfetch's public CDN (no account required
-// by end users); DuckDuckGo's icon service is the no-auth fallback.
+// Real logos load via Brandfetch's public CDN (no account required by end
+// users); Google's favicon service and Icon Horse provide no-auth fallbacks.
 // ══════════════════════════════════════════════════════════════
 const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
