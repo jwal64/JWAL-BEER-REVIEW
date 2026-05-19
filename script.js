@@ -207,7 +207,7 @@ const BRAND_DOMAINS = {
 "Hofbräu Dunkel":"hofbraeu-muenchen.de",
 "Hofbräu Münchner Weiße":"hofbraeu-muenchen.de",
 "Narragansett Lager":"narragansettbeer.com",
-"Peroni Nastro Azzurro":"nastroazzurro.com",
+"Peroni Nastro Azzurro":"peroni.it",
 "Newcastle Brown":"newcastlebrown.com",
 "Norrlands Guld":"norrlandsguld.se",
 "Orion":"orionbeer.co.jp",
