@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Daura Damm Gluten-Free Lager Beer">
+  <rect width="512" height="512" rx="60" fill="#d51f26"/>
+  <g fill="#ffffff" text-anchor="middle">
+    <g font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+      <text x="248" y="214" font-size="116" letter-spacing="3">DAURA</text>
+      <text x="438" y="138" font-size="30">&#174;</text>
+      <text x="256" y="270" font-size="38" letter-spacing="7">DAMM</text>
+    </g>
+    <rect x="146" y="298" width="220" height="5"/>
+    <g font-family="Arial, Helvetica, sans-serif" font-weight="700">
+      <text x="256" y="350" font-size="31" letter-spacing="2">GLUTEN-FREE</text>
+      <text x="256" y="390" font-size="31" letter-spacing="2">LAGER BEER</text>
+    </g>
+  </g>
+</svg>
