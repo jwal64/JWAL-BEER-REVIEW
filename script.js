@@ -80,7 +80,7 @@ let beers=[
   {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026},
-  {beer:"Daura",           style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Daura",           style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/daura.svg"},
 ];
 
 // Merge user-added beers from localStorage
