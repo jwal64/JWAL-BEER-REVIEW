@@ -81,6 +81,7 @@ let beers=[
   {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Daura",           style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/daura.svg"},
+  {beer:"Asahi Super Dry", style:"Lager",                origin:"JP",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"May",monthN:5,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -127,6 +128,7 @@ let breweries=[
   {name:"Kronenbourg",            location:"Obernai, Alsace",           country:"France",      cc:"FR", lang:"fr", beers:"Kronenbourg 1664",                                  lat:48.4637,lng:7.4845,  ratings:[3.00]},
   {name:"Sapporo Brewery",        location:"Sapporo, Hokkaido",         country:"Japan",       cc:"JP", lang:"ja", beers:"Sapporo Premium",       nativeName:"サッポロビール",     lat:43.0685,lng:141.3544, ratings:[3.50]},
   {name:"Kirin Brewery",          location:"Yokohama, Kanagawa",        country:"Japan",       cc:"JP", lang:"ja", beers:"Kirin Ichiban",nativeName:"キリン一番搾り",   lat:35.4634,lng:139.6220, ratings:[3.00]},
+  {name:"Asahi Breweries",        location:"Suita, Osaka",              country:"Japan",       cc:"JP", lang:"ja", beers:"Asahi Super Dry",       nativeName:"アサヒスーパードライ", lat:34.7615,lng:135.5158, ratings:[3.50]},
   {name:"Red Stripe (D&G)",       location:"Kingston, Surrey",          country:"Jamaica",     cc:"JM", lang:"en", beers:"Red Stripe",                                        lat:17.9972,lng:-76.7939, ratings:[3.75]},
   {name:"Estrella Galicia",       location:"A Coruña, Galicia",         country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Galicia",                                   lat:43.3623,lng:-8.4115,  ratings:[4.25]},
   {name:"Pilsner Urquell",        location:"Pilsen, Bohemia",           country:"Czech Republic",cc:"CZ", lang:"cs", beers:"Pilsner Urquell",    nativeName:"Plzeňský Prazdroj", lat:49.7479,lng:13.3756,  ratings:[3.25]},
