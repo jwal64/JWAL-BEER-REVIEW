@@ -37,7 +37,7 @@ let beers=[
   {beer:"Michelob Ultra",  style:"Lager",           origin:"US",abv:4.2,method:"Can",   city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:false,month:"Jan",monthN:1,year:2026},
   {beer:"Red Stripe",      style:"Lager",               origin:"JM",abv:4.7,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Jan",monthN:1,year:2026},
   // FEB 2026
-  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
+  {beer:"Heineken",        style:"Lager",               origin:"NL",abv:5.0,method:"Draft", city:"Uncasville",  region:"Connecticut",     country:"USA",         cc:"US", rating:3.25,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Guinness Draught",style:"Stout",               origin:"IE",abv:4.2,method:"Nitro", city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Weihenstephaner Hefeweissbier",style:"Wheat Beer",origin:"DE",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",     country:"USA",         cc:"US", rating:4.50,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Hofbräu Münchner Weiße",style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
