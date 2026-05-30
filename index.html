@@ -71,11 +71,10 @@
     <div class="mb-logo">JWAL'S</div>
     <div class="mb-item" data-tab="overview"><span class="fkey">F1</span>OVRVW</div>
     <div class="mb-item" data-tab="beers"><span class="fkey">F2</span>BEERS</div>
-    <div class="mb-item" data-tab="analysis"><span class="fkey">F3</span>ANLYS</div>
-    <div class="mb-item" data-tab="geo"><span class="fkey">F4</span>GEO</div>
-    <div class="mb-item" data-tab="maps"><span class="fkey">F5</span>MAPS</div>
-    <div class="mb-item" data-tab="temporal"><span class="fkey">F6</span>TIME</div>
-    <div class="mb-item" data-tab="markets"><span class="fkey">F7</span>MKTS</div>
+    <div class="mb-item" data-tab="geo"><span class="fkey">F3</span>GEO</div>
+    <div class="mb-item" data-tab="maps"><span class="fkey">F4</span>MAPS</div>
+    <div class="mb-item" data-tab="temporal"><span class="fkey">F5</span>TIME</div>
+    <div class="mb-item" data-tab="markets"><span class="fkey">F6</span>MKTS</div>
     <div class="mb-spacer"></div>
     <div class="mb-right" id="mb-clock">—</div>
   </div>
@@ -163,11 +162,7 @@
     <div class="bb-panel-head">ABV vs RATING — SCATTER PLOT<span class="ph-right">r ≈ 0.12 · NO SIGNIFICANT CORRELATION</span></div>
     <div class="bb-body"><canvas id="scatterChart" height="110"></canvas></div>
   </div>
-  <div class="g3">
-    <div class="bb-panel">
-      <div class="bb-panel-head">BEST PERFORMERS</div>
-      <div class="bb-body" id="bestPanel"></div>
-    </div>
+  <div class="g2">
     <div class="bb-panel">
       <div class="bb-panel-head">MARKET SIGNALS</div>
       <div class="bb-body" id="mktPanel"></div>
@@ -177,14 +172,19 @@
       <div class="bb-body" id="latestPanel"></div>
     </div>
   </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">METHOD DETAIL TABLE</div>
-    <div class="bb-body">
-      <table class="bb-table">
-        <thead><tr><th>METHOD</th><th>REVIEWS</th><th>AVG RATING</th><th>BEST BEER</th><th>WORST BEER</th><th>PREMIUM vs AVG</th></tr></thead>
-        <tbody id="methodDetailBody"></tbody>
-      </table>
+  <div class="g2">
+    <div class="bb-panel">
+      <div class="bb-panel-head">STATISTICAL SUMMARY</div>
+      <div class="bb-body" id="statSummary"></div>
     </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">RATING QUINTILE BREAKDOWN</div>
+      <div class="bb-body" id="quintiles"></div>
+    </div>
+  </div>
+  <div class="bb-panel">
+    <div class="bb-panel-head">TASTE PROFILE — PERSONAL BIAS INDICATORS</div>
+    <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
   </div>
 </div>
 
@@ -224,34 +224,6 @@
   </div>
 </div>
 
-<!-- ══════════════ ANALYSIS (insights) ══════════════ -->
-
-<div id="analysis" class="panel">
-
-  <section class="merged-section" data-section="insights">
-    <div class="merged-section-head">◈ INSIGHTS</div>
-    <div class="g2">
-      <div class="bb-panel">
-        <div class="bb-panel-head">STATISTICAL SUMMARY</div>
-        <div class="bb-body" id="statSummary"></div>
-      </div>
-      <div class="bb-panel">
-        <div class="bb-panel-head">RATING QUINTILE BREAKDOWN</div>
-        <div class="bb-body" id="quintiles"></div>
-      </div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">TASTE PROFILE — PERSONAL BIAS INDICATORS</div>
-      <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
-      <div class="bb-body"><canvas id="timelineChart" height="120"></canvas></div>
-    </div>
-  </section>
-
-</div>
-
 <!-- ══════════════ GEOGRAPHY (countries + cities + language) ══════════════ -->
 
 <div id="geo" class="panel">
@@ -285,17 +257,6 @@
     <div class="bb-panel">
       <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
       <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BREWERY REGION TABLE</div>
-      <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table">
-            <thead><tr><th></th><th>BEER</th><th>CTRY</th><th>REGION</th><th>LANG</th><th>RATING</th></tr></thead>
-            <tbody id="langTableBody"></tbody>
-          </table>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -388,15 +349,8 @@
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">ALL REVIEWS — CHRONOLOGICAL WITH MONTH<span class="ph-right">SORTED BY DATE → RATING</span></div>
-    <div class="bb-body">
-      <div style="overflow-x:auto">
-        <table class="bb-table">
-          <thead><tr><th>MONTH</th><th></th><th>BEER</th><th>STYLE</th><th>ORIGIN</th><th>ABV</th><th>METHOD</th><th>CITY</th><th>RATING</th></tr></thead>
-          <tbody id="temporalTableBody"></tbody>
-        </table>
-      </div>
-    </div>
+    <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
+    <div class="bb-body"><canvas id="timelineChart" height="120"></canvas></div>
   </div>
 </div>
 
@@ -410,17 +364,6 @@
     <div class="bb-panel">
       <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
       <div class="bb-body"><canvas id="contrarianChart" height="220"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">FULL CONTRARIAN TABLE<span class="ph-right">JWAL RATING vs UNTAPPD GLOBAL AVG</span></div>
-      <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table">
-            <thead><tr><th></th><th>BEER</th><th>JWAL</th><th>GLOBAL AVG</th><th>DELTA</th><th>VERDICT</th></tr></thead>
-            <tbody id="contrarianBody"></tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
     <div class="bb-grid-2" style="margin-bottom:8px">

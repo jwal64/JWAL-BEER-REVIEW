@@ -649,8 +649,8 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'beers','3':'analysis','4':'geo','5':'maps','6':'temporal','7':'markets',
-    'f1':'overview','f2':'beers','f3':'analysis','f4':'geo','f5':'maps','f6':'temporal','f7':'markets'
+    '1':'overview','2':'beers','3':'geo','4':'maps','5':'temporal','6':'markets',
+    'f1':'overview','f2':'beers','f3':'geo','f4':'maps','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -687,7 +687,6 @@ function showTab(id,btn){
     [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
   const renderers = {
-    analysis: [['_inD',drawInsights]],
     geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
@@ -767,11 +766,6 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
             y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
 });
 
-document.getElementById('bestPanel').innerHTML=STATS.sorted.slice(0,5).map((b,i)=>`
-  <div class="insight-row">
-    <span class="insight-key">#${i+1} ${logoImg(b.beer,16)} ${b.beer}</span>
-    <div><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span> <span class="insight-sub">${b.origin} · ${b.method}</span></div>
-  </div>`).join('');
 
 // Dynamic market signals — computed from live data
 const bestStyle=STATS.styleRanked[0];
@@ -822,6 +816,10 @@ try {
     if(bl) bl.textContent=latest.b.month+' '+latest.b.year;
   }
 } catch(e){ console.error('Streak error:',e); }
+
+// Insights panels (stat summary / quintiles / taste profile) now live on the
+// Overview tab, which renders eagerly at load — so draw them up front too.
+try { drawInsights(); } catch(e){ console.error('Insights init error:',e); }
 
 // ══════════════════════════════════════════════════════════════
 // BEER TABLE + GRID
@@ -951,56 +949,7 @@ function drawCountry(){
       <div class="bb-bar-label"><span class="name">${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x</span></div>
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${rC(d.a)}"></div></div>
     </div>`).join('');
-  safeChart('countryPieChart',document.getElementById('countryPieChart'),{type:'doughnut',
-    data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>d.c),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:1,borderColor:'#111'}]},
-    options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.raw} reviews`}}}}
-  });
 }
-
-// ══════════════════════════════════════════════════════════════
-// METHOD (sync init)
-// ══════════════════════════════════════════════════════════════
-try {
-const eM={Draft:'🍺',Nitro:'🫧',Bottle:'🍾',Can:'🥫'};
-const mColors=['#ff6600','#00aaff','#bb44ff','#555'];
-const mO=STATS.METHOD_ORDER;
-const mA=STATS.methodAvgs;
-const mCt=STATS.methodCounts;
-safeChart('methodDetailChart',document.getElementById('methodDetailChart'),{type:'bar',
-  data:{labels:mO.map((m,i)=>`${m} (${mCt[i]})`),datasets:[{data:mA,backgroundColor:mColors,borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-});
-{const _mc=document.getElementById('methodCards'); if(_mc) _mc.innerHTML=mO.map((m,i)=>`
-  <div class="kpi">
-    <div style="font-size:1.4rem;margin-bottom:4px">${eM[m]}</div>
-    <div class="kpi-val" style="color:${mColors[i]}">${mA[i].toFixed(2)}</div>
-    <div class="kpi-label">${m.toUpperCase()}</div>
-    <div class="kpi-sub">${mCt[i]} review${mCt[i]>1?'s':''}</div>
-  </div>`).join('');}
-const globalAvg=STATS.globalAvg;
-// Single pass: find best/worst per method
-const mBW={};
-for(const b of beers){
-  let e=mBW[b.method];
-  if(!e){mBW[b.method]=e={best:b,worst:b};continue;}
-  if(b.rating>e.best.rating)e.best=b;
-  if(b.rating<e.worst.rating)e.worst=b;
-}
-document.getElementById('methodDetailBody').innerHTML=mO.map((m,i)=>{
-  const bw=mBW[m];
-  const best=bw?bw.best:{beer:'—'};
-  const worst=bw?bw.worst:{beer:'—'};
-  const diff=mA[i]-globalAvg;
-  return `<tr>
-    <td style="color:#ff6600">${eM[m]} ${m}</td>
-    <td style="text-align:center">${mCt[i]}</td>
-    <td><span class="rb ${rbC(mA[i])}">${mA[i].toFixed(2)}</span></td>
-    <td class="up" style="font-size:9px">${best.beer}</td>
-    <td class="dn" style="font-size:9px">${worst.beer}</td>
-    <td class="${diff>=0?'up':'dn'}">${diff>=0?'+':''}${diff.toFixed(2)}</td>
-  </tr>`;
-}).join('');
-} catch(e){ console.error('Method init error:',e); }
 
 // ══════════════════════════════════════════════════════════════
 // CITY
@@ -1017,10 +966,6 @@ function drawCity(){
       <div><div style="font-size:10px;color:#ff6600;font-weight:600">${d.city}</div><div style="font-size:8px;color:#555">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
-  safeChart('cityPieChart',document.getElementById('cityPieChart'),{type:'doughnut',
-    data:{labels:cD.map(d=>`${d.city}, ${d.region}`),datasets:[{data:cD.map(d=>d.c),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:1,borderColor:'#111'}]},
-    options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:{...TT,callbacks:{label:c=>`${c.raw} reviews`}}}}
-  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1094,45 +1039,6 @@ function drawInsights(){
       <div class="bb-bar-label"><span class="name">${p.l}</span><span class="val">${p.v.toFixed(2)}/5</span></div>
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${p.v/5*100}%;background:${p.color}"></div></div>
     </div>`).join('');
-
-  // Single pass build of labels, rating data, point colors, and rolling 5-pt avg (O(n))
-  const tlLabels=new Array(beers.length),tlData=new Array(beers.length),tlColors=new Array(beers.length),tlRoll=new Array(beers.length);
-  let rollSum=0;
-  for(let i=0;i<beers.length;i++){
-    const r=beers[i].rating;
-    tlLabels[i]=`#${i+1}`;
-    tlData[i]=r;
-    tlColors[i]=rC(r);
-    rollSum+=r;
-    if(i>=5)rollSum-=beers[i-5].rating;
-    tlRoll[i]=(rollSum/Math.min(i+1,5)).toFixed(2);
-  }
-  safeChart('timelineChart',document.getElementById('timelineChart'),{type:'line',
-    data:{
-      labels:tlLabels,
-      datasets:[
-        {label:'Rating',data:tlData,borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
-        {label:'5-Pt Avg',data:tlRoll,borderColor:'#00aaff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
-      ]
-    },
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#444',maxTicksLimit:12}}}}
-  });
-
-  const brands2={};
-  beers.forEach(b=>{if(!brands2[b.beer])brands2[b.beer]=[];brands2[b.beer].push(b.rating);});
-  const multi=Object.entries(brands2).filter(([,rs])=>rs.length>1).map(([n,rs])=>({n,rs,avg:avg(rs),std:std(rs)})).sort((a,b)=>a.std-b.std);
-  {const _cp=document.getElementById('consistencyPanel'); if(_cp) _cp.innerHTML=multi.map(b=>`
-    <div class="mini-row" style="gap:10px">
-      ${logoImg(b.n,28)}
-      <div style="flex:1">
-        <div style="color:#ff6600;font-weight:600;font-size:10px;margin-bottom:2px">${b.n}</div>
-        <div style="font-size:8px;color:#555">AVG ${b.avg.toFixed(2)} · σ ${b.std.toFixed(3)} · SCORES: ${b.rs.sort((a,c)=>c-a).join(', ')}</div>
-        <div style="margin-top:3px;height:3px;background:#1a1a1a">
-          <div style="height:100%;width:${(1-b.std)*100}%;background:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'}"></div>
-        </div>
-      </div>
-      <span style="font-size:7px;padding:1px 5px;border:1px solid;color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'};border-color:${b.std<.2?'#00cc44':b.std<.4?'#ffaa00':'#ff2222'};flex-shrink:0">${b.std<.2?'CONSISTENT':b.std<.4?'MODERATE':'VARIABLE'}</span>
-    </div>`).join('');}
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1150,13 +1056,6 @@ function drawLanguage(){
       data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
       options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
     });
-    {const _lc=document.getElementById('langCards'); if(_lc) _lc.innerHTML=lS.map(d=>`
-      <div class="bb-bar-row">
-        <div class="bb-bar-label"><span class="name">${lF[d.l]||''} ${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x · ${d.b.join(', ')}</span></div>
-        <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${lC[d.l]}"></div></div>
-      </div>`).join('');}
-    document.getElementById('langTableBody').innerHTML=[...lD].sort((a,b)=>b.rating-a.rating).map(d=>`
-      <tr><td>${logoImg(d.beer,20)}</td><td style="color:#ff6600">${d.beer}</td><td>${FLAGS[d.country]||''} ${d.country}</td><td style="color:#555;font-size:9px">${d.region}</td><td style="color:${lC[d.lang]||'#ff6600'}">${lF[d.lang]||''} ${d.lang}</td><td><span class="rb ${rbC(d.rating)}">${d.rating.toFixed(2)}</span></td></tr>`).join('');
   } catch(e){ console.error('Language init error:',e); }
 }
 
@@ -1485,21 +1384,30 @@ function drawTemporal(){
     }
   } catch(e) { console.error('Bump chart error:', e); }
 
-  // ── Full chronological table
-  const mColor = Object.fromEntries(months.map((m,i)=>[m,monthColors[i]]));
-  const sorted=[...beers].sort((a,b)=>a.year-b.year||a.monthN-b.monthN||b.rating-a.rating);
-  document.getElementById('temporalTableBody').innerHTML=sorted.map(b=>`
-    <tr>
-      <td><span style="color:${mColor[b.month]||'#888'};font-weight:700;font-size:9px">${b.month.toUpperCase()} ${b.year}</span></td>
-      <td>${logoImg(b.beer,20)}</td>
-      <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</td>
-      <td style="color:#555;font-size:9px">${b.style}</td>
-      <td>${FLAGS[b.origin]||''} ${b.origin}</td>
-      <td style="color:#00aaff">${b.abv.toFixed(1)}%</td>
-      <td style="color:#555">${b.method}</td>
-      <td style="color:#555">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</td>
-      <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-    </tr>`).join('');
+  // ── Review timeline — chronological rating trend with 5-review rolling avg
+  // (relocated from the former Analysis tab). Single pass builds labels, rating
+  // data, point colors, and the rolling average in O(n).
+  const tlLabels=new Array(beers.length),tlData=new Array(beers.length),tlColors=new Array(beers.length),tlRoll=new Array(beers.length);
+  let rollSum=0;
+  for(let i=0;i<beers.length;i++){
+    const r=beers[i].rating;
+    tlLabels[i]=`#${i+1}`;
+    tlData[i]=r;
+    tlColors[i]=rC(r);
+    rollSum+=r;
+    if(i>=5)rollSum-=beers[i-5].rating;
+    tlRoll[i]=(rollSum/Math.min(i+1,5)).toFixed(2);
+  }
+  safeChart('timelineChart',document.getElementById('timelineChart'),{type:'line',
+    data:{
+      labels:tlLabels,
+      datasets:[
+        {label:'Rating',data:tlData,borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
+        {label:'5-Pt Avg',data:tlRoll,borderColor:'#00aaff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
+      ]
+    },
+    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#444',maxTicksLimit:12}}}}
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1831,8 +1739,8 @@ function toggleScanlines(){
   const TABS=[
     {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
-    {id:'analysis',label:'ANALYSIS',icon:'▲',key:'F3'},
-    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
+    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F3'},
+    {id:'maps',label:'MAPS',icon:'◉',key:'F4'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
     {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
   ];
