@@ -1495,19 +1495,6 @@ function drawContrarian(){
       scales:{x:{min:-2,max:2,grid:{color:'#1a1a1a'},ticks:{color:'#444'},title:{display:true,text:'DELTA (+ = JWAL RATES HIGHER)',color:'#555'}},
               y:{grid:{display:false},ticks:{color:'#aaa',font:{size:9}}}}}
   });
-
-  document.getElementById('contrarianBody').innerHTML=rows.map(r=>{
-    const dc=r.delta>0.3?'up':r.delta<-0.3?'dn':'fl';
-    const verdict=r.delta>0.5?'OVERRATED BY WORLD':r.delta>0.2?'JWAL FAVORS':r.delta<-0.5?'JWAL HARSH':r.delta<-0.2?'JWAL BELOW':'IN AGREEMENT';
-    return `<tr>
-      <td>${logoImg(r.name,20)}</td>
-      <td style="color:#ff6600;font-weight:600">${r.name}</td>
-      <td><span class="rb ${rbC(r.jwal)}">${r.jwal.toFixed(2)}</span></td>
-      <td style="color:#555">${r.global.toFixed(2)}</td>
-      <td class="${dc}" style="font-weight:700;font-family:var(--mono)">${r.delta>=0?'+':''}${r.delta.toFixed(2)}</td>
-      <td><span style="font-size:8px;padding:1px 6px;border:1px solid;color:${r.delta>0.2?'#00cc44':r.delta<-0.2?'#ff2222':'#ffaa00'};border-color:${r.delta>0.2?'#00cc44':r.delta<-0.2?'#ff2222':'#ffaa00'}">${verdict}</span></td>
-    </tr>`;
-  }).join('');
 }
 
 // ══════════════════════════════════════════════════════════════
