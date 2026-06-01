@@ -55,7 +55,7 @@ let beers=[
   {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Żywiec",         style:"Lager",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"Stamford",region:"Connecticut",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
@@ -108,6 +108,7 @@ let drunkLocs=[
   {city:"Nijmegen",    region:"Gelderland",           country:"Netherlands", cc:"NL", lat:51.8426,lng:5.8528},
   {city:"Antwerp",     region:"Antwerp",              country:"Belgium",     cc:"BE", lat:51.2194,lng:4.4025},
   {city:"Boston",      region:"Massachusetts",        country:"USA",         cc:"US", lat:42.3601,lng:-71.0589},
+  {city:"Stamford",    region:"Connecticut",          country:"USA",         cc:"US", lat:41.0534,lng:-73.5387},
 ];
 
 let breweries=[
