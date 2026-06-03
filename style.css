@@ -522,9 +522,18 @@ border: 1px solid var(--border);
 color: var(--orange);
 font-family: var(--mono);
 font-size: 9px;
-padding: 3px 6px;
+padding: 3px 20px 3px 6px;
 outline: none;
 cursor: pointer;
+/* Kill the native iOS/Android pill look so selects match the sharp terminal aesthetic */
+-webkit-appearance: none;
+-moz-appearance: none;
+appearance: none;
+border-radius: 0;
+/* Custom orange caret */
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath fill='%23ff6600' d='M0 0h8L4 6z'/%3E%3C/svg%3E");
+background-repeat: no-repeat;
+background-position: right 6px center;
 }
 .bb-select:focus { border-color: var(--cyan); }
 .bb-select option { background: var(--panel); }
@@ -899,16 +908,46 @@ input[type="text"],
 input[type="search"],
 select {
   font-size: 16px !important;
-  padding: 6px 8px !important;
-  min-height: 32px;
+  padding: 7px 10px !important;
+  min-height: 36px;
 }
-/* But keep the dense look in the filter bar: scale via transform-ish trick via padding */
-.bb-ctrl .bb-select, .bb-ctrl #beerSearch {
+
+/* FILTER BAR — stack the title, then lay the controls out tidily instead of as
+   mismatched native pills that wrap awkwardly. The search box gets its own
+   full-width row; the three dropdowns share an even row beneath it and wrap
+   gracefully on very narrow screens. Flex-wrap is used (not auto-fit grid) to
+   avoid the `grid-column:1/-1` + auto-fit single-column collapse quirk. */
+.bb-ctrl {
+  flex-direction: column;
+  align-items: stretch !important;
+  gap: 8px !important;
+  padding: 8px !important;
+}
+.bb-ctrl .bb-ctrl-title { font-size: 11px; }
+.bb-ctrl > div {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px !important;
+  width: 100%;
+}
+.bb-ctrl #beerSearch {
+  flex: 1 1 100%;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box;
   font-size: 16px !important;
-  padding: 4px 6px !important;
+  padding: 8px 10px !important;
 }
-#beerSearch { width: auto !important; max-width: 140px; }
-.bb-ctrl { padding: 6px 8px !important; }
+.bb-ctrl .bb-select {
+  flex: 1 1 100px;
+  min-width: 100px;
+  box-sizing: border-box;
+  font-size: 13px !important;
+  padding: 8px 22px 8px 8px !important;
+  min-height: 38px;
+  background-position: right 7px center;
+}
+#beerFilterCount { flex: 1 1 100%; }
 
 /* IPO/MARKETS sub-nav — wraps + bigger tap targets */
 .ipo-subnav { flex-wrap: wrap; gap: 4px; padding: 6px; }
