@@ -361,7 +361,8 @@ function computeStats(){
     if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;
     if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;
     if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;
-    if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;
+    const L=CANON_LOC.get(b.beer)||b;
+    if(!cityMap[L.city])cityMap[L.city]={t:0,c:0,region:L.region,country:L.country,cc:L.cc};cityMap[L.city].t+=b.rating;cityMap[L.city].c++;
     if(!brandMap[b.beer]){brandMap[b.beer]=[];brandStats[b.beer]={best:b.rating,worst:b.rating};}
     brandMap[b.beer].push(b.rating);
     const bs=brandStats[b.beer];
@@ -418,7 +419,33 @@ function buildIndexes(){
     }
   }
 }
-function refreshStats(){ STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
+// ── Canonical location: a beer reviewed in multiple cities is attributed to its
+// rarest-visited city for AGGREGATION only (city stats, drunk map, markets count).
+// Home bases "New Rochelle"/"New York" never win when any alternative city exists.
+const HOME_CITIES=new Set(["New Rochelle","New York"]);
+function computeCanonLoc(){
+  const cityCount={},byBeer={};
+  beers.forEach(b=>{
+    cityCount[b.city]=(cityCount[b.city]||0)+1;
+    const m=byBeer[b.beer]||(byBeer[b.beer]={});
+    if(!m[b.city])m[b.city]={city:b.city,region:b.region,country:b.country,cc:b.cc};
+  });
+  const out=new Map();
+  for(const beer in byBeer){
+    const cities=Object.values(byBeer[beer]);
+    if(cities.length<2)continue; // single city → callers fall back to the review's own fields
+    const best=cities.reduce((a,c)=>{
+      const ha=HOME_CITIES.has(a.city)?1:0, hc=HOME_CITIES.has(c.city)?1:0;
+      const cmp = (hc-ha) || (cityCount[c.city]-cityCount[a.city]) ||
+                  (c.city<a.city?-1:c.city>a.city?1:0);
+      return cmp<0?c:a; // lowest [homePenalty, rawCount, cityName] wins
+    });
+    out.set(beer,best);
+  }
+  return out;
+}
+let CANON_LOC=computeCanonLoc();
+function refreshStats(){ CANON_LOC=computeCanonLoc(); STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
 let STATS=computeStats();
 buildIndexes();
 
@@ -1080,8 +1107,9 @@ function initDrunkMap(){
   // Single pass: aggregate totals, collect unique beer names, full review list, and earliest date per city
   const cM={};
   beers.forEach(b=>{
-    let e=cM[b.city];
-    if(!e){e=cM[b.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:b.region,country:b.country,cc:b.cc};}
+    const L=CANON_LOC.get(b.beer)||b;
+    let e=cM[L.city];
+    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:L.region,country:L.country,cc:L.cc};}
     e.t+=b.rating;e.c++;
     if(!e.bs.includes(b.beer))e.bs.push(b.beer);
     e.reviews.push(b);

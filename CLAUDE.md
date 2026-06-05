@@ -91,6 +91,42 @@ After adding a new beer, verify:
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
 
+## Location Rule: Canonical / Most-Unique Location
+
+When the **same beer** (same `beer` name) has been reviewed in **more than one
+consumption city**, all location-based **aggregation/display** attributes that beer to a
+single **canonical location** — its **most unique** city.
+
+- **Most unique = rarest-visited**: the city with the **fewest total reviews** in the
+  database wins. All of the beer's reviews are folded into (merged onto) that one city.
+- **Home bases are never canonical when an alternative exists**: **New Rochelle** and
+  **New York, New York** are home markets and are never chosen as the canonical location
+  for a beer as long as that beer has any other consumption city. (If a beer's only cities
+  are both home cities, the standard rarest-visited metric decides between them.)
+- **Tie-breaking** is deterministic: `[homePenalty, rawReviewCount, cityName]` — non-home
+  beats home, then fewest reviews, then alphabetical.
+
+### What this affects (and what it doesn't)
+
+- **Relabeled (aggregate views)**: CITY tab chart/cards, the "drunk" map (dots, legend,
+  table), the **markets** count, and TOP MARKET. A folded home-city contribution may cause
+  the markets count to drop — this is intended.
+- **Left honest (per-session logs)**: the main beers table rows, the beer-detail modal's
+  "ALL SESSIONS" list, and the "LATEST" activity readout still show each session's **true**
+  consumption city. The rule never rewrites where an individual pour actually happened.
+
+### Data-entry implication
+
+Keep recording each review's **real** consumption city/region/country/cc in `beers[]` as
+normal — do **not** pre-apply this rule when adding data. It is enforced at display time in
+`script.js` by `computeCanonLoc()` / the `CANON_LOC` map (recomputed in `refreshStats()`),
+so it stays correct automatically as data changes. Ensure any consumption city involved
+exists in `drunkLocs[]` as usual.
+
+> Note: as of the latest data, every beer is reviewed in exactly one city, so this rule is
+> currently dormant and changes nothing visible; it activates automatically the first time a
+> beer is logged in a second city.
+
 ## Language Code Reference
 
 | Code | Language       | Countries                      |
