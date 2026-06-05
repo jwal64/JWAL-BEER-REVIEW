@@ -693,7 +693,7 @@ function showTab(id,btn){
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
     ],
     temporal: [['_tmpD',drawTemporal]],
-    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO]],
+    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO], ['_recD',drawRecommendations]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
   if(id==='maps'){
@@ -1551,36 +1551,94 @@ const IPO_CANDIDATES=[
 ];
 
 // ══════════════════════════════════════════════════════════════
+// PREDICTED RATING — shared scoring formula
+// ══════════════════════════════════════════════════════════════
+// Blends Untappd market consensus with JWAL's historical biases:
+//   50% Untappd global avg · 25% JWAL style-adjusted · 15% JWAL
+//   country-adjusted · 10% JWAL base anchor · + serving-method nudge.
+function predictRating(style,origin,untappd,method='Bottle'){
+  const g=STATS.globalAvg;
+  const sM=STATS.styleMap[style];
+  const styleAvg=sM?sM.t/sM.c:g;
+  const cM=STATS.countryMap[origin];
+  const countryAvg=cM?cM.t/cM.c:g;
+  const methodAdj=method==='Draft'?0.10:method==='Nitro'?0.05:method==='Can'?-0.10:0;
+  const t=untappd*0.50+(g+(styleAvg-g))*0.25+(g+(countryAvg-g))*0.15+g*0.10+methodAdj;
+  return Math.min(5.0,Math.max(1.0,t));
+}
+
+// ══════════════════════════════════════════════════════════════
+// RECOMMENDATIONS — "WHAT TO DRINK NEXT"
+// ══════════════════════════════════════════════════════════════
+// Ranks unreviewed candidate beers by predicted JWAL rating (taste
+// profile + Untappd consensus) and explains each pick with rationale
+// chips derived from his style / country / serving biases.
+function drawRecommendations(){
+  window._recD=true;
+  try {
+    const reviewed=new Set(beers.map(b=>b.beer));
+    const g=STATS.globalAvg;
+    const picks=IPO_CANDIDATES
+      .filter(c=>!reviewed.has(c.beer))
+      .map(c=>{
+        const pred=predictRating(c.style,c.origin,c.untappd,c.method);
+        return {...c,_pred:pred,_delta:pred-g};
+      })
+      .sort((a,b)=>b._pred-a._pred);
+
+    const cntEl=document.getElementById('rec-count');
+    if(cntEl) cntEl.textContent=picks.length+' PICK'+(picks.length!==1?'S':'');
+
+    // Rationale chips: compare each beer's attributes to JWAL's biases.
+    function rationale(c){
+      const chips=[];
+      const sM=STATS.styleMap[c.style];
+      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`LOVES ${c.style.toUpperCase()} · ${sa.toFixed(2)}`);}
+      const cM=STATS.countryMap[c.origin];
+      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} BIAS · ${ca.toFixed(2)}`);}
+      if(c.method==='Draft'||c.method==='Nitro') chips.push(`${c.method.toUpperCase()} PREMIUM`);
+      if(c._pred>=4.0) chips.push('TOP SHELF');
+      if(!chips.length) chips.push(`MKT ${c.untappd.toFixed(2)} CONSENSUS`);
+      return chips.slice(0,3);
+    }
+
+    const recEl=document.getElementById('recPicks');
+    if(recEl){
+      recEl.innerHTML=picks.length?picks.map((c,i)=>{
+        const col=rC(c._pred);
+        const chips=rationale(c).map(t=>`<span class="rec-chip">${t}</span>`).join('');
+        return `<div class="ipo-top-pick rec-pick" style="border-left-color:${col}">
+          <div class="tp-head"><span class="rec-rank">#${i+1}</span> ${logoImg(c.beer,20)} <span>${c.beer}</span></div>
+          <div class="tp-style">${FLAGS[c.origin]||''} ${c.style} · ${c.abv.toFixed(1)}% · ${c.method}</div>
+          <div class="tp-row">
+            <span style="color:#bb44ff">UNTAPPD ${c.untappd.toFixed(2)}</span>
+            <span class="tp-upside" style="color:${col}">${c._pred.toFixed(2)}</span>
+          </div>
+          <div class="tp-row" style="margin-top:4px">
+            <span style="color:${col};letter-spacing:1px">${strs(c._pred)}</span>
+            <span style="color:#444;font-size:8px">PREDICTED</span>
+          </div>
+          <div class="rec-why">${chips}</div>
+        </div>`;
+      }).join(''):'<div style="color:#333;font-size:9px;padding:10px">ALL CANDIDATES REVIEWED — NO PENDING PICKS</div>';
+    }
+  } catch(e){ console.error('Recommendations error:',e); }
+}
+
+// ══════════════════════════════════════════════════════════════
 // IPO WATCHLIST
 // ══════════════════════════════════════════════════════════════
 function drawIPO(){
   window._ipoD=true;
   try {
 
-  const jwalStyleAvg={};
-  Object.entries(STATS.styleMap).forEach(([s,v])=>jwalStyleAvg[s]=v.t/v.c);
-  const jwalCountryAvg={};
-  Object.entries(STATS.countryMap).forEach(([c,v])=>jwalCountryAvg[c]=v.t/v.c);
-  const jwalGlobal=STATS.globalAvg;
-
-  // Analyst target formula:
-  // 50% Untappd global avg (market consensus)
-  // 25% JWAL style-adjusted expectation (his historical avg for that style, offset from his global)
-  // 15% JWAL country-adjusted expectation (his bias for that country of origin)
-  // 10% JWAL base avg (anchor)
-  // + serving method adjustment
-  function analystTarget(beer,style,origin,untappdRating,defaultMethod='Bottle'){
-    const styleOffset=(jwalStyleAvg[style]||jwalGlobal)-jwalGlobal;
-    const countryOffset=(jwalCountryAvg[origin]||jwalGlobal)-jwalGlobal;
-    const methodAdj=defaultMethod==='Draft'?0.10:defaultMethod==='Nitro'?0.05:defaultMethod==='Can'?-0.10:0;
-    const target=(untappdRating*0.50)+((jwalGlobal+styleOffset)*0.25)+((jwalGlobal+countryOffset)*0.15)+(jwalGlobal*0.10)+methodAdj;
-    return Math.min(5.0,Math.max(1.0,target));
-  }
-
+  // Analyst target uses the shared predictRating() scoring formula
+  // (50% Untappd consensus · 25% style bias · 15% country bias · 10%
+  // base anchor · + serving-method nudge).
   // Pre-compute all analyst targets (cached in a Map)
   const targetCache=new Map();
   IPO_WATCHLIST.forEach(w=>{
-    targetCache.set(w.beer,analystTarget(w.beer,w.style,w.origin,w.untappd,w.method));
+    targetCache.set(w.beer,predictRating(w.style,w.origin,w.untappd,w.method));
   });
 
   const reviewed=new Set(beers.map(b=>b.beer));

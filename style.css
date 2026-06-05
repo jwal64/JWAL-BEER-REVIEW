@@ -1425,6 +1425,31 @@ canvas {
   letter-spacing: 1px;
 }
 
+/* Recommendation picks — rank badge + rationale chips */
+.rec-rank {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--bg, #0a0a12);
+  background: var(--orange);
+  padding: 0 4px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+.rec-pick .rec-why {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+.rec-chip {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: var(--dim);
+  border: 1px solid var(--border2);
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+
 /* Two-column content grid (watchlist + chart, exec + donut) */
 .bb-grid-2 {
   display: grid;
