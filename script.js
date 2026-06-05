@@ -46,16 +46,16 @@ let beers=[
   {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"Sciara",       region:"Sicily",          country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Erdinger Weißbier",style:"Wheat Beer",   origin:"DE",abv:5.3,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Feb",monthN:2,year:2026},
   // MAR 2026
-  {beer:"Estrella Galicia",style:"Lager",              origin:"ES",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Galicia",style:"Lager",              origin:"ES",abv:5.5,method:"Bottle",city:"Madrid",       region:"Madrid",          country:"Spain",       cc:"ES", rating:4.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Pilsner Urquell", style:"Pilsner",     origin:"CZ",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Wrench",         style:"IPA",       origin:"US",abv:7.1,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
+  {beer:"La Fin Du Monde",style:"Belgian Ale",             origin:"CA",abv:9.0,method:"Bottle",city:"Montreal",     region:"Quebec",          country:"Canada",      cc:"CA", rating:3.75,isNew:false,month:"Mar",monthN:3,year:2026},
   {beer:"Żywiec",         style:"Lager",                origin:"PL",abv:5.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
-  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"Stamford",region:"Connecticut",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"Venice",       region:"Veneto",          country:"Italy",       cc:"IT", rating:2.50,isNew:true, month:"Mar",monthN:3,year:2026},
+  {beer:"Estrella Damm",  style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"Barcelona",    region:"Catalonia",       country:"Spain",       cc:"ES", rating:3.50,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Grolsch Puur Weizen",style:"Wheat Beer",origin:"NL",abv:5.1,method:"Draft", city:"Oldenzaal",   region:"Overijssel",      country:"Netherlands", cc:"NL", rating:5.00,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Frisse Lentebok",   style:"Lager",      origin:"NL",abv:6.5,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.25,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Leffe Blonde",      style:"Belgian Ale",           origin:"BE",abv:6.6,method:"Draft", city:"Nijmegen",    region:"Gelderland",      country:"Netherlands", cc:"NL", rating:4.75,isNew:false,month:"Mar",monthN:3,year:2026},
@@ -67,7 +67,7 @@ let beers=[
   {beer:"Stiegl Goldbräu",  style:"Lager",               origin:"AT",abv:5.0,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Mar",monthN:3,year:2026},
   {beer:"Modelo Oro",       style:"Lager",              origin:"MX",abv:4.0,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Mar",monthN:3,year:2026},
   // APR 2026
-  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Apr",monthN:4,year:2026},
+  {beer:"Super Bock",       style:"Lager",              origin:"PT",abv:5.2,method:"Bottle",city:"Lagos",        region:"Algarve",         country:"Portugal",    cc:"PT", rating:3.00,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Estrella Jalisco",      style:"Lager",         origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"Apr",monthN:4,year:2026,logo:"https://pennbeer.com/app/uploads/2021/06/ynaOvePfbmJEMed-400x400-noPad-300x300.png"},
   {beer:"Rolling Rock Extra Pale",style:"Lager",        origin:"US",abv:4.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Apr",monthN:4,year:2026},
   {beer:"Carlsberg Elephant",style:"Lager",             origin:"DK",abv:7.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Apr",monthN:4,year:2026},
@@ -76,7 +76,7 @@ let beers=[
   // MAY 2026
   {beer:"Belhaven Scottish Stout",style:"Stout",        origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Samuel Adams Summer Ale",style:"Wheat Beer",   origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
-  {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026,logo:"https://upload.wikimedia.org/wikipedia/en/f/f7/Pacifico_Logo.png"},
+  {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"Clemson",      region:"South Carolina",  country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026,logo:"https://upload.wikimedia.org/wikipedia/en/f/f7/Pacifico_Logo.png"},
   {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Big Wave Golden Ale",style:"Pale Ale",         origin:"US",abv:4.4,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Smithwick's",     style:"Red Ale",              origin:"IE",abv:4.5,method:"Draft", city:"White Plains",region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"May",monthN:5,year:2026},
@@ -109,6 +109,12 @@ let drunkLocs=[
   {city:"Antwerp",     region:"Antwerp",              country:"Belgium",     cc:"BE", lat:51.2194,lng:4.4025},
   {city:"Boston",      region:"Massachusetts",        country:"USA",         cc:"US", lat:42.3601,lng:-71.0589},
   {city:"Stamford",    region:"Connecticut",          country:"USA",         cc:"US", lat:41.0534,lng:-73.5387},
+  {city:"Clemson",     region:"South Carolina",       country:"USA",         cc:"US", lat:34.6834,lng:-82.8374},
+  {city:"Barcelona",   region:"Catalonia",            country:"Spain",       cc:"ES", lat:41.3851,lng:2.1734},
+  {city:"Madrid",      region:"Madrid",               country:"Spain",       cc:"ES", lat:40.4168,lng:-3.7038},
+  {city:"Lagos",       region:"Algarve",              country:"Portugal",    cc:"PT", lat:37.1028,lng:-8.6736},
+  {city:"Sciara",      region:"Sicily",               country:"Italy",       cc:"IT", lat:37.9156,lng:13.9344},
+  {city:"Venice",      region:"Veneto",               country:"Italy",       cc:"IT", lat:45.4408,lng:12.3155},
 ];
 
 let breweries=[
@@ -361,7 +367,8 @@ function computeStats(){
     if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;
     if(!methodMap[b.method])methodMap[b.method]={t:0,c:0};methodMap[b.method].t+=b.rating;methodMap[b.method].c++;
     if(!countryMap[b.origin])countryMap[b.origin]={t:0,c:0};countryMap[b.origin].t+=b.rating;countryMap[b.origin].c++;
-    if(!cityMap[b.city])cityMap[b.city]={t:0,c:0,region:b.region,country:b.country,cc:b.cc};cityMap[b.city].t+=b.rating;cityMap[b.city].c++;
+    const L=CANON_LOC.get(b.beer)||b;
+    if(!cityMap[L.city])cityMap[L.city]={t:0,c:0,region:L.region,country:L.country,cc:L.cc};cityMap[L.city].t+=b.rating;cityMap[L.city].c++;
     if(!brandMap[b.beer]){brandMap[b.beer]=[];brandStats[b.beer]={best:b.rating,worst:b.rating};}
     brandMap[b.beer].push(b.rating);
     const bs=brandStats[b.beer];
@@ -418,7 +425,33 @@ function buildIndexes(){
     }
   }
 }
-function refreshStats(){ STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
+// ── Canonical location: a beer reviewed in multiple cities is attributed to its
+// rarest-visited city for AGGREGATION only (city stats, drunk map, markets count).
+// Home bases "New Rochelle"/"New York" never win when any alternative city exists.
+const HOME_CITIES=new Set(["New Rochelle","New York"]);
+function computeCanonLoc(){
+  const cityCount={},byBeer={};
+  beers.forEach(b=>{
+    cityCount[b.city]=(cityCount[b.city]||0)+1;
+    const m=byBeer[b.beer]||(byBeer[b.beer]={});
+    if(!m[b.city])m[b.city]={city:b.city,region:b.region,country:b.country,cc:b.cc};
+  });
+  const out=new Map();
+  for(const beer in byBeer){
+    const cities=Object.values(byBeer[beer]);
+    if(cities.length<2)continue; // single city → callers fall back to the review's own fields
+    const best=cities.reduce((a,c)=>{
+      const ha=HOME_CITIES.has(a.city)?1:0, hc=HOME_CITIES.has(c.city)?1:0;
+      const cmp = (hc-ha) || (cityCount[c.city]-cityCount[a.city]) ||
+                  (c.city<a.city?-1:c.city>a.city?1:0);
+      return cmp<0?c:a; // lowest [homePenalty, rawCount, cityName] wins
+    });
+    out.set(beer,best);
+  }
+  return out;
+}
+let CANON_LOC=computeCanonLoc();
+function refreshStats(){ CANON_LOC=computeCanonLoc(); STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
 let STATS=computeStats();
 buildIndexes();
 
@@ -1080,8 +1113,9 @@ function initDrunkMap(){
   // Single pass: aggregate totals, collect unique beer names, full review list, and earliest date per city
   const cM={};
   beers.forEach(b=>{
-    let e=cM[b.city];
-    if(!e){e=cM[b.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:b.region,country:b.country,cc:b.cc};}
+    const L=CANON_LOC.get(b.beer)||b;
+    let e=cM[L.city];
+    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:L.region,country:L.country,cc:L.cc};}
     e.t+=b.rating;e.c++;
     if(!e.bs.includes(b.beer))e.bs.push(b.beer);
     e.reviews.push(b);
