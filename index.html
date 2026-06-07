@@ -69,10 +69,10 @@
 <div id="menubar-wrap">
   <div id="menubar">
     <div class="mb-logo">JWAL'S</div>
-    <div class="mb-item" data-tab="overview"><span class="fkey">F1</span>OVRVW</div>
-    <div class="mb-item" data-tab="beers"><span class="fkey">F2</span>BEERS</div>
-    <div class="mb-item" data-tab="geo"><span class="fkey">F3</span>GEO</div>
-    <div class="mb-item" data-tab="maps"><span class="fkey">F4</span>MAPS</div>
+    <div class="mb-item" data-tab="maps"><span class="fkey">F1</span>MAPS</div>
+    <div class="mb-item" data-tab="overview"><span class="fkey">F2</span>OVRVW</div>
+    <div class="mb-item" data-tab="beers"><span class="fkey">F3</span>BEERS</div>
+    <div class="mb-item" data-tab="geo"><span class="fkey">F4</span>GEO</div>
     <div class="mb-item" data-tab="temporal"><span class="fkey">F5</span>TIME</div>
     <div class="mb-item" data-tab="markets"><span class="fkey">F6</span>MKTS</div>
     <div class="mb-spacer"></div>
@@ -87,33 +87,6 @@
     <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:10px;color:var(--dim);font-weight:500;letter-spacing:1px">· TERMINAL v2.7</span></div>
     <div class="hdr-sub" id="hdr-subtitle">PERSONAL BREW INTELLIGENCE SYSTEM · — REVIEWS · — MARKETS · — BRANDS</div>
   </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--green2)" id="hdr-top">—</div>
-    <div class="hdr-lbl">TOP SCORE</div>
-  </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--orange)" id="hdr-avg">—</div>
-    <div class="hdr-lbl">AVG RATING</div>
-  </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--red)" id="hdr-low">—</div>
-    <div class="hdr-lbl">LOWEST</div>
-  </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--cyan)" id="hdr-abv">—</div>
-    <div class="hdr-lbl">AVG ABV</div>
-  </div>
-  <div class="hdr-block hdr-stat">
-    <div class="hdr-val" style="color:var(--amber)" id="hdr-ctry">—</div>
-    <div class="hdr-lbl">COUNTRIES</div>
-  </div>
-</div>
-
-<!-- TICKER -->
-
-<div id="ticker-bar">
-  <div class="ticker-label">LIVE FEED</div>
-  <div id="ticker-wrap"><div id="ticker-scroll"></div></div>
 </div>
 
 <!-- BODY -->
@@ -123,12 +96,13 @@
 <!-- SIDEBAR -->
 
 <div id="sidebar">
+  <div class="nav-section-head">MAPS</div>
+  <div class="nav-item active" data-tab="maps"><span class="nav-icon">◉</span>MAPS<span class="nkey">F1</span></div>
   <div class="nav-section-head">ANALYTICS</div>
-  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F1</span></div>
-  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
+  <div class="nav-item" data-tab="overview"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F2</span></div>
+  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F3</span></div>
   <div class="nav-section-head">MARKETS</div>
-  <div class="nav-item" data-tab="geo"><span class="nav-icon">◎</span>GEOGRAPHY<span class="nkey">F3</span></div>
-  <div class="nav-item" data-tab="maps"><span class="nav-icon">◉</span>MAPS<span class="nkey">F4</span></div>
+  <div class="nav-item" data-tab="geo"><span class="nav-icon">◎</span>GEOGRAPHY<span class="nkey">F4</span></div>
   <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F5</span></div>
   <div class="nav-item" data-tab="markets"><span class="nav-icon">◆</span>MARKETS<span class="nkey">F6</span></div>
 </div>
@@ -139,7 +113,7 @@
 
 <!-- ══════════════ OVERVIEW ══════════════ -->
 
-<div id="overview" class="panel active">
+<div id="overview" class="panel">
   <div class="g5" style="margin-bottom:8px">
     <div class="kpi"><div class="kpi-val up" id="ov-top-val">—</div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top" height="24"></canvas></div></div>
     <div class="kpi"><div class="kpi-val fl" id="ov-avg-val">—</div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg" height="24"></canvas></div></div>
@@ -157,10 +131,6 @@
       <div class="bb-body"><canvas id="methodChart" height="220"></canvas></div>
     </div>
   </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">ABV vs RATING — SCATTER PLOT<span class="ph-right">r ≈ 0.12 · NO SIGNIFICANT CORRELATION</span></div>
-    <div class="bb-body"><canvas id="scatterChart" height="110"></canvas></div>
-  </div>
   <div class="g2">
     <div class="bb-panel">
       <div class="bb-panel-head">MARKET SIGNALS</div>
@@ -171,20 +141,29 @@
       <div class="bb-body" id="latestPanel"></div>
     </div>
   </div>
-  <div class="g2">
-    <div class="bb-panel">
-      <div class="bb-panel-head">STATISTICAL SUMMARY</div>
-      <div class="bb-body" id="statSummary"></div>
+  <details class="bb-collapse">
+    <summary>MORE ANALYTICS — SCATTER · STATS · TASTE PROFILE</summary>
+    <div class="collapse-panels">
+      <div class="bb-panel">
+        <div class="bb-panel-head">ABV vs RATING — SCATTER PLOT<span class="ph-right">r ≈ 0.12 · NO SIGNIFICANT CORRELATION</span></div>
+        <div class="bb-body"><canvas id="scatterChart" height="110"></canvas></div>
+      </div>
+      <div class="g2">
+        <div class="bb-panel">
+          <div class="bb-panel-head">STATISTICAL SUMMARY</div>
+          <div class="bb-body" id="statSummary"></div>
+        </div>
+        <div class="bb-panel">
+          <div class="bb-panel-head">RATING QUINTILE BREAKDOWN</div>
+          <div class="bb-body" id="quintiles"></div>
+        </div>
+      </div>
+      <div class="bb-panel">
+        <div class="bb-panel-head">TASTE PROFILE — PERSONAL BIAS INDICATORS</div>
+        <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
+      </div>
     </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">RATING QUINTILE BREAKDOWN</div>
-      <div class="bb-body" id="quintiles"></div>
-    </div>
-  </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">TASTE PROFILE — PERSONAL BIAS INDICATORS</div>
-    <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
-  </div>
+  </details>
 </div>
 
 <!-- ══════════════ ALL BEERS ══════════════ -->
@@ -263,7 +242,7 @@
 
 <!-- ══════════════ MAPS (places consumed + brewery locations) ══════════════ -->
 
-<div id="maps" class="panel">
+<div id="maps" class="panel active">
 
   <div class="subtabs" role="tablist">
     <button class="subtab active" data-subtab="drunk" role="tab" aria-selected="true">📍 PLACES CONSUMED</button>
@@ -358,41 +337,7 @@
 <div id="markets" class="panel">
 
   <section class="merged-section" data-section="markets">
-    <div class="merged-section-head">◆ MARKETS — CONTRARIAN &amp; IPO</div>
-
-    <div class="bb-panel">
-      <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
-      <div class="bb-body"><canvas id="contrarianChart" height="220"></canvas></div>
-    </div>
-
-    <div class="bb-grid-2" style="margin-bottom:8px">
-      <div class="bb-panel">
-        <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
-        <div class="bb-body">
-          <div style="overflow-x:auto">
-            <table class="bb-table ipo-watch" id="ipoWatchTable">
-              <thead><tr>
-                <th style="width:36px"></th>
-                <th>BEER / STYLE</th>
-                <th>ORIGIN</th>
-                <th>ABV</th>
-                <th style="color:#bb44ff">UNTAPPD</th>
-                <th style="color:#00aaff">JWAL TGT</th>
-                <th>UPSIDE</th>
-                <th>SIGNAL</th>
-              </tr></thead>
-              <tbody id="ipoWatchBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="bb-panel">
-        <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
-        <div class="bb-body" style="height:220px">
-          <canvas id="ipoUpsideChart"></canvas>
-        </div>
-      </div>
-    </div>
+    <div class="merged-section-head">◆ MARKETS</div>
 
     <div class="bb-panel" style="margin-bottom:8px">
       <div class="bb-panel-head">◈ RECOMMENDATIONS — WHAT TO DRINK NEXT <span class="ph-right" id="rec-count">—</span></div>
@@ -400,6 +345,45 @@
         <div class="ipo-top-picks" id="recPicks"></div>
       </div>
     </div>
+
+    <details class="bb-collapse" style="margin-bottom:8px">
+      <summary>CONTRARIAN &amp; IPO ANALYTICS — JWAL vs THE WORLD · WATCHLIST · UPSIDE</summary>
+      <div class="collapse-panels">
+        <div class="bb-panel">
+          <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
+          <div class="bb-body"><canvas id="contrarianChart" height="220"></canvas></div>
+        </div>
+
+        <div class="bb-grid-2">
+          <div class="bb-panel">
+            <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+            <div class="bb-body">
+              <div style="overflow-x:auto">
+                <table class="bb-table ipo-watch" id="ipoWatchTable">
+                  <thead><tr>
+                    <th style="width:36px"></th>
+                    <th>BEER / STYLE</th>
+                    <th>ORIGIN</th>
+                    <th>ABV</th>
+                    <th style="color:#bb44ff">UNTAPPD</th>
+                    <th style="color:#00aaff">JWAL TGT</th>
+                    <th>UPSIDE</th>
+                    <th>SIGNAL</th>
+                  </tr></thead>
+                  <tbody id="ipoWatchBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="bb-panel">
+            <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
+            <div class="bb-body" style="height:220px">
+              <canvas id="ipoUpsideChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
 
     <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
       <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
