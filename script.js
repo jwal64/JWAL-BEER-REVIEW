@@ -659,8 +659,10 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   setInterval(updateClock,1000);
   updateClock();
 
-  // TICKER
+  // TICKER (element removed from layout; guarded so this no-ops cleanly)
   try {
+    const tickerEl=document.getElementById('ticker-scroll');
+    if(!tickerEl) return;
     const beerMap={};
     beers.forEach(b=>{if(!beerMap[b.beer]||b.rating>beerMap[b.beer].rating)beerMap[b.beer]=b;});
     const tickerBeers=Object.values(beerMap).sort(()=>Math.random()-0.5);
@@ -676,15 +678,15 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
         + `</span>`;
     }).join(SEP);
     tk = SEP + tk + SEP + tk;
-    document.getElementById('ticker-scroll').innerHTML=tk;
+    tickerEl.innerHTML=tk;
   } catch(e){ console.error('Ticker error:',e); }
 })();
 
 // ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'beers','3':'geo','4':'maps','5':'temporal','6':'markets',
-    'f1':'overview','f2':'beers','f3':'geo','f4':'maps','f5':'temporal','f6':'markets'
+    '1':'maps','2':'overview','3':'beers','4':'geo','5':'temporal','6':'markets',
+    'f1':'maps','f2':'overview','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -729,6 +731,9 @@ function showTab(id,btn){
     markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO], ['_recD',drawRecommendations]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
+  // Overview charts are created at top level on load; when maps is the default
+  // tab they're built hidden, so resize them whenever a panel becomes visible.
+  resizeChartsIn(document.getElementById(id));
   if(id==='maps'){
     const active=document.querySelector('#maps .subpanel.active');
     if(active&&active.id==='subpanel-drunk'&&_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
@@ -773,6 +778,15 @@ function safeChart(key,ctx,cfg){
   if(_charts[key]) _charts[key].destroy();
   _charts[key]=new Chart(ctx,cfg);
   return _charts[key];
+}
+// Charts built while their container is display:none size to 0px. Call this once
+// the container becomes visible (tab shown / collapse opened) to fix their layout.
+function resizeChartsIn(el){
+  if(!el) return;
+  el.querySelectorAll('canvas').forEach(cv=>{
+    const ch=Object.values(_charts).find(c=>c&&c.canvas===cv);
+    if(ch) ch.resize();
+  });
 }
 const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
 
@@ -1817,10 +1831,10 @@ function toggleScanlines(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
-    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
-    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F3'},
-    {id:'maps',label:'MAPS',icon:'◉',key:'F4'},
+    {id:'maps',label:'MAPS',icon:'◉',key:'F1'},
+    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F2'},
+    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F3'},
+    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
     {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
   ];
@@ -2116,4 +2130,17 @@ try {
     else if (item.dataset.action === 'brewery') { openBreweryDrawer(item.dataset.brewery); closePalette(); }
     else if (item.dataset.action === 'tab') { showTab(item.dataset.tab); closePalette(); }
   });
+
+  // Collapsed analytics sections render their charts at zero size while hidden;
+  // resize them the first time the section is expanded. `toggle` doesn't bubble,
+  // so listen in the capture phase.
+  document.addEventListener('toggle', function(e) {
+    const d = e.target;
+    if (!d || d.tagName !== 'DETAILS' || !d.open || !d.classList.contains('bb-collapse')) return;
+    resizeChartsIn(d);
+  }, true);
+
+  // Maps is the default landing tab; trigger its lazy renderer so the map
+  // initializes on load (overview charts already render at top level).
+  showTab('maps');
 } catch(e) { console.error('Event delegation setup error:', e); }

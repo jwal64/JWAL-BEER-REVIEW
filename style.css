@@ -1486,6 +1486,12 @@ canvas {
 }
 .bb-collapse > summary::-webkit-details-marker { display: none; }
 .bb-collapse > summary::marker { content: ''; }
+.bb-collapse > summary::before {
+  content: '▸';
+  color: var(--orange);
+  font-size: 10px;
+}
+.bb-collapse[open] > summary::before { content: '▾'; }
 .bb-collapse[open] > summary {
   border-bottom: 1px solid var(--border2);
   background: rgba(255, 102, 0, 0.04);
@@ -1497,4 +1503,12 @@ canvas {
   color: var(--dim);
   line-height: 1.8;
 }
+/* Full panels nested inside a collapsible section (vs. the small text body) */
+.bb-collapse > .collapse-panels {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bb-collapse > .collapse-panels > * { margin-bottom: 0; }
 
