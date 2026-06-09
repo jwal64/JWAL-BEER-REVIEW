@@ -492,11 +492,6 @@ function updateLiveStats(){
   // Header bar
   const sub = document.getElementById('hdr-subtitle');
   if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
-  set('hdr-top',   topBeer.rating.toFixed(2));
-  set('hdr-avg',   avgRating.toFixed(2));
-  set('hdr-low',   lowBeer.rating.toFixed(2));
-  set('hdr-abv',   avgAbv.toFixed(1)+'%');
-  set('hdr-ctry',  totalCtry);
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
@@ -637,49 +632,21 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 })();
 
 // ══════════════════════════════════════════════════════════════
-// CLOCK & TICKER — isolated first, cannot be killed by downstream errors
+// CLOCK — isolated first, cannot be killed by downstream errors
 // ══════════════════════════════════════════════════════════════
-(function initClockAndTicker(){
-  // CLOCK — cache DOM refs once so the 1-Hz tick isn't 4 getElementById lookups/sec
-  const clockTimeEl=document.getElementById('clock-time');
-  const clockDateEl=document.getElementById('clock-date');
+(function initClock(){
+  // Cache DOM refs once so the 1-Hz tick isn't getElementById lookups/sec
   const mbClockEl=document.getElementById('mb-clock');
   const sbTimeEl=document.getElementById('sb-time');
   function updateClock(){
     try {
-      const n=new Date();
-      const t=n.toLocaleTimeString('en-US',{hour12:false});
-      const d=n.toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-      if(clockTimeEl) clockTimeEl.textContent=t;
-      if(clockDateEl) clockDateEl.textContent=d;
+      const t=new Date().toLocaleTimeString('en-US',{hour12:false});
       if(mbClockEl) mbClockEl.textContent=t;
       if(sbTimeEl) sbTimeEl.textContent=t;
     } catch(e){ /* never let clock throw */ }
   }
   setInterval(updateClock,1000);
   updateClock();
-
-  // TICKER (element removed from layout; guarded so this no-ops cleanly)
-  try {
-    const tickerEl=document.getElementById('ticker-scroll');
-    if(!tickerEl) return;
-    const beerMap={};
-    beers.forEach(b=>{if(!beerMap[b.beer]||b.rating>beerMap[b.beer].rating)beerMap[b.beer]=b;});
-    const tickerBeers=Object.values(beerMap).sort(()=>Math.random()-0.5);
-    const SEP='<span style="color:#333;margin:0 20px;font-size:10px">◆</span>';
-    let tk=tickerBeers.map(b=>{
-      const arr=b.rating>=4?'▲':b.rating>=3?'▶':'▼';
-      const cl=b.rating>=4?'up':b.rating>=3?'fl':'dn';
-      const flag=FLAGS[b.origin]||'';
-      return `<span style="display:inline-block;white-space:nowrap;unicode-bidi:isolate">`
-        + `<span style="margin-right:5px;font-size:11px">${flag}</span>`
-        + `<span class="${cl}" style="letter-spacing:0.3px">${b.beer.toUpperCase()} ${arr} ${b.rating.toFixed(2)}</span>`
-        + `<span style="color:#555;margin-left:8px;font-size:9px">${b.abv}% ABV · ${b.origin}</span>`
-        + `</span>`;
-    }).join(SEP);
-    tk = SEP + tk + SEP + tk;
-    tickerEl.innerHTML=tk;
-  } catch(e){ console.error('Ticker error:',e); }
 })();
 
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
@@ -851,23 +818,6 @@ document.getElementById('latestPanel').innerHTML=`
   <div class="insight-row"><span class="insight-key">COVERAGE</span><div><div class="insight-val">${Object.keys(STATS.countryMap).length} countries</div><div class="insight-sub">${Object.keys(STATS.cityMap).length} markets</div></div></div>
   <div class="insight-row"><span class="insight-key">HIT RATE</span><div><div class="insight-val ${hitRate>=60?'up':hitRate>=40?'fl':'dn'}">${hitRate>=60?'▲ ':''}${hitRate}%</div><div class="insight-sub">Rated ≥3.00</div></div></div>`;
 } catch(e){ console.error('Overview init error:',e); }
-
-// ── STREAK / RECENCY
-try {
-  const monthMap={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const latest=beers.reduce((best,b)=>{
-    const d=new Date(b.year,monthMap[b.month]||0,1);
-    return d>best.d?{d,b}:best;
-  },{d:new Date(0),b:null});
-  if(latest.b){
-    const today=new Date();
-    const diffDays=Math.floor((today-latest.d)/(1000*60*60*24));
-    const el=document.getElementById('streak-days');
-    const bl=document.getElementById('streak-beer');
-    if(el) el.textContent=diffDays;
-    if(bl) bl.textContent=latest.b.month+' '+latest.b.year;
-  }
-} catch(e){ console.error('Streak error:',e); }
 
 // Insights panels (stat summary / quintiles / taste profile) now live on the
 // Overview tab, which renders eagerly at load — so draw them up front too.
@@ -1823,26 +1773,6 @@ function drawIPO(){
   } catch(e){ console.error('IPO error:',e); }
 }
 
-
-// ══════════════════════════════════════════════════════════════
-// SCANLINE TOGGLE
-// ══════════════════════════════════════════════════════════════
-function toggleScanlines(){
-  document.body.classList.toggle('no-scanlines');
-  const on=!document.body.classList.contains('no-scanlines');
-  const el=document.getElementById('scanline-status'); if(el) el.textContent=on?'ON':'OFF';
-  try{localStorage.setItem('brewScanlines',on?'1':'0');}catch(e){}
-}
-(function(){
-  try{
-    if(localStorage.getItem('brewScanlines')==='0'){
-      document.body.classList.add('no-scanlines');
-      const el=document.getElementById('scanline-status');
-      if(el) el.textContent='OFF';
-    }
-  }catch(e){}
-})();
-
 // ══════════════════════════════════════════════════════════════
 // COMMAND PALETTE (Ctrl+K / Cmd+K)
 // ══════════════════════════════════════════════════════════════
@@ -2074,9 +2004,6 @@ window.closeBreweryDrawer=closeBreweryDrawer;
     animate('ov-low-val',lowBeer.rating,2);
     animate('ov-abv-val',avgAbv,1,'%');
     animate('ov-brands-val',totalBrands,0);
-    animate('hdr-top',topBeer.rating,2);
-    animate('hdr-avg',STATS.globalAvg,2);
-    animate('hdr-low',lowBeer.rating,2);
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();
 
@@ -2117,9 +2044,6 @@ try {
 
   // Brewery drawer — close button
   document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
-
-  // Scanline toggle
-  {const _st=document.getElementById('scanline-toggle'); if(_st) _st.addEventListener('click', toggleScanlines);}
 
   // Beer table rows (+ "clear filters" button in the empty-state row)
   document.getElementById('beerBody').addEventListener('click', function(e) {
