@@ -947,15 +947,25 @@ function openBeerModal(name){
   _modalPrevFocus=document.activeElement;
   const bm=document.getElementById('beerModal');
   bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
-  const cb=document.getElementById('beerModalClose'); if(cb) cb.focus();
+  // Focus after the visibility transition's first frame: focus() on an
+  // element whose computed visibility is still 'hidden' is silently ignored.
+  const cb=document.getElementById('beerModalClose');
+  if(cb) requestAnimationFrame(()=>requestAnimationFrame(()=>cb.focus()));
 }
 let _modalPrevFocus=null;
 function closeBeerModal(){
   const bm=document.getElementById('beerModal');
   if(!bm.classList.contains('open')) return;
   bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
-  if(_modalPrevFocus&&document.contains(_modalPrevFocus)) _modalPrevFocus.focus();
+  restoreFocus(_modalPrevFocus,bm);
   _modalPrevFocus=null;
+}
+// Return focus to where it was before an overlay opened. If the opener wasn't
+// focusable (e.g. a table-row click leaves focus on <body>), at least blur
+// anything still focused inside the now-hidden overlay.
+function restoreFocus(prev,overlay){
+  if(prev&&prev!==document.body&&document.contains(prev)) prev.focus();
+  else if(overlay.contains(document.activeElement)) document.activeElement.blur();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1803,14 +1813,16 @@ function drawIPO(){
     prevFocus=document.activeElement;
     inp.value='';
     pal.classList.add('open');
-    inp.focus();
+    // Focus after the visibility transition's first frame: focus() on an
+    // input whose computed visibility is still 'hidden' is silently ignored.
+    requestAnimationFrame(()=>requestAnimationFrame(()=>inp.focus()));
     renderResults('');
   }
   function closePalette(){
     const pal=document.getElementById('cmd-palette');
     if(!pal||!pal.classList.contains('open')) return;
     pal.classList.remove('open');
-    if(prevFocus&&document.contains(prevFocus)) prevFocus.focus();
+    restoreFocus(prevFocus,pal);
     prevFocus=null;
   }
 
@@ -1950,7 +1962,7 @@ function closeBreweryDrawer(){
   const drawer=document.getElementById('brewery-drawer');
   if(!drawer||!drawer.classList.contains('open')) return;
   drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');
-  if(_drawerPrevFocus&&document.contains(_drawerPrevFocus)) _drawerPrevFocus.focus();
+  restoreFocus(_drawerPrevFocus,drawer);
   _drawerPrevFocus=null;
 }
 
