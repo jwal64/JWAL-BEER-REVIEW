@@ -692,6 +692,10 @@ function showTab(id,btn){
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     NAV_ITEMS.find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
+  // Deep-linkable tabs: reflect the active tab in the URL without polluting
+  // history (replaceState never fires hashchange, so no feedback loop).
+  // Throws on file:// in some browsers — degrade silently.
+  try{history.replaceState(null,'','#'+id);}catch(e){}
   const renderers = {
     geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
@@ -2089,8 +2093,16 @@ try {
     resizeChartsIn(d);
   }, true);
 
-  // Overview is the default landing tab; its charts render eagerly at top
-  // level, while the Leaflet maps stay lazy until the MAPS tab (F2) is opened —
-  // no tile fetches or map init on first paint.
-  showTab('overview');
+  // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
+  // Overview. Its charts render eagerly at top level, while the Leaflet maps
+  // stay lazy until the MAPS tab (F2) first becomes visible.
+  const validTab = h => TAB_PANELS.some(p => p.id === h);
+  const bootHash = location.hash.slice(1);
+  showTab(validTab(bootHash) ? bootHash : 'overview');
+
+  // Manually edited hashes / external links into an open page
+  window.addEventListener('hashchange', function() {
+    const h = location.hash.slice(1);
+    if (validTab(h) && !document.getElementById(h).classList.contains('active')) showTab(h);
+  });
 } catch(e) { console.error('Event delegation setup error:', e); }
