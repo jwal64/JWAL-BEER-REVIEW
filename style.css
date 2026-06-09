@@ -52,7 +52,7 @@ image-rendering: auto;
 text-size-adjust: 100%;
 touch-action: manipulation;
 }
-button, .mb-item, .nav-item, .subtab, .ipo-subnav-pill, .cmd-item, .beer-card,
+button, .mb-item, .nav-item, .subtab, .cmd-item, .beer-card,
 .bb-select, input, select { -webkit-tap-highlight-color: rgba(255,102,0,0.22); }
 
 /* Visible focus ring for keyboard navigation (mouse clicks stay clean) */
@@ -101,34 +101,13 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
   .kpi:hover,
   .beer-card:hover,
   .subtab:hover,
-  .ipo-subnav-pill:hover,
   .ipo-top-pick:hover,
-  .hdr-stat:hover,
   .bb-table tbody tr:hover,
   .bb-collapse > summary:hover { background: initial; box-shadow: none; }
   .beer-card:hover { transform: none; }
   .beer-card:hover .bc-logo { filter: brightness(1.1) contrast(1.05); }
   .nav-item:hover { padding-left: 6px; color: #aaa; }
 }
-
-/* Scanline overlay — ticker bar only */
-#ticker-bar::after {
-content: '';
-position: absolute;
-inset: 0;
-pointer-events: none;
-z-index: 4;
-background: repeating-linear-gradient(
-0deg,
-transparent,
-transparent 1px,
-rgba(0,0,0,0.35) 1px,
-rgba(0,0,0,0.35) 2px
-);
-opacity: 1;
-transition: opacity 0.3s ease;
-}
-body.no-scanlines #ticker-bar::after { opacity: 0; }
 
 /* ═══════════════════════════════════════════
 TOP MENU BAR — Bloomberg-style function keys
@@ -233,111 +212,6 @@ margin-top: 3px;
 font-family: var(--sans);
 font-weight: 500;
 }
-.hdr-stat {
-text-align: center;
-min-width: 82px;
-position: relative;
-transition: background 0.15s ease;
-}
-.hdr-stat::before {
-content: '';
-position: absolute;
-top: 0;
-left: 6px;
-right: 6px;
-height: 2px;
-border-radius: 0 0 1px 1px;
-}
-.hdr-stat:nth-child(2)::before { background: var(--green2); box-shadow: 0 0 6px rgba(0,255,85,0.3); }
-.hdr-stat:nth-child(3)::before { background: var(--orange); box-shadow: 0 0 6px rgba(255,102,0,0.3); }
-.hdr-stat:nth-child(4)::before { background: var(--red); box-shadow: 0 0 6px rgba(255,34,34,0.3); }
-.hdr-stat:nth-child(5)::before { background: var(--cyan); box-shadow: 0 0 6px rgba(0,170,255,0.3); }
-.hdr-stat:nth-child(6)::before { background: var(--amber); box-shadow: 0 0 6px rgba(255,170,0,0.3); }
-.hdr-stat:nth-child(7)::before { background: var(--cyan); box-shadow: 0 0 6px rgba(0,170,255,0.3); }
-.hdr-stat:hover { background: rgba(255,255,255,0.02); }
-.hdr-val {
-font-size: 14px;
-font-weight: 700;
-font-family: var(--mono);
-line-height: 1;
-letter-spacing: 0.5px;
-}
-.hdr-lbl {
-font-size: 7px;
-color: var(--dim);
-letter-spacing: 1.2px;
-text-transform: uppercase;
-margin-top: 2px;
-font-family: var(--sans);
-font-weight: 500;
-}
-#clock-block {
-padding: 0 16px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-text-align: right;
-min-width: 150px;
-border-left: 1px solid var(--border);
-}
-#clock-time {
-font-size: 18px;
-font-weight: 700;
-color: var(--green);
-letter-spacing: 1.5px;
-font-family: var(--mono);
-text-shadow: 0 0 10px rgba(0,204,68,0.25);
-}
-#clock-date {
-font-size: 8px;
-color: var(--dim);
-letter-spacing: 1.2px;
-margin-top: 3px;
-font-family: var(--sans);
-font-weight: 500;
-}
-
-/* ═══════════════════════════════════════════
-TICKER
-═══════════════════════════════════════════ */
-#ticker-bar {
-background: rgba(0, 0, 0, 0.85);
-backdrop-filter: blur(8px);
--webkit-backdrop-filter: blur(8px);
-border-bottom: 1px solid var(--border);
-height: 18px;
-overflow: hidden;
-white-space: nowrap;
-display: flex;
-align-items: center;
-position: relative;
-}
-#ticker-wrap {
-flex: 1;
-overflow: hidden;
-height: 100%;
-display: flex;
-align-items: center;
-}
-.ticker-label {
-background: var(--orange);
-color: #000;
-font-size: 8px;
-font-weight: 700;
-padding: 0 8px;
-height: 100%;
-display: flex;
-align-items: center;
-letter-spacing: 1.5px;
-flex-shrink: 0;
-border-right: 2px solid #000;
-z-index: 2;
-position: relative;
-font-family: var(--sans);
-}
-#ticker-scroll { display: inline-block; white-space: nowrap; animation: ticker 120s linear infinite; padding-left: 20px; will-change: transform; }
-#ticker-scroll span { font-size: 10px; margin: 0 22px; letter-spacing: 0.3px; white-space: nowrap; }
-@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* ═══════════════════════════════════════════
 LAYOUT
@@ -762,20 +636,6 @@ z-index: 100;
 .hdr-title { font-size: 13px; letter-spacing: 0.6px; }
 .hdr-title span { display: none; }
 .hdr-sub { font-size: 8px; letter-spacing: 1.2px; margin-top: 2px; }
-.hdr-block.hdr-stat {
-  min-width: 0;
-  padding: 3px 4px;
-  border-right: 1px solid var(--border);
-  flex: 1 1 calc(20% - 4px);
-  text-align: center;
-}
-.hdr-block.hdr-stat:nth-child(5n+1) { padding-left: 2px; }
-.hdr-block.hdr-stat:nth-child(5n) { border-right: none; }
-.hdr-block.hdr-stat::before { left: 4px; right: 4px; height: 2px; }
-.hdr-val { font-size: 12px; letter-spacing: 0.3px; line-height: 1; }
-.hdr-lbl { font-size: 7px; letter-spacing: 0.6px; margin-top: 2px; }
-#clock-block { display: none; }
-
 /* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile.
    The wrapper holds the sticky+gradient so the right-edge fade stays pinned to
    the visible viewport instead of sliding with the scrolled content. */
@@ -929,11 +789,6 @@ body { overscroll-behavior: none; }
 .subtabs { flex-wrap: wrap; }
 .subtab { font-size: 10px; padding: 10px 14px; letter-spacing: 1px; min-height: 44px; flex: 1; }
 
-/* TICKER — slightly larger so it's actually readable */
-#ticker-bar { height: 22px; }
-#ticker-scroll span { font-size: 9px; margin: 0 14px; }
-.ticker-label { font-size: 8px; padding: 0 10px; }
-
 /* MAPS — shorter on phones, full-bleed look */
 #drunkMap, #brewedMap { height: 360px; }
 .map-leg { gap: 8px; }
@@ -988,13 +843,8 @@ select {
 }
 #beerFilterCount { flex: 1 1 100%; }
 
-/* IPO/MARKETS sub-nav — wraps + bigger tap targets */
-.ipo-subnav { flex-wrap: wrap; gap: 4px; padding: 6px; }
-.ipo-subnav-pill { font-size: 10px; padding: 8px 12px; min-height: 36px; }
+/* IPO/MARKETS top picks — full-width cards on mobile */
 .ipo-top-pick { flex: 0 0 75vw; }
-
-/* Reduce scanline opacity on mobile for clarity */
-#ticker-bar::after { opacity: 0.5; }
 
 /* Charts — give them a sensible height on mobile */
 canvas#styleChart, canvas#methodChart, canvas#countryChart,
@@ -1007,11 +857,6 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
 
 /* iPhone Pro / narrow phones — extra polish below 430px */
 @media (max-width: 430px) {
-  .hdr-block.hdr-stat { flex: 1 1 calc(33.333% - 4px); padding: 2px 3px; }
-  .hdr-block.hdr-stat:nth-child(5n) { border-right: 1px solid var(--border); }
-  .hdr-block.hdr-stat:nth-child(3n) { border-right: none; }
-  .hdr-val { font-size: 12px; }
-  .hdr-lbl { font-size: 7px; }
   .g2, .g4 { grid-template-columns: 1fr; }
   .beer-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .beer-card { padding: 8px; min-height: 130px; }
@@ -1024,7 +869,6 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
 /* Very small / iPhone SE — keep it usable */
 @media (max-width: 360px) {
   .hdr-title { font-size: 12px; }
-  .hdr-val { font-size: 11px; }
   .kpi-val { font-size: 14px; }
   .mb-item { padding: 0 8px; min-width: 44px; }
 }
@@ -1355,42 +1199,6 @@ canvas {
    IPO / FT TAB REDESIGN
    ═══════════════════════════════════════════ */
 
-/* Sticky sub-nav pills under the banner */
-.ipo-subnav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  margin-bottom: 8px;
-  background: var(--panel);
-  border: 1px solid var(--border2);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-.ipo-subnav-pill {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 1px;
-  padding: 4px 10px;
-  border: 1px solid var(--border2);
-  color: var(--orange);
-  text-decoration: none;
-  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-.ipo-subnav-pill:hover {
-  background: rgba(255, 102, 0, 0.08);
-  border-color: var(--orange);
-  box-shadow: 0 0 8px var(--orange-glow);
-}
-.ipo-subnav-right {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 1px;
-  color: var(--dim);
-  text-transform: uppercase;
-}
 
 /* IPO KPI strip */
 .ipo-kpi-strip {
@@ -1497,7 +1305,6 @@ canvas {
 }
 @media (max-width: 900px) {
   .bb-grid-2 { grid-template-columns: 1fr; }
-  .ipo-subnav-right { display: none; }
 }
 
 /* Watchlist row left-border stripe (set via inline style per signal color) */
