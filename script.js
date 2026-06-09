@@ -327,14 +327,14 @@ function logoImg(name,size=24){
   if(!sources.length)return emojiSpan;
   const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
   const onerr=logoChainOnError(sources,emojiReplace);
-  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
+  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
 function cardLogo(name){
   const sources=logoSources(name);
   if(!sources.length)return `<span class="bc-emoji">🍺</span>`;
   const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));`;
   const onerr=logoChainOnError(sources,emojiReplace);
-  return `<img src="${sources[0]}" class="bc-logo" alt="${name}"${onerr}>`;
+  return `<img src="${sources[0]}" class="bc-logo" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -492,11 +492,6 @@ function updateLiveStats(){
   // Header bar
   const sub = document.getElementById('hdr-subtitle');
   if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
-  set('hdr-top',   topBeer.rating.toFixed(2));
-  set('hdr-avg',   avgRating.toFixed(2));
-  set('hdr-low',   lowBeer.rating.toFixed(2));
-  set('hdr-abv',   avgAbv.toFixed(1)+'%');
-  set('hdr-ctry',  totalCtry);
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
@@ -637,60 +632,32 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 })();
 
 // ══════════════════════════════════════════════════════════════
-// CLOCK & TICKER — isolated first, cannot be killed by downstream errors
+// CLOCK — isolated first, cannot be killed by downstream errors
 // ══════════════════════════════════════════════════════════════
-(function initClockAndTicker(){
-  // CLOCK — cache DOM refs once so the 1-Hz tick isn't 4 getElementById lookups/sec
-  const clockTimeEl=document.getElementById('clock-time');
-  const clockDateEl=document.getElementById('clock-date');
+(function initClock(){
+  // Cache DOM refs once so the 1-Hz tick isn't getElementById lookups/sec
   const mbClockEl=document.getElementById('mb-clock');
   const sbTimeEl=document.getElementById('sb-time');
   function updateClock(){
     try {
-      const n=new Date();
-      const t=n.toLocaleTimeString('en-US',{hour12:false});
-      const d=n.toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-      if(clockTimeEl) clockTimeEl.textContent=t;
-      if(clockDateEl) clockDateEl.textContent=d;
+      const t=new Date().toLocaleTimeString('en-US',{hour12:false});
       if(mbClockEl) mbClockEl.textContent=t;
       if(sbTimeEl) sbTimeEl.textContent=t;
     } catch(e){ /* never let clock throw */ }
   }
   setInterval(updateClock,1000);
   updateClock();
-
-  // TICKER (element removed from layout; guarded so this no-ops cleanly)
-  try {
-    const tickerEl=document.getElementById('ticker-scroll');
-    if(!tickerEl) return;
-    const beerMap={};
-    beers.forEach(b=>{if(!beerMap[b.beer]||b.rating>beerMap[b.beer].rating)beerMap[b.beer]=b;});
-    const tickerBeers=Object.values(beerMap).sort(()=>Math.random()-0.5);
-    const SEP='<span style="color:#333;margin:0 20px;font-size:10px">◆</span>';
-    let tk=tickerBeers.map(b=>{
-      const arr=b.rating>=4?'▲':b.rating>=3?'▶':'▼';
-      const cl=b.rating>=4?'up':b.rating>=3?'fl':'dn';
-      const flag=FLAGS[b.origin]||'';
-      return `<span style="display:inline-block;white-space:nowrap;unicode-bidi:isolate">`
-        + `<span style="margin-right:5px;font-size:11px">${flag}</span>`
-        + `<span class="${cl}" style="letter-spacing:0.3px">${b.beer.toUpperCase()} ${arr} ${b.rating.toFixed(2)}</span>`
-        + `<span style="color:#555;margin-left:8px;font-size:9px">${b.abv}% ABV · ${b.origin}</span>`
-        + `</span>`;
-    }).join(SEP);
-    tk = SEP + tk + SEP + tk;
-    tickerEl.innerHTML=tk;
-  } catch(e){ console.error('Ticker error:',e); }
 })();
 
-// ── KEYBOARD SHORTCUTS (1-9, 0, q-r, F1-F10 for tabs; Esc for modal)
+// ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'maps','2':'overview','3':'beers','4':'geo','5':'temporal','6':'markets',
-    'f1':'maps','f2':'overview','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'overview','2':'maps','3':'beers','4':'geo','5':'temporal','6':'markets',
+    'f1':'overview','f2':'maps','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
-    if(ev.key==='Escape'){closeBeerModal();return;}
+    if(ev.key==='Escape'){closeBeerModal();closeBreweryDrawer();return;}
     const tab=tabMap[ev.key.toLowerCase()];
     if(tab&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ev.preventDefault();showTab(tab);}
   });
@@ -710,18 +677,25 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
     });
   }catch(e){}
 })();
+// Tab navigation is static after load — query once instead of on every switch.
+const TAB_PANELS=[...document.querySelectorAll('.panel')];
+const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
+const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
 function showTab(id,btn){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
-  document.querySelectorAll('.mb-item').forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
-  document.getElementById(id).classList.add('active');
+  TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
+  NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
+  MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
   // Sync menubar
-  const mbEl=document.querySelector(`.mb-item[data-tab="${id}"]`);
+  const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
   if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
   // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
-    [...document.querySelectorAll('.nav-item')].find(n=>n.dataset.tab===id);
+    NAV_ITEMS.find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
+  // Deep-linkable tabs: reflect the active tab in the URL without polluting
+  // history (replaceState never fires hashchange, so no feedback loop).
+  // Throws on file:// in some browsers — degrade silently.
+  try{history.replaceState(null,'','#'+id);}catch(e){}
   const renderers = {
     geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
@@ -731,8 +705,8 @@ function showTab(id,btn){
     markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO], ['_recD',drawRecommendations]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
-  // Overview charts are created at top level on load; when maps is the default
-  // tab they're built hidden, so resize them whenever a panel becomes visible.
+  // Charts built while their panel was hidden sized to 0px — fix them whenever
+  // a panel becomes visible.
   resizeChartsIn(document.getElementById(id));
   if(id==='maps'){
     const active=document.querySelector('#maps .subpanel.active');
@@ -741,7 +715,7 @@ function showTab(id,btn){
   }
 }
 
-// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F5)
+// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F2)
 function showMapSubtab(name){
   document.querySelectorAll('#maps .subtab').forEach(b=>{
     const on=b.dataset.subtab===name;
@@ -771,6 +745,8 @@ try {
   Chart.defaults.elements.line.borderWidth=2;
   Chart.defaults.elements.bar.borderWidth=0;
   Chart.defaults.animation.duration=400;
+  // Respect OS-level reduced-motion preference
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation=false;
 } catch(e){ console.error('Chart.defaults error:',e); }
 const _charts={};
 function safeChart(key,ctx,cfg){
@@ -783,10 +759,9 @@ function safeChart(key,ctx,cfg){
 // the container becomes visible (tab shown / collapse opened) to fix their layout.
 function resizeChartsIn(el){
   if(!el) return;
-  el.querySelectorAll('canvas').forEach(cv=>{
-    const ch=Object.values(_charts).find(c=>c&&c.canvas===cv);
-    if(ch) ch.resize();
-  });
+  for(const ch of Object.values(_charts)){
+    if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
+  }
 }
 const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
 
@@ -848,23 +823,6 @@ document.getElementById('latestPanel').innerHTML=`
   <div class="insight-row"><span class="insight-key">HIT RATE</span><div><div class="insight-val ${hitRate>=60?'up':hitRate>=40?'fl':'dn'}">${hitRate>=60?'▲ ':''}${hitRate}%</div><div class="insight-sub">Rated ≥3.00</div></div></div>`;
 } catch(e){ console.error('Overview init error:',e); }
 
-// ── STREAK / RECENCY
-try {
-  const monthMap={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const latest=beers.reduce((best,b)=>{
-    const d=new Date(b.year,monthMap[b.month]||0,1);
-    return d>best.d?{d,b}:best;
-  },{d:new Date(0),b:null});
-  if(latest.b){
-    const today=new Date();
-    const diffDays=Math.floor((today-latest.d)/(1000*60*60*24));
-    const el=document.getElementById('streak-days');
-    const bl=document.getElementById('streak-beer');
-    if(el) el.textContent=diffDays;
-    if(bl) bl.textContent=latest.b.month+' '+latest.b.year;
-  }
-} catch(e){ console.error('Streak error:',e); }
-
 // Insights panels (stat summary / quintiles / taste profile) now live on the
 // Overview tab, which renders eagerly at load — so draw them up front too.
 try { drawInsights(); } catch(e){ console.error('Insights init error:',e); }
@@ -876,6 +834,12 @@ function renderTable(data){
   try {
     const countEl=document.getElementById('beerFilterCount');
     if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
+    if(!data.length){
+      document.getElementById('beerBody').innerHTML=
+        `<tr><td colspan="9" class="bb-empty">NO BEERS MATCH YOUR FILTERS
+          <button type="button" id="beerFilterReset">CLEAR FILTERS</button></td></tr>`;
+      return;
+    }
     document.getElementById('beerBody').innerHTML=data.map(b=>`
       <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
         <td>${logoImg(b.beer,22)}</td>
@@ -895,16 +859,22 @@ function applyBeerFilter(){
   const st=document.getElementById('beerStyleFilter').value;
   const or=document.getElementById('beerOriginFilter').value;
   const sk=document.getElementById('beerSortSel').value;
-  let data=[...beers];
-  if(q) data=data.filter(b=>b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||b.country.toLowerCase().includes(q)||b.city.toLowerCase().includes(q));
-  if(st) data=data.filter(b=>b.style===st);
-  if(or) data=data.filter(b=>b.origin===or);
+  // Single pass: combine search + style + origin into one predicate
+  const data=beers.filter(b=>
+    (!st||b.style===st)&&
+    (!or||b.origin===or)&&
+    (!q||b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||b.country.toLowerCase().includes(q)||b.city.toLowerCase().includes(q)));
   data.sort((a,b)=>sk==='rating'?b.rating-a.rating:sk==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv);
   renderTable(data);
 }
+function resetBeerFilter(){
+  document.getElementById('beerSearch').value='';
+  document.getElementById('beerStyleFilter').value='';
+  document.getElementById('beerOriginFilter').value='';
+  applyBeerFilter();
+}
 // Debounced version for keystroke-driven search input — select changes stay instant via applyBeerFilter()
 const applyBeerFilterDebounced=(()=>{let t;return ()=>{clearTimeout(t);t=setTimeout(applyBeerFilter,160);};})();
-window.applyBeerFilterDebounced=applyBeerFilterDebounced;
 try {
   // Populate filter dropdowns
   const styles=[...new Set(beers.map(b=>b.style))].sort();
@@ -974,12 +944,28 @@ function openBeerModal(name){
         </tr>`).join('')}
       </tbody>
     </table>`;
+  _modalPrevFocus=document.activeElement;
   const bm=document.getElementById('beerModal');
   bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
+  // Focus after the visibility transition's first frame: focus() on an
+  // element whose computed visibility is still 'hidden' is silently ignored.
+  const cb=document.getElementById('beerModalClose');
+  if(cb) requestAnimationFrame(()=>requestAnimationFrame(()=>cb.focus()));
 }
+let _modalPrevFocus=null;
 function closeBeerModal(){
   const bm=document.getElementById('beerModal');
+  if(!bm.classList.contains('open')) return;
   bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
+  restoreFocus(_modalPrevFocus,bm);
+  _modalPrevFocus=null;
+}
+// Return focus to where it was before an overlay opened. If the opener wasn't
+// focusable (e.g. a table-row click leaves focus on <body>), at least blur
+// anything still focused inside the now-hidden overlay.
+function restoreFocus(prev,overlay){
+  if(prev&&prev!==document.body&&document.contains(prev)) prev.focus();
+  else if(overlay.contains(document.activeElement)) document.activeElement.blur();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1168,7 +1154,7 @@ function initBrewedMap(){
     const firstBeer=b.beers.split(' · ')[0];
     const _bSources=logoSources(firstBeer);
     const _bOnerr=_bSources.length>1?logoChainOnError(_bSources,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
-    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0"${_bOnerr}>`:'';
+    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${_bOnerr}>`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
@@ -1806,51 +1792,38 @@ function drawIPO(){
   } catch(e){ console.error('IPO error:',e); }
 }
 
-
-// ══════════════════════════════════════════════════════════════
-// SCANLINE TOGGLE
-// ══════════════════════════════════════════════════════════════
-function toggleScanlines(){
-  document.body.classList.toggle('no-scanlines');
-  const on=!document.body.classList.contains('no-scanlines');
-  const el=document.getElementById('scanline-status'); if(el) el.textContent=on?'ON':'OFF';
-  try{localStorage.setItem('brewScanlines',on?'1':'0');}catch(e){}
-}
-(function(){
-  try{
-    if(localStorage.getItem('brewScanlines')==='0'){
-      document.body.classList.add('no-scanlines');
-      const el=document.getElementById('scanline-status');
-      if(el) el.textContent='OFF';
-    }
-  }catch(e){}
-})();
-
 // ══════════════════════════════════════════════════════════════
 // COMMAND PALETTE (Ctrl+K / Cmd+K)
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'maps',label:'MAPS',icon:'◉',key:'F1'},
-    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F2'},
+    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
+    {id:'maps',label:'MAPS',icon:'◉',key:'F2'},
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F3'},
     {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
     {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
   ];
 
+  let prevFocus=null;
   function openPalette(){
     const pal=document.getElementById('cmd-palette');
     const inp=document.getElementById('cmd-input');
     if(!pal||!inp) return;
+    prevFocus=document.activeElement;
     inp.value='';
     pal.classList.add('open');
-    inp.focus();
+    // Focus after the visibility transition's first frame: focus() on an
+    // input whose computed visibility is still 'hidden' is silently ignored.
+    requestAnimationFrame(()=>requestAnimationFrame(()=>inp.focus()));
     renderResults('');
   }
   function closePalette(){
     const pal=document.getElementById('cmd-palette');
-    if(pal) pal.classList.remove('open');
+    if(!pal||!pal.classList.contains('open')) return;
+    pal.classList.remove('open');
+    restoreFocus(prevFocus,pal);
+    prevFocus=null;
   }
 
   function renderResults(q){
@@ -1963,8 +1936,10 @@ function openBreweryDrawer(name){
       <div style="font-size:9px;color:var(--cyan);padding-top:4px">${brewery.lat.toFixed(4)}°, ${brewery.lng.toFixed(4)}°</div>
     `;
 
+    _drawerPrevFocus=document.activeElement;
     drawer.classList.add('open');
     drawer.setAttribute('aria-hidden','false');
+    const dc=document.getElementById('drawer-close'); if(dc) dc.focus();
 
     // Mini map inside drawer
     setTimeout(()=>{
@@ -1982,9 +1957,13 @@ function openBreweryDrawer(name){
   } catch(e){ console.error('Brewery drawer error:',e); }
 }
 
+let _drawerPrevFocus=null;
 function closeBreweryDrawer(){
   const drawer=document.getElementById('brewery-drawer');
-  if(drawer){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
+  if(!drawer||!drawer.classList.contains('open')) return;
+  drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');
+  restoreFocus(_drawerPrevFocus,drawer);
+  _drawerPrevFocus=null;
 }
 
 window.openBreweryDrawer=openBreweryDrawer;
@@ -2057,9 +2036,6 @@ window.closeBreweryDrawer=closeBreweryDrawer;
     animate('ov-low-val',lowBeer.rating,2);
     animate('ov-abv-val',avgAbv,1,'%');
     animate('ov-brands-val',totalBrands,0);
-    animate('hdr-top',topBeer.rating,2);
-    animate('hdr-avg',STATS.globalAvg,2);
-    animate('hdr-low',lowBeer.rating,2);
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();
 
@@ -2101,13 +2077,40 @@ try {
   // Brewery drawer — close button
   document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
 
-  // Scanline toggle
-  {const _st=document.getElementById('scanline-toggle'); if(_st) _st.addEventListener('click', toggleScanlines);}
+  // Beer filter controls (search debounced; select changes instant)
+  document.getElementById('beerSearch').addEventListener('input', applyBeerFilterDebounced);
+  ['beerStyleFilter','beerOriginFilter','beerSortSel'].forEach(id =>
+    document.getElementById(id).addEventListener('change', applyBeerFilter));
 
-  // Beer table rows
+  // Beer table rows (+ "clear filters" button in the empty-state row)
   document.getElementById('beerBody').addEventListener('click', function(e) {
+    if (e.target.closest('#beerFilterReset')) { resetBeerFilter(); return; }
     const row = e.target.closest('tr[data-beer]');
     if (row) openBeerModal(row.dataset.beer);
+  });
+
+  // Keyboard activation for tab items (focusable divs with role="tab")
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest ? e.target.closest('.mb-item[data-tab], .nav-item[data-tab]') : null;
+    if (el) { e.preventDefault(); showTab(el.dataset.tab, el); }
+  });
+
+  // Trap Tab inside whichever overlay is open (modal > palette > drawer)
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab') return;
+    const overlay =
+      document.getElementById('beerModal').classList.contains('open') ? document.getElementById('beerModalBox') :
+      document.getElementById('cmd-palette').classList.contains('open') ? document.getElementById('cmd-box') :
+      document.getElementById('brewery-drawer').classList.contains('open') ? document.getElementById('brewery-drawer') : null;
+    if (!overlay) return;
+    const els = [...overlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+      .filter(el => el.offsetParent !== null);
+    if (!els.length) { e.preventDefault(); return; }
+    const first = els[0], last = els[els.length - 1];
+    const inside = overlay.contains(document.activeElement);
+    if (e.shiftKey && (!inside || document.activeElement === first)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (!inside || document.activeElement === last)) { e.preventDefault(); first.focus(); }
   });
 
   // Beer grid cards
@@ -2126,9 +2129,11 @@ try {
   document.getElementById('cmd-results').addEventListener('click', function(e) {
     const item = e.target.closest('.cmd-item');
     if (!item) return;
-    if (item.dataset.action === 'beer') { openBeerModal(item.dataset.beer); closePalette(); }
-    else if (item.dataset.action === 'brewery') { openBreweryDrawer(item.dataset.brewery); closePalette(); }
-    else if (item.dataset.action === 'tab') { showTab(item.dataset.tab); closePalette(); }
+    // Close (and restore focus) BEFORE opening the next overlay so its own
+    // focus save/restore chains from the real underlying element.
+    if (item.dataset.action === 'beer') { closePalette(); openBeerModal(item.dataset.beer); }
+    else if (item.dataset.action === 'brewery') { closePalette(); openBreweryDrawer(item.dataset.brewery); }
+    else if (item.dataset.action === 'tab') { closePalette(); showTab(item.dataset.tab); }
   });
 
   // Collapsed analytics sections render their charts at zero size while hidden;
@@ -2140,7 +2145,16 @@ try {
     resizeChartsIn(d);
   }, true);
 
-  // Maps is the default landing tab; trigger its lazy renderer so the map
-  // initializes on load (overview charts already render at top level).
-  showTab('maps');
+  // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
+  // Overview. Its charts render eagerly at top level, while the Leaflet maps
+  // stay lazy until the MAPS tab (F2) first becomes visible.
+  const validTab = h => TAB_PANELS.some(p => p.id === h);
+  const bootHash = location.hash.slice(1);
+  showTab(validTab(bootHash) ? bootHash : 'overview');
+
+  // Manually edited hashes / external links into an open page
+  window.addEventListener('hashchange', function() {
+    const h = location.hash.slice(1);
+    if (validTab(h) && !document.getElementById(h).classList.contains('active')) showTab(h);
+  });
 } catch(e) { console.error('Event delegation setup error:', e); }
