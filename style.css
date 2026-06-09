@@ -54,6 +54,45 @@ touch-action: manipulation;
 }
 button, .mb-item, .nav-item, .subtab, .ipo-subnav-pill, .cmd-item, .beer-card,
 .bb-select, input, select { -webkit-tap-highlight-color: rgba(255,102,0,0.22); }
+
+/* Visible focus ring for keyboard navigation (mouse clicks stay clean) */
+.mb-item:focus-visible, .nav-item:focus-visible, .subtab:focus-visible,
+button:focus-visible, .bb-select:focus-visible, input:focus-visible,
+.cmd-item:focus-visible, .beer-card:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -2px;
+}
+
+/* Respect OS-level reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Friendly empty state (e.g. beer table with no filter matches) */
+.bb-empty {
+  text-align: center;
+  color: var(--dim);
+  padding: 18px 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.bb-empty button {
+  background: var(--border2);
+  border: 1px solid var(--border);
+  color: var(--orange);
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.bb-empty button:hover { border-color: var(--orange); }
 /* Strip hover-only effects on touch devices to avoid sticky :hover after tap */
 @media (hover: none) {
   .bb-panel-head:hover,
