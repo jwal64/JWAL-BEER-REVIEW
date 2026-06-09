@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+/* Fonts are loaded via <link> in index.html so the fetch parallelizes with CSS parsing */
 
 :root {
 --black:    #0a0a0a;
@@ -429,6 +429,17 @@ margin-bottom: 6px;
 border-bottom: 1px solid var(--border);
 }
 .bb-ctrl-title { font-size: 10px; font-weight: 700; color: var(--orange); letter-spacing: 0.5px; }
+#beerSearch {
+background: var(--border2);
+border: 1px solid var(--border);
+color: var(--orange);
+font-family: var(--mono);
+font-size: 9px;
+padding: 3px 6px;
+outline: none;
+width: 160px;
+}
+#beerSearch:focus { border-color: var(--orange); }
 .bb-select {
 background: var(--border2);
 border: 1px solid var(--border);

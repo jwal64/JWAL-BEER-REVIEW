@@ -327,14 +327,14 @@ function logoImg(name,size=24){
   if(!sources.length)return emojiSpan;
   const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
   const onerr=logoChainOnError(sources,emojiReplace);
-  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}"${onerr}>`;
+  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
 function cardLogo(name){
   const sources=logoSources(name);
   if(!sources.length)return `<span class="bc-emoji">🍺</span>`;
   const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));`;
   const onerr=logoChainOnError(sources,emojiReplace);
-  return `<img src="${sources[0]}" class="bc-logo" alt="${name}"${onerr}>`;
+  return `<img src="${sources[0]}" class="bc-logo" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -875,7 +875,6 @@ function resetBeerFilter(){
 }
 // Debounced version for keystroke-driven search input — select changes stay instant via applyBeerFilter()
 const applyBeerFilterDebounced=(()=>{let t;return ()=>{clearTimeout(t);t=setTimeout(applyBeerFilter,160);};})();
-window.applyBeerFilterDebounced=applyBeerFilterDebounced;
 try {
   // Populate filter dropdowns
   const styles=[...new Set(beers.map(b=>b.style))].sort();
@@ -1145,7 +1144,7 @@ function initBrewedMap(){
     const firstBeer=b.beers.split(' · ')[0];
     const _bSources=logoSources(firstBeer);
     const _bOnerr=_bSources.length>1?logoChainOnError(_bSources,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
-    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0"${_bOnerr}>`:'';
+    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${_bOnerr}>`:'';
     circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
   });
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
@@ -2065,6 +2064,11 @@ try {
 
   // Brewery drawer — close button
   document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
+
+  // Beer filter controls (search debounced; select changes instant)
+  document.getElementById('beerSearch').addEventListener('input', applyBeerFilterDebounced);
+  ['beerStyleFilter','beerOriginFilter','beerSortSel'].forEach(id =>
+    document.getElementById(id).addEventListener('change', applyBeerFilter));
 
   // Beer table rows (+ "clear filters" button in the empty-state row)
   document.getElementById('beerBody').addEventListener('click', function(e) {
