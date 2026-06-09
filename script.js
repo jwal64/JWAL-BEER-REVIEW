@@ -657,7 +657,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
-    if(ev.key==='Escape'){closeBeerModal();return;}
+    if(ev.key==='Escape'){closeBeerModal();closeBreweryDrawer();return;}
     const tab=tabMap[ev.key.toLowerCase()];
     if(tab&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ev.preventDefault();showTab(tab);}
   });
@@ -945,12 +945,18 @@ function openBeerModal(name){
         </tr>`).join('')}
       </tbody>
     </table>`;
+  _modalPrevFocus=document.activeElement;
   const bm=document.getElementById('beerModal');
   bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
+  const cb=document.getElementById('beerModalClose'); if(cb) cb.focus();
 }
+let _modalPrevFocus=null;
 function closeBeerModal(){
   const bm=document.getElementById('beerModal');
+  if(!bm.classList.contains('open')) return;
   bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
+  if(_modalPrevFocus&&document.contains(_modalPrevFocus)) _modalPrevFocus.focus();
+  _modalPrevFocus=null;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1790,10 +1796,12 @@ function drawIPO(){
     {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
   ];
 
+  let prevFocus=null;
   function openPalette(){
     const pal=document.getElementById('cmd-palette');
     const inp=document.getElementById('cmd-input');
     if(!pal||!inp) return;
+    prevFocus=document.activeElement;
     inp.value='';
     pal.classList.add('open');
     inp.focus();
@@ -1801,7 +1809,10 @@ function drawIPO(){
   }
   function closePalette(){
     const pal=document.getElementById('cmd-palette');
-    if(pal) pal.classList.remove('open');
+    if(!pal||!pal.classList.contains('open')) return;
+    pal.classList.remove('open');
+    if(prevFocus&&document.contains(prevFocus)) prevFocus.focus();
+    prevFocus=null;
   }
 
   function renderResults(q){
@@ -1914,8 +1925,10 @@ function openBreweryDrawer(name){
       <div style="font-size:9px;color:var(--cyan);padding-top:4px">${brewery.lat.toFixed(4)}°, ${brewery.lng.toFixed(4)}°</div>
     `;
 
+    _drawerPrevFocus=document.activeElement;
     drawer.classList.add('open');
     drawer.setAttribute('aria-hidden','false');
+    const dc=document.getElementById('drawer-close'); if(dc) dc.focus();
 
     // Mini map inside drawer
     setTimeout(()=>{
@@ -1933,9 +1946,13 @@ function openBreweryDrawer(name){
   } catch(e){ console.error('Brewery drawer error:',e); }
 }
 
+let _drawerPrevFocus=null;
 function closeBreweryDrawer(){
   const drawer=document.getElementById('brewery-drawer');
-  if(drawer){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
+  if(!drawer||!drawer.classList.contains('open')) return;
+  drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');
+  if(_drawerPrevFocus&&document.contains(_drawerPrevFocus)) _drawerPrevFocus.focus();
+  _drawerPrevFocus=null;
 }
 
 window.openBreweryDrawer=openBreweryDrawer;
@@ -2063,6 +2080,23 @@ try {
     if (el) { e.preventDefault(); showTab(el.dataset.tab, el); }
   });
 
+  // Trap Tab inside whichever overlay is open (modal > palette > drawer)
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab') return;
+    const overlay =
+      document.getElementById('beerModal').classList.contains('open') ? document.getElementById('beerModalBox') :
+      document.getElementById('cmd-palette').classList.contains('open') ? document.getElementById('cmd-box') :
+      document.getElementById('brewery-drawer').classList.contains('open') ? document.getElementById('brewery-drawer') : null;
+    if (!overlay) return;
+    const els = [...overlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+      .filter(el => el.offsetParent !== null);
+    if (!els.length) { e.preventDefault(); return; }
+    const first = els[0], last = els[els.length - 1];
+    const inside = overlay.contains(document.activeElement);
+    if (e.shiftKey && (!inside || document.activeElement === first)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (!inside || document.activeElement === last)) { e.preventDefault(); first.focus(); }
+  });
+
   // Beer grid cards
   document.getElementById('beerGrid').addEventListener('click', function(e) {
     const card = e.target.closest('.beer-card[data-beer]');
@@ -2079,9 +2113,11 @@ try {
   document.getElementById('cmd-results').addEventListener('click', function(e) {
     const item = e.target.closest('.cmd-item');
     if (!item) return;
-    if (item.dataset.action === 'beer') { openBeerModal(item.dataset.beer); closePalette(); }
-    else if (item.dataset.action === 'brewery') { openBreweryDrawer(item.dataset.brewery); closePalette(); }
-    else if (item.dataset.action === 'tab') { showTab(item.dataset.tab); closePalette(); }
+    // Close (and restore focus) BEFORE opening the next overlay so its own
+    // focus save/restore chains from the real underlying element.
+    if (item.dataset.action === 'beer') { closePalette(); openBeerModal(item.dataset.beer); }
+    else if (item.dataset.action === 'brewery') { closePalette(); openBreweryDrawer(item.dataset.brewery); }
+    else if (item.dataset.action === 'tab') { closePalette(); showTab(item.dataset.tab); }
   });
 
   // Collapsed analytics sections render their charts at zero size while hidden;
