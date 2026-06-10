@@ -341,16 +341,18 @@ const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'Ma
 const MONTH_COLORS = ['#ff6600','#00aaff','#00cc44','#bb44ff','#ffdd00','#ff2222','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
 
 function getMonthlyData(){
-  // Single pass: group beers by month and record monthN + representative year
-  const monthNMap={},monthYearMap={},byMonth={};
+  // Single pass: group beers by year+month so the same month name in different
+  // years never merges, and bucket order stays truly chronological.
+  const orderMap={},monthAbbr={},monthYearMap={},byMonth={};
   beers.forEach(b=>{
-    if(!(b.month in monthNMap)){monthNMap[b.month]=b.monthN;monthYearMap[b.month]=b.year;byMonth[b.month]=[];}
-    byMonth[b.month].push(b);
+    const key=`${b.month} ${b.year}`;
+    if(!(key in orderMap)){orderMap[key]=b.year*12+b.monthN;monthAbbr[key]=b.month;monthYearMap[key]=b.year;byMonth[key]=[];}
+    byMonth[key].push(b);
   });
-  const months=Object.keys(monthNMap).sort((a,b)=>monthNMap[a]-monthNMap[b]);
+  const months=Object.keys(orderMap).sort((a,b)=>orderMap[a]-orderMap[b]);
   const monthColors=months.map((_,i)=>MONTH_COLORS[i%MONTH_COLORS.length]);
-  const monthLabels=months.map(m=>`${MONTH_FULL[m]||m} ${monthYearMap[m]||''}`);
-  return {months,byMonth,monthColors,monthLabels,monthYearMap};
+  const monthLabels=months.map(m=>`${MONTH_FULL[monthAbbr[m]]||monthAbbr[m]} ${monthYearMap[m]||''}`);
+  return {months,byMonth,monthColors,monthLabels,monthYearMap,monthAbbr};
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -478,15 +480,17 @@ function updateLiveStats(){
   const topBeer      = STATS.sorted[0];
   const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
   const avgRating    = STATS.globalAvg;
-  // Single pass: sum ABV, find min/max, count new
-  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0;
+  // Single pass: sum ABV, find min/max, count new + hits
+  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0,hitCount=0;
   for(const b of beers){
     abvSum+=b.abv;
     if(b.abv<minAbv)minAbv=b.abv;
     if(b.abv>maxAbv)maxAbv=b.abv;
     if(isDisplayNew(b))newCount++;
+    if(b.rating>=3)hitCount++;
   }
   const avgAbv = beers.length?abvSum/beers.length:0;
+  const hitRate = beers.length?Math.round(hitCount/beers.length*100):0;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Header bar
@@ -503,6 +507,8 @@ function updateLiveStats(){
   set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
   set('ov-brands-val', totalBrands);
   set('ov-brands-sub', `Across ${totalCtry} countries`);
+  set('ov-hit-val',  hitRate+'%');
+  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated ≥3.00`);
   // BEERS tab
   set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
   set('brands-count', `${totalBrands} UNIQUE BRANDS`);
@@ -769,14 +775,98 @@ const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleCol
 // OVERVIEW
 // ══════════════════════════════════════════════════════════════
 try {
-// Use pre-computed statistics
+// Use pre-computed statistics. DOM-only panels render first so a Chart.js
+// load failure can't take the text content down with it.
 const sA=STATS.styleRanked;
+const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
+
+// Live Pearson r for the scatter panel header (was previously hardcoded)
+{
+  const mx=avg(beers.map(b=>b.abv)),my=avg(beers.map(b=>b.rating));
+  let num=0,dx=0,dy=0;
+  beers.forEach(b=>{const a=b.abv-mx,r=b.rating-my;num+=a*r;dx+=a*a;dy+=r*r;});
+  const pr=dx&&dy?num/Math.sqrt(dx*dy):0,ab=Math.abs(pr);
+  const corrLabel=ab<0.2?'NO SIGNIFICANT CORRELATION':ab<0.4?'WEAK CORRELATION':ab<0.6?'MODERATE CORRELATION':'STRONG CORRELATION';
+  const corrEl=document.getElementById('scatterCorr');
+  if(corrEl) corrEl.textContent=`r ≈ ${pr.toFixed(2)} · ${corrLabel}`;
+}
+
+// Dynamic market signals — computed from live data
+const bestStyle=STATS.styleRanked[0];
+const worstStyle=STATS.styleRanked[STATS.styleRanked.length-1];
+const topCountry=STATS.countryRanked[0];
+const topCity=STATS.cityRanked[0];
+const bestMethodIdx=mA.indexOf(Math.max(...mA.filter(a=>a>0)));
+const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
+const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
+const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
+
+const last5=beers.slice(-5).map(b=>b.rating);
+const prev5=beers.slice(-10,-5).map(b=>b.rating);
+const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
+const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
+const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
+
+document.getElementById('mktPanel').innerHTML=`
+  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} markets</div></div></div>`;
+
+// Recent activity feed — last 6 pours, newest first (beers[] is chronological)
+const recentEl=document.getElementById('recentFeed');
+if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
+  <div class="feed-row" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
+    ${logoImg(b.beer,20)}
+    <div class="feed-main">
+      <span class="feed-name">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</span>
+      <span class="feed-meta">${b.style} · ${b.method} · ${b.city} · ${b.month} ${b.year}</span>
+    </div>
+    <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
+  </div>`).join('');
+
+// Month in review — latest month vs the one before
+{
+  const {months:mKeys,byMonth:mBuckets,monthLabels:mLabels}=getMonthlyData();
+  const lastK=mKeys[mKeys.length-1],prevK=mKeys[mKeys.length-2];
+  const cur=lastK?mBuckets[lastK]:[];
+  const mirEl=document.getElementById('mirPanel');
+  if(mirEl&&cur.length){
+    const curAvg=avg(cur.map(b=>b.rating));
+    const prevAvg=prevK?avg(mBuckets[prevK].map(b=>b.rating)):null;
+    const dAvg=prevAvg!=null?curAvg-prevAvg:null;
+    const best=cur.reduce((a,b)=>b.rating>a.rating?b:a);
+    const worst=cur.reduce((a,b)=>b.rating<a.rating?b:a);
+    const curSet=new Set(cur);
+    const earlier=new Set(beers.filter(b=>!curSet.has(b)).map(b=>b.beer));
+    const newBrands=[...new Set(cur.map(b=>b.beer))].filter(n=>!earlier.has(n)).length;
+    const lbl=document.getElementById('mirLabel');
+    if(lbl) lbl.textContent=(mLabels[mLabels.length-1]||'').toUpperCase();
+    const dCls=dAvg==null?'fl':dAvg>0.05?'up':dAvg<-0.05?'dn':'fl';
+    const dTxt=dAvg==null?'First month on record':`${dAvg>=0?'+':''}${dAvg.toFixed(2)} vs prior month`;
+    const pourRow=(key,b,cls)=>`
+      <div class="insight-row"><span class="insight-key">${key}</span>
+        <div class="feed-row mir-pour" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
+          ${logoImg(b.beer,18)}
+          <div class="feed-main"><span class="feed-name">${b.beer}</span><span class="feed-meta">${b.style} · ${b.method}</span></div>
+          <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
+        </div></div>`;
+    mirEl.innerHTML=`
+      <div class="insight-row"><span class="insight-key">REVIEWS</span><div><div class="insight-val">${cur.length}</div><div class="insight-sub">${newBrands} first-time brand${newBrands===1?'':'s'}</div></div></div>
+      <div class="insight-row"><span class="insight-key">MONTH AVG</span><div><div class="insight-val ${dCls}">${curAvg.toFixed(2)}</div><div class="insight-sub">${dTxt}</div></div></div>
+      ${pourRow('BEST POUR',best)}
+      ${best!==worst?pourRow('WORST POUR',worst):''}`;
+  }
+}
+
+// ── Charts (everything below needs Chart.js) ──
 safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
   data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
   options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
 });
 
-const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
   data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
@@ -789,38 +879,36 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
             y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
 });
 
+// Monthly flow — review volume bars + avg-rating line
+{
+  const {months:cm,byMonth:cb,monthColors:cc,monthAbbr:ca}=getMonthlyData();
+  const counts=cm.map(m=>cb[m].length);
+  const avgs=cm.map(m=>+avg(cb[m].map(b=>b.rating)).toFixed(2));
+  safeChart('monthlyCombo',document.getElementById('monthlyCombo'),{
+    data:{labels:cm.map(m=>ca[m].toUpperCase()),datasets:[
+      {type:'bar',label:'Reviews',data:counts,backgroundColor:cc.map(c=>c+'33'),borderColor:cc,borderWidth:2,yAxisID:'y'},
+      {type:'line',label:'Avg Rating',data:avgs,borderColor:'#ffaa00',backgroundColor:'transparent',pointBackgroundColor:avgs.map(r=>rC(r)),pointRadius:5,pointBorderColor:'#000',pointBorderWidth:1,tension:0.3,yAxisID:'y2'}
+    ]},
+    options:{plugins:{legend:{display:false},tooltip:TT},
+      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:5}},
+              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffaa00'}},
+              x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
+  });
+}
 
-// Dynamic market signals — computed from live data
-const bestStyle=STATS.styleRanked[0];
-const worstStyle=STATS.styleRanked[STATS.styleRanked.length-1];
-const topCountry=STATS.countryRanked[0];
-const topCity=STATS.cityRanked[0];
-const bestMethodIdx=mA.indexOf(Math.max(...mA.filter(a=>a>0)));
-const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
-const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
-const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
-
-document.getElementById('mktPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>`;
-
-// Dynamic latest activity panel
-const latestTwo=[...beers].sort((a,b)=>b.year-a.year||b.monthN-a.monthN).slice(0,2);
-const hitRate=(beers.filter(b=>b.rating>=3).length/beers.length*100).toFixed(0);
-const last5=beers.slice(-5).map(b=>b.rating);
-const prev5=beers.slice(-10,-5).map(b=>b.rating);
-const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
-const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
-const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
-
-document.getElementById('latestPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">LATEST</span><div><div class="insight-val">${latestTwo.map(b=>b.beer).join(' &amp; ')}</div><div class="insight-sub">${latestTwo.map(b=>b.rating.toFixed(2)).join(' / ')} · ${latestTwo[0]?latestTwo[0].city:'—'}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg</div></div></div>
-  <div class="insight-row"><span class="insight-key">COVERAGE</span><div><div class="insight-val">${Object.keys(STATS.countryMap).length} countries</div><div class="insight-sub">${Object.keys(STATS.cityMap).length} markets</div></div></div>
-  <div class="insight-row"><span class="insight-key">HIT RATE</span><div><div class="insight-val ${hitRate>=60?'up':hitRate>=40?'fl':'dn'}">${hitRate>=60?'▲ ':''}${hitRate}%</div><div class="insight-sub">Rated ≥3.00</div></div></div>`;
+// Rating distribution — quarter-point histogram colored by rating band
+{
+  const histCounts={};
+  beers.forEach(b=>{const k=b.rating.toFixed(2);histCounts[k]=(histCounts[k]||0)+1;});
+  const histKeys=[];
+  for(let r=1.75;r<=5.001;r+=0.25)histKeys.push(r.toFixed(2));
+  safeChart('ratingHist',document.getElementById('ratingHist'),{type:'bar',
+    data:{labels:histKeys,datasets:[{data:histKeys.map(k=>histCounts[k]||0),backgroundColor:histKeys.map(k=>rC(+k)+'cc'),borderWidth:0}]},
+    options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw} review${c.raw===1?'':'s'} @ ${c.label}`}}},
+      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},
+              x:{grid:{display:false},ticks:{color:'#444',font:{size:8},maxRotation:60,minRotation:60}}}}
+  });
+}
 } catch(e){ console.error('Overview init error:',e); }
 
 // Insights panels (stat summary / quintiles / taste profile) now live on the
@@ -842,7 +930,7 @@ function renderTable(data){
     }
     document.getElementById('beerBody').innerHTML=data.map(b=>`
       <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
-        <td>${logoImg(b.beer,22)}</td>
+        <td>${logoImg(b.beer,24)}</td>
         <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
         <td>${FLAGS[b.origin]||''} ${b.origin}</td>
@@ -1033,12 +1121,12 @@ function drawInsights(){
   ].map(([l,v,c])=>`<div class="insight-row"><span class="insight-key">${l}</span><span class="insight-val ${c}" style="font-family:var(--mono)">${v}</span></div>`).join('');
 
   document.getElementById('quintiles').innerHTML=[
-    ['▲▲ EXCELLENT (4.5–5.0)',qb[0],'up'],
-    ['▲  GOOD (4.0–4.4)',qb[1],'up'],
-    ['→  SOLID (3.5–3.9)',qb[2],'fl'],
-    ['→  AVERAGE (3.0–3.4)',qb[3],'fl'],
-    ['▼  BELOW (2.5–2.9)',qb[4],'dn'],
-    ['▼▼ POOR (<2.5)',qb[5],'dn'],
+    ['▲▲ EXCELLENT (4.50–5.00)',qb[0],'up'],
+    ['▲  GOOD (4.00–4.25)',qb[1],'up'],
+    ['→  SOLID (3.50–3.75)',qb[2],'fl'],
+    ['→  AVERAGE (3.00–3.25)',qb[3],'fl'],
+    ['▼  BELOW (2.50–2.75)',qb[4],'dn'],
+    ['▼▼ POOR (<2.50)',qb[5],'dn'],
   ].map(([l,n,c])=>`<div class="insight-row">
     <span class="insight-key">${l}</span>
     <span class="insight-val ${c}">${n} <span style="color:#555;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
@@ -1177,7 +1265,7 @@ function initBrewedMap(){
 function drawTemporal(){
   window._tmpD = true;
 
-  const {months,byMonth,monthColors,monthLabels,monthYearMap} = getMonthlyData();
+  const {months,byMonth,monthColors,monthLabels,monthYearMap,monthAbbr} = getMonthlyData();
 
   const counts     = months.map(m => byMonth[m].length);
   const avgRatings = months.map(m => {
@@ -1194,12 +1282,12 @@ function drawTemporal(){
   const firstYear = monthYearMap[months[0]];
   const lastYear  = monthYearMap[months[months.length-1]];
   const yearLabel = firstYear===lastYear ? firstYear : `${firstYear}–${lastYear}`;
-  const kpiRange = months.length > 1 ? `${months[0]} – ${months[months.length-1]}` : months[0];
+  const kpiRange = months.length > 1 ? `${monthAbbr[months[0]]} – ${monthAbbr[months[months.length-1]]}` : monthAbbr[months[0]];
 
   document.getElementById('temporal-kpis').innerHTML = `<div class="g${Math.min(months.length+2,5)}" style="margin-bottom:0">
     <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${kpiRange} ${yearLabel}</div></div>
     ${months.map((m,i)=>`
-    <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${m.toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
+    <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${monthAbbr[m].toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
     <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">MOM RATING Δ</div><div class="kpi-sub">${deltaLabel}</div></div>
   </div>`;
 
@@ -1253,7 +1341,7 @@ function drawTemporal(){
     data:{labels:bucketKeys,datasets:months.map((m,i)=>{
       const bkts=[0,0,0,0,0,0];
       byMonth[m].forEach(b=>bkts[bucketFn(b.rating)]++);
-      return {label:`${m} ${monthYearMap[m]||''}`.trim(),data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
+      return {label:m,data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
     })},
     options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
       scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
@@ -1264,14 +1352,14 @@ function drawTemporal(){
   if(styleChartsEl){
     styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
       <div class="bb-panel">
-        <div class="bb-panel-head">STYLE MIX — ${(MONTH_FULL[m]||m).toUpperCase()} ${monthYearMap[m]||''}<span class="ph-right">${counts[i]} REVIEWS</span></div>
-        <div class="bb-body"><canvas id="styleChart_${m}" height="180"></canvas></div>
+        <div class="bb-panel-head">STYLE MIX — ${monthLabels[i].toUpperCase()}<span class="ph-right">${counts[i]} REVIEWS</span></div>
+        <div class="bb-body"><canvas id="styleChart_${i}" height="180"></canvas></div>
       </div>`).join('')}</div>`;
-    months.forEach(m=>{
+    months.forEach((m,i)=>{
       const sm={};
       byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
       const labels=Object.keys(sm),data=Object.values(sm);
-      safeChart(`styleChart_${m}`,document.getElementById(`styleChart_${m}`),{type:'doughnut',
+      safeChart(`styleChart_${i}`,document.getElementById(`styleChart_${i}`),{type:'doughnut',
         data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
         options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
       });
@@ -1297,7 +1385,7 @@ function drawTemporal(){
     if(a>=2.5)return'rgba(255,102,0,0.25)';return'rgba(255,34,34,0.3)';
   }
   let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">STYLE</th>';
-  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${m.toUpperCase()}</th>`;});
+  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m].toUpperCase()}</th>`;});
   heatHtml+='</tr></thead><tbody>';
   allStyles.forEach(style=>{
     heatHtml+=`<tr><td style="text-align:left;color:${sC[style]};font-weight:600;font-size:9px;white-space:nowrap">${style}</td>`;
@@ -1315,35 +1403,23 @@ function drawTemporal(){
   heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#555"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #222"><div style="flex:1;background:rgba(255,34,34,0.4)"></div><div style="flex:1;background:rgba(255,102,0,0.35)"></div><div style="flex:1;background:rgba(255,170,0,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(0,204,68,0.4)"></div></div><span>HIGH</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
-  // ── Country exposure — all months
-  const allCountries=[...new Set(beers.map(b=>b.origin))].sort();
-  safeChart('monthCountryChart',document.getElementById('monthCountryChart'),{type:'bar',
-    data:{labels:allCountries.map(c=>`${FLAGS[c]||''} ${c}`),datasets:months.map((m,i)=>({
-      label:m,
-      data:allCountries.map(c=>byMonth[m].filter(b=>b.origin===c).length),
-      backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2
-    }))},
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-  });
-
   // ── Momentum panel — compares latest two months
   const mRow = (l,v,c) => `<div class="mini-row"><span style="font-size:9px;color:var(--orange)">${l}</span><span class="${c}" style="font-family:var(--mono);font-size:10px;font-weight:700">${v}</span></div>`;
   let momentum = '';
   months.forEach((m,i)=>{
     const mAvg = avgRatings[i];
     const mAbv = avg(byMonth[m].map(b=>b.abv));
-    momentum += mRow(`${m.toUpperCase()} REVIEWS`, counts[i], 'fl');
-    momentum += mRow(`${m.toUpperCase()} AVG RATING`, mAvg.toFixed(2), 'fl');
-    momentum += mRow(`${m.toUpperCase()} AVG ABV`, mAbv.toFixed(2)+'%', '');
+    momentum += mRow(`${monthAbbr[m].toUpperCase()} REVIEWS`, counts[i], 'fl');
+    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG RATING`, mAvg.toFixed(2), 'fl');
+    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG ABV`, mAbv.toFixed(2)+'%', '');
     if(i < months.length - 1) {
       const nextM = months[i+1];
       const paceChg = counts[i+1] - counts[i];
       const ratingChg = avgRatings[i+1] - avgRatings[i];
       const overlap = [...new Set(byMonth[m].map(b=>b.beer))].filter(n=>byMonth[nextM].some(b=>b.beer===n));
-      momentum += mRow(`${m.toUpperCase()}→${nextM.toUpperCase()} PACE`, (paceChg>=0?'+':'')+paceChg+' REVIEWS', paceChg>=0?'up':'dn');
-      momentum += mRow(`${m.toUpperCase()}→${nextM.toUpperCase()} Δ RATING`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
-      momentum += mRow('REPEAT BRANDS', overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')','');
+      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} PACE`, (paceChg>=0?'+':'')+paceChg+' REVIEWS', paceChg>=0?'up':'dn');
+      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} Δ RATING`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
+      momentum += mRow('REPEAT BRANDS', overlap.length?overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')':'0','');
     }
   });
   {const _mp=document.getElementById('momentumPanel'); if(_mp) _mp.innerHTML = momentum;}
@@ -1984,10 +2060,11 @@ window.closeBreweryDrawer=closeBreweryDrawer;
       'spark-low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
       'spark-abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
       'spark-brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
+      'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
     };
     const sparkColors={
       'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#cc3366'
+      'spark-abv':'#00f5ff','spark-brands':'#cc3366','spark-hit':'#00cc44'
     };
 
     Object.entries(sparkData).forEach(([id,data])=>{
@@ -2002,7 +2079,8 @@ window.closeBreweryDrawer=closeBreweryDrawer;
             pointRadius:2,pointBackgroundColor:color,fill:true,tension:0.4,spanGaps:true}]
         },
         options:{
-          responsive:false,
+          responsive:true,
+          maintainAspectRatio:false,
           animation:{duration:800},
           plugins:{legend:{display:false},tooltip:{enabled:false}},
           scales:{x:{display:false},y:{display:false}},
@@ -2036,6 +2114,25 @@ window.closeBreweryDrawer=closeBreweryDrawer;
     animate('ov-low-val',lowBeer.rating,2);
     animate('ov-abv-val',avgAbv,1,'%');
     animate('ov-brands-val',totalBrands,0);
+    animate('ov-hit-val',beers.length?beers.filter(b=>b.rating>=3).length/beers.length*100:0,0,'%');
+
+    // MoM delta chips — latest sparkline point vs the one before
+    [['ov-top-delta','spark-top',v=>v.toFixed(2)],
+     ['ov-avg-delta','spark-avg',v=>v.toFixed(2)],
+     ['ov-low-delta','spark-low',v=>v.toFixed(2)],
+     ['ov-abv-delta','spark-abv',v=>v.toFixed(1)+'pp'],
+     ['ov-brands-delta','spark-brands',v=>String(Math.round(v))],
+     ['ov-hit-delta','spark-hit',v=>Math.round(v)+'pp'],
+    ].forEach(([id,key,f])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      const d=sparkData[key],a=d[d.length-2],b=d[d.length-1];
+      if(a==null||b==null){ el.textContent=''; return; }
+      const diff=b-a,up=diff>0.005,dn=diff<-0.005;
+      el.className='kpi-delta '+(up?'up':dn?'dn':'fl');
+      el.textContent=(up?'▲':dn?'▼':'→')+f(Math.abs(diff));
+      el.title='vs previous month';
+    });
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();
 
@@ -2059,6 +2156,18 @@ try {
   document.getElementById('maps').addEventListener('click', function(e) {
     const btn = e.target.closest('.subtab[data-subtab]');
     if (btn) showMapSubtab(btn.dataset.subtab);
+  });
+
+  // Overview — recent-activity / month-in-review rows open the beer modal
+  const ovPanel=document.getElementById('overview');
+  ovPanel.addEventListener('click', function(e) {
+    const row = e.target.closest('.feed-row[data-beer]');
+    if (row) openBeerModal(row.dataset.beer);
+  });
+  ovPanel.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter' && e.key!==' ') return;
+    const row = e.target.closest('.feed-row[data-beer]');
+    if (row) { e.preventDefault(); openBeerModal(row.dataset.beer); }
   });
 
   // Beer modal — close on backdrop click
