@@ -43,7 +43,7 @@ let beers=[
   {beer:"Hofbräu Münchner Weiße",style:"Wheat Beer",    origin:"DE",abv:5.1,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Negra Modelo",    style:"Lager",               origin:"MX",abv:5.4,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Hofbräu Dunkel",  style:"Lager",               origin:"DE",abv:5.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:false,month:"Feb",monthN:2,year:2026},
-  {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
+  {beer:"Bud Light",       style:"Lager",     origin:"US",abv:4.2,method:"Bottle",city:"East Rutherford",region:"New Jersey",      country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Budweiser",       style:"Lager",           origin:"US",abv:5.0,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Feb",monthN:2,year:2026},
   {beer:"Corona Extra",    style:"Lager",            origin:"MX",abv:4.5,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:3.75,isNew:false,month:"Feb",monthN:2,year:2026},
   {beer:"Birra Moretti",   style:"Lager",               origin:"IT",abv:4.6,method:"Bottle",city:"Sciara",       region:"Sicily",          country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Feb",monthN:2,year:2026},
@@ -115,6 +115,7 @@ let drunkLocs=[
   {city:"Lagos",       region:"Algarve",              country:"Portugal",    cc:"PT", lat:37.1028,lng:-8.6736},
   {city:"Sciara",      region:"Sicily",               country:"Italy",       cc:"IT", lat:37.9156,lng:13.9344},
   {city:"Venice",      region:"Veneto",               country:"Italy",       cc:"IT", lat:45.4408,lng:12.3155},
+  {city:"East Rutherford",region:"New Jersey",        country:"USA",         cc:"US", lat:40.8127,lng:-74.0846},
 ];
 
 let breweries=[
