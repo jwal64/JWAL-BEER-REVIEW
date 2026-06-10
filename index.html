@@ -116,11 +116,11 @@
 
 <div id="overview" class="panel active">
   <div class="g5" style="margin-bottom:8px">
-    <div class="kpi"><div class="kpi-val up" id="ov-top-val">—</div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top" height="24"></canvas></div></div>
-    <div class="kpi"><div class="kpi-val fl" id="ov-avg-val">—</div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg" height="24"></canvas></div></div>
-    <div class="kpi"><div class="kpi-val dn" id="ov-low-val">—</div><div class="kpi-label">LOWEST</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low" height="24"></canvas></div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv" height="24"></canvas></div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--amber)" id="ov-brands-val">—</div><div class="kpi-label">BRANDS TRIED</div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands" height="24"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val up" id="ov-top-val">—</div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val fl" id="ov-avg-val">—</div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val dn" id="ov-low-val">—</div><div class="kpi-label">LOWEST</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv"></canvas></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--amber)" id="ov-brands-val">—</div><div class="kpi-label">BRANDS TRIED</div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands"></canvas></div></div>
   </div>
   <div class="g2">
     <div class="bb-panel">
@@ -146,7 +146,7 @@
     <summary>MORE ANALYTICS — SCATTER · STATS · TASTE PROFILE</summary>
     <div class="collapse-panels">
       <div class="bb-panel">
-        <div class="bb-panel-head">ABV vs RATING — SCATTER PLOT<span class="ph-right">r ≈ 0.12 · NO SIGNIFICANT CORRELATION</span></div>
+        <div class="bb-panel-head">ABV vs RATING — SCATTER PLOT<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
         <div class="bb-body"><canvas id="scatterChart" height="110"></canvas></div>
       </div>
       <div class="g2">

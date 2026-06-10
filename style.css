@@ -1160,6 +1160,7 @@ KPI SPARKLINES
   margin-top: 2px;
   height: 24px;
   position: relative;
+  overflow: hidden;
 }
 .kpi-sparkline-wrap canvas {
   display: block;
