@@ -925,7 +925,7 @@ function renderTable(data){
     if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
     if(!data.length){
       document.getElementById('beerBody').innerHTML=
-        `<tr><td colspan="9" class="bb-empty">NO BEERS MATCH YOUR FILTERS
+        `<tr><td colspan="10" class="bb-empty">NO BEERS MATCH YOUR FILTERS
           <button type="button" id="beerFilterReset">CLEAR FILTERS</button></td></tr>`;
       return;
     }
@@ -938,6 +938,7 @@ function renderTable(data){
         <td style="color:#00aaff">${b.abv.toFixed(1)}%</td>
         <td style="color:#555">${b.method}</td>
         <td style="color:#555">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</td>
+        <td style="color:#555">${b.month.toUpperCase()} ${b.year}</td>
         <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
         <td style="color:#ffaa00;font-size:9px">${strs(b.rating)}</td>
       </tr>`).join('');
