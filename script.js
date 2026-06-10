@@ -775,25 +775,10 @@ const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleCol
 // OVERVIEW
 // ══════════════════════════════════════════════════════════════
 try {
-// Use pre-computed statistics
+// Use pre-computed statistics. DOM-only panels render first so a Chart.js
+// load failure can't take the text content down with it.
 const sA=STATS.styleRanked;
-safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
-  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
-  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-});
-
 const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
-safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-});
-
-safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
-  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#ff6600'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
-    scales:{x:{title:{display:true,text:'ABV (%)',color:'#444'},min:3.5,max:10,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},
-            y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
-});
 
 // Live Pearson r for the scatter panel header (was previously hardcoded)
 {
@@ -805,7 +790,6 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
   const corrEl=document.getElementById('scatterCorr');
   if(corrEl) corrEl.textContent=`r ≈ ${pr.toFixed(2)} · ${corrLabel}`;
 }
-
 
 // Dynamic market signals — computed from live data
 const bestStyle=STATS.styleRanked[0];
@@ -877,6 +861,24 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
   }
 }
 
+// ── Charts (everything below needs Chart.js) ──
+safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
+  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
+});
+
+safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
+  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
+  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
+});
+
+safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
+  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#ff6600'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
+  options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
+    scales:{x:{title:{display:true,text:'ABV (%)',color:'#444'},min:3.5,max:10,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},
+            y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
+});
+
 // Monthly flow — review volume bars + avg-rating line
 {
   const {months:cm,byMonth:cb,monthColors:cc,monthAbbr:ca}=getMonthlyData();
@@ -928,7 +930,7 @@ function renderTable(data){
     }
     document.getElementById('beerBody').innerHTML=data.map(b=>`
       <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
-        <td>${logoImg(b.beer,22)}</td>
+        <td>${logoImg(b.beer,24)}</td>
         <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#555;font-size:9px">${b.style}</td>
         <td>${FLAGS[b.origin]||''} ${b.origin}</td>
@@ -1401,18 +1403,6 @@ function drawTemporal(){
   heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#555"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #222"><div style="flex:1;background:rgba(255,34,34,0.4)"></div><div style="flex:1;background:rgba(255,102,0,0.35)"></div><div style="flex:1;background:rgba(255,170,0,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(0,204,68,0.4)"></div></div><span>HIGH</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
-  // ── Country exposure — all months
-  const allCountries=[...new Set(beers.map(b=>b.origin))].sort();
-  safeChart('monthCountryChart',document.getElementById('monthCountryChart'),{type:'bar',
-    data:{labels:allCountries.map(c=>`${FLAGS[c]||''} ${c}`),datasets:months.map((m,i)=>({
-      label:m,
-      data:allCountries.map(c=>byMonth[m].filter(b=>b.origin===c).length),
-      backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2
-    }))},
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-  });
-
   // ── Momentum panel — compares latest two months
   const mRow = (l,v,c) => `<div class="mini-row"><span style="font-size:9px;color:var(--orange)">${l}</span><span class="${c}" style="font-family:var(--mono);font-size:10px;font-weight:700">${v}</span></div>`;
   let momentum = '';
@@ -1429,7 +1419,7 @@ function drawTemporal(){
       const overlap = [...new Set(byMonth[m].map(b=>b.beer))].filter(n=>byMonth[nextM].some(b=>b.beer===n));
       momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} PACE`, (paceChg>=0?'+':'')+paceChg+' REVIEWS', paceChg>=0?'up':'dn');
       momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} Δ RATING`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
-      momentum += mRow('REPEAT BRANDS', overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')','');
+      momentum += mRow('REPEAT BRANDS', overlap.length?overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')':'0','');
     }
   });
   {const _mp=document.getElementById('momentumPanel'); if(_mp) _mp.innerHTML = momentum;}

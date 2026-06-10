@@ -332,6 +332,17 @@
     </div>
   </div>
 
+  <div class="g2">
+    <div class="bb-panel">
+      <div class="bb-panel-head">MOMENTUM — MONTH OVER MONTH<span class="ph-right">PACE · Δ RATING · REPEAT BRANDS</span></div>
+      <div class="bb-body" id="momentumPanel"></div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">RATING DISTRIBUTION BY MONTH<span class="ph-right">COUNT PER BUCKET</span></div>
+      <div class="bb-body"><canvas id="monthDistChart" height="200"></canvas></div>
+    </div>
+  </div>
+
   <div class="bb-panel">
     <div class="bb-panel-head">COUNTRY RANKINGS — BUMP CHART<span class="ph-right">RANK OVER TIME · LINE = COUNTRY</span></div>
     <div class="bb-body" id="bump-chart-wrap"><canvas id="bumpChart" height="180"></canvas></div>
@@ -341,6 +352,9 @@
     <div class="bb-panel-head">SEASONAL TASTE PROFILE<span class="ph-right">STYLE × MONTH · COLOR = AVG RATING</span></div>
     <div class="bb-body" id="seasonalHeatmap"></div>
   </div>
+
+  <!-- Style-mix doughnuts — one panel per month, injected by drawTemporal() -->
+  <div id="temporal-style-charts"></div>
 
   <div class="bb-panel">
     <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
@@ -367,7 +381,15 @@
       <div class="collapse-panels">
         <div class="bb-panel">
           <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
-          <div class="bb-body"><canvas id="contrarianChart" height="220"></canvas></div>
+          <div class="bb-body">
+            <div id="ciFreshness" style="font-size:8px;letter-spacing:1px;margin-bottom:4px"></div>
+            <canvas id="contrarianChart" height="220"></canvas>
+          </div>
+        </div>
+
+        <div class="bb-panel">
+          <div class="bb-panel-head">★ TOP PICKS — HIGHEST UPSIDE<span class="ph-right" id="ipo-top-count">—</span></div>
+          <div class="bb-body"><div class="ipo-top-picks" id="ipoTopPicks"></div></div>
         </div>
 
         <div class="bb-grid-2">
