@@ -250,19 +250,16 @@
         <span class="bb-ctrl-title">BEER INDEX <span class="new-tag" id="beers-new-tag"></span></span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           <input id="beerSearch" type="text" placeholder="SEARCH BEER, STYLE, CITY…" aria-label="Search beers">
-          <select id="beerStyleFilter" class="bb-select"><option value="">ALL STYLES</option></select>
-          <select id="beerOriginFilter" class="bb-select"><option value="">ALL ORIGINS</option></select>
-          <select id="beerSortSel" class="bb-select">
-            <option value="rating">SORT: RATING ↓</option>
-            <option value="name">SORT: NAME A→Z</option>
-            <option value="abv">SORT: ABV ↓</option>
-          </select>
+          <select id="beerStyleFilter" class="bb-select" aria-label="Filter by style"><option value="">ALL STYLES</option></select>
+          <select id="beerOriginFilter" class="bb-select" aria-label="Filter by origin"><option value="">ALL ORIGINS</option></select>
+          <select id="beerMonthFilter" class="bb-select" aria-label="Filter by month consumed"><option value="">ALL MONTHS</option></select>
           <span id="beerFilterCount" role="status" aria-live="polite" style="font-size:9px;color:#555"></span>
         </div>
       </div>
+      <div id="beerChips" class="flt-chips" hidden></div>
       <div style="overflow-x:auto">
         <table class="bb-table">
-          <thead><tr><th width="30"></th><th>BEER</th><th>STYLE</th><th>ORIGIN</th><th>ABV</th><th>METHOD</th><th>CITY</th><th>MONTH</th><th>RATING</th><th>STARS</th></tr></thead>
+          <thead id="beerHead"><tr><th width="30"></th><th data-sort="beer">BEER</th><th data-sort="style">STYLE</th><th data-sort="origin">ORIGIN</th><th data-sort="abv">ABV</th><th data-sort="method">METHOD</th><th data-sort="city">CITY</th><th data-sort="month">MONTH</th><th data-sort="rating">RATING</th><th>STARS</th></tr></thead>
           <tbody id="beerBody"></tbody>
         </table>
       </div>

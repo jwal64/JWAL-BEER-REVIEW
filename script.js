@@ -944,23 +944,61 @@ function renderTable(data){
       </tr>`).join('');
   } catch(e){ console.error('renderTable error:',e); }
 }
+// Column sorting state — clicking a table header sorts by that column,
+// clicking it again reverses. Numeric/date columns default to descending.
+const beerSort={key:'rating',dir:-1};
+const BEER_SORT_CMP={
+  beer:(a,b)=>a.beer.localeCompare(b.beer),
+  style:(a,b)=>a.style.localeCompare(b.style),
+  origin:(a,b)=>a.origin.localeCompare(b.origin),
+  abv:(a,b)=>a.abv-b.abv,
+  method:(a,b)=>a.method.localeCompare(b.method),
+  city:(a,b)=>a.city.localeCompare(b.city),
+  month:(a,b)=>(a.year*12+a.monthN)-(b.year*12+b.monthN),
+  rating:(a,b)=>a.rating-b.rating
+};
+function updateBeerSortHeaders(){
+  document.querySelectorAll('#beerHead th[data-sort]').forEach(th=>{
+    th.classList.toggle('s-asc',th.dataset.sort===beerSort.key&&beerSort.dir===1);
+    th.classList.toggle('s-desc',th.dataset.sort===beerSort.key&&beerSort.dir===-1);
+    th.setAttribute('aria-sort',th.dataset.sort===beerSort.key?(beerSort.dir===1?'ascending':'descending'):'none');
+  });
+}
+function renderBeerChips(f){
+  const wrap=document.getElementById('beerChips');
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const chips=[];
+  if(f.q)chips.push({k:'q',label:`“${esc(f.q)}”`});
+  if(f.st)chips.push({k:'st',label:`STYLE: ${esc(f.st)}`});
+  if(f.or)chips.push({k:'or',label:`ORIGIN: ${FLAGS[f.or]||''} ${f.or}`});
+  if(f.mo)chips.push({k:'mo',label:`MONTH: ${esc(f.moLabel)}`});
+  wrap.hidden=!chips.length;
+  wrap.innerHTML=chips.map(c=>
+    `<button type="button" class="flt-chip" data-clear="${c.k}">${c.label}<span class="x" aria-hidden="true">✕</span></button>`).join('')
+    +(chips.length?`<button type="button" class="flt-chip clear-all" data-clear="all">CLEAR ALL</button>`:'');
+}
 function applyBeerFilter(){
-  const q=(document.getElementById('beerSearch').value||'').toLowerCase();
+  const q=(document.getElementById('beerSearch').value||'').trim().toLowerCase();
   const st=document.getElementById('beerStyleFilter').value;
   const or=document.getElementById('beerOriginFilter').value;
-  const sk=document.getElementById('beerSortSel').value;
-  // Single pass: combine search + style + origin into one predicate
+  const moEl=document.getElementById('beerMonthFilter');
+  const mo=moEl.value;
+  // Single pass: combine search + style + origin + month into one predicate
   const data=beers.filter(b=>
     (!st||b.style===st)&&
     (!or||b.origin===or)&&
+    (!mo||`${b.monthN}-${b.year}`===mo)&&
     (!q||b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||b.country.toLowerCase().includes(q)||b.city.toLowerCase().includes(q)));
-  data.sort((a,b)=>sk==='rating'?b.rating-a.rating:sk==='name'?a.beer.localeCompare(b.beer):b.abv-a.abv);
+  data.sort((a,b)=>beerSort.dir*BEER_SORT_CMP[beerSort.key](a,b));
+  updateBeerSortHeaders();
+  renderBeerChips({q,st,or,mo,moLabel:mo?moEl.options[moEl.selectedIndex].textContent:''});
   renderTable(data);
 }
 function resetBeerFilter(){
   document.getElementById('beerSearch').value='';
   document.getElementById('beerStyleFilter').value='';
   document.getElementById('beerOriginFilter').value='';
+  document.getElementById('beerMonthFilter').value='';
   applyBeerFilter();
 }
 // Debounced version for keystroke-driven search input — select changes stay instant via applyBeerFilter()
@@ -973,6 +1011,13 @@ try {
   const origEl=document.getElementById('beerOriginFilter');
   const sf=document.createDocumentFragment();styles.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sf.appendChild(o);});styleEl.appendChild(sf);
   const of=document.createDocumentFragment();origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=`${FLAGS[o]||''} ${o}`;of.appendChild(el);});origEl.appendChild(of);
+  // Month-consumed filter — one option per month/year present in the data, chronological
+  const monthEl=document.getElementById('beerMonthFilter');
+  const monthMap=new Map();
+  beers.forEach(b=>monthMap.set(`${b.monthN}-${b.year}`,{label:`${b.month.toUpperCase()} ${b.year}`,ord:b.year*12+b.monthN}));
+  const mf=document.createDocumentFragment();
+  [...monthMap.entries()].sort((a,b)=>a[1].ord-b[1].ord).forEach(([v,m])=>{const o=document.createElement('option');o.value=v;o.textContent=m.label;mf.appendChild(o);});
+  monthEl.appendChild(mf);
   applyBeerFilter();
 } catch(e){ console.error('renderTable init:',e); }
 
@@ -2190,8 +2235,29 @@ try {
 
   // Beer filter controls (search debounced; select changes instant)
   document.getElementById('beerSearch').addEventListener('input', applyBeerFilterDebounced);
-  ['beerStyleFilter','beerOriginFilter','beerSortSel'].forEach(id =>
+  ['beerStyleFilter','beerOriginFilter','beerMonthFilter'].forEach(id =>
     document.getElementById(id).addEventListener('change', applyBeerFilter));
+
+  // Sortable column headers — click to sort, click again to reverse
+  document.getElementById('beerHead').addEventListener('click', function(e) {
+    const th = e.target.closest('th[data-sort]');
+    if (!th) return;
+    const key = th.dataset.sort;
+    if (beerSort.key === key) { beerSort.dir = -beerSort.dir; }
+    else { beerSort.key = key; beerSort.dir = (key==='abv'||key==='rating'||key==='month') ? -1 : 1; }
+    applyBeerFilter();
+  });
+
+  // Active-filter chips — ✕ removes one filter, CLEAR ALL resets everything
+  document.getElementById('beerChips').addEventListener('click', function(e) {
+    const chip = e.target.closest('[data-clear]');
+    if (!chip) return;
+    const k = chip.dataset.clear;
+    if (k === 'all') { resetBeerFilter(); return; }
+    const id = {q:'beerSearch',st:'beerStyleFilter',or:'beerOriginFilter',mo:'beerMonthFilter'}[k];
+    document.getElementById(id).value = '';
+    applyBeerFilter();
+  });
 
   // Beer table rows (+ "clear filters" button in the empty-state row)
   document.getElementById('beerBody').addEventListener('click', function(e) {
