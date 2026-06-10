@@ -28,8 +28,15 @@
 --glass-blur: 12px;
 --cyan-glow: rgba(0, 170, 255, 0.15);
 --orange-glow: rgba(255, 102, 0, 0.15);
+--green-glow: rgba(0, 204, 68, 0.15);
+--panel-hover: #161616;
 --transition-fast: 0.15s ease;
 --transition-med: 0.25s ease;
+}
+
+/* Lining, equal-width digits everywhere numbers column up */
+.kpi-val, .kpi-delta, .rb, .bb-table tbody td, .insight-val, .drawer-val {
+  font-variant-numeric: tabular-nums;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -281,7 +288,11 @@ flex-shrink: 0;
 PANELS
 ═══════════════════════════════════════════ */
 .panel { display: none; padding: 6px; }
-.panel.active { display: block; }
+.panel.active { display: block; animation: panelIn 0.18s ease; }
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
 
 .merged-section { margin-bottom: 10px; }
 .merged-section + .merged-section { border-top: 1px solid var(--border2); padding-top: 8px; }
@@ -300,7 +311,9 @@ background: var(--panel);
 border: 1px solid var(--border2);
 margin-bottom: 6px;
 position: relative;
+transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
+.bb-panel:hover { border-color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.45); }
 .bb-panel-head {
 background: var(--orange);
 color: #000;
@@ -323,6 +336,10 @@ transition: box-shadow var(--transition-fast);
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
 .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 6px; }
 .g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 6px; }
+.g6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-bottom: 6px; }
+@media (max-width: 1280px) and (min-width: 1025px) {
+  .g6 { grid-template-columns: repeat(3,1fr); }
+}
 
 /* ═══════════════════════════════════════════
 KPI TILES
@@ -331,12 +348,12 @@ KPI TILES
 background: var(--panel);
 border: 1px solid var(--border2);
 border-top: 2px solid var(--orange);
-padding: 6px 8px;
-transition: border-top-color var(--transition-fast), box-shadow var(--transition-fast);
+padding: 7px 9px;
+transition: border-top-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
-.kpi:hover { border-top-color: var(--cyan); box-shadow: 0 -2px 8px var(--cyan-glow); }
+.kpi:hover { border-top-color: var(--cyan); box-shadow: 0 -2px 8px var(--cyan-glow); transform: translateY(-1px); }
 .kpi-val {
-font-size: 17px;
+font-size: 21px;
 font-weight: 700;
 font-family: var(--mono);
 line-height: 1;
@@ -694,7 +711,7 @@ z-index: 100;
 .mb-spacer { display: none; }
 
 /* GRIDS — singleton on narrow screens for readability */
-.g2, .g4 { grid-template-columns: 1fr 1fr; gap: 6px; }
+.g2, .g4, .g6 { grid-template-columns: 1fr 1fr; gap: 6px; }
 .g3, .g5 { grid-template-columns: 1fr; gap: 6px; }
 
 .panel { padding: 8px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
@@ -705,7 +722,7 @@ z-index: 100;
 
 /* KPI TILES — readable sizes */
 .kpi { padding: 6px 8px; }
-.kpi-val { font-size: 16px; }
+.kpi-val { font-size: 18px; }
 .kpi-label { font-size: 8px; letter-spacing: 1.0px; }
 .kpi-sub { font-size: 9px; }
 
@@ -868,12 +885,12 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
 
 /* iPhone Pro / narrow phones — extra polish below 430px */
 @media (max-width: 430px) {
-  .g2, .g4 { grid-template-columns: 1fr; }
+  .g2, .g4, .g6 { grid-template-columns: 1fr; }
   .beer-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .beer-card { padding: 8px; min-height: 130px; }
   .bc-logo-wrap { height: 50px; }
   .panel { padding: 6px; }
-  .kpi-val { font-size: 15px; }
+  .kpi-val { font-size: 16px; }
   #drunkMap, #brewedMap { height: 320px; }
 }
 
@@ -897,6 +914,7 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
 .sidebar-label { font-size: 9px; }
 .sidebar-key { display: none; }
 .g4, .g5 { grid-template-columns: 1fr 1fr; }
+.g6 { grid-template-columns: repeat(3, 1fr); }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
