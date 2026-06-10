@@ -480,15 +480,17 @@ function updateLiveStats(){
   const topBeer      = STATS.sorted[0];
   const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
   const avgRating    = STATS.globalAvg;
-  // Single pass: sum ABV, find min/max, count new
-  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0;
+  // Single pass: sum ABV, find min/max, count new + hits
+  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0,hitCount=0;
   for(const b of beers){
     abvSum+=b.abv;
     if(b.abv<minAbv)minAbv=b.abv;
     if(b.abv>maxAbv)maxAbv=b.abv;
     if(isDisplayNew(b))newCount++;
+    if(b.rating>=3)hitCount++;
   }
   const avgAbv = beers.length?abvSum/beers.length:0;
+  const hitRate = beers.length?Math.round(hitCount/beers.length*100):0;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Header bar
@@ -505,6 +507,8 @@ function updateLiveStats(){
   set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
   set('ov-brands-val', totalBrands);
   set('ov-brands-sub', `Across ${totalCtry} countries`);
+  set('ov-hit-val',  hitRate+'%');
+  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated ≥3.00`);
   // BEERS tab
   set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
   set('brands-count', `${totalBrands} UNIQUE BRANDS`);
@@ -813,27 +817,96 @@ const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
 const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
 const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
 
-document.getElementById('mktPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>`;
-
-// Dynamic latest activity panel
-const latestTwo=[...beers].sort((a,b)=>b.year-a.year||b.monthN-a.monthN).slice(0,2);
-const hitRate=(beers.filter(b=>b.rating>=3).length/beers.length*100).toFixed(0);
 const last5=beers.slice(-5).map(b=>b.rating);
 const prev5=beers.slice(-10,-5).map(b=>b.rating);
 const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
 const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
 const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
 
-document.getElementById('latestPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">LATEST</span><div><div class="insight-val">${latestTwo.map(b=>b.beer).join(' &amp; ')}</div><div class="insight-sub">${latestTwo.map(b=>b.rating.toFixed(2)).join(' / ')} · ${latestTwo[0]?latestTwo[0].city:'—'}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg</div></div></div>
-  <div class="insight-row"><span class="insight-key">COVERAGE</span><div><div class="insight-val">${Object.keys(STATS.countryMap).length} countries</div><div class="insight-sub">${Object.keys(STATS.cityMap).length} markets</div></div></div>
-  <div class="insight-row"><span class="insight-key">HIT RATE</span><div><div class="insight-val ${hitRate>=60?'up':hitRate>=40?'fl':'dn'}">${hitRate>=60?'▲ ':''}${hitRate}%</div><div class="insight-sub">Rated ≥3.00</div></div></div>`;
+document.getElementById('mktPanel').innerHTML=`
+  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} markets</div></div></div>`;
+
+// Recent activity feed — last 6 pours, newest first (beers[] is chronological)
+const recentEl=document.getElementById('recentFeed');
+if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
+  <div class="feed-row" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
+    ${logoImg(b.beer,20)}
+    <div class="feed-main">
+      <span class="feed-name">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</span>
+      <span class="feed-meta">${b.style} · ${b.method} · ${b.city} · ${b.month} ${b.year}</span>
+    </div>
+    <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
+  </div>`).join('');
+
+// Month in review — latest month vs the one before
+{
+  const {months:mKeys,byMonth:mBuckets,monthLabels:mLabels}=getMonthlyData();
+  const lastK=mKeys[mKeys.length-1],prevK=mKeys[mKeys.length-2];
+  const cur=lastK?mBuckets[lastK]:[];
+  const mirEl=document.getElementById('mirPanel');
+  if(mirEl&&cur.length){
+    const curAvg=avg(cur.map(b=>b.rating));
+    const prevAvg=prevK?avg(mBuckets[prevK].map(b=>b.rating)):null;
+    const dAvg=prevAvg!=null?curAvg-prevAvg:null;
+    const best=cur.reduce((a,b)=>b.rating>a.rating?b:a);
+    const worst=cur.reduce((a,b)=>b.rating<a.rating?b:a);
+    const curSet=new Set(cur);
+    const earlier=new Set(beers.filter(b=>!curSet.has(b)).map(b=>b.beer));
+    const newBrands=[...new Set(cur.map(b=>b.beer))].filter(n=>!earlier.has(n)).length;
+    const lbl=document.getElementById('mirLabel');
+    if(lbl) lbl.textContent=(mLabels[mLabels.length-1]||'').toUpperCase();
+    const dCls=dAvg==null?'fl':dAvg>0.05?'up':dAvg<-0.05?'dn':'fl';
+    const dTxt=dAvg==null?'First month on record':`${dAvg>=0?'+':''}${dAvg.toFixed(2)} vs prior month`;
+    const pourRow=(key,b,cls)=>`
+      <div class="insight-row"><span class="insight-key">${key}</span>
+        <div class="feed-row mir-pour" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
+          ${logoImg(b.beer,18)}
+          <div class="feed-main"><span class="feed-name">${b.beer}</span><span class="feed-meta">${b.style} · ${b.method}</span></div>
+          <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
+        </div></div>`;
+    mirEl.innerHTML=`
+      <div class="insight-row"><span class="insight-key">REVIEWS</span><div><div class="insight-val">${cur.length}</div><div class="insight-sub">${newBrands} first-time brand${newBrands===1?'':'s'}</div></div></div>
+      <div class="insight-row"><span class="insight-key">MONTH AVG</span><div><div class="insight-val ${dCls}">${curAvg.toFixed(2)}</div><div class="insight-sub">${dTxt}</div></div></div>
+      ${pourRow('BEST POUR',best)}
+      ${best!==worst?pourRow('WORST POUR',worst):''}`;
+  }
+}
+
+// Monthly flow — review volume bars + avg-rating line
+{
+  const {months:cm,byMonth:cb,monthColors:cc,monthAbbr:ca}=getMonthlyData();
+  const counts=cm.map(m=>cb[m].length);
+  const avgs=cm.map(m=>+avg(cb[m].map(b=>b.rating)).toFixed(2));
+  safeChart('monthlyCombo',document.getElementById('monthlyCombo'),{
+    data:{labels:cm.map(m=>ca[m].toUpperCase()),datasets:[
+      {type:'bar',label:'Reviews',data:counts,backgroundColor:cc.map(c=>c+'33'),borderColor:cc,borderWidth:2,yAxisID:'y'},
+      {type:'line',label:'Avg Rating',data:avgs,borderColor:'#ffaa00',backgroundColor:'transparent',pointBackgroundColor:avgs.map(r=>rC(r)),pointRadius:5,pointBorderColor:'#000',pointBorderWidth:1,tension:0.3,yAxisID:'y2'}
+    ]},
+    options:{plugins:{legend:{display:false},tooltip:TT},
+      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:5}},
+              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffaa00'}},
+              x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
+  });
+}
+
+// Rating distribution — quarter-point histogram colored by rating band
+{
+  const histCounts={};
+  beers.forEach(b=>{const k=b.rating.toFixed(2);histCounts[k]=(histCounts[k]||0)+1;});
+  const histKeys=[];
+  for(let r=1.75;r<=5.001;r+=0.25)histKeys.push(r.toFixed(2));
+  safeChart('ratingHist',document.getElementById('ratingHist'),{type:'bar',
+    data:{labels:histKeys,datasets:[{data:histKeys.map(k=>histCounts[k]||0),backgroundColor:histKeys.map(k=>rC(+k)+'cc'),borderWidth:0}]},
+    options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw} review${c.raw===1?'':'s'} @ ${c.label}`}}},
+      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},
+              x:{grid:{display:false},ticks:{color:'#444',font:{size:8},maxRotation:60,minRotation:60}}}}
+  });
+}
 } catch(e){ console.error('Overview init error:',e); }
 
 // Insights panels (stat summary / quintiles / taste profile) now live on the
@@ -1997,10 +2070,11 @@ window.closeBreweryDrawer=closeBreweryDrawer;
       'spark-low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
       'spark-abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
       'spark-brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
+      'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
     };
     const sparkColors={
       'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#cc3366'
+      'spark-abv':'#00f5ff','spark-brands':'#cc3366','spark-hit':'#00cc44'
     };
 
     Object.entries(sparkData).forEach(([id,data])=>{
@@ -2050,6 +2124,25 @@ window.closeBreweryDrawer=closeBreweryDrawer;
     animate('ov-low-val',lowBeer.rating,2);
     animate('ov-abv-val',avgAbv,1,'%');
     animate('ov-brands-val',totalBrands,0);
+    animate('ov-hit-val',beers.length?beers.filter(b=>b.rating>=3).length/beers.length*100:0,0,'%');
+
+    // MoM delta chips — latest sparkline point vs the one before
+    [['ov-top-delta','spark-top',v=>v.toFixed(2)],
+     ['ov-avg-delta','spark-avg',v=>v.toFixed(2)],
+     ['ov-low-delta','spark-low',v=>v.toFixed(2)],
+     ['ov-abv-delta','spark-abv',v=>v.toFixed(1)+'pp'],
+     ['ov-brands-delta','spark-brands',v=>String(Math.round(v))],
+     ['ov-hit-delta','spark-hit',v=>Math.round(v)+'pp'],
+    ].forEach(([id,key,f])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      const d=sparkData[key],a=d[d.length-2],b=d[d.length-1];
+      if(a==null||b==null){ el.textContent=''; return; }
+      const diff=b-a,up=diff>0.005,dn=diff<-0.005;
+      el.className='kpi-delta '+(up?'up':dn?'dn':'fl');
+      el.textContent=(up?'▲':dn?'▼':'→')+f(Math.abs(diff));
+      el.title='vs previous month';
+    });
   } catch(e){ console.error('KPI sparklines error:',e); }
 })();
 
@@ -2073,6 +2166,18 @@ try {
   document.getElementById('maps').addEventListener('click', function(e) {
     const btn = e.target.closest('.subtab[data-subtab]');
     if (btn) showMapSubtab(btn.dataset.subtab);
+  });
+
+  // Overview — recent-activity / month-in-review rows open the beer modal
+  const ovPanel=document.getElementById('overview');
+  ovPanel.addEventListener('click', function(e) {
+    const row = e.target.closest('.feed-row[data-beer]');
+    if (row) openBeerModal(row.dataset.beer);
+  });
+  ovPanel.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter' && e.key!==' ') return;
+    const row = e.target.closest('.feed-row[data-beer]');
+    if (row) { e.preventDefault(); openBeerModal(row.dataset.beer); }
   });
 
   // Beer modal — close on backdrop click

@@ -109,6 +109,7 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
   .beer-card:hover,
   .subtab:hover,
   .ipo-top-pick:hover,
+  .feed-row:hover,
   .bb-table tbody tr:hover,
   .bb-collapse > summary:hover { background: initial; box-shadow: none; }
   .beer-card:hover { transform: none; }
@@ -366,7 +367,8 @@ letter-spacing: 1.5px;
 text-transform: uppercase;
 }
 .kpi-sub { font-size: 9px; color: var(--dim); margin-top: 2px; }
-.kpi-delta { font-size: 9px; font-weight: 600; }
+.kpi-top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+.kpi-delta { font-size: 9px; font-weight: 600; white-space: nowrap; }
 .up { color: var(--green2); }
 .dn { color: var(--red); }
 .fl { color: var(--amber); }
@@ -608,6 +610,25 @@ MINI-ROW
 ═══════════════════════════════════════════ */
 .mini-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 10px; }
 .mini-row:last-child { border-bottom: none; }
+
+/* ═══════════════════════════════════════════
+OVERVIEW ACTIVITY FEED
+═══════════════════════════════════════════ */
+.feed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 3px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.feed-row:last-child { border-bottom: none; }
+.feed-row:hover { background: rgba(0, 170, 255, 0.05); }
+.feed-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.feed-name { color: var(--orange); font-weight: 600; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-meta { color: var(--dim); font-size: 8px; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.insight-row .feed-row.mir-pour { flex: 1; border-bottom: none; padding: 0; }
 
 /* ═══════════════════════════════════════════
 SEPARATOR
