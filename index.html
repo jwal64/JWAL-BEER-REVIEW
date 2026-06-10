@@ -65,28 +65,19 @@
   <div id="drawer-body"></div>
 </div>
 
-<!-- MENU BAR -->
+<!-- MENU BAR — single chrome strip: identity + nav + live stats -->
 
 <div id="menubar-wrap">
   <div id="menubar">
-    <div class="mb-logo">JWAL'S</div>
-    <div class="mb-item active" data-tab="overview" title="Overview — KPIs, ratings &amp; insights"><span class="fkey">F1</span>OVERVIEW</div>
-    <div class="mb-item" data-tab="maps" title="Maps — places consumed &amp; brewery locations"><span class="fkey">F2</span>MAPS</div>
+    <div class="mb-logo">🍺 JWAL'S<span class="mb-logo-full"> BREW REVIEWS</span></div>
+    <div class="mb-item active" data-tab="maps" title="Maps — places consumed &amp; brewery locations"><span class="fkey">F1</span>MAPS</div>
+    <div class="mb-item" data-tab="overview" title="Overview — KPIs, ratings &amp; insights"><span class="fkey">F2</span>OVERVIEW</div>
     <div class="mb-item" data-tab="beers" title="All beers — searchable full dataset"><span class="fkey">F3</span>BEERS</div>
     <div class="mb-item" data-tab="geo" title="Geography — countries, cities &amp; brewing language"><span class="fkey">F4</span>GEO</div>
     <div class="mb-item" data-tab="temporal" title="Temporal — trends over time"><span class="fkey">F5</span>TIME</div>
     <div class="mb-item" data-tab="markets" title="Markets — recommendations &amp; watchlist"><span class="fkey">F6</span>MARKETS</div>
     <div class="mb-spacer"></div>
-    <div class="mb-right" id="mb-clock">—</div>
-  </div>
-</div>
-
-<!-- HEADER -->
-
-<div id="hdr">
-  <div class="hdr-block wide">
-    <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:10px;color:var(--dim);font-weight:500;letter-spacing:1px">· TERMINAL v2.7</span></div>
-    <div class="hdr-sub" id="hdr-subtitle">PERSONAL BREW INTELLIGENCE SYSTEM · — REVIEWS · — MARKETS · — BRANDS</div>
+    <div class="mb-right" id="mb-stats">—</div>
   </div>
 </div>
 
@@ -94,27 +85,13 @@
 
 <div class="terminal-body">
 
-<!-- SIDEBAR -->
-
-<div id="sidebar">
-  <div class="nav-section-head">DASHBOARD</div>
-  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F1</span></div>
-  <div class="nav-item" data-tab="maps"><span class="nav-icon">◉</span>MAPS<span class="nkey">F2</span></div>
-  <div class="nav-section-head">ANALYTICS</div>
-  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F3</span></div>
-  <div class="nav-item" data-tab="geo"><span class="nav-icon">◎</span>GEOGRAPHY<span class="nkey">F4</span></div>
-  <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F5</span></div>
-  <div class="nav-section-head">MARKETS</div>
-  <div class="nav-item" data-tab="markets"><span class="nav-icon">◆</span>MARKETS<span class="nkey">F6</span></div>
-</div>
-
 <!-- MAIN CONTENT -->
 
 <div id="main">
 
 <!-- ══════════════ OVERVIEW ══════════════ -->
 
-<div id="overview" class="panel active">
+<div id="overview" class="panel">
   <div class="g5" style="margin-bottom:8px">
     <div class="kpi"><div class="kpi-val up" id="ov-top-val">—</div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top" height="24"></canvas></div></div>
     <div class="kpi"><div class="kpi-val fl" id="ov-avg-val">—</div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg" height="24"></canvas></div></div>
@@ -169,7 +146,7 @@
 
 <!-- ══════════════ MAPS (places consumed + brewery locations) ══════════════ -->
 
-<div id="maps" class="panel">
+<div id="maps" class="panel active">
 
   <div class="subtabs" role="tablist">
     <button class="subtab active" data-subtab="drunk" role="tab" aria-selected="true">📍 PLACES CONSUMED</button>
@@ -177,47 +154,48 @@
   </div>
 
   <div id="subpanel-drunk" class="subpanel active">
-    <div class="bb-panel">
-      <div class="bb-panel-head">MAP<span class="ph-right">CLICK PINS · SIZE = REVIEW COUNT</span></div>
-      <div class="bb-body">
-        <div id="drunkMap"></div>
-        <div class="map-leg" id="drunkLeg"></div>
-      </div>
+    <div class="map-hero">
+      <div id="drunkMap"></div>
+      <div class="map-leg" id="drunkLeg"></div>
     </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">CONSUMPTION BY LOCATION</div>
-      <div class="bb-body">
-        <table class="bb-table">
-          <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>REVIEWS</th><th>AVG</th><th>BEERS TRIED</th></tr></thead>
-          <tbody id="drunkTbody"></tbody>
-        </table>
+    <div class="map-below">
+      <div class="bb-panel">
+        <div class="bb-panel-head">CONSUMPTION BY LOCATION<span class="ph-right">CLICK PINS · SIZE = REVIEW COUNT</span></div>
+        <div class="bb-body">
+          <div style="overflow-x:auto">
+            <table class="bb-table">
+              <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>REVIEWS</th><th>AVG</th><th>BEERS TRIED</th></tr></thead>
+              <tbody id="drunkTbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <div id="subpanel-brewed" class="subpanel">
-    <div class="bb-panel">
-      <div class="bb-panel-head">MAP<span class="ph-right">COLOR = AVG RATING</span></div>
-      <div class="bb-body">
-        <div id="brewedMap"></div>
-        <div class="map-leg">
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#16a34a"></div>4.5+</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#22c55e"></div>4.0–4.4</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#84cc16"></div>3.5–3.9</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#eab308"></div>3.0–3.4</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#f97316"></div>2.5–2.9</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#ef4444"></div>&lt;2.5</div>
-        </div>
+    <div class="map-hero">
+      <div id="brewedMap"></div>
+      <div class="map-leg">
+        <div class="map-leg-title">COLOR = AVG RATING</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#16a34a"></div>4.5+</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#22c55e"></div>4.0–4.4</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#84cc16"></div>3.5–3.9</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#eab308"></div>3.0–3.4</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#f97316"></div>2.5–2.9</div>
+        <div class="map-leg-item"><div class="map-leg-dot" style="background:#ef4444"></div>&lt;2.5</div>
       </div>
     </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BREWERY DIRECTORY</div>
-      <div class="bb-body">
-        <div style="overflow-x:auto">
-          <table class="bb-table">
-            <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>LOCATION</th><th>COUNTRY</th><th>BEER(S)</th><th>AVG</th></tr></thead>
-            <tbody id="brewedTbody"></tbody>
-          </table>
+    <div class="map-below">
+      <div class="bb-panel">
+        <div class="bb-panel-head">BREWERY DIRECTORY</div>
+        <div class="bb-body">
+          <div style="overflow-x:auto">
+            <table class="bb-table">
+              <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>LOCATION</th><th>COUNTRY</th><th>BEER(S)</th><th>AVG</th></tr></thead>
+              <tbody id="brewedTbody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -419,10 +397,9 @@
 
 <div id="statusbar">
   <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
-  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v2.7</div>
+  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v3.0</div>
   <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
   <div class="sb-spacer"></div>
-  <div class="sb-item" id="sb-time">--:--:--</div>
 </div>
 
 <script defer src="script.js"></script>

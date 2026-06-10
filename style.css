@@ -52,11 +52,11 @@ image-rendering: auto;
 text-size-adjust: 100%;
 touch-action: manipulation;
 }
-button, .mb-item, .nav-item, .subtab, .cmd-item, .beer-card,
+button, .mb-item, .subtab, .cmd-item, .beer-card,
 .bb-select, input, select { -webkit-tap-highlight-color: rgba(255,102,0,0.22); }
 
 /* Visible focus ring for keyboard navigation (mouse clicks stay clean) */
-.mb-item:focus-visible, .nav-item:focus-visible, .subtab:focus-visible,
+.mb-item:focus-visible, .subtab:focus-visible,
 button:focus-visible, .bb-select:focus-visible, input:focus-visible,
 .cmd-item:focus-visible, .beer-card:focus-visible {
   outline: 2px solid var(--cyan);
@@ -96,7 +96,6 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
 /* Strip hover-only effects on touch devices to avoid sticky :hover after tap */
 @media (hover: none) {
   .bb-panel-head:hover,
-  .nav-item:hover,
   .mb-item:hover,
   .kpi:hover,
   .beer-card:hover,
@@ -106,17 +105,18 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
   .bb-collapse > summary:hover { background: initial; box-shadow: none; }
   .beer-card:hover { transform: none; }
   .beer-card:hover .bc-logo { filter: brightness(1.1) contrast(1.05); }
-  .nav-item:hover { padding-left: 6px; color: #aaa; }
 }
 
 /* ═══════════════════════════════════════════
-TOP MENU BAR — Bloomberg-style function keys
+TOP MENU BAR — the single chrome strip:
+identity · tabs · live stats. No header bar,
+no sidebar — this is the whole navigation.
 ═══════════════════════════════════════════ */
 #menubar {
 background: var(--orange);
 display: flex;
 align-items: stretch;
-height: 20px;
+height: 28px;
 border-bottom: 1px solid var(--orange3);
 user-select: none;
 padding-left: env(safe-area-inset-left, 0px);
@@ -125,8 +125,8 @@ padding-right: env(safe-area-inset-right, 0px);
 .mb-item {
 display: flex;
 align-items: center;
-padding: 0 8px;
-font-size: 9px;
+padding: 0 12px;
+font-size: 10px;
 font-weight: 600;
 color: #000;
 border-right: 1px solid rgba(0,0,0,0.12);
@@ -158,8 +158,8 @@ border-radius: 1px;
 }
 .mb-logo {
 font-weight: 700;
-font-size: 11px;
-padding: 0 10px;
+font-size: 12px;
+padding: 0 14px;
 border-right: 2px solid rgba(0,0,0,0.2);
 background: #000;
 color: var(--orange);
@@ -167,69 +167,19 @@ letter-spacing: 1.5px;
 display: flex;
 align-items: center;
 text-shadow: 0 0 8px rgba(255,102,0,0.4);
+white-space: nowrap;
 }
+/* Flex strips whitespace between the logo's text nodes — restore the gap */
+.mb-logo-full { margin-left: 0.45em; }
 .mb-spacer { flex: 1; }
-.mb-right { display: flex; align-items: center; padding: 0 12px; font-size: 10px; color: #000; font-weight: 600; letter-spacing: 0.5px; }
+.mb-right { display: flex; align-items: center; padding: 0 12px; font-size: 9px; color: #000; font-weight: 600; letter-spacing: 0.5px; white-space: nowrap; }
 
 /* ═══════════════════════════════════════════
-HEADER BAR
-═══════════════════════════════════════════ */
-#hdr {
-background: linear-gradient(180deg, rgba(17,17,17,0.85) 0%, rgba(13,13,13,0.92) 100%);
-backdrop-filter: blur(var(--glass-blur));
--webkit-backdrop-filter: blur(var(--glass-blur));
-border-bottom: 2px solid var(--orange);
-display: flex;
-align-items: stretch;
-height: 44px;
-}
-.hdr-block {
-padding: 0 10px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-border-right: 1px solid var(--border);
-}
-.hdr-block.wide {
-flex: 1;
-padding: 0 18px;
-}
-.hdr-title {
-font-size: 13px;
-font-weight: 700;
-color: var(--orange);
-letter-spacing: 0.8px;
-line-height: 1;
-font-family: var(--mono);
-text-shadow: 0 0 12px rgba(255,102,0,0.2);
-}
-.hdr-sub {
-font-size: 8px;
-color: var(--dim);
-letter-spacing: 1.8px;
-text-transform: uppercase;
-margin-top: 3px;
-font-family: var(--sans);
-font-weight: 500;
-}
-
-/* ═══════════════════════════════════════════
-LAYOUT
+LAYOUT — menubar (28px) + statusbar (16px)
 ═══════════════════════════════════════════ */
 .terminal-body {
 display: flex;
-height: calc(100vh - 82px);
-}
-#sidebar {
-width: 150px;
-flex-shrink: 0;
-background: var(--glass-bg);
-backdrop-filter: blur(var(--glass-blur));
--webkit-backdrop-filter: blur(var(--glass-blur));
-border-right: 2px solid var(--orange);
-overflow-y: auto;
-display: flex;
-flex-direction: column;
+height: calc(100vh - 45px);
 }
 #main {
 flex: 1;
@@ -239,49 +189,13 @@ padding-bottom: 20px;
 }
 
 /* ═══════════════════════════════════════════
-SIDEBAR NAV
-═══════════════════════════════════════════ */
-.nav-section-head {
-background: var(--border2);
-padding: 3px 6px;
-font-size: 8px;
-color: var(--dim);
-letter-spacing: 2px;
-text-transform: uppercase;
-border-bottom: 1px solid var(--border);
-border-top: 1px solid var(--border);
-}
-.nav-item {
-display: flex;
-align-items: center;
-padding: 4px 6px;
-cursor: pointer;
-border-bottom: 1px solid var(--border);
-transition: background var(--transition-fast), color var(--transition-fast), padding-left var(--transition-fast);
-gap: 4px;
-font-size: 9px;
-color: #aaa;
-letter-spacing: 0.3px;
-}
-.nav-item:hover { background: var(--panel2); color: var(--cyan); padding-left: 12px; }
-.nav-item.active { background: var(--orange); color: #000; font-weight: 700; box-shadow: inset 2px 0 0 var(--orange3); }
-.nav-item .nkey {
-margin-left: auto;
-font-size: 8px;
-background: var(--border2);
-color: var(--dim);
-padding: 0 3px;
-border: 1px solid var(--border);
-flex-shrink: 0;
-}
-.nav-item.active .nkey { background: var(--orange3); color: #000; border-color: var(--orange3); }
-.nav-icon { width: 12px; text-align: center; flex-shrink: 0; font-size: 8px; }
-
-/* ═══════════════════════════════════════════
 PANELS
 ═══════════════════════════════════════════ */
 .panel { display: none; padding: 6px; }
 .panel.active { display: block; }
+/* Panels are #hash fragment targets; keep the browser's scroll-to-fragment
+   from tucking them under the sticky menubar (34px tall on mobile). */
+.panel { scroll-margin-top: 40px; }
 
 .merged-section { margin-bottom: 10px; }
 .merged-section + .merged-section { border-top: 1px solid var(--border2); padding-top: 8px; }
@@ -514,34 +428,88 @@ transition: filter 0.15s;
 .bc-new { position: absolute; top: 5px; right: 5px; background: var(--green); color: #000; font-size: 7px; font-weight: 700; padding: 1px 4px; }
 
 /* ═══════════════════════════════════════════
-MAPS
+MAPS — full-bleed hero map. The map IS the tab:
+edge-to-edge, viewport-height, with the subtab
+switcher and legend floating over it as glass
+panels. Tables live below the fold.
 ═══════════════════════════════════════════ */
+#maps.panel { padding: 0; position: relative; }
+.map-hero { position: relative; }
 #drunkMap, #brewedMap {
 width: 100%;
-height: 500px;
-border: 1px solid var(--border2);
+height: calc(100dvh - 45px);
+min-height: 380px;
+border: none;
+border-bottom: 1px solid var(--border2);
 filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7);
 }
-.map-leg { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-.map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--dim); letter-spacing: 0.2px; }
-.map-leg-dot { width: 10px; height: 10px; border: 1px solid rgba(255,255,255,.25); flex-shrink: 0; }
 
-/* Subtab strip — used inside a panel to switch between sibling sub-views */
-.subtabs { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 1px solid var(--border2); }
-.subtab {
-  background: transparent; color: var(--dim);
-  border: 1px solid var(--border2); border-bottom: none;
-  border-right: none;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
-  padding: 7px 14px; cursor: pointer;
-  transition: background .12s, color .12s;
+/* Floating subtab pills — overlaid top-center on the hero map.
+   z-index sits above Leaflet's internal panes/controls (≤1000 inside the
+   map container) but below the modal/palette/drawer overlays (≥1000 fixed). */
+#maps .subtabs {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  border: none;
+  max-width: calc(100% - 20px);
 }
-.subtab:last-child { border-right: 1px solid var(--border2); }
-.subtab:hover { color: var(--orange); }
-.subtab.active { background: var(--orange); color: #000; border-color: var(--orange); }
+.subtab {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  color: #bbb;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.2px;
+  padding: 8px 16px; cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  transition: background .12s, color .12s, border-color .12s;
+}
+.subtab:hover { color: var(--orange); border-color: var(--orange3); }
+.subtab.active { background: var(--orange); color: #000; border-color: var(--orange); font-weight: 700; }
 .subpanel { display: none; }
 .subpanel.active { display: block; }
-@media (max-width:700px){ .subtab { font-size: 9px; padding: 6px 10px; letter-spacing: 1px; } }
+
+/* Floating legend — glass panel pinned bottom-left of the hero map */
+.map-hero .map-leg {
+  position: absolute;
+  bottom: 14px;
+  left: 10px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  max-width: min(320px, 72%);
+  max-height: 38%;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+.map-leg-title { font-size: 8px; color: var(--orange); letter-spacing: 1.5px; padding-bottom: 2px; border-bottom: 1px solid var(--border2); }
+.map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #999; letter-spacing: 0.2px; }
+.map-leg-dot { width: 10px; height: 10px; border: 1px solid rgba(255,255,255,.25); flex-shrink: 0; border-radius: 50%; }
+
+/* Tables under the hero map */
+.map-below { padding: 8px; }
+
+@media (max-width:700px){
+  .subtab { font-size: 9px; padding: 8px 12px; letter-spacing: 0.8px; }
+  #drunkMap, #brewedMap { height: calc(100dvh - 75px); min-height: 320px; }
+  .map-hero .map-leg { max-height: 30%; max-width: 80%; }
+}
 
 /* ═══════════════════════════════════════════
 LEAFLET DARK POPUP
@@ -624,29 +592,12 @@ z-index: 100;
 .sb-spacer { flex: 1; }
 
 @media (max-width: 700px) {
-#sidebar { display: none; }
-.terminal-body { height: auto; }
+/* Keep #main as the scroll container (like desktop) so the body never
+   scrolls — otherwise the browser's load-time fragment scroll tucks the
+   page under the sticky menubar. 34px menubar + 20px statusbar. */
+.terminal-body { height: calc(100dvh - 54px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
 #main { width: 100%; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
 
-/* HEADER — collapse the wide title block; group the 5 stats into a tidy 3-up row */
-#hdr {
-  flex-wrap: wrap;
-  height: auto;
-  padding: 6px 8px;
-  padding-left: max(8px, env(safe-area-inset-left, 0px));
-  padding-right: max(8px, env(safe-area-inset-right, 0px));
-  gap: 4px;
-  background: linear-gradient(180deg, rgba(17,17,17,0.95) 0%, rgba(13,13,13,1) 100%);
-}
-.hdr-block.wide {
-  min-width: 100%;
-  border-right: none;
-  border-bottom: 1px solid var(--border);
-  padding: 0 0 4px 0;
-}
-.hdr-title { font-size: 13px; letter-spacing: 0.6px; }
-.hdr-title span { display: none; }
-.hdr-sub { font-size: 8px; letter-spacing: 1.2px; margin-top: 2px; }
 /* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile.
    The wrapper holds the sticky+gradient so the right-edge fade stays pinned to
    the visible viewport instead of sliding with the scrolled content. */
@@ -690,6 +641,7 @@ z-index: 100;
 .mb-item .fkey { font-size: 9px; padding: 1px 4px; }
 .mb-item.active::after { height: 2px; }
 .mb-logo { padding: 0 10px; font-size: 11px; flex-shrink: 0; min-height: 34px; }
+.mb-logo-full { display: none; }
 .mb-right { display: none; }
 .mb-spacer { display: none; }
 
@@ -721,7 +673,8 @@ z-index: 100;
   padding-left: max(8px, env(safe-area-inset-left, 0px));
   padding-right: max(8px, env(safe-area-inset-right, 0px));
 }
-.sb-item:nth-child(3), .sb-item:nth-child(4) { display: none; }
+/* Hide the SYS label on phones; keep the live record counts */
+.sb-item:nth-child(2), .sb-spacer { display: none; }
 body { overscroll-behavior: none; }
 
 /* BEER GRID — 2 columns with breathing room */
@@ -796,13 +749,7 @@ body { overscroll-behavior: none; }
 .cmd-item-main { font-size: 12px; }
 .cmd-item-icon { font-size: 14px; width: 20px; }
 
-/* SUB-TABS — bigger tap zone, snappier sizing */
-.subtabs { flex-wrap: wrap; }
-.subtab { font-size: 10px; padding: 10px 14px; letter-spacing: 1px; min-height: 44px; flex: 1; }
-
-/* MAPS — shorter on phones, full-bleed look */
-#drunkMap, #brewedMap { height: 360px; }
-.map-leg { gap: 8px; }
+/* MAPS — floating legend stays compact on phones */
 .map-leg-item { font-size: 9px; }
 
 /* FORM CONTROLS — 16px font-size to prevent iOS zoom-on-focus */
@@ -874,12 +821,10 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   .bc-logo-wrap { height: 50px; }
   .panel { padding: 6px; }
   .kpi-val { font-size: 15px; }
-  #drunkMap, #brewedMap { height: 320px; }
 }
 
 /* Very small / iPhone SE — keep it usable */
 @media (max-width: 360px) {
-  .hdr-title { font-size: 12px; }
   .kpi-val { font-size: 14px; }
   .mb-item { padding: 0 8px; min-width: 44px; }
 }
@@ -889,13 +834,9 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   #menubar { height: calc(30px + env(safe-area-inset-top, 0px)); }
   .mb-item { min-height: 30px; }
   .mb-logo { min-height: 30px; }
-  #drunkMap, #brewedMap { height: 240px; }
 }
 
 @media (max-width: 1024px) and (min-width: 701px) {
-#sidebar { width: 140px; }
-.sidebar-label { font-size: 9px; }
-.sidebar-key { display: none; }
 .g4, .g5 { grid-template-columns: 1fr 1fr; }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
 }

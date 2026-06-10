@@ -467,7 +467,7 @@ function isDisplayNew(b){
 }
 
 // ══════════════════════════════════════════════════════════════
-// DYNAMIC STATS — update header, overview KPIs, and BEERS tab
+// DYNAMIC STATS — update menubar, overview KPIs, and BEERS tab
 // from live data so they never go stale when new beers are added
 // ══════════════════════════════════════════════════════════════
 function updateLiveStats(){
@@ -489,9 +489,8 @@ function updateLiveStats(){
   const avgAbv = beers.length?abvSum/beers.length:0;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  // Header bar
-  const sub = document.getElementById('hdr-subtitle');
-  if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+  // Menubar live readout (right edge)
+  set('mb-stats', `${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`);
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
@@ -631,29 +630,11 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   });
 })();
 
-// ══════════════════════════════════════════════════════════════
-// CLOCK — isolated first, cannot be killed by downstream errors
-// ══════════════════════════════════════════════════════════════
-(function initClock(){
-  // Cache DOM refs once so the 1-Hz tick isn't getElementById lookups/sec
-  const mbClockEl=document.getElementById('mb-clock');
-  const sbTimeEl=document.getElementById('sb-time');
-  function updateClock(){
-    try {
-      const t=new Date().toLocaleTimeString('en-US',{hour12:false});
-      if(mbClockEl) mbClockEl.textContent=t;
-      if(sbTimeEl) sbTimeEl.textContent=t;
-    } catch(e){ /* never let clock throw */ }
-  }
-  setInterval(updateClock,1000);
-  updateClock();
-})();
-
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'maps','3':'beers','4':'geo','5':'temporal','6':'markets',
-    'f1':'overview','f2':'maps','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'maps','2':'overview','3':'beers','4':'geo','5':'temporal','6':'markets',
+    'f1':'maps','f2':'overview','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -667,8 +648,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 (function initTabA11y(){
   try{
     const mb=document.getElementById('menubar'); if(mb) mb.setAttribute('role','tablist');
-    const sb=document.querySelector('.sidebar nav,#sidebar nav,nav'); if(sb) sb.setAttribute('role','tablist');
-    document.querySelectorAll('.nav-item,.mb-item').forEach(el=>{
+    document.querySelectorAll('.mb-item').forEach(el=>{
       const tab=el.dataset.tab; if(!tab) return;
       el.setAttribute('role','tab');
       el.setAttribute('tabindex','0');
@@ -679,19 +659,14 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 })();
 // Tab navigation is static after load — query once instead of on every switch.
 const TAB_PANELS=[...document.querySelectorAll('.panel')];
-const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
 const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
-function showTab(id,btn){
+function showTab(id){
   TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
-  NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
-  MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
-  // Sync menubar
-  const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
-  if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
-  // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
-  const navEl=btn&&btn.classList.contains('nav-item')?btn:
-    NAV_ITEMS.find(n=>n.dataset.tab===id);
-  if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
+  MB_ITEMS.forEach(m=>{
+    const on=m.dataset.tab===id;
+    m.classList.toggle('active',on);
+    m.setAttribute('aria-selected',on?'true':'false');
+  });
   // Deep-linkable tabs: reflect the active tab in the URL without polluting
   // history (replaceState never fires hashchange, so no feedback loop).
   // Throws on file:// in some browsers — degrade silently.
@@ -715,7 +690,7 @@ function showTab(id,btn){
   }
 }
 
-// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F2)
+// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F1)
 function showMapSubtab(name){
   document.querySelectorAll('#maps .subtab').forEach(b=>{
     const on=b.dataset.subtab===name;
@@ -1132,7 +1107,8 @@ function initDrunkMap(){
       `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
   });
 
-  document.getElementById('drunkLeg').innerHTML=drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
+  document.getElementById('drunkLeg').innerHTML='<div class="map-leg-title">CLICK PINS · SIZE = REVIEWS</div>'+
+    drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
     <td style="color:#ff6600">${c.city}</td>
@@ -1797,8 +1773,8 @@ function drawIPO(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
-    {id:'maps',label:'MAPS',icon:'◉',key:'F2'},
+    {id:'maps',label:'MAPS',icon:'◉',key:'F1'},
+    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F2'},
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F3'},
     {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
     {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
@@ -2046,13 +2022,7 @@ try {
   // Menu bar tab navigation
   document.getElementById('menubar').addEventListener('click', function(e) {
     const item = e.target.closest('.mb-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
-  });
-
-  // Sidebar tab navigation
-  document.getElementById('sidebar').addEventListener('click', function(e) {
-    const item = e.target.closest('.nav-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
+    if (item) showTab(item.dataset.tab);
   });
 
   // Map sub-tab navigation
@@ -2092,8 +2062,8 @@ try {
   // Keyboard activation for tab items (focusable divs with role="tab")
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    const el = e.target.closest ? e.target.closest('.mb-item[data-tab], .nav-item[data-tab]') : null;
-    if (el) { e.preventDefault(); showTab(el.dataset.tab, el); }
+    const el = e.target.closest ? e.target.closest('.mb-item[data-tab]') : null;
+    if (el) { e.preventDefault(); showTab(el.dataset.tab); }
   });
 
   // Trap Tab inside whichever overlay is open (modal > palette > drawer)
@@ -2145,12 +2115,21 @@ try {
     resizeChartsIn(d);
   }, true);
 
-  // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
-  // Overview. Its charts render eagerly at top level, while the Leaflet maps
-  // stay lazy until the MAPS tab (F2) first becomes visible.
+  // Boot tab: honor a #hash deep link (e.g. index.html#beers), else land on
+  // MAPS (F1) — the map is the front door now. Overview's charts still render
+  // eagerly at top level and get resized when that panel first shows.
   const validTab = h => TAB_PANELS.some(p => p.id === h);
   const bootHash = location.hash.slice(1);
-  showTab(validTab(bootHash) ? bootHash : 'overview');
+  showTab(validTab(bootHash) ? bootHash : 'maps');
+
+  // The browser's load-time fragment scroll tucks the active panel under the
+  // sticky menubar (body is the scroll container on phones). Every panel
+  // already sits flush below the chrome, so that scroll only ever hides the
+  // menubar — undo it once the load-time scroll has happened.
+  window.addEventListener('load', () => requestAnimationFrame(() => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }), { once: true });
 
   // Manually edited hashes / external links into an open page
   window.addEventListener('hashchange', function() {
