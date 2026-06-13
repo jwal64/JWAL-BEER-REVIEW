@@ -83,6 +83,9 @@ let beers=[
   {beer:"Daura",           style:"Lager",                origin:"ES",abv:5.4,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026,logo:"logos/daura.svg"},
   {beer:"Asahi Super Dry", style:"Lager",                origin:"JP",abv:5.0,method:"Bottle",city:"Eastchester", region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Blue Moon",       style:"Wheat Beer",           origin:"US",abv:5.4,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"May",monthN:5,year:2026},
+  // JUN 2026
+  {beer:"Hop Commander",   style:"IPA",                  origin:"US",abv:6.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Paulaner Hefe-Weißbier",style:"Wheat Beer",     origin:"DE",abv:5.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -165,6 +168,8 @@ let breweries=[
   {name:"Kona Brewing Company",      location:"Kailua-Kona, Hawaii",       country:"USA",         cc:"US", lang:"en", beers:"Big Wave Golden Ale",                                       lat:19.6406,lng:-155.9969,ratings:[3.75]},
   {name:"Blue Moon Brewing Company", location:"Denver, Colorado",          country:"USA",         cc:"US", lang:"en", beers:"Blue Moon",                                                 lat:39.7392,lng:-104.9903,ratings:[3.50]},
   {name:"Smithwick's (St. Francis Abbey)", location:"Kilkenny, Leinster",  country:"Ireland",     cc:"IE", lang:"en", beers:"Smithwick's",                                               lat:52.6541,lng:-7.2448,  ratings:[2.75]},
+  {name:"Captain Lawrence Brewing Company", location:"Elmsford, New York", country:"USA",         cc:"US", lang:"en", beers:"Hop Commander",                                             lat:41.0540,lng:-73.8201, ratings:[3.00]},
+  {name:"Paulaner Brauerei",         location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Paulaner Hefe-Weißbier",                                    lat:48.1234,lng:11.5808,  ratings:[4.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -219,6 +224,7 @@ const BRAND_DOMAINS = {
 "Modelo Oro":"modelousa.com",
 "Mythos":"mythosbrewery.gr",
 "Hofbräu Dunkel":"hofbraeu-muenchen.de",
+"Hop Commander":"captainlawrencebrewing.com",
 "Hofbräu Münchner Weiße":"hofbraeu-muenchen.de",
 "Narragansett Lager":"narragansettbeer.com",
 "Peroni Nastro Azzurro":"peroni.it",
@@ -227,6 +233,7 @@ const BRAND_DOMAINS = {
 "Orion":"orionbeer.co.jp",
 "Pacífico Clara":"drinkpacifico.com",
 "Paulaner Hefe":"paulaner.com",
+"Paulaner Hefe-Weißbier":"paulaner.com",
 "Peroni":"peroni.it",
 "Pilsner Urquell":"prazdroj.cz",
 "Quilmes":"quilmes.com.ar",
