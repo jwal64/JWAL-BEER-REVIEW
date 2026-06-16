@@ -296,7 +296,7 @@
   <section class="merged-section" data-section="countries">
     <div class="merged-section-head">◎ COUNTRIES</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">COUNTRY PERFORMANCE INDEX<span class="ph-right">AVG RATING / REVIEWS</span></div>
+      <div class="bb-panel-head">RATINGS BY COUNTRY<span class="ph-right">AVG RATING · # OF REVIEWS</span></div>
       <div class="bb-body"><canvas id="countryChart" height="240"></canvas></div>
     </div>
     <div class="bb-panel">
@@ -308,7 +308,7 @@
   <section class="merged-section" data-section="city">
     <div class="merged-section-head">▣ CITIES</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">MARKET PERFORMANCE BY CITY<span class="ph-right">AVG RATING</span></div>
+      <div class="bb-panel-head">RATINGS BY CITY<span class="ph-right">AVG RATING</span></div>
       <div class="bb-body"><canvas id="cityChart" height="200"></canvas></div>
     </div>
     <div class="bb-panel">
@@ -320,7 +320,7 @@
   <section class="merged-section" data-section="language">
     <div class="merged-section-head">◑ BREWING LANGUAGE</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
+      <div class="bb-panel-head">RATINGS BY BREWING LANGUAGE<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
       <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
     </div>
   </section>
@@ -357,7 +357,7 @@
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">COUNTRY RANKINGS — BUMP CHART<span class="ph-right">RANK OVER TIME · LINE = COUNTRY</span></div>
+    <div class="bb-panel-head">COUNTRY RANKINGS OVER TIME<span class="ph-right">EACH LINE = A COUNTRY</span></div>
     <div class="bb-body" id="bump-chart-wrap"><canvas id="bumpChart" height="180"></canvas></div>
   </div>
 
@@ -381,19 +381,20 @@
 
   <section class="merged-section" data-section="markets">
     <div class="merged-section-head">◆ WHAT TO DRINK NEXT</div>
+    <p class="section-note">Beers I haven't reviewed yet, ranked by how much I'm likely to enjoy them — a blend of my own taste so far and what the world thinks on Untappd.</p>
 
     <div class="bb-panel" style="margin-bottom:8px">
-      <div class="bb-panel-head">◈ RECOMMENDATIONS — WHAT TO DRINK NEXT <span class="ph-right" id="rec-count">—</span></div>
+      <div class="bb-panel-head">◈ TOP PICKS FOR ME — RANKED BY HOW MUCH I'LL LIKE THEM <span class="ph-right" id="rec-count">—</span></div>
       <div class="bb-body">
         <div class="ipo-top-picks" id="recPicks"></div>
       </div>
     </div>
 
     <details class="bb-collapse" style="margin-bottom:8px">
-      <summary>CONTRARIAN &amp; IPO ANALYTICS — JWAL vs THE WORLD · WATCHLIST · UPSIDE</summary>
+      <summary>THE NERDY BITS — HOW MY TASTE COMPARES &amp; BEERS I HAVEN'T TRIED YET</summary>
       <div class="collapse-panels">
         <div class="bb-panel">
-          <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
+          <div class="bb-panel-head">MY RATING vs THE WORLD AVERAGE<span class="ph-right">GREEN = I LIKED IT MORE THAN MOST PEOPLE</span></div>
           <div class="bb-body">
             <div id="ciFreshness" style="font-size:8px;letter-spacing:1px;margin-bottom:4px"></div>
             <canvas id="contrarianChart" height="220"></canvas>
@@ -401,13 +402,13 @@
         </div>
 
         <div class="bb-panel">
-          <div class="bb-panel-head">★ TOP PICKS — HIGHEST UPSIDE<span class="ph-right" id="ipo-top-count">—</span></div>
+          <div class="bb-panel-head">★ MOST PROMISING TO TRY<span class="ph-right" id="ipo-top-count">—</span></div>
           <div class="bb-body"><div class="ipo-top-picks" id="ipoTopPicks"></div></div>
         </div>
 
         <div class="bb-grid-2">
           <div class="bb-panel">
-            <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+            <div class="bb-panel-head">◈ WANT TO TRY — NOT REVIEWED YET <span class="ph-right" id="ipo-watch-count">—</span></div>
             <div class="bb-body">
               <div style="overflow-x:auto">
                 <table class="bb-table ipo-watch" id="ipoWatchTable">
@@ -416,10 +417,10 @@
                     <th>BEER / STYLE</th>
                     <th>ORIGIN</th>
                     <th>ABV</th>
-                    <th style="color:#bb44ff">UNTAPPD</th>
-                    <th style="color:#00aaff">JWAL TGT</th>
-                    <th>UPSIDE</th>
-                    <th>SIGNAL</th>
+                    <th style="color:#bb44ff">WORLD ★</th>
+                    <th style="color:#00aaff">MY GUESS ★</th>
+                    <th>vs WORLD</th>
+                    <th>VERDICT</th>
                   </tr></thead>
                   <tbody id="ipoWatchBody"></tbody>
                 </table>
@@ -427,7 +428,7 @@
             </div>
           </div>
           <div class="bb-panel">
-            <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
+            <div class="bb-panel-head">▦ HOW MY GUESSES COMPARE <span class="ph-right">MY GUESS − WORLD ★</span></div>
             <div class="bb-body" style="height:220px">
               <canvas id="ipoUpsideChart"></canvas>
             </div>
@@ -437,7 +438,7 @@
     </details>
 
     <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
-      <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
+      <div class="bb-panel-head">✓ PREDICTION SCORECARD — BEERS I'VE NOW TRIED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
       <div class="bb-body">
         <div style="overflow-x:auto">
           <table class="bb-table">
@@ -445,12 +446,12 @@
               <th style="width:36px"></th>
               <th>BEER / STYLE</th>
               <th>ORIGIN</th>
-              <th style="color:#bb44ff">UNTAPPD</th>
-              <th style="color:#00aaff">JWAL TGT</th>
-              <th style="color:#ff6600">JWAL PRICE</th>
-              <th>vs TGT</th>
-              <th>vs MKT</th>
-              <th>VERDICT</th>
+              <th style="color:#bb44ff">WORLD ★</th>
+              <th style="color:#00aaff">MY GUESS ★</th>
+              <th style="color:#ff6600">MY RATING</th>
+              <th>vs GUESS</th>
+              <th>vs WORLD</th>
+              <th>RESULT</th>
             </tr></thead>
             <tbody id="ipoPricedBody"></tbody>
           </table>

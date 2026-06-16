@@ -303,6 +303,15 @@ PANELS
   border-bottom: 1px dashed var(--border2);
 }
 @media (max-width:700px){ .merged-section-head { font-size: 9px; } }
+.section-note {
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--dim);
+  letter-spacing: 0.2px;
+  margin: -2px 0 10px;
+  max-width: 70ch;
+}
 
 /* ═══════════════════════════════════════════
 BLOOMBERG PANELS / WINDOWS
