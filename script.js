@@ -801,7 +801,7 @@ function showMapSubtab(name){
 
 // ── CHART DEFAULTS
 try {
-  Chart.defaults.color='#555';
+  Chart.defaults.color='#888';
   Chart.defaults.borderColor='#222';
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
   Chart.defaults.font.size=11;
