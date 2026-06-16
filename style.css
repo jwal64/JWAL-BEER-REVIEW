@@ -902,6 +902,39 @@ body { overscroll-behavior: none; }
 
 .insight-key { width: 100px; font-size: 9px; }
 
+/* BEERS — collapse the 10-col table into a clean tap-list: logo · name ·
+   style · ABV · rating. Hidden columns (origin/method/city/month/stars) are
+   still one tap away in the beer-detail modal. No horizontal scroll. */
+#beers .bb-table { min-width: 0; }
+#beers #beerHead th:nth-child(4),  /* origin */
+#beers #beerHead th:nth-child(6),  /* method */
+#beers #beerHead th:nth-child(7),  /* city */
+#beers #beerHead th:nth-child(8),  /* month */
+#beers #beerHead th:nth-child(10), /* stars */
+#beers #beerBody td:nth-child(4),
+#beers #beerBody td:nth-child(6),
+#beers #beerBody td:nth-child(7),
+#beers #beerBody td:nth-child(8),
+#beers #beerBody td:nth-child(10) { display: none; }
+#beers #beerBody td { padding: 11px 6px; }
+#beers #beerBody td:nth-child(2) { font-size: 12px; }
+/* The separate quick-view card grid duplicates the list on phones — hide it */
+#beerCardsPanel { display: none; }
+
+/* MAP directories — drop the widest columns so they fit without scrolling.
+   Rows stay tappable: cities open popups, breweries open the detail drawer. */
+#subpanel-drunk .bb-table th:nth-child(2),  /* region */
+#subpanel-drunk .bb-table th:nth-child(3),  /* country */
+#subpanel-drunk .bb-table th:nth-child(6),  /* beers tried */
+#subpanel-drunk .bb-table td:nth-child(2),
+#subpanel-drunk .bb-table td:nth-child(3),
+#subpanel-drunk .bb-table td:nth-child(6),
+#subpanel-brewed .bb-table th:nth-child(3),  /* location */
+#subpanel-brewed .bb-table th:nth-child(5),  /* beers */
+#subpanel-brewed .bb-table td:nth-child(3),
+#subpanel-brewed .bb-table td:nth-child(5) { display: none; }
+#subpanel-drunk .bb-table, #subpanel-brewed .bb-table { min-width: 0; }
+
 /* MODAL — near full-screen on phones */
 #beerModalBox {
   width: 100vw;
