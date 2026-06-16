@@ -504,6 +504,21 @@ function updateLiveStats(){
   // Header bar
   const sub = document.getElementById('hdr-subtitle');
   if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+  // Home hero — plain-language summary so a first-time visitor instantly gets it
+  const heroEl = document.getElementById('ov-hero');
+  if(heroEl){
+    let nMonths = 0;
+    try { nMonths = getMonthlyData().months.length; } catch(e){}
+    heroEl.innerHTML =
+      `<div class="ov-hero-stats">`+
+        `<span><b>${totalReviews}</b> beers reviewed</span>`+
+        `<span><b>${avgRating.toFixed(2)}★</b> average</span>`+
+        `<span><b>${totalBrands}</b> brands</span>`+
+        `<span><b>${totalCtry}</b> countries</span>`+
+        (nMonths?`<span><b>${nMonths}</b> month${nMonths===1?'':'s'} tracked</span>`:'')+
+      `</div>`+
+      `<div class="ov-hero-sub">A running log of every beer I drink — each one rated out of 5. Tap any beer for the full story.</div>`;
+  }
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
@@ -666,8 +681,10 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'maps','3':'beers','4':'geo','5':'temporal','6':'markets',
-    'f1':'overview','f2':'maps','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'overview','2':'beers','3':'maps','4':'insights',
+    'f1':'overview','f2':'beers','f3':'maps','f4':'insights',
+    // Legacy keys still jump straight to the relevant Insights sub-section
+    '5':'temporal','6':'markets','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -692,13 +709,21 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   }catch(e){}
 })();
 // Tab navigation is static after load — query once instead of on every switch.
-const TAB_PANELS=[...document.querySelectorAll('.panel')];
+const TAB_PANELS=[...document.querySelectorAll('#main > .panel')];
 const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
 const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
+const BN_ITEMS=[...document.querySelectorAll('#bottomnav .bn-item')];
+// Geography / Over-time / What-to-try now live as sub-sections inside the
+// single INSIGHTS tab. Asking for one of these jumps to Insights + that sub.
+const INSIGHTS_SUBS=['geo','temporal','markets'];
+let _insightsSub='geo';
 function showTab(id,btn){
+  // Redirect legacy sub-section ids into the Insights tab
+  if(INSIGHTS_SUBS.includes(id)){ _insightsSub=id; showTab('insights',btn); return; }
   TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
   NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
   MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
+  BN_ITEMS.forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');});
   // Sync menubar
   const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
   if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
@@ -706,17 +731,16 @@ function showTab(id,btn){
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     NAV_ITEMS.find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
+  // Insights renders whichever sub-section is current; it also owns the URL hash.
+  if(id==='insights'){ showInsightsSubtab(_insightsSub); return; }
   // Deep-linkable tabs: reflect the active tab in the URL without polluting
   // history (replaceState never fires hashchange, so no feedback loop).
   // Throws on file:// in some browsers — degrade silently.
   try{history.replaceState(null,'','#'+id);}catch(e){}
   const renderers = {
-    geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
     ],
-    temporal: [['_tmpD',drawTemporal]],
-    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO], ['_recD',drawRecommendations]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
   // Charts built while their panel was hidden sized to 0px — fix them whenever
@@ -727,6 +751,34 @@ function showTab(id,btn){
     if(active&&active.id==='subpanel-drunk'&&_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
     if(active&&active.id==='subpanel-brewed'&&_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
   }
+}
+
+// ── INSIGHTS SUB-SECTIONS (Places / Over time / What to try within F4)
+function showInsightsSubtab(name){
+  if(!INSIGHTS_SUBS.includes(name)) name='geo';
+  _insightsSub=name;
+  document.querySelectorAll('#insights > .subtabs .subtab').forEach(b=>{
+    const on=b.dataset.subtab===name;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
+  document.querySelectorAll('#insights > .subpanel').forEach(p=>{
+    p.classList.toggle('active',p.id===name);
+  });
+  // Lazy-render the active sub-section (each draw fn sets its own guard flag)
+  if(name==='geo'){
+    if(!window._cD) drawCountry();
+    if(!window._ciD) drawCity();
+    if(!window._langD) drawLanguage();
+  } else if(name==='temporal'){
+    if(!window._tmpD) drawTemporal();
+  } else if(name==='markets'){
+    if(!window._ciX) drawContrarian();
+    if(!window._ipoD) drawIPO();
+    if(!window._recD) drawRecommendations();
+  }
+  resizeChartsIn(document.getElementById(name));
+  try{history.replaceState(null,'','#'+name);}catch(e){}
 }
 
 // ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F2)
@@ -1927,12 +1979,13 @@ function drawIPO(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
-    {id:'maps',label:'MAPS',icon:'◉',key:'F2'},
-    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F3'},
-    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
-    {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
-    {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
+    {id:'overview',label:'HOME',icon:'◈',key:'F1'},
+    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
+    {id:'maps',label:'MAP',icon:'◎',key:'F3'},
+    {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
+    {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
+    {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},
+    {id:'markets',label:'INSIGHTS · WHAT TO TRY',icon:'🍺',key:''},
   ];
 
   let prevFocus=null;
@@ -2206,10 +2259,23 @@ try {
     if (item) showTab(item.dataset.tab, item);
   });
 
+  // Bottom nav (mobile thumb-reach)
+  const bottomnav = document.getElementById('bottomnav');
+  if (bottomnav) bottomnav.addEventListener('click', function(e) {
+    const item = e.target.closest('.bn-item[data-tab]');
+    if (item) showTab(item.dataset.tab, item);
+  });
+
   // Map sub-tab navigation
   document.getElementById('maps').addEventListener('click', function(e) {
     const btn = e.target.closest('.subtab[data-subtab]');
     if (btn) showMapSubtab(btn.dataset.subtab);
+  });
+
+  // Insights sub-section navigation (Places / Over time / What to try)
+  document.getElementById('insights').addEventListener('click', function(e) {
+    const btn = e.target.closest('.subtab[data-subtab]');
+    if (btn) showInsightsSubtab(btn.dataset.subtab);
   });
 
   // Overview — recent-activity / month-in-review rows open the beer modal
@@ -2332,13 +2398,14 @@ try {
   // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
   // Overview. Its charts render eagerly at top level, while the Leaflet maps
   // stay lazy until the MAPS tab (F2) first becomes visible.
-  const validTab = h => TAB_PANELS.some(p => p.id === h);
+  const validTab = h => TAB_PANELS.some(p => p.id === h) || INSIGHTS_SUBS.includes(h);
   const bootHash = location.hash.slice(1);
   showTab(validTab(bootHash) ? bootHash : 'overview');
 
   // Manually edited hashes / external links into an open page
   window.addEventListener('hashchange', function() {
     const h = location.hash.slice(1);
-    if (validTab(h) && !document.getElementById(h).classList.contains('active')) showTab(h);
+    const el = document.getElementById(h);
+    if (validTab(h) && el && !el.classList.contains('active')) showTab(h);
   });
 } catch(e) { console.error('Event delegation setup error:', e); }
