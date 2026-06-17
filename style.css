@@ -288,7 +288,7 @@ flex-shrink: 0;
 /* ═══════════════════════════════════════════
 PANELS
 ═══════════════════════════════════════════ */
-.panel { display: none; padding: 6px; }
+.panel { display: none; padding: 10px; }
 .panel.active { display: block; animation: panelIn 0.18s ease; }
 @keyframes panelIn {
   from { opacity: 0; transform: translateY(4px); }
@@ -303,6 +303,15 @@ PANELS
   border-bottom: 1px dashed var(--border2);
 }
 @media (max-width:700px){ .merged-section-head { font-size: 9px; } }
+.section-note {
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--dim);
+  letter-spacing: 0.2px;
+  margin: -2px 0 10px;
+  max-width: 70ch;
+}
 
 /* ═══════════════════════════════════════════
 BLOOMBERG PANELS / WINDOWS
@@ -310,7 +319,7 @@ BLOOMBERG PANELS / WINDOWS
 .bb-panel {
 background: var(--panel);
 border: 1px solid var(--border2);
-margin-bottom: 6px;
+margin-bottom: 8px;
 position: relative;
 transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -318,9 +327,9 @@ transition: border-color var(--transition-fast), box-shadow var(--transition-fas
 .bb-panel-head {
 background: var(--orange);
 color: #000;
-font-size: 8px;
+font-size: 9px;
 font-weight: 700;
-padding: 2px 6px;
+padding: 3px 7px;
 letter-spacing: 1px;
 text-transform: uppercase;
 display: flex;
@@ -329,15 +338,15 @@ justify-content: space-between;
 transition: box-shadow var(--transition-fast);
 }
 .bb-panel-head:hover { box-shadow: 0 2px 8px var(--orange-glow); }
-.bb-panel-head .ph-right { font-size: 8px; font-weight: 400; color: var(--orange3); }
-.bb-body { padding: 6px; }
+.bb-panel-head .ph-right { font-size: 8px; font-weight: 500; color: var(--orange3); }
+.bb-body { padding: 8px; }
 
 /* Grid layouts */
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 6px; }
-.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 6px; }
-.g6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-bottom: 6px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 8px; }
+.g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 8px; }
+.g6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-bottom: 8px; }
 @media (max-width: 1280px) and (min-width: 1025px) {
   .g6 { grid-template-columns: repeat(3,1fr); }
 }
@@ -364,8 +373,8 @@ line-height: 1;
 margin-bottom: 2px;
 }
 .kpi-label {
-font-size: 8px;
-color: var(--dim);
+font-size: 9px;
+color: #777;
 letter-spacing: 1.5px;
 text-transform: uppercase;
 }
@@ -379,14 +388,14 @@ text-transform: uppercase;
 /* ═══════════════════════════════════════════
 TABLES
 ═══════════════════════════════════════════ */
-.bb-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+.bb-table { width: 100%; border-collapse: collapse; font-size: 10px; }
 .bb-table thead th {
 background: var(--border2);
 color: var(--orange);
-font-size: 8px;
+font-size: 9px;
 text-transform: uppercase;
 letter-spacing: 1px;
-padding: 3px 6px;
+padding: 4px 7px;
 text-align: left;
 border-right: 1px solid var(--border);
 border-bottom: 1px solid var(--orange3);
@@ -398,7 +407,7 @@ transition: background 0.1s ease;
 }
 .bb-table tbody tr:hover { background: rgba(0, 170, 255, 0.04); }
 .bb-table tbody td {
-padding: 3px 6px;
+padding: 4px 7px;
 color: var(--white);
 border-right: 1px solid var(--border);
 vertical-align: middle;
@@ -631,8 +640,18 @@ font-size: 10px;
 .insight-sub { color: var(--dim); font-size: 9px; margin-top: 1px; }
 
 /* ═══════════════════════════════════════════
-SCROLLBARS
+SCROLLBARS — thin, dark, subtle orange thumb
 ═══════════════════════════════════════════ */
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border: 2px solid var(--bg);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--orange3); }
+::-webkit-scrollbar-corner { background: transparent; }
 
 /* ═══════════════════════════════════════════
 MINI-ROW
@@ -666,6 +685,67 @@ SEPARATOR
 .bb-sep-orange { height: 1px; background: var(--orange3); margin: 6px 0; }
 
 /* ═══════════════════════════════════════════
+HOME HERO — plain-language summary line
+═══════════════════════════════════════════ */
+#ov-hero {
+  background: linear-gradient(180deg, rgba(255,102,0,0.06), rgba(255,102,0,0.0));
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--orange);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.ov-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #bbb;
+  letter-spacing: 0.3px;
+}
+.ov-hero-stats b { color: var(--white); font-size: 16px; font-weight: 700; }
+.ov-hero-stats span { white-space: nowrap; }
+.ov-hero-sub {
+  margin-top: 7px;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════════════
+BOTTOM NAV — mobile thumb-reach (hidden on desktop)
+═══════════════════════════════════════════ */
+#bottomnav { display: none; }
+.bn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  border-top: 2px solid transparent;
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  padding: 6px 2px;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.bn-item .bn-icon { font-size: 16px; line-height: 1; }
+.bn-item.active {
+  color: var(--orange);
+  border-top-color: var(--orange);
+  background: rgba(255,102,0,0.07);
+}
+
+/* ═══════════════════════════════════════════
 STATUS BAR
 ═══════════════════════════════════════════ */
 #statusbar {
@@ -693,7 +773,32 @@ z-index: 100;
 @media (max-width: 700px) {
 #sidebar { display: none; }
 .terminal-body { height: auto; }
-#main { width: 100%; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+#main { width: 100%; padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+
+/* Phone-first navigation: the bottom bar is the primary nav, so the top
+   function-key strip and the desktop status bar are redundant — retire both. */
+#menubar-wrap { display: none; }
+#statusbar { display: none; }
+#bottomnav {
+  display: flex;
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-top: 2px solid var(--orange);
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.5);
+  z-index: 120;
+}
+.bn-item { font-size: 10px; }
+.bn-item .bn-icon { font-size: 18px; }
+
+/* Header is the top identity now that the menu strip is gone — keep it pinned */
+#hdr { position: sticky; top: 0; z-index: 50; }
 
 /* HEADER — collapse the wide title block; group the 5 stats into a tidy 3-up row */
 #hdr {
@@ -766,9 +871,9 @@ z-index: 100;
 
 .panel { padding: 8px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 .bb-body { padding: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.bb-panel { margin-bottom: 6px; }
-.bb-panel-head { padding: 3px 6px; font-size: 8px; }
-.bb-panel-head .ph-right { font-size: 7px; }
+.bb-panel { margin-bottom: 8px; }
+.bb-panel-head { padding: 4px 7px; font-size: 10px; }
+.bb-panel-head .ph-right { font-size: 8px; }
 
 /* KPI TILES — readable sizes */
 .kpi { padding: 6px 8px; }
@@ -801,11 +906,44 @@ body { overscroll-behavior: none; }
 
 /* TABLES — wider tap zones, slightly bigger text */
 .bb-body div[style*="overflow-x"] { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.bb-table { min-width: 360px; font-size: 9px; }
-.bb-table thead th { padding: 3px 6px; font-size: 8px; }
-.bb-table tbody td { padding: 4px 6px; }
+.bb-table { min-width: 360px; font-size: 11px; }
+.bb-table thead th { padding: 5px 7px; font-size: 9px; }
+.bb-table tbody td { padding: 7px 7px; }
 
 .insight-key { width: 100px; font-size: 9px; }
+
+/* BEERS — collapse the 10-col table into a clean tap-list: logo · name ·
+   style · ABV · rating. Hidden columns (origin/method/city/month/stars) are
+   still one tap away in the beer-detail modal. No horizontal scroll. */
+#beers .bb-table { min-width: 0; }
+#beers #beerHead th:nth-child(4),  /* origin */
+#beers #beerHead th:nth-child(6),  /* method */
+#beers #beerHead th:nth-child(7),  /* city */
+#beers #beerHead th:nth-child(8),  /* month */
+#beers #beerHead th:nth-child(10), /* stars */
+#beers #beerBody td:nth-child(4),
+#beers #beerBody td:nth-child(6),
+#beers #beerBody td:nth-child(7),
+#beers #beerBody td:nth-child(8),
+#beers #beerBody td:nth-child(10) { display: none; }
+#beers #beerBody td { padding: 11px 6px; }
+#beers #beerBody td:nth-child(2) { font-size: 12px; }
+/* The separate quick-view card grid duplicates the list on phones — hide it */
+#beerCardsPanel { display: none; }
+
+/* MAP directories — drop the widest columns so they fit without scrolling.
+   Rows stay tappable: cities open popups, breweries open the detail drawer. */
+#subpanel-drunk .bb-table th:nth-child(2),  /* region */
+#subpanel-drunk .bb-table th:nth-child(3),  /* country */
+#subpanel-drunk .bb-table th:nth-child(6),  /* beers tried */
+#subpanel-drunk .bb-table td:nth-child(2),
+#subpanel-drunk .bb-table td:nth-child(3),
+#subpanel-drunk .bb-table td:nth-child(6),
+#subpanel-brewed .bb-table th:nth-child(3),  /* location */
+#subpanel-brewed .bb-table th:nth-child(5),  /* beers */
+#subpanel-brewed .bb-table td:nth-child(3),
+#subpanel-brewed .bb-table td:nth-child(5) { display: none; }
+#subpanel-drunk .bb-table, #subpanel-brewed .bb-table { min-width: 0; }
 
 /* MODAL — near full-screen on phones */
 #beerModalBox {

@@ -504,6 +504,21 @@ function updateLiveStats(){
   // Header bar
   const sub = document.getElementById('hdr-subtitle');
   if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+  // Home hero — plain-language summary so a first-time visitor instantly gets it
+  const heroEl = document.getElementById('ov-hero');
+  if(heroEl){
+    let nMonths = 0;
+    try { nMonths = getMonthlyData().months.length; } catch(e){}
+    heroEl.innerHTML =
+      `<div class="ov-hero-stats">`+
+        `<span><b>${totalReviews}</b> beers reviewed</span>`+
+        `<span><b>${avgRating.toFixed(2)}★</b> average</span>`+
+        `<span><b>${totalBrands}</b> brands</span>`+
+        `<span><b>${totalCtry}</b> countries</span>`+
+        (nMonths?`<span><b>${nMonths}</b> month${nMonths===1?'':'s'} tracked</span>`:'')+
+      `</div>`+
+      `<div class="ov-hero-sub">A running log of every beer I drink — each one rated out of 5. Tap any beer for the full story.</div>`;
+  }
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
@@ -666,8 +681,10 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
   const tabMap={
-    '1':'overview','2':'maps','3':'beers','4':'geo','5':'temporal','6':'markets',
-    'f1':'overview','f2':'maps','f3':'beers','f4':'geo','f5':'temporal','f6':'markets'
+    '1':'overview','2':'beers','3':'maps','4':'insights',
+    'f1':'overview','f2':'beers','f3':'maps','f4':'insights',
+    // Legacy keys still jump straight to the relevant Insights sub-section
+    '5':'temporal','6':'markets','f5':'temporal','f6':'markets'
   };
   document.addEventListener('keydown',function(ev){
     if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
@@ -692,13 +709,21 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   }catch(e){}
 })();
 // Tab navigation is static after load — query once instead of on every switch.
-const TAB_PANELS=[...document.querySelectorAll('.panel')];
+const TAB_PANELS=[...document.querySelectorAll('#main > .panel')];
 const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
 const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
+const BN_ITEMS=[...document.querySelectorAll('#bottomnav .bn-item')];
+// Geography / Over-time / What-to-try now live as sub-sections inside the
+// single INSIGHTS tab. Asking for one of these jumps to Insights + that sub.
+const INSIGHTS_SUBS=['geo','temporal','markets'];
+let _insightsSub='geo';
 function showTab(id,btn){
+  // Redirect legacy sub-section ids into the Insights tab
+  if(INSIGHTS_SUBS.includes(id)){ _insightsSub=id; showTab('insights',btn); return; }
   TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
   NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
   MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
+  BN_ITEMS.forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');});
   // Sync menubar
   const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
   if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
@@ -706,17 +731,16 @@ function showTab(id,btn){
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     NAV_ITEMS.find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
+  // Insights renders whichever sub-section is current; it also owns the URL hash.
+  if(id==='insights'){ showInsightsSubtab(_insightsSub); return; }
   // Deep-linkable tabs: reflect the active tab in the URL without polluting
   // history (replaceState never fires hashchange, so no feedback loop).
   // Throws on file:// in some browsers — degrade silently.
   try{history.replaceState(null,'','#'+id);}catch(e){}
   const renderers = {
-    geo: [['_cD',drawCountry], ['_ciD',drawCity], ['_langD',drawLanguage]],
     maps: [
       ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
     ],
-    temporal: [['_tmpD',drawTemporal]],
-    markets:  [['_ciX',drawContrarian], ['_ipoD',drawIPO], ['_recD',drawRecommendations]],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
   // Charts built while their panel was hidden sized to 0px — fix them whenever
@@ -727,6 +751,34 @@ function showTab(id,btn){
     if(active&&active.id==='subpanel-drunk'&&_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
     if(active&&active.id==='subpanel-brewed'&&_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
   }
+}
+
+// ── INSIGHTS SUB-SECTIONS (Places / Over time / What to try within F4)
+function showInsightsSubtab(name){
+  if(!INSIGHTS_SUBS.includes(name)) name='geo';
+  _insightsSub=name;
+  document.querySelectorAll('#insights > .subtabs .subtab').forEach(b=>{
+    const on=b.dataset.subtab===name;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
+  document.querySelectorAll('#insights > .subpanel').forEach(p=>{
+    p.classList.toggle('active',p.id===name);
+  });
+  // Lazy-render the active sub-section (each draw fn sets its own guard flag)
+  if(name==='geo'){
+    if(!window._cD) drawCountry();
+    if(!window._ciD) drawCity();
+    if(!window._langD) drawLanguage();
+  } else if(name==='temporal'){
+    if(!window._tmpD) drawTemporal();
+  } else if(name==='markets'){
+    if(!window._ciX) drawContrarian();
+    if(!window._ipoD) drawIPO();
+    if(!window._recD) drawRecommendations();
+  }
+  resizeChartsIn(document.getElementById(name));
+  try{history.replaceState(null,'','#'+name);}catch(e){}
 }
 
 // ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F2)
@@ -749,7 +801,7 @@ function showMapSubtab(name){
 
 // ── CHART DEFAULTS
 try {
-  Chart.defaults.color='#555';
+  Chart.defaults.color='#888';
   Chart.defaults.borderColor='#222';
   Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
   Chart.defaults.font.size=11;
@@ -1632,7 +1684,7 @@ function drawContrarian(){
     const ageMs=Date.now()-new Date(UNTAPPD_LAST_REFRESHED).getTime();
     const ageDays=Math.floor(ageMs/86400000);
     const stale=ageDays>UNTAPPD_REFRESH_INTERVAL_DAYS;
-    freshEl.textContent=`UNTAPPD DATA · ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · REFRESH DUE':''}`;
+    freshEl.textContent=`WORLD RATINGS · UPDATED ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · REFRESH DUE':''}`;
     freshEl.style.color=stale?'#ffaa00':'#555';
   }
 
@@ -1652,12 +1704,12 @@ function drawContrarian(){
   const contrarianCanvas=document.getElementById('contrarianChart');
   if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
-    data:{labels:sorted.map(r=>r.name),datasets:[{label:'Jwal vs World (Δ)',data:sorted.map(r=>+r.delta.toFixed(2)),
+    data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
       backgroundColor:sorted.map(r=>r.delta>0?'rgba(0,204,68,0.7)':'rgba(255,34,34,0.7)'),
       borderColor:sorted.map(r=>r.delta>0?'#00cc44':'#ff2222'),borderWidth:1.5}]},
     options:{indexAxis:'y',maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`Δ${c.raw>=0?'+':''}${c.raw} · Jwal: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
-      scales:{x:{min:-2,max:2,grid:{color:'#1a1a1a'},ticks:{color:'#444'},title:{display:true,text:'DELTA (+ = JWAL RATES HIGHER)',color:'#555'}},
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
+      scales:{x:{min:-2,max:2,grid:{color:'#1a1a1a'},ticks:{color:'#444'},title:{display:true,text:'← WORLD LIKED IT MORE   ·   I LIKED IT MORE →',color:'#555'}},
               y:{grid:{display:false},ticks:{color:'#aaa',font:{size:9}}}}}
   });
 }
@@ -1757,12 +1809,12 @@ function drawRecommendations(){
     function rationale(c){
       const chips=[];
       const sM=STATS.styleMap[c.style];
-      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`LOVES ${c.style.toUpperCase()} · ${sa.toFixed(2)}`);}
+      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I LIKE ${c.style.toUpperCase()} · ${sa.toFixed(2)}`);}
       const cM=STATS.countryMap[c.origin];
-      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} BIAS · ${ca.toFixed(2)}`);}
-      if(c.method==='Draft'||c.method==='Nitro') chips.push(`${c.method.toUpperCase()} PREMIUM`);
+      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} FAVOURITE · ${ca.toFixed(2)}`);}
+      if(c.method==='Draft'||c.method==='Nitro') chips.push(`BETTER ON ${c.method.toUpperCase()}`);
       if(c._pred>=4.0) chips.push('TOP SHELF');
-      if(!chips.length) chips.push(`MKT ${c.untappd.toFixed(2)} CONSENSUS`);
+      if(!chips.length) chips.push(`WORLD RATES IT ${c.untappd.toFixed(2)}`);
       return chips.slice(0,3);
     }
 
@@ -1775,12 +1827,12 @@ function drawRecommendations(){
           <div class="tp-head"><span class="rec-rank">#${i+1}</span> ${logoImg(c.beer,20)} <span>${c.beer}</span></div>
           <div class="tp-style">${FLAGS[c.origin]||''} ${c.style} · ${c.abv.toFixed(1)}% · ${c.method}</div>
           <div class="tp-row">
-            <span style="color:#bb44ff">UNTAPPD ${c.untappd.toFixed(2)}</span>
+            <span style="color:#bb44ff">WORLD ${c.untappd.toFixed(2)}</span>
             <span class="tp-upside" style="color:${col}">${c._pred.toFixed(2)}</span>
           </div>
           <div class="tp-row" style="margin-top:4px">
             <span style="color:${col};letter-spacing:1px">${strs(c._pred)}</span>
-            <span style="color:#444;font-size:8px">PREDICTED</span>
+            <span style="color:#444;font-size:8px">MY GUESS</span>
           </div>
           <div class="rec-why">${chips}</div>
         </div>`;
@@ -1823,7 +1875,7 @@ function drawIPO(){
 
   // Signal helper used by table + conveyor
   function sigOf(target){
-    const label=target>=4.0?'STRONG BUY':target>=3.5?'BUY':target>=3.0?'HOLD':target>=2.5?'SELL':'STRONG SELL';
+    const label=target>=4.0?'MUST TRY':target>=3.5?'WORTH IT':target>=3.0?'DECENT':target>=2.5?'MEH':'SKIP';
     const color=target>=4.0?'#00cc44':target>=3.5?'#aacc00':target>=3.0?'#ffaa00':target>=2.5?'#ff6600':'#ff2222';
     return {label,color};
   }
@@ -1857,15 +1909,15 @@ function drawIPO(){
         <div class="tp-head">${logoImg(w.beer,20)} <span>${w.beer}</span></div>
         <div class="tp-style">${FLAGS[w.origin]||''} ${w.style} · ${w.abv.toFixed(1)}%</div>
         <div class="tp-row">
-          <span style="color:#00aaff">TGT ${w._target.toFixed(2)}</span>
+          <span style="color:#00aaff">MY GUESS ${w._target.toFixed(2)}</span>
           <span class="tp-upside ${uClass}">${w._upside>=0?'+':''}${w._upside.toFixed(2)}</span>
         </div>
         <div class="tp-row" style="margin-top:6px">
-          <span style="color:#bb44ff">UNTAPPD ${w.untappd.toFixed(2)}</span>
+          <span style="color:#bb44ff">WORLD ${w.untappd.toFixed(2)}</span>
           <span class="tp-signal" style="border-color:${sigColor};color:${sigColor}">${signal}</span>
         </div>
       </div>`;
-    }).join(''):'<div style="color:#333;font-size:9px;padding:10px">WATCHLIST FULLY PRICED — NO PENDING PICKS</div>';
+    }).join(''):'<div style="color:#333;font-size:9px;padding:10px">TRIED EVERYTHING ON THE LIST — NOTHING PENDING</div>';
   }
 
   // ── UPSIDE DISTRIBUTION CHART
@@ -1903,7 +1955,7 @@ function drawIPO(){
       const jwalPrice=avg(revd.map(b=>b.rating));
       const vsAnalyst=jwalPrice-target;
       const vsMkt=jwalPrice-w.untappd;
-      const verdict=vsAnalyst>0.3?'BEAT ANALYST':vsAnalyst>-0.3?'IN LINE':'MISSED ANALYST';
+      const verdict=vsAnalyst>0.3?'BEAT MY GUESS':vsAnalyst>-0.3?'ON TARGET':'BELOW MY GUESS';
       const vColor=vsAnalyst>0.3?'#00cc44':vsAnalyst<-0.3?'#ff2222':'#ffaa00';
       return `<tr>
         <td>${logoImg(w.beer,24)}</td>
@@ -1927,12 +1979,13 @@ function drawIPO(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',label:'OVERVIEW',icon:'◈',key:'F1'},
-    {id:'maps',label:'MAPS',icon:'◉',key:'F2'},
-    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F3'},
-    {id:'geo',label:'GEOGRAPHY',icon:'◎',key:'F4'},
-    {id:'temporal',label:'TEMPORAL',icon:'◷',key:'F5'},
-    {id:'markets',label:'MARKETS',icon:'◆',key:'F6'},
+    {id:'overview',label:'HOME',icon:'◈',key:'F1'},
+    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
+    {id:'maps',label:'MAP',icon:'◎',key:'F3'},
+    {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
+    {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
+    {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},
+    {id:'markets',label:'INSIGHTS · WHAT TO TRY',icon:'🍺',key:''},
   ];
 
   let prevFocus=null;
@@ -2206,10 +2259,23 @@ try {
     if (item) showTab(item.dataset.tab, item);
   });
 
+  // Bottom nav (mobile thumb-reach)
+  const bottomnav = document.getElementById('bottomnav');
+  if (bottomnav) bottomnav.addEventListener('click', function(e) {
+    const item = e.target.closest('.bn-item[data-tab]');
+    if (item) showTab(item.dataset.tab, item);
+  });
+
   // Map sub-tab navigation
   document.getElementById('maps').addEventListener('click', function(e) {
     const btn = e.target.closest('.subtab[data-subtab]');
     if (btn) showMapSubtab(btn.dataset.subtab);
+  });
+
+  // Insights sub-section navigation (Places / Over time / What to try)
+  document.getElementById('insights').addEventListener('click', function(e) {
+    const btn = e.target.closest('.subtab[data-subtab]');
+    if (btn) showInsightsSubtab(btn.dataset.subtab);
   });
 
   // Overview — recent-activity / month-in-review rows open the beer modal
@@ -2332,13 +2398,14 @@ try {
   // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
   // Overview. Its charts render eagerly at top level, while the Leaflet maps
   // stay lazy until the MAPS tab (F2) first becomes visible.
-  const validTab = h => TAB_PANELS.some(p => p.id === h);
+  const validTab = h => TAB_PANELS.some(p => p.id === h) || INSIGHTS_SUBS.includes(h);
   const bootHash = location.hash.slice(1);
   showTab(validTab(bootHash) ? bootHash : 'overview');
 
   // Manually edited hashes / external links into an open page
   window.addEventListener('hashchange', function() {
     const h = location.hash.slice(1);
-    if (validTab(h) && !document.getElementById(h).classList.contains('active')) showTab(h);
+    const el = document.getElementById(h);
+    if (validTab(h) && el && !el.classList.contains('active')) showTab(h);
   });
 } catch(e) { console.error('Event delegation setup error:', e); }

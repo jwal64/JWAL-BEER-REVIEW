@@ -70,12 +70,10 @@
 <div id="menubar-wrap">
   <div id="menubar">
     <div class="mb-logo">JWAL'S</div>
-    <div class="mb-item active" data-tab="overview" title="Overview — KPIs, ratings &amp; insights"><span class="fkey">F1</span>OVERVIEW</div>
-    <div class="mb-item" data-tab="maps" title="Maps — places consumed &amp; brewery locations"><span class="fkey">F2</span>MAPS</div>
-    <div class="mb-item" data-tab="beers" title="All beers — searchable full dataset"><span class="fkey">F3</span>BEERS</div>
-    <div class="mb-item" data-tab="geo" title="Geography — countries, cities &amp; brewing language"><span class="fkey">F4</span>GEO</div>
-    <div class="mb-item" data-tab="temporal" title="Temporal — trends over time"><span class="fkey">F5</span>TIME</div>
-    <div class="mb-item" data-tab="markets" title="Markets — recommendations &amp; watchlist"><span class="fkey">F6</span>MARKETS</div>
+    <div class="mb-item active" data-tab="overview" title="Home — the highlights at a glance"><span class="fkey">F1</span>HOME</div>
+    <div class="mb-item" data-tab="beers" title="Beers — search the full list of everything I've reviewed"><span class="fkey">F2</span>BEERS</div>
+    <div class="mb-item" data-tab="maps" title="Map — where beers were brewed &amp; where I drank them"><span class="fkey">F3</span>MAP</div>
+    <div class="mb-item" data-tab="insights" title="Insights — places, trends over time &amp; what to try next"><span class="fkey">F4</span>INSIGHTS</div>
     <div class="mb-spacer"></div>
     <div class="mb-right" id="mb-clock">—</div>
   </div>
@@ -85,7 +83,7 @@
 
 <div id="hdr">
   <div class="hdr-block wide">
-    <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:10px;color:var(--dim);font-weight:500;letter-spacing:1px">· TERMINAL v2.7</span></div>
+    <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:10px;color:var(--dim);font-weight:500;letter-spacing:1px">· TERMINAL v3.0</span></div>
     <div class="hdr-sub" id="hdr-subtitle">PERSONAL BREW INTELLIGENCE SYSTEM · — REVIEWS · — MARKETS · — BRANDS</div>
   </div>
 </div>
@@ -98,14 +96,10 @@
 
 <div id="sidebar">
   <div class="nav-section-head">DASHBOARD</div>
-  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>OVERVIEW<span class="nkey">F1</span></div>
-  <div class="nav-item" data-tab="maps"><span class="nav-icon">◉</span>MAPS<span class="nkey">F2</span></div>
-  <div class="nav-section-head">ANALYTICS</div>
-  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F3</span></div>
-  <div class="nav-item" data-tab="geo"><span class="nav-icon">◎</span>GEOGRAPHY<span class="nkey">F4</span></div>
-  <div class="nav-item" data-tab="temporal"><span class="nav-icon">◷</span>TEMPORAL<span class="nkey">F5</span></div>
-  <div class="nav-section-head">MARKETS</div>
-  <div class="nav-item" data-tab="markets"><span class="nav-icon">◆</span>MARKETS<span class="nkey">F6</span></div>
+  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>HOME<span class="nkey">F1</span></div>
+  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
+  <div class="nav-item" data-tab="maps"><span class="nav-icon">◎</span>MAP<span class="nkey">F3</span></div>
+  <div class="nav-item" data-tab="insights"><span class="nav-icon">◆</span>INSIGHTS<span class="nkey">F4</span></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -115,55 +109,67 @@
 <!-- ══════════════ OVERVIEW ══════════════ -->
 
 <div id="overview" class="panel active">
-  <div class="g6" style="margin-bottom:8px">
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val up" id="ov-top-val">—</span><span class="kpi-delta" id="ov-top-delta"></span></div><div class="kpi-label">TOP SCORE</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top"></canvas></div></div>
+
+  <!-- Plain-language summary so a first-time visitor instantly gets it -->
+  <div id="ov-hero"></div>
+
+  <!-- Four headline numbers, no more -->
+  <div class="g4 kpi-row" style="margin-bottom:10px">
+    <div class="kpi"><div class="kpi-top"><span class="kpi-val up" id="ov-top-val">—</span><span class="kpi-delta" id="ov-top-delta"></span></div><div class="kpi-label">BEST RATED</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top"></canvas></div></div>
     <div class="kpi"><div class="kpi-top"><span class="kpi-val fl" id="ov-avg-val">—</span><span class="kpi-delta" id="ov-avg-delta"></span></div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg"></canvas></div></div>
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val dn" id="ov-low-val">—</span><span class="kpi-delta" id="ov-low-delta"></span></div><div class="kpi-label">LOWEST</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low"></canvas></div></div>
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</span><span class="kpi-delta" id="ov-abv-delta"></span></div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv"></canvas></div></div>
     <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--amber)" id="ov-brands-val">—</span><span class="kpi-delta" id="ov-brands-delta"></span></div><div class="kpi-label">BRANDS TRIED</div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands"></canvas></div></div>
     <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--green2)" id="ov-hit-val">—</span><span class="kpi-delta" id="ov-hit-delta"></span></div><div class="kpi-label">HIT RATE</div><div class="kpi-sub" id="ov-hit-sub">Rated ≥3.00</div><div class="kpi-sparkline-wrap"><canvas id="spark-hit"></canvas></div></div>
   </div>
-  <div class="g3">
-    <div class="bb-panel">
-      <div class="bb-panel-head">RATING BY STYLE<span class="ph-right">AVG/5.00</span></div>
-      <div class="bb-body"><canvas id="styleChart" height="200"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">MONTHLY FLOW<span class="ph-right">REVIEWS × AVG RATING</span></div>
-      <div class="bb-body"><canvas id="monthlyCombo" height="200"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">RATING DISTRIBUTION<span class="ph-right">QUARTER-POINT BUCKETS</span></div>
-      <div class="bb-body"><canvas id="ratingHist" height="200"></canvas></div>
-    </div>
+
+  <!-- The most human, friend-friendly section, kept up top -->
+  <div class="bb-panel">
+    <div class="bb-panel-head">RECENT POURS<span class="ph-right">LAST 6 · TAP ONE FOR DETAIL</span></div>
+    <div class="bb-body" id="recentFeed"></div>
   </div>
+
+  <!-- One signature chart -->
+  <div class="bb-panel">
+    <div class="bb-panel-head">HOW EACH STYLE SCORES<span class="ph-right">AVG RATING / 5.00</span></div>
+    <div class="bb-body"><canvas id="styleChart" height="200"></canvas></div>
+  </div>
+
   <div class="g2">
     <div class="bb-panel">
-      <div class="bb-panel-head">MARKET SIGNALS</div>
+      <div class="bb-panel-head">HIGHLIGHTS<span class="ph-right">WHAT STANDS OUT</span></div>
       <div class="bb-body" id="mktPanel"></div>
     </div>
     <div class="bb-panel">
-      <div class="bb-panel-head">RECENT ACTIVITY<span class="ph-right">LAST 6 POURS · CLICK FOR DETAIL</span></div>
-      <div class="bb-body" id="recentFeed"></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="bb-panel">
-      <div class="bb-panel-head">MONTH IN REVIEW<span class="ph-right" id="mirLabel">—</span></div>
+      <div class="bb-panel-head">THIS MONTH<span class="ph-right" id="mirLabel">—</span></div>
       <div class="bb-body" id="mirPanel"></div>
     </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">ABV vs RATING — SCATTER<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
-      <div class="bb-body"><canvas id="scatterChart" height="160"></canvas></div>
-    </div>
   </div>
-  <div class="bb-panel">
-    <div class="bb-panel-head">TASTE PROFILE — PERSONAL BIAS INDICATORS</div>
-    <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
-  </div>
-  <details class="bb-collapse">
-    <summary>DEEP STATS — SUMMARY · QUINTILES · SERVING METHOD</summary>
+
+  <!-- Everything denser/nerdier lives here, collapsed by default -->
+  <details class="bb-collapse" id="moreStats">
+    <summary>MORE STATS — ABV · DISTRIBUTION · TASTE PROFILE · DEEP DIVE</summary>
     <div class="collapse-panels">
+      <div class="g2" style="margin-bottom:8px">
+        <div class="kpi"><div class="kpi-top"><span class="kpi-val dn" id="ov-low-val">—</span><span class="kpi-delta" id="ov-low-delta"></span></div><div class="kpi-label">LOWEST RATED</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low"></canvas></div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</span><span class="kpi-delta" id="ov-abv-delta"></span></div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv"></canvas></div></div>
+      </div>
+      <div class="g3">
+        <div class="bb-panel">
+          <div class="bb-panel-head">REVIEWS PER MONTH<span class="ph-right">COUNT × AVG RATING</span></div>
+          <div class="bb-body"><canvas id="monthlyCombo" height="200"></canvas></div>
+        </div>
+        <div class="bb-panel">
+          <div class="bb-panel-head">RATING DISTRIBUTION<span class="ph-right">QUARTER-POINT BUCKETS</span></div>
+          <div class="bb-body"><canvas id="ratingHist" height="200"></canvas></div>
+        </div>
+        <div class="bb-panel">
+          <div class="bb-panel-head">STRONGER = BETTER?<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
+          <div class="bb-body"><canvas id="scatterChart" height="200"></canvas></div>
+        </div>
+      </div>
+      <div class="bb-panel">
+        <div class="bb-panel-head">TASTE PROFILE — WHAT MY RATINGS LEAN TOWARD</div>
+        <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
+      </div>
       <div class="g3">
         <div class="bb-panel">
           <div class="bb-panel-head">STATISTICAL SUMMARY</div>
@@ -265,7 +271,7 @@
       </div>
     </div>
   </div>
-  <div class="bb-panel">
+  <div class="bb-panel" id="beerCardsPanel">
     <div class="bb-panel-head">BEER CARDS — QUICK VIEW<span class="ph-right" id="brands-count">— UNIQUE BRANDS</span></div>
     <div class="bb-body">
       <div class="beer-grid" id="beerGrid"></div>
@@ -273,14 +279,24 @@
   </div>
 </div>
 
-<!-- ══════════════ GEOGRAPHY (countries + cities + language) ══════════════ -->
+<!-- ══════════════ INSIGHTS (geography + trends over time + what to try) ══════════════ -->
 
-<div id="geo" class="panel">
+<div id="insights" class="panel">
+
+  <div class="subtabs" role="tablist">
+    <button class="subtab active" data-subtab="geo" role="tab" aria-selected="true">🌍 PLACES</button>
+    <button class="subtab" data-subtab="temporal" role="tab" aria-selected="false">📈 OVER TIME</button>
+    <button class="subtab" data-subtab="markets" role="tab" aria-selected="false">🍺 WHAT TO TRY</button>
+  </div>
+
+<!-- ── PLACES: countries + cities + brewing language ── -->
+
+<div id="geo" class="subpanel active">
 
   <section class="merged-section" data-section="countries">
     <div class="merged-section-head">◎ COUNTRIES</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">COUNTRY PERFORMANCE INDEX<span class="ph-right">AVG RATING / REVIEWS</span></div>
+      <div class="bb-panel-head">RATINGS BY COUNTRY<span class="ph-right">AVG RATING · # OF REVIEWS</span></div>
       <div class="bb-body"><canvas id="countryChart" height="240"></canvas></div>
     </div>
     <div class="bb-panel">
@@ -292,7 +308,7 @@
   <section class="merged-section" data-section="city">
     <div class="merged-section-head">▣ CITIES</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">MARKET PERFORMANCE BY CITY<span class="ph-right">AVG RATING</span></div>
+      <div class="bb-panel-head">RATINGS BY CITY<span class="ph-right">AVG RATING</span></div>
       <div class="bb-body"><canvas id="cityChart" height="200"></canvas></div>
     </div>
     <div class="bb-panel">
@@ -304,16 +320,16 @@
   <section class="merged-section" data-section="language">
     <div class="merged-section-head">◑ BREWING LANGUAGE</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">BREWING LANGUAGE INDEX<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
+      <div class="bb-panel-head">RATINGS BY BREWING LANGUAGE<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
       <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
     </div>
   </section>
 
 </div>
 
-<!-- ══════════════ TEMPORAL ══════════════ -->
+<!-- ── OVER TIME: temporal trends ── -->
 
-<div id="temporal" class="panel">
+<div id="temporal" class="subpanel">
 
   <!-- Dynamic KPI row — filled by drawTemporal() -->
   <div id="temporal-kpis" style="margin-bottom:8px"></div>
@@ -341,7 +357,7 @@
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">COUNTRY RANKINGS — BUMP CHART<span class="ph-right">RANK OVER TIME · LINE = COUNTRY</span></div>
+    <div class="bb-panel-head">COUNTRY RANKINGS OVER TIME<span class="ph-right">EACH LINE = A COUNTRY</span></div>
     <div class="bb-body" id="bump-chart-wrap"><canvas id="bumpChart" height="180"></canvas></div>
   </div>
 
@@ -359,25 +375,26 @@
   </div>
 </div>
 
-<!-- ══════════════ MARKETS (contrarian + ipo) ══════════════ -->
+<!-- ── WHAT TO TRY: recommendations + contrarian/ipo analytics ── -->
 
-<div id="markets" class="panel">
+<div id="markets" class="subpanel">
 
   <section class="merged-section" data-section="markets">
-    <div class="merged-section-head">◆ MARKETS</div>
+    <div class="merged-section-head">◆ WHAT TO DRINK NEXT</div>
+    <p class="section-note">Beers I haven't reviewed yet, ranked by how much I'm likely to enjoy them — a blend of my own taste so far and what the world thinks on Untappd.</p>
 
     <div class="bb-panel" style="margin-bottom:8px">
-      <div class="bb-panel-head">◈ RECOMMENDATIONS — WHAT TO DRINK NEXT <span class="ph-right" id="rec-count">—</span></div>
+      <div class="bb-panel-head">◈ TOP PICKS FOR ME — RANKED BY HOW MUCH I'LL LIKE THEM <span class="ph-right" id="rec-count">—</span></div>
       <div class="bb-body">
         <div class="ipo-top-picks" id="recPicks"></div>
       </div>
     </div>
 
     <details class="bb-collapse" style="margin-bottom:8px">
-      <summary>CONTRARIAN &amp; IPO ANALYTICS — JWAL vs THE WORLD · WATCHLIST · UPSIDE</summary>
+      <summary>THE NERDY BITS — HOW MY TASTE COMPARES &amp; BEERS I HAVEN'T TRIED YET</summary>
       <div class="collapse-panels">
         <div class="bb-panel">
-          <div class="bb-panel-head">JWAL vs THE WORLD — RATING DELTA PER BEER<span class="ph-right">+ = YOU RATE HIGHER THAN GLOBAL AVG</span></div>
+          <div class="bb-panel-head">MY RATING vs THE WORLD AVERAGE<span class="ph-right">GREEN = I LIKED IT MORE THAN MOST PEOPLE</span></div>
           <div class="bb-body">
             <div id="ciFreshness" style="font-size:8px;letter-spacing:1px;margin-bottom:4px"></div>
             <canvas id="contrarianChart" height="220"></canvas>
@@ -385,13 +402,13 @@
         </div>
 
         <div class="bb-panel">
-          <div class="bb-panel-head">★ TOP PICKS — HIGHEST UPSIDE<span class="ph-right" id="ipo-top-count">—</span></div>
+          <div class="bb-panel-head">★ MOST PROMISING TO TRY<span class="ph-right" id="ipo-top-count">—</span></div>
           <div class="bb-body"><div class="ipo-top-picks" id="ipoTopPicks"></div></div>
         </div>
 
         <div class="bb-grid-2">
           <div class="bb-panel">
-            <div class="bb-panel-head">◈ PRE-REVIEW WATCHLIST — PENDING IPO <span class="ph-right" id="ipo-watch-count">—</span></div>
+            <div class="bb-panel-head">◈ WANT TO TRY — NOT REVIEWED YET <span class="ph-right" id="ipo-watch-count">—</span></div>
             <div class="bb-body">
               <div style="overflow-x:auto">
                 <table class="bb-table ipo-watch" id="ipoWatchTable">
@@ -400,10 +417,10 @@
                     <th>BEER / STYLE</th>
                     <th>ORIGIN</th>
                     <th>ABV</th>
-                    <th style="color:#bb44ff">UNTAPPD</th>
-                    <th style="color:#00aaff">JWAL TGT</th>
-                    <th>UPSIDE</th>
-                    <th>SIGNAL</th>
+                    <th style="color:#bb44ff">WORLD ★</th>
+                    <th style="color:#00aaff">MY GUESS ★</th>
+                    <th>vs WORLD</th>
+                    <th>VERDICT</th>
                   </tr></thead>
                   <tbody id="ipoWatchBody"></tbody>
                 </table>
@@ -411,7 +428,7 @@
             </div>
           </div>
           <div class="bb-panel">
-            <div class="bb-panel-head">▦ UPSIDE DISTRIBUTION <span class="ph-right">JWAL TGT − UNTAPPD</span></div>
+            <div class="bb-panel-head">▦ HOW MY GUESSES COMPARE <span class="ph-right">MY GUESS − WORLD ★</span></div>
             <div class="bb-body" style="height:220px">
               <canvas id="ipoUpsideChart"></canvas>
             </div>
@@ -421,7 +438,7 @@
     </details>
 
     <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
-      <div class="bb-panel-head">✓ POST-REVIEW — PRICED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
+      <div class="bb-panel-head">✓ PREDICTION SCORECARD — BEERS I'VE NOW TRIED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
       <div class="bb-body">
         <div style="overflow-x:auto">
           <table class="bb-table">
@@ -429,12 +446,12 @@
               <th style="width:36px"></th>
               <th>BEER / STYLE</th>
               <th>ORIGIN</th>
-              <th style="color:#bb44ff">UNTAPPD</th>
-              <th style="color:#00aaff">JWAL TGT</th>
-              <th style="color:#ff6600">JWAL PRICE</th>
-              <th>vs TGT</th>
-              <th>vs MKT</th>
-              <th>VERDICT</th>
+              <th style="color:#bb44ff">WORLD ★</th>
+              <th style="color:#00aaff">MY GUESS ★</th>
+              <th style="color:#ff6600">MY RATING</th>
+              <th>vs GUESS</th>
+              <th>vs WORLD</th>
+              <th>RESULT</th>
             </tr></thead>
             <tbody id="ipoPricedBody"></tbody>
           </table>
@@ -443,17 +460,28 @@
     </div>
   </section>
 
-</div>
+</div><!-- /markets subpanel -->
+
+</div><!-- /insights -->
 
 
 </div><!-- /main -->
 </div><!-- /terminal-body -->
 
+<!-- BOTTOM NAV (mobile, thumb-reach) -->
+
+<nav id="bottomnav" role="tablist" aria-label="Primary">
+  <button class="bn-item active" data-tab="overview" role="tab" aria-selected="true"><span class="bn-icon">◈</span><span class="bn-label">HOME</span></button>
+  <button class="bn-item" data-tab="beers" role="tab" aria-selected="false"><span class="bn-icon">◉</span><span class="bn-label">BEERS</span></button>
+  <button class="bn-item" data-tab="maps" role="tab" aria-selected="false"><span class="bn-icon">◎</span><span class="bn-label">MAP</span></button>
+  <button class="bn-item" data-tab="insights" role="tab" aria-selected="false"><span class="bn-icon">◆</span><span class="bn-label">INSIGHTS</span></button>
+</nav>
+
 <!-- STATUS BAR -->
 
 <div id="statusbar">
   <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
-  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v2.7</div>
+  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v3.0</div>
   <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
   <div class="sb-spacer"></div>
   <div class="sb-item" id="sb-time">--:--:--</div>
