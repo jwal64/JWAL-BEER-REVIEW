@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico"};
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS INTEGRATION
@@ -86,6 +86,7 @@ let beers=[
   // JUN 2026
   {beer:"Hop Commander",   style:"IPA",                  origin:"US",abv:6.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Paulaner Hefe-Weißbier",style:"Wheat Beer",     origin:"DE",abv:5.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Medalla Light",   style:"Lager",                origin:"PR",abv:4.2,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -119,6 +120,7 @@ let drunkLocs=[
   {city:"Sciara",      region:"Sicily",               country:"Italy",       cc:"IT", lat:37.9156,lng:13.9344},
   {city:"Venice",      region:"Veneto",               country:"Italy",       cc:"IT", lat:45.4408,lng:12.3155},
   {city:"East Rutherford",region:"New Jersey",        country:"USA",         cc:"US", lat:40.8127,lng:-74.0846},
+  {city:"San Juan",    region:"San Juan",             country:"Puerto Rico", cc:"PR", lat:18.4655,lng:-66.1057},
 ];
 
 let breweries=[
@@ -170,6 +172,7 @@ let breweries=[
   {name:"Smithwick's (St. Francis Abbey)", location:"Kilkenny, Leinster",  country:"Ireland",     cc:"IE", lang:"en", beers:"Smithwick's",                                               lat:52.6541,lng:-7.2448,  ratings:[2.75]},
   {name:"Captain Lawrence Brewing Company", location:"Elmsford, New York", country:"USA",         cc:"US", lang:"en", beers:"Hop Commander",                                             lat:41.0540,lng:-73.8201, ratings:[3.00]},
   {name:"Paulaner Brauerei",         location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Paulaner Hefe-Weißbier",                                    lat:48.1234,lng:11.5808,  ratings:[4.00]},
+  {name:"Compañía Cervecera de Puerto Rico", location:"Mayagüez, Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Medalla Light",                                           lat:18.2011,lng:-67.1397, ratings:[4.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -216,6 +219,7 @@ const BRAND_DOMAINS = {
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
+"Medalla Light":"medallalight.com",
 "Menabrea":"birramenabrea.com",
 "Michelob Ultra":"michelobultra.com",
 "Miller Lite":"millerlite.com",
