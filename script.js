@@ -87,6 +87,7 @@ let beers=[
   {beer:"Hop Commander",   style:"IPA",                  origin:"US",abv:6.5,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Paulaner Hefe-Weißbier",style:"Wheat Beer",     origin:"DE",abv:5.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Medalla Light",   style:"Lager",                origin:"PR",abv:4.2,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Magna",           style:"Lager",                origin:"PR",abv:4.5,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -172,7 +173,7 @@ let breweries=[
   {name:"Smithwick's (St. Francis Abbey)", location:"Kilkenny, Leinster",  country:"Ireland",     cc:"IE", lang:"en", beers:"Smithwick's",                                               lat:52.6541,lng:-7.2448,  ratings:[2.75]},
   {name:"Captain Lawrence Brewing Company", location:"Elmsford, New York", country:"USA",         cc:"US", lang:"en", beers:"Hop Commander",                                             lat:41.0540,lng:-73.8201, ratings:[3.00]},
   {name:"Paulaner Brauerei",         location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Paulaner Hefe-Weißbier",                                    lat:48.1234,lng:11.5808,  ratings:[4.00]},
-  {name:"Compañía Cervecera de Puerto Rico", location:"Mayagüez, Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Medalla Light",                                           lat:18.2011,lng:-67.1397, ratings:[4.00]},
+  {name:"Compañía Cervecera de Puerto Rico", location:"Mayagüez, Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Medalla Light · Magna",                                    lat:18.2011,lng:-67.1397, ratings:[4.00,4.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
