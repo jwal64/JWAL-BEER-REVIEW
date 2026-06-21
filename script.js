@@ -88,7 +88,7 @@ let beers=[
   {beer:"Paulaner Hefe-Weißbier",style:"Wheat Beer",     origin:"DE",abv:5.5,method:"Bottle",city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Medalla Light",   style:"Lager",                origin:"PR",abv:4.2,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Magna",           style:"Lager",                origin:"PR",abv:4.5,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
-  {beer:"Ocean SJU",       style:"Lager",                origin:"PR",abv:5.0,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:2.50,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Ocean SJU",       style:"Lager",                origin:"PR",abv:5.9,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:2.50,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Bloodline Blood Orange IPA",style:"IPA",        origin:"US",abv:8.0,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
