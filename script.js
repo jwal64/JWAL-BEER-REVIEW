@@ -90,6 +90,7 @@ let beers=[
   {beer:"Magna",           style:"Lager",                origin:"PR",abv:4.5,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:4.00,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Ocean SJU",       style:"Lager",                origin:"PR",abv:5.9,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:2.50,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Bloodline Blood Orange IPA",style:"IPA",        origin:"US",abv:8.0,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Goose IPA",             style:"IPA",                  origin:"US",abv:5.9,method:"Can",   city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -124,6 +125,7 @@ let drunkLocs=[
   {city:"Venice",      region:"Veneto",               country:"Italy",       cc:"IT", lat:45.4408,lng:12.3155},
   {city:"East Rutherford",region:"New Jersey",        country:"USA",         cc:"US", lat:40.8127,lng:-74.0846},
   {city:"San Juan",    region:"San Juan",             country:"Puerto Rico", cc:"PR", lat:18.4655,lng:-66.1057},
+  {city:"Washington",  region:"District of Columbia", country:"USA",         cc:"US", lat:38.9072,lng:-77.0369},
 ];
 
 let breweries=[
@@ -178,6 +180,7 @@ let breweries=[
   {name:"Compañía Cervecera de Puerto Rico", location:"Mayagüez, Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Medalla Light · Magna",                                    lat:18.2011,lng:-67.1397, ratings:[4.00,4.00]},
   {name:"Ocean Lab Brewing Co.",     location:"Carolina (Isla Verde), Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Ocean SJU",                                       lat:18.4486,lng:-66.0203, ratings:[2.50]},
   {name:"Flying Dog Brewery",        location:"Frederick, Maryland",       country:"USA",         cc:"US", lang:"en", beers:"Bloodline Blood Orange IPA",                                lat:39.4143,lng:-77.4105, ratings:[3.50]},
+  {name:"Goose Island Beer Co.",     location:"Chicago, Illinois",         country:"USA",         cc:"US", lang:"en", beers:"Goose IPA",                                                 lat:41.9166,lng:-87.6530, ratings:[3.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -211,6 +214,7 @@ const BRAND_DOMAINS = {
 "Estrella Damm":"estrelladamm.com",
 "Estrella Galicia":"estrellagalicia.com",
 "Estrella Jalisco":"estrellajalisco.com",
+"Goose IPA":"gooseisland.com",
 "Grolsch":"grolsch.com",
 "Grolsch Puur Weizen":"grolsch.com",
 "Frisse Lentebok":"grolsch.com",
