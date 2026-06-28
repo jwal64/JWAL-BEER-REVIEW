@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon"};
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS INTEGRATION
@@ -91,6 +91,8 @@ let beers=[
   {beer:"Ocean SJU",       style:"Lager",                origin:"PR",abv:5.9,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:2.50,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Bloodline Blood Orange IPA",style:"IPA",        origin:"US",abv:8.0,method:"Bottle",city:"San Juan",    region:"San Juan",        country:"Puerto Rico", cc:"PR", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Goose IPA",             style:"IPA",                  origin:"US",abv:5.9,method:"Can",   city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Almaza Pilsener",       style:"Pilsner",              origin:"LB",abv:4.2,method:"Bottle",city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Jun",monthN:6,year:2026},
+  {beer:"Mythos",                style:"Lager",                origin:"GR",abv:5.0,method:"Bottle",city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Jun",monthN:6,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -181,6 +183,8 @@ let breweries=[
   {name:"Ocean Lab Brewing Co.",     location:"Carolina (Isla Verde), Puerto Rico", country:"Puerto Rico", cc:"PR", lang:"es", beers:"Ocean SJU",                                       lat:18.4486,lng:-66.0203, ratings:[2.50]},
   {name:"Flying Dog Brewery",        location:"Frederick, Maryland",       country:"USA",         cc:"US", lang:"en", beers:"Bloodline Blood Orange IPA",                                lat:39.4143,lng:-77.4105, ratings:[3.50]},
   {name:"Goose Island Beer Co.",     location:"Chicago, Illinois",         country:"USA",         cc:"US", lang:"en", beers:"Goose IPA",                                                 lat:41.9166,lng:-87.6530, ratings:[3.50]},
+  {name:"Brasserie Almaza",          location:"Beirut, Beirut Governorate",country:"Lebanon",     cc:"LB", lang:"ar", beers:"Almaza Pilsener",                                          lat:33.8938,lng:35.5018,  ratings:[2.75], nativeName:"ألمازة"},
+  {name:"Olympic Brewery",           location:"Sindos, Central Macedonia", country:"Greece",      cc:"GR", lang:"el", beers:"Mythos",                                                   lat:40.6736,lng:22.8064,  ratings:[3.25]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -190,6 +194,7 @@ let breweries=[
 // ══════════════════════════════════════════════════════════════
 const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
+"Almaza Pilsener":"almaza.com",
 "Asahi Super Dry":"asahibeer.com",
 "Augustiner Helles":"augustiner-braeu.de",
 "Big Wave Golden Ale":"konabrewingco.com",
@@ -416,11 +421,11 @@ function computeStats(){
 
 // ── Lookup indexes — replace O(n) .filter/.find on hot paths
 // Rebuild alongside STATS whenever the data arrays mutate.
-const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans"};
+const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
-const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German"};
-const LANG_COLORS={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749"};
-const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦"};
+const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
+const LANG_COLORS={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749","Arabic":"#ce1126"};
+const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
 let BREWERIES_BY_CC=new Map();    // country code → [breweries]

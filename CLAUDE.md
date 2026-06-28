@@ -148,6 +148,7 @@ exists in `drunkLocs[]` as usual.
 | `th` | Thai           | TH                             |
 | `el` | Greek          | GR                             |
 | `af` | Afrikaans      | ZA                             |
+| `ar` | Arabic         | LB                             |
 
 ## Notable Native Beer Names
 
@@ -161,3 +162,4 @@ These beers have native-language names that differ from their marketed names:
 | Birra Moretti           | Birra Moretti      | Italian  |
 | Erdinger Weißbier       | Erdinger Weißbier  | German   |
 | Hofbräu Münchner Weiße  | Hofbräu Münchner Weiße | German |
+| Almaza Pilsener         | ألمازة             | Arabic   |
