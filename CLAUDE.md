@@ -108,12 +108,12 @@ single **canonical location** — its **most unique** city.
 
 ### What this affects (and what it doesn't)
 
-- **Relabeled (aggregate views)**: CITY tab chart/cards, the "drunk" map (dots, legend,
-  table), the **markets** count, and TOP MARKET. A folded home-city contribution may cause
-  the markets count to drop — this is intended.
-- **Left honest (per-session logs)**: the main beers table rows, the beer-detail modal's
-  "ALL SESSIONS" list, and the "LATEST" activity readout still show each session's **true**
-  consumption city. The rule never rewrites where an individual pour actually happened.
+- **Relabeled (aggregate views)**: the "Where I drank" map view (dots and popups) and the
+  **cities** count in the hero stat row. A folded home-city contribution may cause the
+  cities count to drop — this is intended.
+- **Left honest (per-session logs)**: the beer-detail modal's "Every time I've had it"
+  list still shows each session's **true** consumption city. The rule never rewrites where
+  an individual pour actually happened.
 
 ### Data-entry implication
 
