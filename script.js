@@ -640,7 +640,7 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   function refreshUI(){
     refreshStats();
     // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_bM','_langD']
+    ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_langD']
       .forEach(f=>window[f]=false);
     // Re-run live stats
     try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
@@ -759,18 +759,14 @@ function showTab(id,btn){
   try{history.replaceState(null,'','#'+id);}catch(e){}
   const renderers = {
     maps: [
-      ['_dM',()=>{window._dM=true;setTimeout(initDrunkMap,80);}],
+      ['_dM',()=>{window._dM=true;setTimeout(initWorldMap,80);}],
     ],
   };
   (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
   // Charts built while their panel was hidden sized to 0px — fix them whenever
   // a panel becomes visible.
   resizeChartsIn(document.getElementById(id));
-  if(id==='maps'){
-    const active=document.querySelector('#maps .subpanel.active');
-    if(active&&active.id==='subpanel-drunk'&&_drunkMap&&_drunkMap.invalidateSize) _drunkMap.invalidateSize();
-    if(active&&active.id==='subpanel-brewed'&&_brewedMap&&_brewedMap.invalidateSize) _brewedMap.invalidateSize();
-  }
+  if(id==='maps'&&_worldMap&&_worldMap.invalidateSize) setTimeout(()=>_worldMap.invalidateSize(),50);
 }
 
 // ── INSIGHTS SUB-SECTIONS (Places / Over time / What to try within F4)
@@ -801,23 +797,7 @@ function showInsightsSubtab(name){
   try{history.replaceState(null,'','#'+name);}catch(e){}
 }
 
-// ── MAP SUBTABS (PLACES CONSUMED ↔ BREWERY LOCATIONS within F2)
-function showMapSubtab(name){
-  document.querySelectorAll('#maps .subtab').forEach(b=>{
-    const on=b.dataset.subtab===name;
-    b.classList.toggle('active',on);
-    b.setAttribute('aria-selected',on?'true':'false');
-  });
-  document.querySelectorAll('#maps .subpanel').forEach(p=>{
-    p.classList.toggle('active',p.id===`subpanel-${name}`);
-  });
-  if(name==='brewed'){
-    if(!window._bM){window._bM=true;setTimeout(initBrewedMap,80);}
-    else if(_brewedMap&&_brewedMap.invalidateSize) setTimeout(()=>_brewedMap.invalidateSize(),50);
-  } else if(name==='drunk'){
-    if(_drunkMap&&_drunkMap.invalidateSize) setTimeout(()=>_drunkMap.invalidateSize(),50);
-  }
-}
+// (Map view switching lives in setMapMode, defined in the MAP section.)
 
 // ── CHART DEFAULTS
 try {
@@ -1308,48 +1288,198 @@ function drawLanguage(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// MAPS
+// MAP — one world map, three plain-language views:
+//   drank   → every city I've reviewed a beer in (size = pours)
+//   brewed  → every brewery's hometown (color = my rating)
+//   journey → an arc from each brewery to the city where I drank its beer
 // ══════════════════════════════════════════════════════════════
-// Deterministic palette derived from drunkLocs order so newly added cities
-// always receive a distinct legend color without hand-editing this file.
-const cityColors=Object.fromEntries(drunkLocs.map((l,i)=>[l.city,`hsl(${(i*47)%360},78%,58%)`]));
 function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
 function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.7;letter-spacing:0.2px;-webkit-font-smoothing:antialiased">${h}</div>`;}
-function circleM(map,lat,lng,color,r,html){L.circleMarker([lat,lng],{radius:r,fillColor:color,color:'#222',weight:1,opacity:.8,fillOpacity:.75}).addTo(map).bindPopup(popHtml(html),{className:'dpop'});}
+// Overline that tells the reader what KIND of thing they just clicked
+function popKicker(t){return `<div style="font-size:8px;letter-spacing:1.5px;color:#777;border-bottom:1px solid #222;padding-bottom:3px;margin-bottom:4px">${t}</div>`;}
+const fmtMi=n=>Math.round(n).toLocaleString('en-US');
+// Plain-words label for a rating bucket — used by popups and the map key
+function rWord(r){return r>=4.5?'LOVED IT':r>=4?'GREAT':r>=3.5?'GOOD':r>=3?'FINE':r>=2.5?'MEH':'SKIP IT';}
+function distMi(aLat,aLng,bLat,bLng){
+  const d=Math.PI/180,R=3958.8;
+  const h=Math.sin((bLat-aLat)*d/2)**2+Math.cos(aLat*d)*Math.cos(bLat*d)*Math.sin((bLng-aLng)*d/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+// Gentle quadratic arc between two points (flat-map approximation; pairs that
+// would cross the antimeridian get one endpoint shifted onto the adjacent
+// world copy so the line takes the short way across the Pacific).
+function arcPts(aLat,aLng,bLat,bLng){
+  if(Math.abs(bLng-aLng)>180){ bLng+=bLng>aLng?-360:360; }
+  const dLat=bLat-aLat,dLng=bLng-aLng,len=Math.sqrt(dLat*dLat+dLng*dLng)||1;
+  const off=Math.min(len*0.18,14);
+  const cLat=(aLat+bLat)/2+(-dLng/len)*off, cLng=(aLng+bLng)/2+(dLat/len)*off;
+  const pts=[];
+  for(let i=0;i<=32;i++){
+    const t=i/32,u=1-t;
+    pts.push([u*u*aLat+2*u*t*cLat+t*t*bLat, u*u*aLng+2*u*t*cLng+t*t*bLng]);
+  }
+  return pts;
+}
 
-// Track Leaflet map instances so a Sheets-driven refresh can dispose the
+// Track the Leaflet instance so a Sheets-driven refresh can dispose the
 // existing map before re-initializing — without this Leaflet throws
 // "Map container is already initialized."
-let _drunkMap=null, _brewedMap=null;
+let _worldMap=null, _mapLayers=null, _mapMode='drank';
 
-function initDrunkMap(){
-  if(_drunkMap){_drunkMap.remove();_drunkMap=null;}
-  // Single pass: aggregate totals, collect unique beer names, full review list, and earliest date per city
+const MAP_MODES={
+  drank:{head:'WHERE I DRANK THEM — EVERY CITY WITH A REVIEW',hint:'CLICK A DOT FOR THE POUR LIST'},
+  brewed:{head:'WHERE THEY’RE BREWED — EVERY BREWERY’S HOMETOWN',hint:'CLICK A DOT FOR THE BREWERY'},
+  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'}
+};
+
+// beer name → brewery record (breweries[].beers is " · "-separated)
+function beerBreweryIndex(){
+  const idx={};
+  breweries.forEach(br=>br.beers.split(' · ').forEach(n=>{idx[n.trim()]=br;}));
+  return idx;
+}
+
+// Aggregate pours per city (canonical location rule applies, same as before)
+function drankCityData(){
   const cM={};
   beers.forEach(b=>{
     const L=CANON_LOC.get(b.beer)||b;
     let e=cM[L.city];
-    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],earliest:Infinity,region:L.region,country:L.country,cc:L.cc};}
+    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],region:L.region,country:L.country,cc:L.cc};}
     e.t+=b.rating;e.c++;
     if(!e.bs.includes(b.beer))e.bs.push(b.beer);
     e.reviews.push(b);
-    const t=b.year*12+b.monthN;
-    if(t<e.earliest)e.earliest=t;
   });
-  const map=L.map('drunkMap',{scrollWheelZoom:false}).setView([46,-20],3);
-  _drunkMap=map;
-  addTiles(map);
-  drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
-    const d=cM[l.city],a=(d.t/d.c).toFixed(2),r=Math.max(5,Math.min(14,4+d.c*1.5));
-    const beerRows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
-    circleM(map,l.lat,l.lng,cityColors[l.city]||'#ff6600',r,
-      `<span style="color:#ff6600;font-weight:700">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}<br><span style="color:#555;font-size:9px">${d.c} review${d.c>1?'s':''} · AVG <span style="color:#00cc44;font-weight:700">${a}/5</span></span><div style="margin-top:6px">${beerRows}</div>`);
-  });
+  return cM;
+}
 
-  document.getElementById('drunkLeg').innerHTML=drunkLocs.filter(l=>cM[l.city]).map(l=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${cityColors[l.city]||'#ff6600'}"></div>${l.city}, ${l.region} · ${FLAGS[l.cc]||''} ${l.country} (${cM[l.city].c})</div>`).join('');
+// One journey per unique (beer, city where I actually drank it) pair
+function buildJourneys(){
+  const idx=beerBreweryIndex();
+  const locByCity={};drunkLocs.forEach(l=>{locByCity[l.city]=l;});
+  const seen=new Map();
+  beers.forEach(b=>{
+    const br=idx[b.beer],loc=locByCity[b.city];
+    if(!br||!loc) return;
+    const key=b.beer+'@'+b.city;
+    let j=seen.get(key);
+    if(!j){j={beer:b.beer,br,loc,ratings:[],pours:0,miles:distMi(br.lat,br.lng,loc.lat,loc.lng)};seen.set(key,j);}
+    j.ratings.push(b.rating);j.pours++;
+  });
+  return [...seen.values()];
+}
+
+function mapHeroHtml(journeys){
+  const cM=drankCityData();
+  const cityN=Object.keys(cM).length;
+  const drankCountries=new Set(Object.values(cM).map(c=>c.cc)).size;
+  const brewCountries=new Set(breweries.map(b=>b.cc)).size;
+  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+  const chip=(v,l)=>`<span class="mh-chip"><b>${v}</b> ${l}</span>`;
+  return `<div class="bb-body" id="map-hero-body">
+    <div class="mh-line">Every beer on this site has <b>two places</b>: where it’s <b class="mh-brew">brewed</b> and where I <b class="mh-drink">drank it</b>. Pick a view below to see either end of the trip — or the trip itself.</div>
+    <div class="mh-chips">
+      ${chip(beers.length,'POURS LOGGED')}
+      ${chip(cityN,'CITIES POURED IN')}
+      ${chip(drankCountries,'COUNTRIES DRUNK IN')}
+      ${chip(breweries.length,'BREWERIES')}
+      ${chip(brewCountries,'BREWING NATIONS')}
+      ${chip(fmtMi(totalMi),'TOTAL BEER-MILES')}
+    </div>
+  </div>`;
+}
+
+function keyHtml(mode,journeys){
+  const head=`<div class="mk-head">WHAT YOU’RE LOOKING AT</div>`;
+  if(mode==='drank'){
+    return head+`
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ff6600"></span>a city where I’ve reviewed a beer</div>
+      <div class="mk-row"><span class="mk-scale"><i style="width:8px;height:8px"></i><i style="width:12px;height:12px"></i><i style="width:16px;height:16px"></i></span>bigger dot = more pours there</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ff6600;box-shadow:0 0 0 2px #ffaa00"></span>gold ring = my home turf (NY)</div>
+      <div class="mk-tap">CLICK ANY DOT TO SEE WHAT I HAD THERE</div>`;
+  }
+  if(mode==='brewed'){
+    const buckets=[[4.75,'4.5+ LOVED IT'],[4.2,'4.0+ GREAT'],[3.7,'3.5+ GOOD'],[3.2,'3.0+ FINE'],[2.7,'2.5+ MEH'],[2.0,'<2.5 SKIP IT']];
+    return head+`
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#aacc00"></span>a brewery’s hometown</div>
+      <div class="mk-row mk-note">dot color = my average rating of its beers</div>
+      <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
+      <div class="mk-tap">CLICK ANY DOT FOR THE BREWERY’S CARD</div>`;
+  }
+  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+  return head+`
+    <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
+    <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
+    <div class="mk-row mk-note">all pours added up: <b style="color:#ffaa00">${fmtMi(totalMi)} beer-miles</b></div>
+    <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+}
+
+function buildDrankLayer(map){
+  const cM=drankCityData();
+  const group=L.layerGroup(),bounds=[];
+  drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
+    const d=cM[l.city],a=d.t/d.c,r=Math.max(6,Math.min(16,5+d.c*1.2));
+    const home=HOME_CITIES.has(l.city);
+    const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
+    const html=popKicker('📍 A CITY WHERE I DRANK')+
+      `<span style="color:#ff6600;font-weight:700;font-size:12px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:#ffaa00">⌂ HOME TURF</span>':''}<br>`+
+      `<span style="color:#888;font-size:10px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
+      `<div style="margin-top:6px">${rows}</div>`;
+    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#ff6600',color:home?'#ffaa00':'#000',weight:home?2:1,opacity:.9,fillOpacity:.8})
+      .bindTooltip(`${l.city} · ${d.c} pour${d.c>1?'s':''}`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([l.lat,l.lng]);
+  });
+  return {group,bounds};
+}
+
+function buildBrewedLayer(map){
+  const group=L.layerGroup(),bounds=[];
+  breweries.forEach(b=>{
+    const a=avg(b.ratings),r=Math.max(6,Math.min(14,5+b.ratings.length*1.2));
+    const firstBeer=b.beers.split(' · ')[0];
+    const srcs=logoSources(firstBeer);
+    const onerr=srcs.length>1?logoChainOnError(srcs,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
+    const logoHtml=srcs.length?`<img src="${srcs[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${onerr}>`:'';
+    const beerList=b.beers.split(' · ').map(n=>`<span style="color:#aaa">${n}</span>`).join('<span style="color:#444"> · </span>');
+    const html=popKicker('🏭 A BREWERY’S HOMETOWN')+logoHtml+
+      `<span style="color:#ff6600;font-weight:700;font-size:12px">${b.name}</span><br>`+
+      `<span style="color:#888;font-size:10px">brews in ${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br>`+
+      `<span style="color:#666;font-size:9px">WHAT I’VE HAD:</span> <span style="font-size:10px">${beerList}</span><br>`+
+      `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:#666">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
+    L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rC(a),color:'#000',weight:1,opacity:.9,fillOpacity:.85})
+      .bindTooltip(`${b.name} · ${a.toFixed(2)}/5`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([b.lat,b.lng]);
+  });
+  return {group,bounds};
+}
+
+function buildJourneyLayer(map,journeys){
+  const group=L.layerGroup(),bounds=[];
+  journeys.forEach(j=>{
+    const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
+    const html=popKicker('✈ ONE BEER’S TRIP TO MY GLASS')+
+      `<span style="color:#ff6600;font-weight:700;font-size:12px">${j.beer}</span><br>`+
+      `<span style="color:#aaa">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:#555">→</span> <span style="color:#aaa">${j.loc.city} ${FLAGS[j.loc.cc]||''}</span><br>`+
+      `<span style="color:#888;font-size:10px">traveled ~<b style="color:#ffaa00">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
+    L.polyline(pts,{color:rC(a),weight:1.6,opacity:.65})
+      .bindTooltip(`${j.beer} · ${fmtMi(j.miles)} mi`,{sticky:true,className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    // endpoints: hollow ring = brewery, solid dot = where I drank it
+    const p0=pts[0],p1=pts[pts.length-1];
+    L.circleMarker(p0,{radius:3.5,fillColor:'#0d0d0d',color:'#bbb',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
+    L.circleMarker(p1,{radius:3.5,fillColor:'#ff6600',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
+    bounds.push(p0,p1);
+  });
+  return {group,bounds};
+}
+
+function renderDrankTable(){
+  const cM=drankCityData();
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
-    <td style="color:#ff6600">${c.city}</td>
+    <td style="color:#ff6600">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:#ffaa00;font-size:8px">⌂ HOME</span>':''}</td>
     <td style="color:#555">${c.region}</td>
     <td style="color:#aaa">${FLAGS[c.cc]||''} ${c.country}</td>
     <td style="text-align:center;color:#00aaff">${c.count}</td>
@@ -1358,19 +1488,7 @@ function initDrunkMap(){
   </tr>`).join('');
 }
 
-function initBrewedMap(){
-  if(_brewedMap){_brewedMap.remove();_brewedMap=null;}
-  const map=L.map('brewedMap',{scrollWheelZoom:false}).setView([30,10],2);
-  _brewedMap=map;
-  addTiles(map);
-  breweries.forEach(b=>{
-    const a=avg(b.ratings),r=Math.max(5,Math.min(14,4+b.ratings.length*1.5));
-    const firstBeer=b.beers.split(' · ')[0];
-    const _bSources=logoSources(firstBeer);
-    const _bOnerr=_bSources.length>1?logoChainOnError(_bSources,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
-    const logoHtml=_bSources.length?`<img src="${_bSources[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${_bOnerr}>`:'';
-    circleM(map,b.lat,b.lng,rC(a),r,`${logoHtml}<span style="color:#ff6600;font-weight:700">${b.name}</span><br><span style="color:#555;font-size:9px">${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br><span style="color:#444;font-size:9px">${b.beers}</span><br>AVG <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span> · ${b.ratings.length} review${b.ratings.length>1?'s':''}`);
-  });
+function renderBrewedTable(){
   const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
   document.getElementById('brewedTbody').innerHTML=s.map(b=>{
     const firstBeer=b.beers.split(' · ')[0];
@@ -1383,6 +1501,79 @@ function initBrewedMap(){
       <td><span class="rb ${rbC(b.avg)}">${b.avg.toFixed(2)}</span></td>
     </tr>`;
   }).join('');
+}
+
+function renderJourneyTable(journeys){
+  const s=[...journeys].sort((a,b)=>b.miles-a.miles);
+  const totalMi=journeys.reduce((sum,j)=>sum+j.miles*j.pours,0);
+  const far=s[0],near=s[s.length-1];
+  const sumEl=document.getElementById('journeySummary');
+  if(sumEl&&far) sumEl.innerHTML=`<div class="jny-sum">
+    <span>🏆 LONGEST HAUL: <b style="color:#ffaa00">${far.beer}</b> — ${fmtMi(far.miles)} mi (${far.br.location.split(',')[0]} → ${far.loc.city})</span>
+    <span>🏠 MOST LOCAL: <b style="color:#00cc44">${near.beer}</b> — ${fmtMi(near.miles)} mi (${near.br.location.split(',')[0]} → ${near.loc.city})</span>
+    <span>🌍 ALL POURS COMBINED: <b style="color:#00aaff">${fmtMi(totalMi)} beer-miles</b></span>
+  </div>`;
+  document.getElementById('journeyTbody').innerHTML=s.map((j,i)=>{
+    const a=avg(j.ratings);
+    return `<tr data-beer="${j.beer.replace(/"/g,'&quot;')}" style="cursor:pointer">
+      <td style="color:#555">${i+1}</td>
+      <td style="color:#ff6600;font-weight:600">${j.beer}</td>
+      <td style="color:#aaa">${FLAGS[j.br.cc]||''} ${j.br.location}</td>
+      <td style="color:#aaa">${FLAGS[j.loc.cc]||''} ${j.loc.city}</td>
+      <td style="text-align:right;color:#00aaff">${fmtMi(j.miles)}</td>
+      <td><span class="rb ${rbC(a)}">${a.toFixed(2)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function setMapMode(mode){
+  if(!MAP_MODES[mode]) mode='drank';
+  _mapMode=mode;
+  document.querySelectorAll('#map-modes .map-mode').forEach(b=>{
+    const on=b.dataset.mode===mode;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
+  document.querySelectorAll('#maps .map-sec').forEach(s=>s.classList.toggle('active',s.id==='mapsec-'+mode));
+  const headEl=document.getElementById('map-panel-head');
+  if(headEl) headEl.innerHTML=`${MAP_MODES[mode].head}<span class="ph-right">${MAP_MODES[mode].hint}</span>`;
+  if(!_worldMap||!_mapLayers) return; // map not built yet — initWorldMap re-applies
+  document.getElementById('map-key').innerHTML=keyHtml(mode,_mapLayers.journeys);
+  Object.entries(_mapLayers.byMode).forEach(([m,l])=>{
+    if(m===mode) l.group.addTo(_worldMap); else _worldMap.removeLayer(l.group);
+  });
+  _worldMap.invalidateSize();
+  const b=_mapLayers.byMode[mode].bounds;
+  if(b.length) _worldMap.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});
+}
+
+function initWorldMap(){
+  if(_worldMap){_worldMap.remove();_worldMap=null;_mapLayers=null;}
+  const journeys=buildJourneys();
+  document.getElementById('map-hero').innerHTML=mapHeroHtml(journeys);
+  const map=L.map('worldMap',{scrollWheelZoom:false}).setView([40,-20],2);
+  _worldMap=map;
+  addTiles(map);
+  // ⛶ reset control: re-fit the current view's markers
+  const Reset=L.Control.extend({options:{position:'topleft'},onAdd(){
+    const a=L.DomUtil.create('a','map-reset');
+    a.href='#';a.title='Reset view';a.textContent='⛶';
+    L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);const b=_mapLayers&&_mapLayers.byMode[_mapMode].bounds;if(b&&b.length)map.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});});
+    return a;
+  }});
+  map.addControl(new Reset());
+  _mapLayers={
+    journeys,
+    byMode:{
+      drank:buildDrankLayer(map),
+      brewed:buildBrewedLayer(map),
+      journey:buildJourneyLayer(map,journeys)
+    }
+  };
+  renderDrankTable();
+  renderBrewedTable();
+  renderJourneyTable(journeys);
+  setMapMode(_mapMode);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2002,6 +2193,9 @@ function drawIPO(){
     {id:'overview',label:'HOME',icon:'◈',key:'F1'},
     {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
     {id:'maps',label:'MAP',icon:'◎',key:'F3'},
+    {id:'maps',label:'MAP · WHERE I DRANK THEM',icon:'🍺',key:'',mode:'drank'},
+    {id:'maps',label:'MAP · WHERE THEY\'RE BREWED',icon:'🏭',key:'',mode:'brewed'},
+    {id:'maps',label:'MAP · BREWERY → MY GLASS',icon:'✈',key:'',mode:'journey'},
     {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
     {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
     {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},
@@ -2039,8 +2233,8 @@ function drawIPO(){
     const matchedTabs=lq?TABS.filter(t=>t.label.toLowerCase().includes(lq)||t.id.toLowerCase().includes(lq)):TABS;
     if(matchedTabs.length){
       html+=`<div class="cmd-section">NAVIGATE</div>`;
-      html+=matchedTabs.slice(0,7).map(t=>`
-        <div class="cmd-item" data-tab="${t.id}" data-action="tab">
+      html+=matchedTabs.slice(0,10).map(t=>`
+        <div class="cmd-item" data-tab="${t.id}"${t.mode?` data-mode="${t.mode}"`:''} data-action="tab">
           <span class="cmd-item-icon">${t.icon}</span>
           <span class="cmd-item-main">${t.label}</span>
           <span class="cmd-item-badge">${t.key}</span>
@@ -2286,10 +2480,16 @@ try {
     if (item) showTab(item.dataset.tab, item);
   });
 
-  // Map sub-tab navigation
+  // Map view switcher (drank / brewed / journey)
   document.getElementById('maps').addEventListener('click', function(e) {
-    const btn = e.target.closest('.subtab[data-subtab]');
-    if (btn) showMapSubtab(btn.dataset.subtab);
+    const btn = e.target.closest('.map-mode[data-mode]');
+    if (btn) setMapMode(btn.dataset.mode);
+  });
+
+  // Journey table rows open the beer's detail modal
+  document.getElementById('journeyTbody').addEventListener('click', function(e) {
+    const row = e.target.closest('tr[data-beer]');
+    if (row) openBeerModal(row.dataset.beer);
   });
 
   // Insights sub-section navigation (Places / Over time / What to try)
@@ -2403,7 +2603,12 @@ try {
     // focus save/restore chains from the real underlying element.
     if (item.dataset.action === 'beer') { closePalette(); openBeerModal(item.dataset.beer); }
     else if (item.dataset.action === 'brewery') { closePalette(); openBreweryDrawer(item.dataset.brewery); }
-    else if (item.dataset.action === 'tab') { closePalette(); showTab(item.dataset.tab); }
+    else if (item.dataset.action === 'tab') {
+      closePalette(); showTab(item.dataset.tab);
+      // Map view entries also flip the map to that view (safe pre-init: it
+      // records the mode and initWorldMap applies it when the map builds).
+      if (item.dataset.mode) setMapMode(item.dataset.mode);
+    }
   });
 
   // Collapsed analytics sections render their charts at zero size while hidden;

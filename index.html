@@ -192,52 +192,83 @@
 
 <div id="maps" class="panel">
 
-  <div class="subtabs" role="tablist">
-    <button class="subtab active" data-subtab="drunk" role="tab" aria-selected="true">📍 PLACES CONSUMED</button>
-    <button class="subtab" data-subtab="brewed" role="tab" aria-selected="false">🏭 BREWERY LOCATIONS</button>
+  <!-- Plain-language intro: what this page maps (filled by initWorldMap) -->
+  <div id="map-hero" class="bb-panel"></div>
+
+  <!-- Big self-explanatory view switcher (replaces the old tiny subtabs) -->
+  <div id="map-modes" role="tablist" aria-label="Map views">
+    <button class="map-mode active" data-mode="drank" role="tab" aria-selected="true">
+      <span class="mm-icon">🍺</span>
+      <span class="mm-text">
+        <span class="mm-title">WHERE I DRANK THEM</span>
+        <span class="mm-desc">Every city I've reviewed a beer in. Bigger dot = more pours.</span>
+      </span>
+    </button>
+    <button class="map-mode" data-mode="brewed" role="tab" aria-selected="false">
+      <span class="mm-icon">🏭</span>
+      <span class="mm-text">
+        <span class="mm-title">WHERE THEY'RE BREWED</span>
+        <span class="mm-desc">Each brewery's hometown. Dot color = my rating.</span>
+      </span>
+    </button>
+    <button class="map-mode" data-mode="journey" role="tab" aria-selected="false">
+      <span class="mm-icon">✈</span>
+      <span class="mm-text">
+        <span class="mm-title">BREWERY → MY GLASS</span>
+        <span class="mm-desc">Every beer's trip from where it's made to where I drank it.</span>
+      </span>
+    </button>
   </div>
 
-  <div id="subpanel-drunk" class="subpanel active">
-    <div class="bb-panel">
-      <div class="bb-panel-head">MAP<span class="ph-right">CLICK PINS · SIZE = REVIEW COUNT</span></div>
-      <div class="bb-body">
-        <div id="drunkMap"></div>
-        <div class="map-leg" id="drunkLeg"></div>
-      </div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">CONSUMPTION BY LOCATION</div>
-      <div class="bb-body">
-        <table class="bb-table">
-          <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>REVIEWS</th><th>AVG</th><th>BEERS TRIED</th></tr></thead>
-          <tbody id="drunkTbody"></tbody>
-        </table>
+  <!-- One world map; the key overlay explains the active view in plain words -->
+  <div class="bb-panel">
+    <div class="bb-panel-head" id="map-panel-head">MAP<span class="ph-right" id="map-panel-hint"></span></div>
+    <div class="bb-body">
+      <div id="worldMapWrap">
+        <div id="worldMap"></div>
+        <div id="map-key" aria-live="polite"></div>
       </div>
     </div>
   </div>
 
-  <div id="subpanel-brewed" class="subpanel">
+  <!-- Detail table for the active view -->
+  <div id="mapsec-drank" class="map-sec active">
     <div class="bb-panel">
-      <div class="bb-panel-head">MAP<span class="ph-right">COLOR = AVG RATING</span></div>
-      <div class="bb-body">
-        <div id="brewedMap"></div>
-        <div class="map-leg">
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#16a34a"></div>4.5+</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#22c55e"></div>4.0–4.4</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#84cc16"></div>3.5–3.9</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#eab308"></div>3.0–3.4</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#f97316"></div>2.5–2.9</div>
-          <div class="map-leg-item"><div class="map-leg-dot" style="background:#ef4444"></div>&lt;2.5</div>
-        </div>
-      </div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BREWERY DIRECTORY</div>
+      <div class="bb-panel-head">EVERY CITY I'VE POURED IN<span class="ph-right">MOST POURS FIRST</span></div>
       <div class="bb-body">
         <div style="overflow-x:auto">
           <table class="bb-table">
-            <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>LOCATION</th><th>COUNTRY</th><th>BEER(S)</th><th>AVG</th></tr></thead>
+            <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>POURS</th><th>MY AVG</th><th>WHAT I HAD</th></tr></thead>
+            <tbody id="drunkTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mapsec-brewed" class="map-sec">
+    <div class="bb-panel">
+      <div class="bb-panel-head">BREWERY DIRECTORY<span class="ph-right">BEST RATED FIRST · CLICK A NAME FOR ITS CARD</span></div>
+      <div class="bb-body">
+        <div style="overflow-x:auto">
+          <table class="bb-table">
+            <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>HOMETOWN</th><th>COUNTRY</th><th>WHAT I'VE HAD</th><th>MY AVG</th></tr></thead>
             <tbody id="brewedTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mapsec-journey" class="map-sec">
+    <div class="bb-panel">
+      <div class="bb-panel-head">THE LONGEST HAULS<span class="ph-right">MILES FROM BREWERY TO MY GLASS · CLICK A BEER</span></div>
+      <div class="bb-body">
+        <div id="journeySummary"></div>
+        <div style="overflow-x:auto">
+          <table class="bb-table">
+            <thead><tr><th style="width:30px">#</th><th>BEER</th><th>BREWED IN</th><th>DRUNK IN</th><th>MILES</th><th>MY RATING</th></tr></thead>
+            <tbody id="journeyTbody"></tbody>
           </table>
         </div>
       </div>

@@ -571,17 +571,104 @@ transition: filter 0.15s;
 .bc-new { position: absolute; top: 5px; right: 5px; background: var(--green); color: #000; font-size: 7px; font-weight: 700; padding: 1px 4px; }
 
 /* ═══════════════════════════════════════════
-MAPS
+MAP — one world map, three self-explanatory views
 ═══════════════════════════════════════════ */
-#drunkMap, #brewedMap {
-width: 100%;
-height: 500px;
-border: 1px solid var(--border2);
-filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7);
+#worldMapWrap { position: relative; }
+#worldMap {
+  width: 100%;
+  height: 520px;
+  border: 1px solid var(--border2);
+  background: #0b0b0b;
 }
-.map-leg { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
-.map-leg-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--dim); letter-spacing: 0.2px; }
-.map-leg-dot { width: 10px; height: 10px; border: 1px solid rgba(255,255,255,.25); flex-shrink: 0; }
+/* Mute only the basemap tiles — markers & lines keep their true colors */
+#worldMap .leaflet-tile-pane { filter: grayscale(30%) brightness(0.85) contrast(1.15) saturate(0.7); }
+
+/* Plain-language intro above the map */
+#map-hero { margin-bottom: 8px; }
+#map-hero-body { padding: 10px 12px; }
+.mh-line { font-size: 11px; color: #999; line-height: 1.7; letter-spacing: 0.3px; margin-bottom: 8px; }
+.mh-line b { color: var(--white); }
+.mh-line .mh-brew { color: var(--cyan); }
+.mh-line .mh-drink { color: var(--orange); }
+.mh-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mh-chip {
+  font-size: 9px; letter-spacing: 1px; color: var(--dim);
+  border: 1px solid var(--border2); background: var(--panel2);
+  padding: 3px 8px; white-space: nowrap;
+}
+.mh-chip b { color: var(--amber); font-size: 11px; margin-right: 3px; }
+
+/* Big view-switcher cards */
+#map-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.map-mode {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  background: var(--panel); border: 1px solid var(--border2);
+  padding: 9px 12px; cursor: pointer; min-height: 52px;
+  font-family: var(--mono); color: var(--white);
+  transition: border-color .12s, background .12s;
+}
+.map-mode:hover { border-color: var(--orange3); background: var(--panel-hover); }
+.map-mode .mm-icon { font-size: 18px; flex-shrink: 0; }
+.map-mode .mm-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.map-mode .mm-title { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--dim); }
+.map-mode .mm-desc { font-size: 9px; color: var(--dim); line-height: 1.45; letter-spacing: 0.2px; }
+.map-mode.active { border-color: var(--orange); background: #1a1208; box-shadow: inset 0 0 0 1px var(--orange), 0 0 14px var(--orange-glow); }
+.map-mode.active .mm-title { color: var(--orange); }
+.map-mode.active .mm-desc { color: #a08560; }
+
+/* Always-visible key overlaid on the map: says what the dots/lines mean */
+#map-key {
+  position: absolute; top: 8px; right: 8px; z-index: 650;
+  max-width: 240px;
+  background: rgba(13,13,13,0.88);
+  border: 1px solid var(--border2);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  padding: 8px 10px;
+  font-size: 9px; color: #999; letter-spacing: 0.3px; line-height: 1.5;
+  pointer-events: none;
+}
+.mk-head { font-size: 8px; letter-spacing: 1.5px; color: var(--orange); margin-bottom: 6px; }
+.mk-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+.mk-row.mk-note { color: #777; }
+.mk-dot { display: inline-block; border-radius: 50%; flex-shrink: 0; }
+.mk-scale { display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.mk-scale i { display: inline-block; border-radius: 50%; background: var(--orange); opacity: .8; }
+.mk-swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; margin: 4px 0; }
+.mk-sw { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.mk-sw i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.mk-jline { display: inline-flex; align-items: center; flex-shrink: 0; }
+.mk-jline b { width: 22px; height: 0; border-top: 2px solid #aacc00; display: inline-block; }
+.mk-jline .mk-o { width: 7px; height: 7px; border: 1.5px solid #bbb; border-radius: 50%; display: inline-block; }
+.mk-jline .mk-f { width: 7px; height: 7px; background: var(--orange); border-radius: 50%; display: inline-block; }
+.mk-tap { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--border); font-size: 8px; letter-spacing: 1px; color: var(--dim); }
+
+/* Marker hover labels */
+.mtip {
+  background: var(--panel) !important; color: var(--white) !important;
+  border: 1px solid var(--orange3) !important; border-radius: 0 !important;
+  font-family: var(--mono) !important; font-size: 9px !important;
+  letter-spacing: 0.5px; padding: 2px 6px !important;
+  box-shadow: none !important;
+}
+.mtip::before { display: none; }
+
+/* ⛶ reset-view control (below the zoom buttons) */
+.map-reset {
+  display: block; width: 26px; height: 26px; line-height: 26px;
+  text-align: center; margin-top: 4px;
+  background: var(--panel); color: var(--orange);
+  border: 2px solid rgba(0,0,0,0.2); font-size: 13px; cursor: pointer;
+}
+.map-reset:hover { background: var(--panel-hover); color: var(--orange2); }
+
+/* Mode-specific detail sections under the map */
+.map-sec { display: none; }
+.map-sec.active { display: block; }
+.jny-sum {
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  font-size: 9px; letter-spacing: 0.5px; color: #888;
+  padding: 6px 2px 10px;
+}
 
 /* Subtab strip — used inside a panel to switch between sibling sub-views */
 .subtabs { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 1px solid var(--border2); }
@@ -933,17 +1020,19 @@ body { overscroll-behavior: none; }
 
 /* MAP directories — drop the widest columns so they fit without scrolling.
    Rows stay tappable: cities open popups, breweries open the detail drawer. */
-#subpanel-drunk .bb-table th:nth-child(2),  /* region */
-#subpanel-drunk .bb-table th:nth-child(3),  /* country */
-#subpanel-drunk .bb-table th:nth-child(6),  /* beers tried */
-#subpanel-drunk .bb-table td:nth-child(2),
-#subpanel-drunk .bb-table td:nth-child(3),
-#subpanel-drunk .bb-table td:nth-child(6),
-#subpanel-brewed .bb-table th:nth-child(3),  /* location */
-#subpanel-brewed .bb-table th:nth-child(5),  /* beers */
-#subpanel-brewed .bb-table td:nth-child(3),
-#subpanel-brewed .bb-table td:nth-child(5) { display: none; }
-#subpanel-drunk .bb-table, #subpanel-brewed .bb-table { min-width: 0; }
+#mapsec-drank .bb-table th:nth-child(2),  /* region */
+#mapsec-drank .bb-table th:nth-child(3),  /* country */
+#mapsec-drank .bb-table th:nth-child(6),  /* what I had */
+#mapsec-drank .bb-table td:nth-child(2),
+#mapsec-drank .bb-table td:nth-child(3),
+#mapsec-drank .bb-table td:nth-child(6),
+#mapsec-brewed .bb-table th:nth-child(3),  /* hometown */
+#mapsec-brewed .bb-table th:nth-child(5),  /* beers */
+#mapsec-brewed .bb-table td:nth-child(3),
+#mapsec-brewed .bb-table td:nth-child(5),
+#mapsec-journey .bb-table th:nth-child(3),  /* brewed in */
+#mapsec-journey .bb-table td:nth-child(3) { display: none; }
+#mapsec-drank .bb-table, #mapsec-brewed .bb-table, #mapsec-journey .bb-table { min-width: 0; }
 
 /* MODAL — near full-screen on phones */
 #beerModalBox {
@@ -1005,10 +1094,15 @@ body { overscroll-behavior: none; }
 .subtabs { flex-wrap: wrap; }
 .subtab { font-size: 10px; padding: 10px 14px; letter-spacing: 1px; min-height: 44px; flex: 1; }
 
-/* MAPS — shorter on phones, full-bleed look */
-#drunkMap, #brewedMap { height: 360px; }
-.map-leg { gap: 8px; }
-.map-leg-item { font-size: 9px; }
+/* MAPS — shorter on phones; key drops below the map instead of covering it */
+#worldMap { height: 360px; }
+#map-key {
+  position: static; max-width: none; margin-top: 6px;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  background: var(--panel2);
+}
+#map-modes { grid-template-columns: 1fr; }
+.map-mode { min-height: 44px; }
 
 /* FORM CONTROLS — 16px font-size to prevent iOS zoom-on-focus */
 .bb-select,
@@ -1079,7 +1173,7 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   .bc-logo-wrap { height: 50px; }
   .panel { padding: 6px; }
   .kpi-val { font-size: 16px; }
-  #drunkMap, #brewedMap { height: 320px; }
+  #worldMap { height: 320px; }
 }
 
 /* Very small / iPhone SE — keep it usable */
@@ -1094,7 +1188,7 @@ canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   #menubar { height: calc(30px + env(safe-area-inset-top, 0px)); }
   .mb-item { min-height: 30px; }
   .mb-logo { min-height: 30px; }
-  #drunkMap, #brewedMap { height: 240px; }
+  #worldMap { height: 240px; }
 }
 
 @media (max-width: 1024px) and (min-width: 701px) {
