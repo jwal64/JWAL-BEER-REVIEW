@@ -321,16 +321,37 @@ rebuildLocalLogos();
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
-const sC={"Lager":"#00f5ff","Pilsner":"#bb5580","Wheat Beer":"#cc3366","Belgian Ale":"#bb44ff","IPA":"#ffae00","Pale Ale":"#39ff14","Stout":"#9966ff","Brown Ale":"#8b4513","Red Ale":"#ff4400"};
-function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
-function rC(r){return r>=4.5?"#00cc44":r>=4?"#22dd55":r>=3.5?"#aacc00":r>=3?"#ffaa00":r>=2.5?"#ff6600":"#ff2222";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// Friendly 3-bucket rating color: loved it / liked it / not for me
+function rColor(r){return r>=4?'#4C8C2B':r>=3?'#D97706':'#B3423A';}
+function rWord(r){return r>=4.5?'Loved it':r>=4?'Great':r>=3.5?'Good':r>=3?'Fine':r>=2.5?'Meh':'Not for me';}
+const fmtMi=n=>Math.round(n).toLocaleString('en-US');
+// Reusable star + number rating snippet
+function ratingHtml(r,size){return `<span class="stars" style="color:${rColor(r)}${size?`;font-size:${size}px`:''}">${strs(r)}</span> <b class="rnum" style="color:${rColor(r)}">${r.toFixed(2)}</b>`;}
 
-// Source chain priority: local override → Brandfetch → Google favicons → Icon
-// Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
-// the next available source.
+const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
+
+function getMonthlyData(){
+  // Single pass: group beers by year+month so the same month name in different
+  // years never merges, and bucket order stays truly chronological.
+  const orderMap={},monthAbbr={},monthYearMap={},byMonth={};
+  beers.forEach(b=>{
+    const key=`${b.month} ${b.year}`;
+    if(!(key in orderMap)){orderMap[key]=b.year*12+b.monthN;monthAbbr[key]=b.month;monthYearMap[key]=b.year;byMonth[key]=[];}
+    byMonth[key].push(b);
+  });
+  const months=Object.keys(orderMap).sort((a,b)=>orderMap[a]-orderMap[b]);
+  const monthLabels=months.map(m=>`${MONTH_FULL[monthAbbr[m]]||monthAbbr[m]} ${monthYearMap[m]||''}`);
+  return {months,byMonth,monthLabels,monthYearMap,monthAbbr};
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOGO RENDERING — source chain: local override → Brandfetch →
+// Google favicons → Icon Horse → 🍺 emoji
+// ══════════════════════════════════════════════════════════════
 function logoSources(name){
   const local=LOCAL_LOGOS[name];
   const sources=[];
@@ -350,10 +371,10 @@ function logoChainOnError(sources,replaceJS){
   return ` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;${conds}${elseClause}"`;
 }
 function logoImg(name,size=24){
-  const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle">🍺</span>`;
   const sources=logoSources(name);
   if(!sources.length)return emojiSpan;
-  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle'}));`;
   const onerr=logoChainOnError(sources,emojiReplace);
   return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
@@ -365,24 +386,6 @@ function cardLogo(name){
   return `<img src="${sources[0]}" class="bc-logo" alt="${name}" loading="lazy" decoding="async"${onerr}>`;
 }
 
-const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#ff6600','#00aaff','#00cc44','#bb44ff','#ffdd00','#ff2222','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
-
-function getMonthlyData(){
-  // Single pass: group beers by year+month so the same month name in different
-  // years never merges, and bucket order stays truly chronological.
-  const orderMap={},monthAbbr={},monthYearMap={},byMonth={};
-  beers.forEach(b=>{
-    const key=`${b.month} ${b.year}`;
-    if(!(key in orderMap)){orderMap[key]=b.year*12+b.monthN;monthAbbr[key]=b.month;monthYearMap[key]=b.year;byMonth[key]=[];}
-    byMonth[key].push(b);
-  });
-  const months=Object.keys(orderMap).sort((a,b)=>orderMap[a]-orderMap[b]);
-  const monthColors=months.map((_,i)=>MONTH_COLORS[i%MONTH_COLORS.length]);
-  const monthLabels=months.map(m=>`${MONTH_FULL[monthAbbr[m]]||monthAbbr[m]} ${monthYearMap[m]||''}`);
-  return {months,byMonth,monthColors,monthLabels,monthYearMap,monthAbbr};
-}
-
 // ══════════════════════════════════════════════════════════════
 // PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
 // ══════════════════════════════════════════════════════════════
@@ -390,8 +393,6 @@ function computeStats(){
   const styleMap={},methodMap={},countryMap={},cityMap={},brandMap={},brandStats={};
   let ratingSum=0;
 
-  // Single pass over beers — build aggregation maps AND track per-brand min/max
-  // so brandList doesn't need Math.max(...rs) / Math.min(...rs) (which spread every rating array)
   beers.forEach(b=>{
     ratingSum+=b.rating;
     if(!styleMap[b.style])styleMap[b.style]={t:0,c:0};styleMap[b.style].t+=b.rating;styleMap[b.style].c++;
@@ -407,29 +408,18 @@ function computeStats(){
   });
 
   const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-  const METHOD_ORDER=['Draft','Nitro','Bottle','Can'];
-  const methodAvgs=METHOD_ORDER.map(m=>methodMap[m]?+(methodMap[m].t/methodMap[m].c).toFixed(2):0);
-  const methodCounts=METHOD_ORDER.map(m=>methodMap[m]?methodMap[m].c:0);
   const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
   const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
   const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:brandStats[n].best,worst:brandStats[n].worst,std:std(rs)})).sort((a,b)=>b.avg-a.avg);
-  const sorted=[...beers].sort((a,b)=>b.rating-a.rating);
   const globalAvg=beers.length?ratingSum/beers.length:0;
 
-  return {styleMap,styleRanked,METHOD_ORDER,methodMap,methodAvgs,methodCounts,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,sorted,globalAvg};
+  return {styleMap,styleRanked,methodMap,countryMap,countryRanked,cityMap,cityRanked,brandMap,brandList,globalAvg};
 }
 
-// ── Lookup indexes — replace O(n) .filter/.find on hot paths
-// Rebuild alongside STATS whenever the data arrays mutate.
+// ── Lookup indexes — rebuilt alongside STATS whenever the data arrays mutate.
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
-// Language tab — country-code → language fallback when a beer's brewery has no lang
-const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#ff6600","Dutch":"#00aaff","English":"#00cc44","French":"#bb44ff","Japanese":"#ff2222","Spanish":"#ffaa00","Danish":"#555","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749","Arabic":"#ce1126"};
-const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
-let BREWERIES_BY_CC=new Map();    // country code → [breweries]
-let BEER_LANG_LOOKUP={};          // beer name → language label
 let BREW_LOC={};                  // beer name → brewery location string
 function buildIndexes(){
   BEER_REVIEWS=new Map();
@@ -439,22 +429,16 @@ function buildIndexes(){
     arr.push(b);
   }
   BREWERY_BY_NAME=new Map();
-  BREWERIES_BY_CC=new Map();
-  BEER_LANG_LOOKUP={};
   BREW_LOC={};
   for(const br of breweries){
     BREWERY_BY_NAME.set(br.name,br);
-    let ccArr=BREWERIES_BY_CC.get(br.cc);
-    if(!ccArr){ccArr=[];BREWERIES_BY_CC.set(br.cc,ccArr);}
-    ccArr.push(br);
-    const langName=LANG_NAMES_IDX[br.lang]||br.lang;
     for(const raw of br.beers.split(' · ')){
       const n=raw.trim();
-      BEER_LANG_LOOKUP[n]=langName;
       if(!BREW_LOC[n])BREW_LOC[n]=br.location;
     }
   }
 }
+
 // ── Canonical location: a beer reviewed in multiple cities is attributed to its
 // rarest-visited city for AGGREGATION only (city stats, drunk map, markets count).
 // Home bases "New Rochelle"/"New York" never win when any alternative city exists.
@@ -485,11 +469,7 @@ function refreshStats(){ CANON_LOC=computeCanonLoc(); STATS=computeStats(); buil
 let STATS=computeStats();
 buildIndexes();
 
-// ══════════════════════════════════════════════════════════════
-// "NEW" DISPLAY — only show NEW tag for beers reviewed in the current month
-// Recompute the date on every call so a long-lived tab crossing midnight
-// on a month boundary re-flags correctly without a reload.
-// ══════════════════════════════════════════════════════════════
+// Only show the NEW tag for beers reviewed in the current calendar month.
 function isDisplayNew(b){
   if(!b.isNew) return false;
   const n=new Date();
@@ -497,73 +477,466 @@ function isDisplayNew(b){
 }
 
 // ══════════════════════════════════════════════════════════════
-// DYNAMIC STATS — update header, overview KPIs, and BEERS tab
-// from live data so they never go stale when new beers are added
+// WORLD (UNTAPPD) RATINGS
+// The refresh-untappd-reminder GitHub Action opens an issue every 2 weeks
+// when this stamp gets stale (>14 days old).
 // ══════════════════════════════════════════════════════════════
-function updateLiveStats(){
-  const totalReviews = beers.length;
-  const totalMarkets = Object.keys(STATS.cityMap).length;
-  const totalBrands  = Object.keys(STATS.brandMap).length;
-  const totalCtry    = Object.keys(STATS.countryMap).length;
-  const topBeer      = STATS.sorted[0];
-  const lowBeer      = STATS.sorted[STATS.sorted.length - 1];
-  const avgRating    = STATS.globalAvg;
-  // Single pass: sum ABV, find min/max, count new + hits
-  let abvSum=0,minAbv=Infinity,maxAbv=-Infinity,newCount=0,hitCount=0;
-  for(const b of beers){
-    abvSum+=b.abv;
-    if(b.abv<minAbv)minAbv=b.abv;
-    if(b.abv>maxAbv)maxAbv=b.abv;
-    if(isDisplayNew(b))newCount++;
-    if(b.rating>=3)hitCount++;
-  }
-  const avgAbv = beers.length?abvSum/beers.length:0;
-  const hitRate = beers.length?Math.round(hitCount/beers.length*100):0;
+const UNTAPPD_LAST_REFRESHED='2026-05-05';
+const UNTAPPD_REFRESH_INTERVAL_DAYS=14;
+// Global Untappd averages — refreshed on UNTAPPD_LAST_REFRESHED above.
+// Keys MUST match the exact beer names in beers[] (case + diacritics).
+// Update every 2 weeks (the refresh workflow opens a reminder issue).
+const globalAvgs={
+  'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
+  'Sapporo Premium':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
+  'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
+  'Harp Lager':3.42,'La Fin Du Monde':4.07,'Kronenbourg 1664':3.30,
+  'Michelob Ultra':2.84,'Guinness Draught':3.80,'Red Stripe':3.31,
+  'Heineken':3.00,'Weihenstephaner Hefeweissbier':3.80,'Negra Modelo':3.60,
+  'Hofbräu Münchner Weiße':3.80,'Hofbräu Dunkel':3.55,
+  'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
+  'Dos Equis Lager Especial':3.25,
+  'Frisse Lentebok':3.25,
+  // Apr 2026 expansion — values mirror Untappd consensus snapshots
+  // (cross-checked against IPO_WATCHLIST entries where overlap exists).
+  'Estrella Galicia':3.65,'Pilsner Urquell':3.80,'Wrench':3.95,
+  'Żywiec':3.35,'Peroni Nastro Azzurro':3.56,'Estrella Damm':3.61,
+  'Grolsch Puur Weizen':3.50,'Leffe Blonde':3.75,'Texels Skuumkoppe':3.65,
+  'Affligem Tripel':3.80,'De Koninck':3.55,'IJwit':3.50,
+  'La Chouffe Blonde':3.85,'Stiegl Goldbräu':3.35,'Modelo Oro':3.45,
+  'Super Bock':3.41,'Estrella Jalisco':3.20,'Rolling Rock Extra Pale':3.05,
+  'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
+  'Pacífico Clara':3.65,'Narragansett Lager':3.23,'Big Wave Golden Ale':3.52,
+  'Belhaven Scottish Stout':3.45,'Samuel Adams Summer Ale':3.50,
+};
 
-  const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  // Header bar
-  const sub = document.getElementById('hdr-subtitle');
-  if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
-  // Home hero — plain-language summary so a first-time visitor instantly gets it
-  const heroEl = document.getElementById('ov-hero');
-  if(heroEl){
-    let nMonths = 0;
-    try { nMonths = getMonthlyData().months.length; } catch(e){}
-    heroEl.innerHTML =
-      `<div class="ov-hero-stats">`+
-        `<span><b>${totalReviews}</b> beers reviewed</span>`+
-        `<span><b>${avgRating.toFixed(2)}★</b> average</span>`+
-        `<span><b>${totalBrands}</b> brands</span>`+
-        `<span><b>${totalCtry}</b> countries</span>`+
-        (nMonths?`<span><b>${nMonths}</b> month${nMonths===1?'':'s'} tracked</span>`:'')+
-      `</div>`+
-      `<div class="ov-hero-sub">A running log of every beer I drink — each one rated out of 5. Tap any beer for the full story.</div>`;
-  }
-  // Overview KPI tiles
-  set('ov-top-val',  topBeer.rating.toFixed(2));
-  set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
-  set('ov-avg-val',  avgRating.toFixed(2));
-  set('ov-avg-sub',  `${totalReviews} total reviews`);
-  set('ov-low-val',  lowBeer.rating.toFixed(2));
-  set('ov-low-sub',  `▼ ${lowBeer.beer} · ${lowBeer.origin}`);
-  set('ov-abv-val',  avgAbv.toFixed(1)+'%');
-  set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
-  set('ov-brands-val', totalBrands);
-  set('ov-brands-sub', `Across ${totalCtry} countries`);
-  set('ov-hit-val',  hitRate+'%');
-  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated ≥3.00`);
-  // BEERS tab
-  set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
-  set('brands-count', `${totalBrands} UNIQUE BRANDS`);
-  const newTag = document.getElementById('beers-new-tag');
-  if(newTag) newTag.textContent = `+${newCount} NEW`;
-  // Status bar
-  set('sb-stats', `RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
+// Beers I want to try next — curated by hand ("On my list" section)
+const IPO_WATCHLIST=[
+  {beer:'Birra Moretti',   style:'Lager',        origin:'IT', abv:4.6, region:'Udine, Friuli-Venezia Giulia', untappd:3.58, method:'Bottle'},
+  {beer:'Peroni',          style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
+  {beer:'Blue Moon',       style:'Wheat Beer',   origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
+  {beer:'Miller Lite',     style:'Lager',        origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
+  {beer:'Estrella Damm',   style:'Lager',        origin:'ES', abv:5.4, region:'Barcelona, Catalonia',  untappd:3.61, method:'Bottle'},
+  {beer:'Estrella Galicia',style:'Lager',        origin:'ES', abv:5.5, region:'A Coruña, Galicia',     untappd:3.65, method:'Bottle'},
+  {beer:'Brahma',          style:'Lager',        origin:'BR', abv:4.8, region:'São Paulo, SP',         untappd:3.18, method:'Can'},
+  {beer:'Quilmes',         style:'Lager',        origin:'AR', abv:4.9, region:'Buenos Aires, BA',      untappd:3.22, method:'Bottle'},
+  {beer:'Tsingtao',        style:'Lager',        origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
+  {beer:'Castle Lager',    style:'Lager',        origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
+  {beer:'Pilsner Urquell', style:'Pilsner',      origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',       untappd:3.80, method:'Bottle'},
+  {beer:'Super Bock',      style:'Lager',        origin:'PT', abv:5.2, region:'Leça do Balio, Porto',  untappd:3.41, method:'Bottle'},
+  {beer:'Mythos',          style:'Lager',        origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
+  {beer:'Victoria Bitter', style:'Lager',        origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
+  {beer:'Norrlands Guld',  style:'Lager',        origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
+  {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
+  {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
+  {beer:'Kronenbourg 1664',style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
+  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
+  {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
+  {beer:'Żywiec',          style:'Lager',        origin:'PL', abv:5.5, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
+  {beer:'Tyskie',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Tychy, Silesia',        untappd:3.28, method:'Can'},
+  {beer:'Chimay Blue',     style:'Belgian Ale',  origin:'BE', abv:9.0, region:'Chimay, Hainaut',       untappd:4.05, method:'Bottle'},
+  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Dinant, Namur',         untappd:3.75, method:'Bottle'},
+  {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
+  {beer:'Sam Adams Boston Lager',style:'Lager',  origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
+];
+
+// ══════════════════════════════════════════════════════════════
+// HERO STATS
+// ══════════════════════════════════════════════════════════════
+function renderHeroStats(){
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('stat-beers',STATS.brandList.length);
+  set('stat-countries',STATS.countryRanked.length);
+  set('stat-cities',Object.keys(drankCityData()).length);
+  set('stat-avg',STATS.globalAvg.toFixed(2));
+  // Footer freshness line
+  const latest=beers.reduce((a,b)=>(b.year*12+b.monthN)>(a.year*12+a.monthN)?b:a,beers[0]);
+  set('footer-updated',latest?`${MONTH_FULL[latest.month]||latest.month} ${latest.year}`:'');
 }
-try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 
 // ══════════════════════════════════════════════════════════════
-// GOOGLE SHEETS LOADER — fetches live data and refreshes the dashboard
+// BEER CARDS — search / filter / sort
+// ══════════════════════════════════════════════════════════════
+function uniqueBeers(){
+  // One card per beer name: best-rated review carries the card, but we also
+  // remember the most recent review for the "newest" sort and the date line.
+  const best={};
+  beers.forEach(b=>{
+    const e=best[b.beer];
+    if(!e){best[b.beer]={...b,latestOrd:b.year*12+b.monthN,latestMonth:b.month,latestYear:b.year,count:1};return;}
+    e.count++;
+    if(b.rating>e.rating){e.rating=b.rating;e.style=b.style;e.abv=b.abv;e.origin=b.origin;e.method=b.method;}
+    const ord=b.year*12+b.monthN;
+    if(ord>e.latestOrd){e.latestOrd=ord;e.latestMonth=b.month;e.latestYear=b.year;}
+    if(isDisplayNew(b))e.isNew=true;
+  });
+  return Object.values(best);
+}
+
+const BEER_SORTS={
+  rating:(a,b)=>b.rating-a.rating||a.beer.localeCompare(b.beer),
+  newest:(a,b)=>b.latestOrd-a.latestOrd||a.beer.localeCompare(b.beer),
+  az:(a,b)=>a.beer.localeCompare(b.beer)
+};
+
+function populateBeerFilters(){
+  const fill=(el,opts)=>{
+    const keep=el.value;
+    el.length=1; // keep the "All …" option
+    const frag=document.createDocumentFragment();
+    opts.forEach(([v,label])=>{const o=document.createElement('option');o.value=v;o.textContent=label;frag.appendChild(o);});
+    el.appendChild(frag);
+    el.value=[...el.options].some(o=>o.value===keep)?keep:'';
+  };
+  fill(document.getElementById('beerStyleFilter'),[...new Set(beers.map(b=>b.style))].sort().map(s=>[s,s]));
+  fill(document.getElementById('beerOriginFilter'),[...new Set(beers.map(b=>b.origin))].sort().map(o=>[o,`${FLAGS[o]||''} ${CNAMES[o]||o}`]));
+}
+
+function applyBeerFilter(){
+  const q=(document.getElementById('beerSearch').value||'').trim().toLowerCase();
+  const st=document.getElementById('beerStyleFilter').value;
+  const or=document.getElementById('beerOriginFilter').value;
+  const sort=document.getElementById('beerSort').value;
+  const data=uniqueBeers().filter(b=>
+    (!st||b.style===st)&&
+    (!or||b.origin===or)&&
+    (!q||b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||(CNAMES[b.origin]||'').toLowerCase().includes(q)));
+  data.sort(BEER_SORTS[sort]||BEER_SORTS.rating);
+  renderBeerGrid(data);
+}
+const applyBeerFilterDebounced=(()=>{let t;return ()=>{clearTimeout(t);t=setTimeout(applyBeerFilter,160);};})();
+
+function renderBeerGrid(data){
+  const grid=document.getElementById('beerGrid');
+  const countEl=document.getElementById('beerCount');
+  if(countEl)countEl.textContent=data.length===0?'No beers match — try clearing the filters':`Showing ${data.length} beer${data.length===1?'':'s'}`;
+  grid.innerHTML=data.map(b=>`
+    <article class="beer-card" data-beer="${esc(b.beer)}" tabindex="0" role="button" aria-label="${esc(b.beer)} details">
+      ${b.isNew&&isDisplayNew(b)?'<span class="bc-new">New</span>':''}
+      <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
+      <div class="bc-name">${esc(b.beer)}</div>
+      <div class="bc-meta">${FLAGS[b.origin]||''} ${b.style} · ${b.abv}%</div>
+      <div class="bc-rating">${ratingHtml(b.rating)}</div>
+      <div class="bc-date">${b.latestMonth} ${b.latestYear}${b.count>1?` · ${b.count}×`:''}</div>
+    </article>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// BEER DETAIL MODAL
+// ══════════════════════════════════════════════════════════════
+let _modalPrevFocus=null;
+function openBeerModal(name){
+  const reviews=BEER_REVIEWS.get(name)||[];
+  if(!reviews.length) return;
+  const ratings=reviews.map(b=>b.rating);
+  const avgR=avg(ratings);
+  const b0=reviews[0];
+  const world=globalAvgs[name];
+  const brewLoc=BREW_LOC[name];
+  document.getElementById('beerModalTitle').textContent=name;
+  document.getElementById('beerModalBody').innerHTML=`
+    <div class="bm-head">
+      <div class="bm-logo">${cardLogo(name)}</div>
+      <div class="bm-info">
+        <div class="bm-style">${esc(b0.style)} · ${b0.abv}% ABV</div>
+        <div class="bm-origin">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin}${brewLoc?` — brewed in ${esc(brewLoc)}`:''}</div>
+      </div>
+      <div class="bm-score">
+        <div class="bm-stars">${ratingHtml(avgR,20)}</div>
+        <div class="bm-word" style="color:${rColor(avgR)}">${rWord(avgR)}</div>
+        ${world!==undefined?`<div class="bm-world">The world says ★ ${world.toFixed(2)}</div>`:''}
+      </div>
+    </div>
+    <div class="bm-sessions-title">Every time I've had it</div>
+    <ul class="bm-sessions">${reviews.map(b=>`
+      <li>
+        <span class="bm-sess-date">${b.month} ${b.year}</span>
+        <span class="bm-sess-place">${esc(b.city)} ${FLAGS[b.cc]||''} · ${esc(b.method)}</span>
+        <span class="bm-sess-rating" style="color:${rColor(b.rating)}">${strs(b.rating)} ${b.rating.toFixed(2)}</span>
+      </li>`).join('')}
+    </ul>`;
+  _modalPrevFocus=document.activeElement;
+  const bm=document.getElementById('beerModal');
+  bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');
+  // Focus after the visibility transition's first frame: focus() on an
+  // element whose computed visibility is still 'hidden' is silently ignored.
+  const cb=document.getElementById('beerModalClose');
+  if(cb) requestAnimationFrame(()=>requestAnimationFrame(()=>cb.focus()));
+}
+function closeBeerModal(){
+  const bm=document.getElementById('beerModal');
+  if(!bm.classList.contains('open')) return;
+  bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open');
+  restoreFocus(_modalPrevFocus,bm);
+  _modalPrevFocus=null;
+}
+// Return focus to where it was before the overlay opened. If the opener wasn't
+// focusable, at least blur anything still focused inside the now-hidden overlay.
+function restoreFocus(prev,overlay){
+  if(prev&&prev!==document.body&&document.contains(prev)) prev.focus();
+  else if(overlay.contains(document.activeElement)) document.activeElement.blur();
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAP — one world map, three plain-language views:
+//   drank   → every city I've had a beer in (dot size = how many)
+//   brewed  → every brewery's hometown (dot color = my rating)
+//   journey → an arc from each brewery to the city where I drank its beer
+// ══════════════════════════════════════════════════════════════
+function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
+function popHtml(h){return `<div class="pop">${h}</div>`;}
+function popKicker(t){return `<div class="pop-kicker">${t}</div>`;}
+function distMi(aLat,aLng,bLat,bLng){
+  const d=Math.PI/180,R=3958.8;
+  const h=Math.sin((bLat-aLat)*d/2)**2+Math.cos(aLat*d)*Math.cos(bLat*d)*Math.sin((bLng-aLng)*d/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+// Gentle quadratic arc between two points (flat-map approximation; pairs that
+// would cross the antimeridian get one endpoint shifted onto the adjacent
+// world copy so the line takes the short way across the Pacific).
+function arcPts(aLat,aLng,bLat,bLng){
+  if(Math.abs(bLng-aLng)>180){ bLng+=bLng>aLng?-360:360; }
+  const dLat=bLat-aLat,dLng=bLng-aLng,len=Math.sqrt(dLat*dLat+dLng*dLng)||1;
+  const off=Math.min(len*0.18,14);
+  const cLat=(aLat+bLat)/2+(-dLng/len)*off, cLng=(aLng+bLng)/2+(dLat/len)*off;
+  const pts=[];
+  for(let i=0;i<=32;i++){
+    const t=i/32,u=1-t;
+    pts.push([u*u*aLat+2*u*t*cLat+t*t*bLat, u*u*aLng+2*u*t*cLng+t*t*bLng]);
+  }
+  return pts;
+}
+
+// Track the Leaflet instance so a Sheets-driven refresh can dispose the
+// existing map before re-initializing — without this Leaflet throws
+// "Map container is already initialized."
+let _worldMap=null, _mapLayers=null, _mapMode='drank';
+
+const MAP_MODES={
+  drank:{caption:'Every city I’ve had a beer in. Bigger dot = more beers there — tap one to see what I had.'},
+  brewed:{caption:'Every brewery’s hometown. Dot color = how much I liked their beer — tap one for details.'},
+  journey:{caption:'Each line is one beer’s trip from its brewery to my glass. Tap a line for the story.'}
+};
+
+// beer name → brewery record (breweries[].beers is " · "-separated)
+function beerBreweryIndex(){
+  const idx={};
+  breweries.forEach(br=>br.beers.split(' · ').forEach(n=>{idx[n.trim()]=br;}));
+  return idx;
+}
+
+// Aggregate pours per city (canonical location rule applies)
+function drankCityData(){
+  const cM={};
+  beers.forEach(b=>{
+    const L=CANON_LOC.get(b.beer)||b;
+    let e=cM[L.city];
+    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],region:L.region,country:L.country,cc:L.cc};}
+    e.t+=b.rating;e.c++;
+    if(!e.bs.includes(b.beer))e.bs.push(b.beer);
+    e.reviews.push(b);
+  });
+  return cM;
+}
+
+// One journey per unique (beer, city where I actually drank it) pair
+function buildJourneys(){
+  const idx=beerBreweryIndex();
+  const locByCity={};drunkLocs.forEach(l=>{locByCity[l.city]=l;});
+  const seen=new Map();
+  beers.forEach(b=>{
+    const br=idx[b.beer],loc=locByCity[b.city];
+    if(!br||!loc) return;
+    const key=b.beer+'@'+b.city;
+    let j=seen.get(key);
+    if(!j){j={beer:b.beer,br,loc,ratings:[],pours:0,miles:distMi(br.lat,br.lng,loc.lat,loc.lng)};seen.set(key,j);}
+    j.ratings.push(b.rating);j.pours++;
+  });
+  return [...seen.values()];
+}
+
+function buildDrankLayer(){
+  const cM=drankCityData();
+  const group=L.layerGroup(),bounds=[];
+  drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
+    const d=cM[l.city],a=d.t/d.c,r=Math.max(6,Math.min(16,5+d.c*1.2));
+    const home=HOME_CITIES.has(l.city);
+    const rows=d.reviews.map(b=>`<div class="pop-row"><span class="pop-beer" data-open-beer="${esc(b.beer)}">${esc(b.beer)}</span><span style="color:${rColor(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
+    const html=popKicker('📍 A city where I drank')+
+      `<div class="pop-title">${esc(l.city)}, ${esc(l.region)} ${FLAGS[l.cc]||''}${home?' <span class="pop-home">⌂ home turf</span>':''}</div>`+
+      `<div class="pop-sub">${d.c} beer${d.c>1?'s':''} here · my average <b style="color:${rColor(a)}">${a.toFixed(2)}</b></div>`+
+      `<div class="pop-list">${rows}</div>`;
+    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#E8871E',color:home?'#B45309':'#fff',weight:2,opacity:1,fillOpacity:.85})
+      .bindTooltip(`${l.city} · ${d.c} beer${d.c>1?'s':''}`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([l.lat,l.lng]);
+  });
+  return {group,bounds};
+}
+
+function buildBrewedLayer(){
+  const group=L.layerGroup(),bounds=[];
+  breweries.forEach(b=>{
+    const a=avg(b.ratings),r=Math.max(6,Math.min(14,5+b.ratings.length*1.2));
+    const firstBeer=b.beers.split(' · ')[0];
+    const srcs=logoSources(firstBeer);
+    const onerr=srcs.length>1?logoChainOnError(srcs,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
+    const logoHtml=srcs.length?`<img src="${srcs[0]}" class="pop-logo" loading="lazy" decoding="async"${onerr}>`:'';
+    const beerList=b.beers.split(' · ').map(n=>`<span class="pop-beer" data-open-beer="${esc(n)}">${esc(n)}</span>`).join('<span class="pop-dot-sep"> · </span>');
+    const html=popKicker('🏭 A brewery’s hometown')+logoHtml+
+      `<div class="pop-title">${esc(b.name)}${b.nativeName?` <span class="pop-native">${esc(b.nativeName)}</span>`:''}</div>`+
+      `<div class="pop-sub">${esc(b.location)} · ${FLAGS[b.cc]||''} ${esc(b.country)}</div>`+
+      `<div class="pop-sub">What I’ve had: ${beerList}</div>`+
+      `<div class="pop-sub">My average: <b style="color:${rColor(a)}">${a.toFixed(2)} · ${rWord(a)}</b></div>`;
+    L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rColor(a),color:'#fff',weight:2,opacity:1,fillOpacity:.9})
+      .bindTooltip(`${b.name} · ${a.toFixed(2)}`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([b.lat,b.lng]);
+  });
+  return {group,bounds};
+}
+
+function buildJourneyLayer(journeys){
+  const group=L.layerGroup(),bounds=[];
+  journeys.forEach(j=>{
+    const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
+    const html=popKicker('✈️ One beer’s trip to my glass')+
+      `<div class="pop-title"><span class="pop-beer" data-open-beer="${esc(j.beer)}">${esc(j.beer)}</span></div>`+
+      `<div class="pop-sub">${esc(j.br.location.split(',')[0])} ${FLAGS[j.br.cc]||''} → ${esc(j.loc.city)} ${FLAGS[j.loc.cc]||''}</div>`+
+      `<div class="pop-sub">Traveled ~<b>${fmtMi(j.miles)} miles</b> · my rating <b style="color:${rColor(a)}">${a.toFixed(2)}</b></div>`;
+    L.polyline(pts,{color:rColor(a),weight:2,opacity:.55})
+      .bindTooltip(`${j.beer} · ${fmtMi(j.miles)} mi`,{sticky:true,className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    // endpoints: hollow ring = brewery, solid dot = where I drank it
+    const p0=pts[0],p1=pts[pts.length-1];
+    L.circleMarker(p0,{radius:3.5,fillColor:'#FFFDF7',color:'#7A6A5B',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
+    L.circleMarker(p1,{radius:3.5,fillColor:'#E8871E',color:'#fff',weight:1,fillOpacity:1,interactive:false}).addTo(group);
+    bounds.push(p0,p1);
+  });
+  return {group,bounds};
+}
+
+function setMapMode(mode){
+  if(!MAP_MODES[mode]) mode='drank';
+  _mapMode=mode;
+  document.querySelectorAll('#map-modes .map-mode').forEach(b=>{
+    const on=b.dataset.mode===mode;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',on?'true':'false');
+  });
+  const cap=document.getElementById('map-caption');
+  if(cap) cap.textContent=MAP_MODES[mode].caption;
+  if(!_worldMap||!_mapLayers) return; // map not built yet — initWorldMap re-applies
+  Object.entries(_mapLayers.byMode).forEach(([m,l])=>{
+    if(m===mode) l.group.addTo(_worldMap); else _worldMap.removeLayer(l.group);
+  });
+  _worldMap.invalidateSize();
+  const b=_mapLayers.byMode[mode].bounds;
+  if(b.length) _worldMap.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});
+}
+
+function initWorldMap(){
+  if(_worldMap){_worldMap.remove();_worldMap=null;_mapLayers=null;}
+  const journeys=buildJourneys();
+  const map=L.map('worldMap',{scrollWheelZoom:false}).setView([40,-20],2);
+  _worldMap=map;
+  addTiles(map);
+  // Scroll-zoom is opt-in so the page scroll never gets hijacked:
+  // click/tap the map to enable, mouse-out to disable again.
+  map.on('click',()=>map.scrollWheelZoom.enable());
+  map.getContainer().addEventListener('mouseleave',()=>map.scrollWheelZoom.disable());
+  // ⛶ reset control: re-fit the current view's markers
+  const Reset=L.Control.extend({options:{position:'topleft'},onAdd(){
+    const a=L.DomUtil.create('a','map-reset');
+    a.href='#';a.title='Reset view';a.textContent='⛶';
+    L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);const b=_mapLayers&&_mapLayers.byMode[_mapMode].bounds;if(b&&b.length)map.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});});
+    return a;
+  }});
+  map.addControl(new Reset());
+  _mapLayers={
+    journeys,
+    byMode:{
+      drank:buildDrankLayer(),
+      brewed:buildBrewedLayer(),
+      journey:buildJourneyLayer(journeys)
+    }
+  };
+  // Beer names inside popups open the detail modal
+  map.on('popupopen',e=>{
+    e.popup.getElement().querySelectorAll('[data-open-beer]').forEach(el=>{
+      el.addEventListener('click',()=>{if(BEER_REVIEWS.has(el.dataset.openBeer))openBeerModal(el.dataset.openBeer);});
+    });
+  });
+  setMapMode(_mapMode);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATS SECTION — hand-rolled visuals, no chart library
+// ══════════════════════════════════════════════════════════════
+function renderStyleBars(){
+  const el=document.getElementById('styleBars');
+  el.innerHTML=STATS.styleRanked.map(s=>`
+    <div class="hbar-row">
+      <span class="hbar-label">${esc(s.s)}</span>
+      <span class="hbar-track"><i style="width:${(s.a/5*100).toFixed(1)}%;background:${rColor(s.a)}"></i></span>
+      <span class="hbar-value">★ ${s.a.toFixed(2)} <em>· ${s.c} beer${s.c>1?'s':''}</em></span>
+    </div>`).join('');
+}
+
+function renderCountryBars(){
+  const el=document.getElementById('countryBars');
+  const byCount=[...STATS.countryRanked].sort((a,b)=>b.c-a.c||b.a-a.a);
+  const max=byCount[0]?byCount[0].c:1;
+  el.innerHTML=byCount.map(c=>`
+    <div class="hbar-row">
+      <span class="hbar-label">${c.l}</span>
+      <span class="hbar-track"><i style="width:${(c.c/max*100).toFixed(1)}%;background:#E8871E"></i></span>
+      <span class="hbar-value">${c.c} <em>· ★ ${c.a.toFixed(2)}</em></span>
+    </div>`).join('');
+}
+
+function renderTimeline(){
+  const el=document.getElementById('timelineCols');
+  const {months,byMonth,monthAbbr,monthYearMap}=getMonthlyData();
+  const max=Math.max(...months.map(m=>byMonth[m].length),1);
+  el.innerHTML=months.map(m=>{
+    const n=byMonth[m].length;
+    return `<div class="tcol" title="${byMonth[m].length} beers in ${MONTH_FULL[monthAbbr[m]]} ${monthYearMap[m]}">
+      <span class="tcol-n">${n}</span>
+      <i style="height:${Math.max(6,n/max*100).toFixed(1)}%"></i>
+      <span class="tcol-m">${monthAbbr[m]}<br>${String(monthYearMap[m]).slice(2)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderOnMyList(){
+  const el=document.getElementById('watchlistGrid');
+  el.innerHTML=IPO_WATCHLIST.map(w=>`
+    <div class="wl-card">
+      <div class="wl-logo">${cardLogo(w.beer)}</div>
+      <div class="wl-name">${esc(w.beer)}</div>
+      <div class="wl-meta">${FLAGS[w.origin]||''} ${esc(w.style)} · ${w.abv}%</div>
+      <div class="wl-world">The world says ★ ${w.untappd.toFixed(2)}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ALL — one entry point, also used by the Sheets refresh
+// ══════════════════════════════════════════════════════════════
+function renderAll(){
+  renderHeroStats();
+  populateBeerFilters();
+  applyBeerFilter();
+  renderStyleBars();
+  renderCountryBars();
+  renderTimeline();
+  renderOnMyList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// GOOGLE SHEETS LOADER — fetches live data and refreshes the page
 // ══════════════════════════════════════════════════════════════
 (function loadFromGoogleSheets(){
   if(!SHEETS_CONFIG.enabled || !SHEETS_CONFIG.sheetId) return;
@@ -639,15 +1012,9 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 
   function refreshUI(){
     refreshStats();
-    // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_langD']
-      .forEach(f=>window[f]=false);
-    // Re-run live stats
-    try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
-    // Re-render the currently active tab
-    const activePanel=document.querySelector('.panel.active');
-    if(activePanel) showTab(activePanel.id);
-    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#00ff88');
+    renderAll();
+    initWorldMap();
+    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#4C8C2B');
   }
 
   // Fetch all 3 sheets in parallel
@@ -681,1956 +1048,61 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 })();
 
 // ══════════════════════════════════════════════════════════════
-// CLOCK — isolated first, cannot be killed by downstream errors
+// EVENTS + BOOT (script is defer-loaded, so the DOM is ready here)
 // ══════════════════════════════════════════════════════════════
-(function initClock(){
-  // Cache DOM refs once so the 1-Hz tick isn't getElementById lookups/sec
-  const mbClockEl=document.getElementById('mb-clock');
-  const sbTimeEl=document.getElementById('sb-time');
-  function updateClock(){
-    try {
-      const t=new Date().toLocaleTimeString('en-US',{hour12:false});
-      if(mbClockEl) mbClockEl.textContent=t;
-      if(sbTimeEl) sbTimeEl.textContent=t;
-    } catch(e){ /* never let clock throw */ }
-  }
-  setInterval(updateClock,1000);
-  updateClock();
-})();
+try{
+  // Beer filters
+  document.getElementById('beerSearch').addEventListener('input',applyBeerFilterDebounced);
+  ['beerSort','beerStyleFilter','beerOriginFilter'].forEach(id=>
+    document.getElementById(id).addEventListener('change',applyBeerFilter));
 
-// ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
-(function(){
-  const tabMap={
-    '1':'overview','2':'beers','3':'maps','4':'insights',
-    'f1':'overview','f2':'beers','f3':'maps','f4':'insights',
-    // Legacy keys still jump straight to the relevant Insights sub-section
-    '5':'temporal','6':'markets','f5':'temporal','f6':'markets'
-  };
-  document.addEventListener('keydown',function(ev){
-    if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return;
-    if(ev.key==='Escape'){closeBeerModal();closeBreweryDrawer();return;}
-    const tab=tabMap[ev.key.toLowerCase()];
-    if(tab&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ev.preventDefault();showTab(tab);}
+  // Card grid → modal (click or Enter)
+  const grid=document.getElementById('beerGrid');
+  grid.addEventListener('click',e=>{
+    const card=e.target.closest('.beer-card');
+    if(card)openBeerModal(card.dataset.beer);
   });
-})();
-
-// ── TAB
-(function initTabA11y(){
-  try{
-    const mb=document.getElementById('menubar'); if(mb) mb.setAttribute('role','tablist');
-    const sb=document.querySelector('.sidebar nav,#sidebar nav,nav'); if(sb) sb.setAttribute('role','tablist');
-    document.querySelectorAll('.nav-item,.mb-item').forEach(el=>{
-      const tab=el.dataset.tab; if(!tab) return;
-      el.setAttribute('role','tab');
-      el.setAttribute('tabindex','0');
-      el.setAttribute('aria-selected',el.classList.contains('active')?'true':'false');
-      if(!el.getAttribute('aria-label')) el.setAttribute('aria-label',tab.replace(/^./,c=>c.toUpperCase())+' tab');
-    });
-  }catch(e){}
-})();
-// Tab navigation is static after load — query once instead of on every switch.
-const TAB_PANELS=[...document.querySelectorAll('#main > .panel')];
-const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
-const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
-const BN_ITEMS=[...document.querySelectorAll('#bottomnav .bn-item')];
-// Geography / Over-time / What-to-try now live as sub-sections inside the
-// single INSIGHTS tab. Asking for one of these jumps to Insights + that sub.
-const INSIGHTS_SUBS=['geo','temporal','markets'];
-let _insightsSub='geo';
-function showTab(id,btn){
-  // Redirect legacy sub-section ids into the Insights tab
-  if(INSIGHTS_SUBS.includes(id)){ _insightsSub=id; showTab('insights',btn); return; }
-  TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
-  NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
-  MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
-  BN_ITEMS.forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');});
-  // Sync menubar
-  const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
-  if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
-  // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
-  const navEl=btn&&btn.classList.contains('nav-item')?btn:
-    NAV_ITEMS.find(n=>n.dataset.tab===id);
-  if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
-  // Insights renders whichever sub-section is current; it also owns the URL hash.
-  if(id==='insights'){ showInsightsSubtab(_insightsSub); return; }
-  // Deep-linkable tabs: reflect the active tab in the URL without polluting
-  // history (replaceState never fires hashchange, so no feedback loop).
-  // Throws on file:// in some browsers — degrade silently.
-  try{history.replaceState(null,'','#'+id);}catch(e){}
-  const renderers = {
-    maps: [
-      ['_dM',()=>{window._dM=true;setTimeout(initWorldMap,80);}],
-    ],
-  };
-  (renderers[id]||[]).forEach(([flag,fn])=>{ if(!window[flag]) fn(); });
-  // Charts built while their panel was hidden sized to 0px — fix them whenever
-  // a panel becomes visible.
-  resizeChartsIn(document.getElementById(id));
-  if(id==='maps'&&_worldMap&&_worldMap.invalidateSize) setTimeout(()=>_worldMap.invalidateSize(),50);
-}
-
-// ── INSIGHTS SUB-SECTIONS (Places / Over time / What to try within F4)
-function showInsightsSubtab(name){
-  if(!INSIGHTS_SUBS.includes(name)) name='geo';
-  _insightsSub=name;
-  document.querySelectorAll('#insights > .subtabs .subtab').forEach(b=>{
-    const on=b.dataset.subtab===name;
-    b.classList.toggle('active',on);
-    b.setAttribute('aria-selected',on?'true':'false');
+  grid.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const card=e.target.closest('.beer-card');
+    if(card){e.preventDefault();openBeerModal(card.dataset.beer);}
   });
-  document.querySelectorAll('#insights > .subpanel').forEach(p=>{
-    p.classList.toggle('active',p.id===name);
+
+  // Modal close: button, backdrop, Esc — plus a small focus trap
+  document.getElementById('beerModalClose').addEventListener('click',closeBeerModal);
+  document.getElementById('beerModal').addEventListener('click',e=>{
+    if(e.target.id==='beerModal')closeBeerModal();
   });
-  // Lazy-render the active sub-section (each draw fn sets its own guard flag)
-  if(name==='geo'){
-    if(!window._cD) drawCountry();
-    if(!window._ciD) drawCity();
-    if(!window._langD) drawLanguage();
-  } else if(name==='temporal'){
-    if(!window._tmpD) drawTemporal();
-  } else if(name==='markets'){
-    if(!window._ciX) drawContrarian();
-    if(!window._ipoD) drawIPO();
-    if(!window._recD) drawRecommendations();
-  }
-  resizeChartsIn(document.getElementById(name));
-  try{history.replaceState(null,'','#'+name);}catch(e){}
-}
-
-// (Map view switching lives in setMapMode, defined in the MAP section.)
-
-// ── CHART DEFAULTS
-try {
-  Chart.defaults.color='#888';
-  Chart.defaults.borderColor='#222';
-  Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
-  Chart.defaults.font.size=11;
-  Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
-  Chart.defaults.elements.point.radius=3;
-  Chart.defaults.elements.point.hoverRadius=5;
-  Chart.defaults.elements.line.borderWidth=2;
-  Chart.defaults.elements.bar.borderWidth=0;
-  Chart.defaults.animation.duration=400;
-  // Respect OS-level reduced-motion preference
-  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation=false;
-} catch(e){ console.error('Chart.defaults error:',e); }
-const _charts={};
-function safeChart(key,ctx,cfg){
-  if(!ctx) return null;
-  if(_charts[key]) _charts[key].destroy();
-  _charts[key]=new Chart(ctx,cfg);
-  return _charts[key];
-}
-// Charts built while their container is display:none size to 0px. Call this once
-// the container becomes visible (tab shown / collapse opened) to fix their layout.
-function resizeChartsIn(el){
-  if(!el) return;
-  for(const ch of Object.values(_charts)){
-    if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
-  }
-}
-const TT={backgroundColor:'#0a0a12',borderColor:'#cc3366',borderWidth:1,titleColor:'#00f5ff',bodyColor:'#aaa',padding:8};
-
-// ══════════════════════════════════════════════════════════════
-// OVERVIEW
-// ══════════════════════════════════════════════════════════════
-try {
-// Use pre-computed statistics. DOM-only panels render first so a Chart.js
-// load failure can't take the text content down with it.
-const sA=STATS.styleRanked;
-const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
-
-// Live Pearson r for the scatter panel header (was previously hardcoded)
-{
-  const mx=avg(beers.map(b=>b.abv)),my=avg(beers.map(b=>b.rating));
-  let num=0,dx=0,dy=0;
-  beers.forEach(b=>{const a=b.abv-mx,r=b.rating-my;num+=a*r;dx+=a*a;dy+=r*r;});
-  const pr=dx&&dy?num/Math.sqrt(dx*dy):0,ab=Math.abs(pr);
-  const corrLabel=ab<0.2?'NO SIGNIFICANT CORRELATION':ab<0.4?'WEAK CORRELATION':ab<0.6?'MODERATE CORRELATION':'STRONG CORRELATION';
-  const corrEl=document.getElementById('scatterCorr');
-  if(corrEl) corrEl.textContent=`r ≈ ${pr.toFixed(2)} · ${corrLabel}`;
-}
-
-// Dynamic market signals — computed from live data
-const bestStyle=STATS.styleRanked[0];
-const worstStyle=STATS.styleRanked[STATS.styleRanked.length-1];
-const topCountry=STATS.countryRanked[0];
-const topCity=STATS.cityRanked[0];
-const bestMethodIdx=mA.indexOf(Math.max(...mA.filter(a=>a>0)));
-const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
-const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
-const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
-
-const last5=beers.slice(-5).map(b=>b.rating);
-const prev5=beers.slice(-10,-5).map(b=>b.rating);
-const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
-const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
-const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
-
-document.getElementById('mktPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} markets</div></div></div>`;
-
-// Recent activity feed — last 6 pours, newest first (beers[] is chronological)
-const recentEl=document.getElementById('recentFeed');
-if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
-  <div class="feed-row" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
-    ${logoImg(b.beer,20)}
-    <div class="feed-main">
-      <span class="feed-name">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</span>
-      <span class="feed-meta">${b.style} · ${b.method} · ${b.city} · ${b.month} ${b.year}</span>
-    </div>
-    <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
-  </div>`).join('');
-
-// Month in review — latest month vs the one before
-{
-  const {months:mKeys,byMonth:mBuckets,monthLabels:mLabels}=getMonthlyData();
-  const lastK=mKeys[mKeys.length-1],prevK=mKeys[mKeys.length-2];
-  const cur=lastK?mBuckets[lastK]:[];
-  const mirEl=document.getElementById('mirPanel');
-  if(mirEl&&cur.length){
-    const curAvg=avg(cur.map(b=>b.rating));
-    const prevAvg=prevK?avg(mBuckets[prevK].map(b=>b.rating)):null;
-    const dAvg=prevAvg!=null?curAvg-prevAvg:null;
-    const best=cur.reduce((a,b)=>b.rating>a.rating?b:a);
-    const worst=cur.reduce((a,b)=>b.rating<a.rating?b:a);
-    const curSet=new Set(cur);
-    const earlier=new Set(beers.filter(b=>!curSet.has(b)).map(b=>b.beer));
-    const newBrands=[...new Set(cur.map(b=>b.beer))].filter(n=>!earlier.has(n)).length;
-    const lbl=document.getElementById('mirLabel');
-    if(lbl) lbl.textContent=(mLabels[mLabels.length-1]||'').toUpperCase();
-    const dCls=dAvg==null?'fl':dAvg>0.05?'up':dAvg<-0.05?'dn':'fl';
-    const dTxt=dAvg==null?'First month on record':`${dAvg>=0?'+':''}${dAvg.toFixed(2)} vs prior month`;
-    const pourRow=(key,b,cls)=>`
-      <div class="insight-row"><span class="insight-key">${key}</span>
-        <div class="feed-row mir-pour" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
-          ${logoImg(b.beer,18)}
-          <div class="feed-main"><span class="feed-name">${b.beer}</span><span class="feed-meta">${b.style} · ${b.method}</span></div>
-          <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
-        </div></div>`;
-    mirEl.innerHTML=`
-      <div class="insight-row"><span class="insight-key">REVIEWS</span><div><div class="insight-val">${cur.length}</div><div class="insight-sub">${newBrands} first-time brand${newBrands===1?'':'s'}</div></div></div>
-      <div class="insight-row"><span class="insight-key">MONTH AVG</span><div><div class="insight-val ${dCls}">${curAvg.toFixed(2)}</div><div class="insight-sub">${dTxt}</div></div></div>
-      ${pourRow('BEST POUR',best)}
-      ${best!==worst?pourRow('WORST POUR',worst):''}`;
-  }
-}
-
-// ── Charts (everything below needs Chart.js) ──
-safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
-  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#ff6600'),borderWidth:0}]},
-  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-});
-
-safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#ff6600','#00aaff','#bb44ff','#555'],borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-});
-
-safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
-  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#ff6600'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
-    scales:{x:{title:{display:true,text:'ABV (%)',color:'#444'},min:3.5,max:10,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},
-            y:{title:{display:true,text:'RATING',color:'#444'},min:1.5,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}}}}
-});
-
-// Monthly flow — review volume bars + avg-rating line
-{
-  const {months:cm,byMonth:cb,monthColors:cc,monthAbbr:ca}=getMonthlyData();
-  const counts=cm.map(m=>cb[m].length);
-  const avgs=cm.map(m=>+avg(cb[m].map(b=>b.rating)).toFixed(2));
-  safeChart('monthlyCombo',document.getElementById('monthlyCombo'),{
-    data:{labels:cm.map(m=>ca[m].toUpperCase()),datasets:[
-      {type:'bar',label:'Reviews',data:counts,backgroundColor:cc.map(c=>c+'33'),borderColor:cc,borderWidth:2,yAxisID:'y'},
-      {type:'line',label:'Avg Rating',data:avgs,borderColor:'#ffaa00',backgroundColor:'transparent',pointBackgroundColor:avgs.map(r=>rC(r)),pointRadius:5,pointBorderColor:'#000',pointBorderWidth:1,tension:0.3,yAxisID:'y2'}
-    ]},
-    options:{plugins:{legend:{display:false},tooltip:TT},
-      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:5}},
-              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffaa00'}},
-              x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-  });
-}
-
-// Rating distribution — quarter-point histogram colored by rating band
-{
-  const histCounts={};
-  beers.forEach(b=>{const k=b.rating.toFixed(2);histCounts[k]=(histCounts[k]||0)+1;});
-  const histKeys=[];
-  for(let r=1.75;r<=5.001;r+=0.25)histKeys.push(r.toFixed(2));
-  safeChart('ratingHist',document.getElementById('ratingHist'),{type:'bar',
-    data:{labels:histKeys,datasets:[{data:histKeys.map(k=>histCounts[k]||0),backgroundColor:histKeys.map(k=>rC(+k)+'cc'),borderWidth:0}]},
-    options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw} review${c.raw===1?'':'s'} @ ${c.label}`}}},
-      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},
-              x:{grid:{display:false},ticks:{color:'#444',font:{size:8},maxRotation:60,minRotation:60}}}}
-  });
-}
-} catch(e){ console.error('Overview init error:',e); }
-
-// Insights panels (stat summary / quintiles / taste profile) now live on the
-// Overview tab, which renders eagerly at load — so draw them up front too.
-try { drawInsights(); } catch(e){ console.error('Insights init error:',e); }
-
-// ══════════════════════════════════════════════════════════════
-// BEER TABLE + GRID
-// ══════════════════════════════════════════════════════════════
-function renderTable(data){
-  try {
-    const countEl=document.getElementById('beerFilterCount');
-    if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
-    if(!data.length){
-      document.getElementById('beerBody').innerHTML=
-        `<tr><td colspan="10" class="bb-empty">NO BEERS MATCH YOUR FILTERS
-          <button type="button" id="beerFilterReset">CLEAR FILTERS</button></td></tr>`;
-      return;
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')closeBeerModal();
+    if(e.key==='Tab'){
+      const bm=document.getElementById('beerModal');
+      if(!bm.classList.contains('open'))return;
+      const f=bm.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])');
+      if(!f.length)return;
+      const first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
     }
-    document.getElementById('beerBody').innerHTML=data.map(b=>`
-      <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
-        <td>${logoImg(b.beer,24)}</td>
-        <td style="color:#ff6600;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
-        <td style="color:#555;font-size:9px">${b.style}</td>
-        <td>${FLAGS[b.origin]||''} ${b.origin}</td>
-        <td style="color:#00aaff">${b.abv.toFixed(1)}%</td>
-        <td style="color:#555">${b.method}</td>
-        <td style="color:#555">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</td>
-        <td style="color:#555">${b.month.toUpperCase()} ${b.year}</td>
-        <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-        <td style="color:#ffaa00;font-size:9px">${strs(b.rating)}</td>
-      </tr>`).join('');
-  } catch(e){ console.error('renderTable error:',e); }
-}
-// Column sorting state — clicking a table header sorts by that column,
-// clicking it again reverses. Numeric/date columns default to descending.
-const beerSort={key:'rating',dir:-1};
-const BEER_SORT_CMP={
-  beer:(a,b)=>a.beer.localeCompare(b.beer),
-  style:(a,b)=>a.style.localeCompare(b.style),
-  origin:(a,b)=>a.origin.localeCompare(b.origin),
-  abv:(a,b)=>a.abv-b.abv,
-  method:(a,b)=>a.method.localeCompare(b.method),
-  city:(a,b)=>a.city.localeCompare(b.city),
-  month:(a,b)=>(a.year*12+a.monthN)-(b.year*12+b.monthN),
-  rating:(a,b)=>a.rating-b.rating
-};
-function updateBeerSortHeaders(){
-  document.querySelectorAll('#beerHead th[data-sort]').forEach(th=>{
-    th.classList.toggle('s-asc',th.dataset.sort===beerSort.key&&beerSort.dir===1);
-    th.classList.toggle('s-desc',th.dataset.sort===beerSort.key&&beerSort.dir===-1);
-    th.setAttribute('aria-sort',th.dataset.sort===beerSort.key?(beerSort.dir===1?'ascending':'descending'):'none');
-  });
-}
-function renderBeerChips(f){
-  const wrap=document.getElementById('beerChips');
-  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const chips=[];
-  if(f.q)chips.push({k:'q',label:`“${esc(f.q)}”`});
-  if(f.st)chips.push({k:'st',label:`STYLE: ${esc(f.st)}`});
-  if(f.or)chips.push({k:'or',label:`ORIGIN: ${FLAGS[f.or]||''} ${f.or}`});
-  if(f.mo)chips.push({k:'mo',label:`MONTH: ${esc(f.moLabel)}`});
-  wrap.hidden=!chips.length;
-  wrap.innerHTML=chips.map(c=>
-    `<button type="button" class="flt-chip" data-clear="${c.k}">${c.label}<span class="x" aria-hidden="true">✕</span></button>`).join('')
-    +(chips.length?`<button type="button" class="flt-chip clear-all" data-clear="all">CLEAR ALL</button>`:'');
-}
-function applyBeerFilter(){
-  const q=(document.getElementById('beerSearch').value||'').trim().toLowerCase();
-  const st=document.getElementById('beerStyleFilter').value;
-  const or=document.getElementById('beerOriginFilter').value;
-  const moEl=document.getElementById('beerMonthFilter');
-  const mo=moEl.value;
-  // Single pass: combine search + style + origin + month into one predicate
-  const data=beers.filter(b=>
-    (!st||b.style===st)&&
-    (!or||b.origin===or)&&
-    (!mo||`${b.monthN}-${b.year}`===mo)&&
-    (!q||b.beer.toLowerCase().includes(q)||b.style.toLowerCase().includes(q)||b.country.toLowerCase().includes(q)||b.city.toLowerCase().includes(q)));
-  data.sort((a,b)=>beerSort.dir*BEER_SORT_CMP[beerSort.key](a,b));
-  updateBeerSortHeaders();
-  renderBeerChips({q,st,or,mo,moLabel:mo?moEl.options[moEl.selectedIndex].textContent:''});
-  renderTable(data);
-}
-function resetBeerFilter(){
-  document.getElementById('beerSearch').value='';
-  document.getElementById('beerStyleFilter').value='';
-  document.getElementById('beerOriginFilter').value='';
-  document.getElementById('beerMonthFilter').value='';
-  applyBeerFilter();
-}
-// Debounced version for keystroke-driven search input — select changes stay instant via applyBeerFilter()
-const applyBeerFilterDebounced=(()=>{let t;return ()=>{clearTimeout(t);t=setTimeout(applyBeerFilter,160);};})();
-try {
-  // Populate filter dropdowns
-  const styles=[...new Set(beers.map(b=>b.style))].sort();
-  const origins=[...new Set(beers.map(b=>b.origin))].sort();
-  const styleEl=document.getElementById('beerStyleFilter');
-  const origEl=document.getElementById('beerOriginFilter');
-  const sf=document.createDocumentFragment();styles.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sf.appendChild(o);});styleEl.appendChild(sf);
-  const of=document.createDocumentFragment();origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=`${FLAGS[o]||''} ${o}`;of.appendChild(el);});origEl.appendChild(of);
-  // Month-consumed filter — one option per month/year present in the data, chronological
-  const monthEl=document.getElementById('beerMonthFilter');
-  const monthMap=new Map();
-  beers.forEach(b=>monthMap.set(`${b.monthN}-${b.year}`,{label:`${b.month.toUpperCase()} ${b.year}`,ord:b.year*12+b.monthN}));
-  const mf=document.createDocumentFragment();
-  [...monthMap.entries()].sort((a,b)=>a[1].ord-b[1].ord).forEach(([v,m])=>{const o=document.createElement('option');o.value=v;o.textContent=m.label;mf.appendChild(o);});
-  monthEl.appendChild(mf);
-  applyBeerFilter();
-} catch(e){ console.error('renderTable init:',e); }
-
-try {
-const _beerBest={};
-beers.forEach(b=>{if(!_beerBest[b.beer]||b.rating>_beerBest[b.beer].rating)_beerBest[b.beer]=b;});
-const unique=Object.values(_beerBest).sort((a,b)=>b.rating-a.rating);
-document.getElementById('beerGrid').innerHTML=unique.map(b=>`
-  <div class="beer-card" data-beer="${b.beer.replace(/"/g,'&quot;')}">
-    ${isDisplayNew(b)?'<span class="bc-new">NEW</span>':''}
-    <div class="bc-logo-wrap">${cardLogo(b.beer)}</div>
-    <div class="bc-ticker">${b.beer}</div>
-    <div class="bc-style">${b.style}</div>
-    <div class="bc-bottom">
-      <span class="bc-abv">${b.abv}%</span>
-      <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
-    </div>
-    <div style="font-size:8px;color:#555;margin-top:3px">${FLAGS[b.origin]||''} ${CNAMES[b.origin]||b.origin} · ${b.method.toUpperCase()}</div>
-  </div>`).join('');
-} catch(e){ console.error('beerGrid init:',e); }
-
-// ══════════════════════════════════════════════════════════════
-// BEER DETAIL MODAL
-// ══════════════════════════════════════════════════════════════
-function openBeerModal(name){
-  const reviews=BEER_REVIEWS.get(name)||[];
-  if(!reviews.length) return;
-  const ratings=reviews.map(b=>b.rating);
-  const avgR=avg(ratings),bestR=Math.max(...ratings),worstR=Math.min(...ratings);
-  const b0=reviews[0];
-  document.getElementById('beerModalTitle').textContent=`${name.toUpperCase()} — DETAIL VIEW`;
-  document.getElementById('beerModalBody').innerHTML=`
-    <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #1a1a1a;margin-bottom:12px;flex-wrap:wrap">
-      <div style="width:120px;height:60px;background:#0a0a0a;border:1px solid #222;display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0">${cardLogo(name)}</div>
-      <div style="flex:1;min-width:160px">
-        <div style="font-size:15px;font-weight:700;color:#ff6600;margin-bottom:4px">${name}</div>
-        <div style="font-size:10px;color:#555;margin-bottom:2px">${b0.style}</div>
-        <div style="font-size:10px;color:#aaa">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin} · ${b0.abv}% ABV</div>
-      </div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap">
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(avgR)}">${avgR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">AVG</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(bestR)}">${bestR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">BEST</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(worstR)}">${worstR.toFixed(2)}</div><div style="font-size:8px;color:#555;letter-spacing:1px">WORST</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#00aaff">${reviews.length}</div><div style="font-size:8px;color:#555;letter-spacing:1px">REVIEWS</div></div>
-      </div>
-    </div>
-    <div style="font-size:9px;color:#ff6600;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
-    <table class="bb-table" style="min-width:unset">
-      <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
-      <tbody>${reviews.map((b,i)=>`
-        <tr>
-          <td style="color:#555">${i+1}</td>
-          <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-          <td style="color:#ffaa00;font-size:9px">${strs(b.rating)}</td>
-          <td style="color:#555">${b.method}</td>
-          <td style="color:#aaa">${b.city}, ${b.region}</td>
-          <td>${FLAGS[b.cc]||''} ${b.country}</td>
-          <td style="color:#555;font-size:9px">${b.month} ${b.year}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
-  _modalPrevFocus=document.activeElement;
-  const bm=document.getElementById('beerModal');
-  bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
-  // Focus after the visibility transition's first frame: focus() on an
-  // element whose computed visibility is still 'hidden' is silently ignored.
-  const cb=document.getElementById('beerModalClose');
-  if(cb) requestAnimationFrame(()=>requestAnimationFrame(()=>cb.focus()));
-}
-let _modalPrevFocus=null;
-function closeBeerModal(){
-  const bm=document.getElementById('beerModal');
-  if(!bm.classList.contains('open')) return;
-  bm.classList.remove('open'); bm.setAttribute('aria-hidden','true');
-  restoreFocus(_modalPrevFocus,bm);
-  _modalPrevFocus=null;
-}
-// Return focus to where it was before an overlay opened. If the opener wasn't
-// focusable (e.g. a table-row click leaves focus on <body>), at least blur
-// anything still focused inside the now-hidden overlay.
-function restoreFocus(prev,overlay){
-  if(prev&&prev!==document.body&&document.contains(prev)) prev.focus();
-  else if(overlay.contains(document.activeElement)) document.activeElement.blur();
-}
-
-// ══════════════════════════════════════════════════════════════
-// COUNTRY
-// ══════════════════════════════════════════════════════════════
-function drawCountry(){
-  window._cD=true;
-  const cD=STATS.countryRanked;
-  safeChart('countryChart',document.getElementById('countryChart'),{type:'bar',
-    data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
-  });
-  document.getElementById('countryCards').innerHTML=cD.map(d=>`
-    <div class="bb-bar-row">
-      <div class="bb-bar-label"><span class="name">${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x</span></div>
-      <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${rC(d.a)}"></div></div>
-    </div>`).join('');
-}
-
-// ══════════════════════════════════════════════════════════════
-// CITY
-// ══════════════════════════════════════════════════════════════
-function drawCity(){
-  window._ciD=true;
-  const cD=STATS.cityRanked;
-  safeChart('cityChart',document.getElementById('cityChart'),{type:'bar',
-    data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
-  });
-  document.getElementById('cityCards').innerHTML=cD.map(d=>`
-    <div class="mini-row">
-      <div><div style="font-size:10px;color:#ff6600;font-weight:600">${d.city}</div><div style="font-size:8px;color:#555">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
-      <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
-    </div>`).join('');
-}
-
-// ══════════════════════════════════════════════════════════════
-// INSIGHTS
-// ══════════════════════════════════════════════════════════════
-function drawInsights(){
-  window._inD=true;
-  const ratings=beers.map(b=>b.rating);
-  const sr=[...ratings].sort((a,b)=>a-b);
-  const mean=avg(ratings),med=sr.length%2===0?(sr[sr.length/2-1]+sr[sr.length/2])/2:sr[Math.floor(sr.length/2)],stdD=std(ratings);
-  const q1=sr[Math.floor(sr.length*.25)],q3=sr[Math.floor(sr.length*.75)];
-  const minR=sr[0]??0,maxR=sr[sr.length-1]??0;
-
-  // Single pass bucket count for quintiles
-  const qb=[0,0,0,0,0,0];
-  for(const r of ratings){
-    if(r>=4.5)qb[0]++;
-    else if(r>=4)qb[1]++;
-    else if(r>=3.5)qb[2]++;
-    else if(r>=3)qb[3]++;
-    else if(r>=2.5)qb[4]++;
-    else qb[5]++;
-  }
-
-  document.getElementById('statSummary').innerHTML=[
-    ['MEAN',mean.toFixed(4),'fl'],['MEDIAN',med.toFixed(2),''],
-    ['STD DEV',stdD.toFixed(4),''],['MIN',minR.toFixed(2),'dn'],
-    ['MAX',maxR.toFixed(2),'up'],['RANGE',(maxR-minR).toFixed(2),''],
-    ['Q1 (25th)',q1.toFixed(2),''],['Q3 (75th)',q3.toFixed(2),''],
-    ['IQR',(q3-q1).toFixed(2),''],['N',ratings.length,''],
-  ].map(([l,v,c])=>`<div class="insight-row"><span class="insight-key">${l}</span><span class="insight-val ${c}" style="font-family:var(--mono)">${v}</span></div>`).join('');
-
-  document.getElementById('quintiles').innerHTML=[
-    ['▲▲ EXCELLENT (4.50–5.00)',qb[0],'up'],
-    ['▲  GOOD (4.00–4.25)',qb[1],'up'],
-    ['→  SOLID (3.50–3.75)',qb[2],'fl'],
-    ['→  AVERAGE (3.00–3.25)',qb[3],'fl'],
-    ['▼  BELOW (2.50–2.75)',qb[4],'dn'],
-    ['▼▼ POOR (<2.50)',qb[5],'dn'],
-  ].map(([l,n,c])=>`<div class="insight-row">
-    <span class="insight-key">${l}</span>
-    <span class="insight-val ${c}">${n} <span style="color:#555;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
-  </div>`).join('');
-
-  const profKeys=['wheat','dark','lager','de','us','artisan','highAbv','draftNitro'];
-  const profAcc={};profKeys.forEach(k=>profAcc[k]={t:0,c:0});
-  beers.forEach(b=>{
-    const r=b.rating;
-    if(b.style==='Wheat Beer'){profAcc.wheat.t+=r;profAcc.wheat.c++;}
-    if(b.style==='Stout'||b.style==='Brown Ale'){profAcc.dark.t+=r;profAcc.dark.c++;}
-    if(b.style.includes('Lager')){profAcc.lager.t+=r;profAcc.lager.c++;}
-    if(b.origin==='DE'){profAcc.de.t+=r;profAcc.de.c++;}
-    if(b.origin==='US'){profAcc.us.t+=r;profAcc.us.c++;}
-    if(b.style.includes('Belgian')||b.style.includes('IPA')||b.style.includes('Wheat')){profAcc.artisan.t+=r;profAcc.artisan.c++;}
-    if(b.abv>=6.0){profAcc.highAbv.t+=r;profAcc.highAbv.c++;}
-    if(b.method==='Draft'||b.method==='Nitro'){profAcc.draftNitro.t+=r;profAcc.draftNitro.c++;}
-  });
-  const pv=k=>profAcc[k].c?profAcc[k].t/profAcc[k].c:0;
-  const profile=[
-    {l:'WHEAT BEER BIAS',v:pv('wheat'),color:'#ff6600'},
-    {l:'DARK BEER TOLERANCE',v:pv('dark'),color:'#444'},
-    {l:'LAGER APPRECIATION',v:pv('lager'),color:'#00cc44'},
-    {l:'GERMAN BEER PREMIUM',v:pv('de'),color:'#ff6600'},
-    {l:'AMERICAN BEER DISCOUNT',v:pv('us'),color:'#ff2222'},
-    {l:'ARTISAN vs MACRO',v:pv('artisan'),color:'#bb44ff'},
-    {l:'HIGH ABV PREFERENCE',v:pv('highAbv'),color:'#00aaff'},
-    {l:'DRAFT/NITRO PREMIUM',v:pv('draftNitro'),color:'#00aaff'},
-  ];
-  document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
-    <div class="bb-bar-row">
-      <div class="bb-bar-label"><span class="name">${p.l}</span><span class="val">${p.v.toFixed(2)}/5</span></div>
-      <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${p.v/5*100}%;background:${p.color}"></div></div>
-    </div>`).join('');
-}
-
-// ══════════════════════════════════════════════════════════════
-// LANGUAGE
-// ══════════════════════════════════════════════════════════════
-function drawLanguage(){
-  window._langD=true;
-  try {
-    const lC=LANG_COLORS, lF=LANG_FLAGS;
-    const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:BREW_LOC[b.beer]||'',lang:BEER_LANG_LOOKUP[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
-    const lA={};
-    lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
-    const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
-    safeChart('langChart',document.getElementById('langChart'),{type:'bar',
-      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#ff6600'),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:10}}}}}
-    });
-  } catch(e){ console.error('Language init error:',e); }
-}
-
-// ══════════════════════════════════════════════════════════════
-// MAP — one world map, three plain-language views:
-//   drank   → every city I've reviewed a beer in (size = pours)
-//   brewed  → every brewery's hometown (color = my rating)
-//   journey → an arc from each brewery to the city where I drank its beer
-// ══════════════════════════════════════════════════════════════
-function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
-function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.7;letter-spacing:0.2px;-webkit-font-smoothing:antialiased">${h}</div>`;}
-// Overline that tells the reader what KIND of thing they just clicked
-function popKicker(t){return `<div style="font-size:8px;letter-spacing:1.5px;color:#777;border-bottom:1px solid #222;padding-bottom:3px;margin-bottom:4px">${t}</div>`;}
-const fmtMi=n=>Math.round(n).toLocaleString('en-US');
-// Plain-words label for a rating bucket — used by popups and the map key
-function rWord(r){return r>=4.5?'LOVED IT':r>=4?'GREAT':r>=3.5?'GOOD':r>=3?'FINE':r>=2.5?'MEH':'SKIP IT';}
-function distMi(aLat,aLng,bLat,bLng){
-  const d=Math.PI/180,R=3958.8;
-  const h=Math.sin((bLat-aLat)*d/2)**2+Math.cos(aLat*d)*Math.cos(bLat*d)*Math.sin((bLng-aLng)*d/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h));
-}
-// Gentle quadratic arc between two points (flat-map approximation; pairs that
-// would cross the antimeridian get one endpoint shifted onto the adjacent
-// world copy so the line takes the short way across the Pacific).
-function arcPts(aLat,aLng,bLat,bLng){
-  if(Math.abs(bLng-aLng)>180){ bLng+=bLng>aLng?-360:360; }
-  const dLat=bLat-aLat,dLng=bLng-aLng,len=Math.sqrt(dLat*dLat+dLng*dLng)||1;
-  const off=Math.min(len*0.18,14);
-  const cLat=(aLat+bLat)/2+(-dLng/len)*off, cLng=(aLng+bLng)/2+(dLat/len)*off;
-  const pts=[];
-  for(let i=0;i<=32;i++){
-    const t=i/32,u=1-t;
-    pts.push([u*u*aLat+2*u*t*cLat+t*t*bLat, u*u*aLng+2*u*t*cLng+t*t*bLng]);
-  }
-  return pts;
-}
-
-// Track the Leaflet instance so a Sheets-driven refresh can dispose the
-// existing map before re-initializing — without this Leaflet throws
-// "Map container is already initialized."
-let _worldMap=null, _mapLayers=null, _mapMode='drank';
-
-const MAP_MODES={
-  drank:{head:'WHERE I DRANK THEM — EVERY CITY WITH A REVIEW',hint:'CLICK A DOT FOR THE POUR LIST'},
-  brewed:{head:'WHERE THEY’RE BREWED — EVERY BREWERY’S HOMETOWN',hint:'CLICK A DOT FOR THE BREWERY'},
-  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'}
-};
-
-// beer name → brewery record (breweries[].beers is " · "-separated)
-function beerBreweryIndex(){
-  const idx={};
-  breweries.forEach(br=>br.beers.split(' · ').forEach(n=>{idx[n.trim()]=br;}));
-  return idx;
-}
-
-// Aggregate pours per city (canonical location rule applies, same as before)
-function drankCityData(){
-  const cM={};
-  beers.forEach(b=>{
-    const L=CANON_LOC.get(b.beer)||b;
-    let e=cM[L.city];
-    if(!e){e=cM[L.city]={t:0,c:0,bs:[],reviews:[],region:L.region,country:L.country,cc:L.cc};}
-    e.t+=b.rating;e.c++;
-    if(!e.bs.includes(b.beer))e.bs.push(b.beer);
-    e.reviews.push(b);
-  });
-  return cM;
-}
-
-// One journey per unique (beer, city where I actually drank it) pair
-function buildJourneys(){
-  const idx=beerBreweryIndex();
-  const locByCity={};drunkLocs.forEach(l=>{locByCity[l.city]=l;});
-  const seen=new Map();
-  beers.forEach(b=>{
-    const br=idx[b.beer],loc=locByCity[b.city];
-    if(!br||!loc) return;
-    const key=b.beer+'@'+b.city;
-    let j=seen.get(key);
-    if(!j){j={beer:b.beer,br,loc,ratings:[],pours:0,miles:distMi(br.lat,br.lng,loc.lat,loc.lng)};seen.set(key,j);}
-    j.ratings.push(b.rating);j.pours++;
-  });
-  return [...seen.values()];
-}
-
-function mapHeroHtml(journeys){
-  const cM=drankCityData();
-  const cityN=Object.keys(cM).length;
-  const drankCountries=new Set(Object.values(cM).map(c=>c.cc)).size;
-  const brewCountries=new Set(breweries.map(b=>b.cc)).size;
-  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
-  const chip=(v,l)=>`<span class="mh-chip"><b>${v}</b> ${l}</span>`;
-  return `<div class="bb-body" id="map-hero-body">
-    <div class="mh-line">Every beer on this site has <b>two places</b>: where it’s <b class="mh-brew">brewed</b> and where I <b class="mh-drink">drank it</b>. Pick a view below to see either end of the trip — or the trip itself.</div>
-    <div class="mh-chips">
-      ${chip(beers.length,'POURS LOGGED')}
-      ${chip(cityN,'CITIES POURED IN')}
-      ${chip(drankCountries,'COUNTRIES DRUNK IN')}
-      ${chip(breweries.length,'BREWERIES')}
-      ${chip(brewCountries,'BREWING NATIONS')}
-      ${chip(fmtMi(totalMi),'TOTAL BEER-MILES')}
-    </div>
-  </div>`;
-}
-
-function keyHtml(mode,journeys){
-  const head=`<div class="mk-head">WHAT YOU’RE LOOKING AT</div>`;
-  if(mode==='drank'){
-    return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ff6600"></span>a city where I’ve reviewed a beer</div>
-      <div class="mk-row"><span class="mk-scale"><i style="width:8px;height:8px"></i><i style="width:12px;height:12px"></i><i style="width:16px;height:16px"></i></span>bigger dot = more pours there</div>
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ff6600;box-shadow:0 0 0 2px #ffaa00"></span>gold ring = my home turf (NY)</div>
-      <div class="mk-tap">CLICK ANY DOT TO SEE WHAT I HAD THERE</div>`;
-  }
-  if(mode==='brewed'){
-    const buckets=[[4.75,'4.5+ LOVED IT'],[4.2,'4.0+ GREAT'],[3.7,'3.5+ GOOD'],[3.2,'3.0+ FINE'],[2.7,'2.5+ MEH'],[2.0,'<2.5 SKIP IT']];
-    return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#aacc00"></span>a brewery’s hometown</div>
-      <div class="mk-row mk-note">dot color = my average rating of its beers</div>
-      <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
-      <div class="mk-tap">CLICK ANY DOT FOR THE BREWERY’S CARD</div>`;
-  }
-  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
-  return head+`
-    <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
-    <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
-    <div class="mk-row mk-note">all pours added up: <b style="color:#ffaa00">${fmtMi(totalMi)} beer-miles</b></div>
-    <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
-}
-
-function buildDrankLayer(map){
-  const cM=drankCityData();
-  const group=L.layerGroup(),bounds=[];
-  drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
-    const d=cM[l.city],a=d.t/d.c,r=Math.max(6,Math.min(16,5+d.c*1.2));
-    const home=HOME_CITIES.has(l.city);
-    const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #1a1a1a"><span style="color:#aaa">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
-    const html=popKicker('📍 A CITY WHERE I DRANK')+
-      `<span style="color:#ff6600;font-weight:700;font-size:12px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:#ffaa00">⌂ HOME TURF</span>':''}<br>`+
-      `<span style="color:#888;font-size:10px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
-      `<div style="margin-top:6px">${rows}</div>`;
-    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#ff6600',color:home?'#ffaa00':'#000',weight:home?2:1,opacity:.9,fillOpacity:.8})
-      .bindTooltip(`${l.city} · ${d.c} pour${d.c>1?'s':''}`,{direction:'top',className:'mtip'})
-      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
-    bounds.push([l.lat,l.lng]);
-  });
-  return {group,bounds};
-}
-
-function buildBrewedLayer(map){
-  const group=L.layerGroup(),bounds=[];
-  breweries.forEach(b=>{
-    const a=avg(b.ratings),r=Math.max(6,Math.min(14,5+b.ratings.length*1.2));
-    const firstBeer=b.beers.split(' · ')[0];
-    const srcs=logoSources(firstBeer);
-    const onerr=srcs.length>1?logoChainOnError(srcs,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
-    const logoHtml=srcs.length?`<img src="${srcs[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${onerr}>`:'';
-    const beerList=b.beers.split(' · ').map(n=>`<span style="color:#aaa">${n}</span>`).join('<span style="color:#444"> · </span>');
-    const html=popKicker('🏭 A BREWERY’S HOMETOWN')+logoHtml+
-      `<span style="color:#ff6600;font-weight:700;font-size:12px">${b.name}</span><br>`+
-      `<span style="color:#888;font-size:10px">brews in ${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br>`+
-      `<span style="color:#666;font-size:9px">WHAT I’VE HAD:</span> <span style="font-size:10px">${beerList}</span><br>`+
-      `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:#666">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
-    L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rC(a),color:'#000',weight:1,opacity:.9,fillOpacity:.85})
-      .bindTooltip(`${b.name} · ${a.toFixed(2)}/5`,{direction:'top',className:'mtip'})
-      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
-    bounds.push([b.lat,b.lng]);
-  });
-  return {group,bounds};
-}
-
-function buildJourneyLayer(map,journeys){
-  const group=L.layerGroup(),bounds=[];
-  journeys.forEach(j=>{
-    const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
-    const html=popKicker('✈ ONE BEER’S TRIP TO MY GLASS')+
-      `<span style="color:#ff6600;font-weight:700;font-size:12px">${j.beer}</span><br>`+
-      `<span style="color:#aaa">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:#555">→</span> <span style="color:#aaa">${j.loc.city} ${FLAGS[j.loc.cc]||''}</span><br>`+
-      `<span style="color:#888;font-size:10px">traveled ~<b style="color:#ffaa00">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
-    L.polyline(pts,{color:rC(a),weight:1.6,opacity:.65})
-      .bindTooltip(`${j.beer} · ${fmtMi(j.miles)} mi`,{sticky:true,className:'mtip'})
-      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
-    // endpoints: hollow ring = brewery, solid dot = where I drank it
-    const p0=pts[0],p1=pts[pts.length-1];
-    L.circleMarker(p0,{radius:3.5,fillColor:'#0d0d0d',color:'#bbb',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
-    L.circleMarker(p1,{radius:3.5,fillColor:'#ff6600',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
-    bounds.push(p0,p1);
-  });
-  return {group,bounds};
-}
-
-function renderDrankTable(){
-  const cM=drankCityData();
-  const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
-  document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
-    <td style="color:#ff6600">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:#ffaa00;font-size:8px">⌂ HOME</span>':''}</td>
-    <td style="color:#555">${c.region}</td>
-    <td style="color:#aaa">${FLAGS[c.cc]||''} ${c.country}</td>
-    <td style="text-align:center;color:#00aaff">${c.count}</td>
-    <td><span class="rb ${rbC(c.avg)}">${c.avg.toFixed(2)}</span></td>
-    <td style="color:#555;font-size:9px">${c.beers.join(', ')}</td>
-  </tr>`).join('');
-}
-
-function renderBrewedTable(){
-  const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
-  document.getElementById('brewedTbody').innerHTML=s.map(b=>{
-    const firstBeer=b.beers.split(' · ')[0];
-    return `<tr>
-      <td>${logoImg(firstBeer,22)}</td>
-      <td style="font-weight:600"><span class="brewery-clickable" data-brewery="${b.name.replace(/"/g,'&quot;')}">${b.name}</span></td>
-      <td style="color:#555;font-size:9px">${b.location}</td>
-      <td style="color:#aaa">${FLAGS[b.cc]||''} ${b.country}</td>
-      <td style="color:#555;font-size:9px">${b.beers}</td>
-      <td><span class="rb ${rbC(b.avg)}">${b.avg.toFixed(2)}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderJourneyTable(journeys){
-  const s=[...journeys].sort((a,b)=>b.miles-a.miles);
-  const totalMi=journeys.reduce((sum,j)=>sum+j.miles*j.pours,0);
-  const far=s[0],near=s[s.length-1];
-  const sumEl=document.getElementById('journeySummary');
-  if(sumEl&&far) sumEl.innerHTML=`<div class="jny-sum">
-    <span>🏆 LONGEST HAUL: <b style="color:#ffaa00">${far.beer}</b> — ${fmtMi(far.miles)} mi (${far.br.location.split(',')[0]} → ${far.loc.city})</span>
-    <span>🏠 MOST LOCAL: <b style="color:#00cc44">${near.beer}</b> — ${fmtMi(near.miles)} mi (${near.br.location.split(',')[0]} → ${near.loc.city})</span>
-    <span>🌍 ALL POURS COMBINED: <b style="color:#00aaff">${fmtMi(totalMi)} beer-miles</b></span>
-  </div>`;
-  document.getElementById('journeyTbody').innerHTML=s.map((j,i)=>{
-    const a=avg(j.ratings);
-    return `<tr data-beer="${j.beer.replace(/"/g,'&quot;')}" style="cursor:pointer">
-      <td style="color:#555">${i+1}</td>
-      <td style="color:#ff6600;font-weight:600">${j.beer}</td>
-      <td style="color:#aaa">${FLAGS[j.br.cc]||''} ${j.br.location}</td>
-      <td style="color:#aaa">${FLAGS[j.loc.cc]||''} ${j.loc.city}</td>
-      <td style="text-align:right;color:#00aaff">${fmtMi(j.miles)}</td>
-      <td><span class="rb ${rbC(a)}">${a.toFixed(2)}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function setMapMode(mode){
-  if(!MAP_MODES[mode]) mode='drank';
-  _mapMode=mode;
-  document.querySelectorAll('#map-modes .map-mode').forEach(b=>{
-    const on=b.dataset.mode===mode;
-    b.classList.toggle('active',on);
-    b.setAttribute('aria-selected',on?'true':'false');
-  });
-  document.querySelectorAll('#maps .map-sec').forEach(s=>s.classList.toggle('active',s.id==='mapsec-'+mode));
-  const headEl=document.getElementById('map-panel-head');
-  if(headEl) headEl.innerHTML=`${MAP_MODES[mode].head}<span class="ph-right">${MAP_MODES[mode].hint}</span>`;
-  if(!_worldMap||!_mapLayers) return; // map not built yet — initWorldMap re-applies
-  document.getElementById('map-key').innerHTML=keyHtml(mode,_mapLayers.journeys);
-  Object.entries(_mapLayers.byMode).forEach(([m,l])=>{
-    if(m===mode) l.group.addTo(_worldMap); else _worldMap.removeLayer(l.group);
-  });
-  _worldMap.invalidateSize();
-  const b=_mapLayers.byMode[mode].bounds;
-  if(b.length) _worldMap.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});
-}
-
-function initWorldMap(){
-  if(_worldMap){_worldMap.remove();_worldMap=null;_mapLayers=null;}
-  const journeys=buildJourneys();
-  document.getElementById('map-hero').innerHTML=mapHeroHtml(journeys);
-  const map=L.map('worldMap',{scrollWheelZoom:false}).setView([40,-20],2);
-  _worldMap=map;
-  addTiles(map);
-  // ⛶ reset control: re-fit the current view's markers
-  const Reset=L.Control.extend({options:{position:'topleft'},onAdd(){
-    const a=L.DomUtil.create('a','map-reset');
-    a.href='#';a.title='Reset view';a.textContent='⛶';
-    L.DomEvent.on(a,'click',e=>{L.DomEvent.stop(e);const b=_mapLayers&&_mapLayers.byMode[_mapMode].bounds;if(b&&b.length)map.fitBounds(L.latLngBounds(b),{padding:[36,36],maxZoom:6});});
-    return a;
-  }});
-  map.addControl(new Reset());
-  _mapLayers={
-    journeys,
-    byMode:{
-      drank:buildDrankLayer(map),
-      brewed:buildBrewedLayer(map),
-      journey:buildJourneyLayer(map,journeys)
-    }
-  };
-  renderDrankTable();
-  renderBrewedTable();
-  renderJourneyTable(journeys);
-  setMapMode(_mapMode);
-}
-
-// ══════════════════════════════════════════════════════════════
-// TEMPORAL ANALYTICS
-// ══════════════════════════════════════════════════════════════
-function drawTemporal(){
-  window._tmpD = true;
-
-  const {months,byMonth,monthColors,monthLabels,monthYearMap,monthAbbr} = getMonthlyData();
-
-  const counts     = months.map(m => byMonth[m].length);
-  const avgRatings = months.map(m => {
-    const rs = byMonth[m].map(b => b.rating);
-    return rs.length ? +(rs.reduce((a,v)=>a+v,0)/rs.length).toFixed(2) : 0;
   });
 
-  // ── KPI tiles (dynamic: months tracked + one tile per month + MOM delta)
-  const latest = months[months.length - 1];
-  const prev   = months[months.length - 2];
-  const delta  = prev != null ? +(avgRatings[months.length-1] - avgRatings[months.length-2]).toFixed(2) : 0;
-  const deltaColor = delta > 0 ? 'var(--green2)' : delta < 0 ? 'var(--red)' : 'var(--amber)';
-  const deltaLabel = delta > 0 ? '▲ IMPROVING' : delta < 0 ? '▼ DECLINING' : '→ FLAT';
-  const firstYear = monthYearMap[months[0]];
-  const lastYear  = monthYearMap[months[months.length-1]];
-  const yearLabel = firstYear===lastYear ? firstYear : `${firstYear}–${lastYear}`;
-  const kpiRange = months.length > 1 ? `${monthAbbr[months[0]]} – ${monthAbbr[months[months.length-1]]}` : monthAbbr[months[0]];
+  // Map view pills
+  document.querySelectorAll('#map-modes .map-mode').forEach(b=>
+    b.addEventListener('click',()=>setMapMode(b.dataset.mode)));
 
-  document.getElementById('temporal-kpis').innerHTML = `<div class="g${Math.min(months.length+2,5)}" style="margin-bottom:0">
-    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${kpiRange} ${yearLabel}</div></div>
-    ${months.map((m,i)=>`
-    <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${monthAbbr[m].toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
-    <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">MOM RATING Δ</div><div class="kpi-sub">${deltaLabel}</div></div>
-  </div>`;
-
-  // ── Monthly volume + avg rating chart
-  safeChart('monthlyChart',document.getElementById('monthlyChart'), {
-    data: {
-      labels: monthLabels,
-      datasets: [
-        {type:'bar',label:'Reviews',data:counts,backgroundColor:monthColors.map(c=>c+'33'),borderColor:monthColors,borderWidth:2,yAxisID:'y'},
-        {type:'line',label:'Avg Rating',data:avgRatings,borderColor:'#ffaa00',backgroundColor:'transparent',pointBackgroundColor:avgRatings.map(r=>rC(r)),pointRadius:8,pointBorderColor:'#000',pointBorderWidth:2,tension:0.3,yAxisID:'y2'}
-      ]
-    },
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{position:'left',grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1},title:{display:true,text:'REVIEWS',color:'#444'}},
-              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffaa00'},title:{display:true,text:'AVG RATING',color:'#ffaa00'}},
-              x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-  });
-
-  // ── Best & worst by month
-  document.getElementById('monthBestWorst').innerHTML = months.map((m,i) => {
-    const mb = byMonth[m];
-    if(!mb.length) return '';
-    const best  = mb.reduce((a,b)=>b.rating>a.rating?b:a);
-    const worst = mb.reduce((a,b)=>b.rating<a.rating?b:a);
-    return `
-      <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
-        <div style="font-size:9px;font-weight:700;color:${monthColors[i]};letter-spacing:1px;margin-bottom:6px">${monthLabels[i].toUpperCase()} · ${mb.length} REVIEWS · AVG ${avgRatings[i].toFixed(2)}</div>
-        <div class="mini-row">
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:9px;color:var(--green2);font-weight:700">▲ BEST</span>
-            ${logoImg(best.beer,18)}
-            <span style="color:#ddd;font-size:10px">${best.beer}</span>
-          </div>
-          <span class="rb ${rbC(best.rating)}">${best.rating.toFixed(2)}</span>
-        </div>
-        <div class="mini-row">
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:9px;color:var(--red);font-weight:700">▼ WORST</span>
-            ${logoImg(worst.beer,18)}
-            <span style="color:#ddd;font-size:10px">${worst.beer}</span>
-          </div>
-          <span class="rb ${rbC(worst.rating)}">${worst.rating.toFixed(2)}</span>
-        </div>
-      </div>`;
-  }).join('');
-
-  // ── Rating distribution (all months side-by-side)
-  const bucketKeys = ['2.0-2.4','2.5-2.9','3.0-3.4','3.5-3.9','4.0-4.4','4.5+'];
-  const bucketFn = r => r>=4.5?5:r>=4?4:r>=3.5?3:r>=3?2:r>=2.5?1:0;
-  safeChart('monthDistChart',document.getElementById('monthDistChart'),{type:'bar',
-    data:{labels:bucketKeys,datasets:months.map((m,i)=>{
-      const bkts=[0,0,0,0,0,0];
-      byMonth[m].forEach(b=>bkts[bucketFn(b.rating)]++);
-      return {label:m,data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
-    })},
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{grid:{color:'#1a1a1a'},ticks:{color:'#444',stepSize:1}},x:{grid:{display:false},ticks:{color:'#ff6600'}}}}
-  });
-
-  // ── Style-mix doughnut charts — one per month, rendered dynamically
-  const styleChartsEl = document.getElementById('temporal-style-charts');
-  if(styleChartsEl){
-    styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
-      <div class="bb-panel">
-        <div class="bb-panel-head">STYLE MIX — ${monthLabels[i].toUpperCase()}<span class="ph-right">${counts[i]} REVIEWS</span></div>
-        <div class="bb-body"><canvas id="styleChart_${i}" height="180"></canvas></div>
-      </div>`).join('')}</div>`;
-    months.forEach((m,i)=>{
-      const sm={};
-      byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
-      const labels=Object.keys(sm),data=Object.values(sm);
-      safeChart(`styleChart_${i}`,document.getElementById(`styleChart_${i}`),{type:'doughnut',
-        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#ff6600'),borderWidth:1,borderColor:'#111'}]},
-        options:{plugins:{legend:{position:'right',labels:{color:'#666',font:{size:9},boxWidth:10}},tooltip:TT}}
+  // Sticky-nav active-link highlight
+  const links=[...document.querySelectorAll('.site-nav a[href^="#"]')];
+  const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if('IntersectionObserver' in window&&secs.length){
+    const io=new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if(!en.isIntersecting)return;
+        links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+en.target.id));
       });
-    });
+    },{rootMargin:'-40% 0px -55% 0px'});
+    secs.forEach(s=>io.observe(s));
   }
 
-  // ── Seasonal Taste Profile — style × month heatmap
-  const allStyles=Object.keys(sC);
-  const heatData={};
-  allStyles.forEach(style=>{
-    heatData[style]={};
-    months.forEach(m=>{
-      const matching=byMonth[m].filter(b=>b.style===style);
-      if(matching.length){
-        const avgR=matching.reduce((s,b)=>s+b.rating,0)/matching.length;
-        heatData[style][m]={avg:avgR,count:matching.length};
-      }
-    });
-  });
-  function heatColor(a){
-    if(a>=4.5)return'rgba(0,204,68,0.5)';if(a>=4.0)return'rgba(0,204,68,0.3)';
-    if(a>=3.5)return'rgba(170,204,0,0.25)';if(a>=3.0)return'rgba(255,170,0,0.22)';
-    if(a>=2.5)return'rgba(255,102,0,0.25)';return'rgba(255,34,34,0.3)';
-  }
-  let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">STYLE</th>';
-  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m].toUpperCase()}</th>`;});
-  heatHtml+='</tr></thead><tbody>';
-  allStyles.forEach(style=>{
-    heatHtml+=`<tr><td style="text-align:left;color:${sC[style]};font-weight:600;font-size:9px;white-space:nowrap">${style}</td>`;
-    months.forEach(m=>{
-      const cell=heatData[style][m];
-      if(cell){
-        heatHtml+=`<td style="background:${heatColor(cell.avg)};color:#e8e8e8;font-size:10px;font-weight:700;padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:8px;color:#666;font-weight:400">${cell.count}×</span></td>`;
-      }else{
-        heatHtml+='<td style="color:#333;font-size:9px">—</td>';
-      }
-    });
-    heatHtml+='</tr>';
-  });
-  heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#555"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #222"><div style="flex:1;background:rgba(255,34,34,0.4)"></div><div style="flex:1;background:rgba(255,102,0,0.35)"></div><div style="flex:1;background:rgba(255,170,0,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(0,204,68,0.4)"></div></div><span>HIGH</span></div>`;
-  document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
-
-  // ── Momentum panel — compares latest two months
-  const mRow = (l,v,c) => `<div class="mini-row"><span style="font-size:9px;color:var(--orange)">${l}</span><span class="${c}" style="font-family:var(--mono);font-size:10px;font-weight:700">${v}</span></div>`;
-  let momentum = '';
-  months.forEach((m,i)=>{
-    const mAvg = avgRatings[i];
-    const mAbv = avg(byMonth[m].map(b=>b.abv));
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} REVIEWS`, counts[i], 'fl');
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG RATING`, mAvg.toFixed(2), 'fl');
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG ABV`, mAbv.toFixed(2)+'%', '');
-    if(i < months.length - 1) {
-      const nextM = months[i+1];
-      const paceChg = counts[i+1] - counts[i];
-      const ratingChg = avgRatings[i+1] - avgRatings[i];
-      const overlap = [...new Set(byMonth[m].map(b=>b.beer))].filter(n=>byMonth[nextM].some(b=>b.beer===n));
-      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} PACE`, (paceChg>=0?'+':'')+paceChg+' REVIEWS', paceChg>=0?'up':'dn');
-      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} Δ RATING`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
-      momentum += mRow('REPEAT BRANDS', overlap.length?overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')':'0','');
-    }
-  });
-  {const _mp=document.getElementById('momentumPanel'); if(_mp) _mp.innerHTML = momentum;}
-
-  // ── Bump Chart — Country Rankings Over Time
-  try {
-    const BUMP_COLORS=['#cc3366','#00f5ff','#39ff14','#ffae00','#bb44ff','#bb5580','#00c4d4','#ff4400','#80ff44','#9966ff'];
-    // Get all countries that appear in at least 2 months
-    const countriesByMonth = {};
-    months.forEach(m => {
-      const cm = {};
-      byMonth[m].forEach(b => { if(!cm[b.origin]) cm[b.origin]={t:0,c:0}; cm[b.origin].t+=b.rating; cm[b.origin].c++; });
-      countriesByMonth[m] = cm;
-    });
-    const allCodes = [...new Set(beers.map(b=>b.origin))];
-    const multiMonthCodes = allCodes.filter(cc => months.filter(m=>countriesByMonth[m][cc]).length >= 2);
-    // Sort by total review count to pick top 8
-    const topCodes = multiMonthCodes.sort((a,b)=>{
-      const ta=months.reduce((s,m)=>s+(countriesByMonth[m][a]?.c||0),0);
-      const tb=months.reduce((s,m)=>s+(countriesByMonth[m][b]?.c||0),0);
-      return tb-ta;
-    }).slice(0,8);
-
-    // For each month, rank all countries present by avg rating
-    const rankByMonth = {};
-    months.forEach(m => {
-      const sorted=Object.entries(countriesByMonth[m]).map(([cc,v])=>({cc,a:v.t/v.c})).sort((a,b)=>b.a-a.a);
-      rankByMonth[m]={};
-      sorted.forEach((r,i)=>{ rankByMonth[m][r.cc]=i+1; });
-    });
-
-    const maxRank = Math.max(...months.flatMap(m => Object.values(rankByMonth[m])));
-
-    const bumpCtx = document.getElementById('bumpChart');
-    if(bumpCtx) {
-      safeChart('bumpChart', bumpCtx, {
-        type: 'line',
-        data: {
-          labels: monthLabels,
-          datasets: topCodes.map((cc,i) => ({
-            label: (FLAGS[cc]||'')+' '+CNAMES[cc],
-            data: months.map(m => rankByMonth[m][cc] || null),
-            borderColor: BUMP_COLORS[i % BUMP_COLORS.length],
-            backgroundColor: BUMP_COLORS[i % BUMP_COLORS.length]+'44',
-            pointBackgroundColor: BUMP_COLORS[i % BUMP_COLORS.length],
-            pointRadius: 6,
-            pointHoverRadius: 9,
-            pointBorderColor: '#000',
-            pointBorderWidth: 2,
-            borderWidth: 2.5,
-            tension: 0.3,
-            spanGaps: false
-          }))
-        },
-        options: {
-          plugins: {
-            legend: { labels: { color: '#4a4a6a', font: { size: 9 }, boxWidth: 10 } },
-            tooltip: { ...TT, callbacks: { label: c => `${c.dataset.label}: Rank #${c.raw}` } }
-          },
-          scales: {
-            y: {
-              reverse: true,
-              min: 1,
-              max: maxRank + 0.5,
-              ticks: { color: '#4a4a6a', stepSize: 1, callback: v => '#'+v },
-              grid: { color: '#1a1a2e' },
-              title: { display: true, text: 'RANK (1 = BEST)', color: '#4a4a6a' }
-            },
-            x: { grid: { display: false }, ticks: { color: '#cc3366' } }
-          }
-        }
-      });
-    }
-  } catch(e) { console.error('Bump chart error:', e); }
-
-  // ── Review timeline — chronological rating trend with 5-review rolling avg
-  // (relocated from the former Analysis tab). Single pass builds labels, rating
-  // data, point colors, and the rolling average in O(n).
-  const tlLabels=new Array(beers.length),tlData=new Array(beers.length),tlColors=new Array(beers.length),tlRoll=new Array(beers.length);
-  let rollSum=0;
-  for(let i=0;i<beers.length;i++){
-    const r=beers[i].rating;
-    tlLabels[i]=`#${i+1}`;
-    tlData[i]=r;
-    tlColors[i]=rC(r);
-    rollSum+=r;
-    if(i>=5)rollSum-=beers[i-5].rating;
-    tlRoll[i]=(rollSum/Math.min(i+1,5)).toFixed(2);
-  }
-  safeChart('timelineChart',document.getElementById('timelineChart'),{type:'line',
-    data:{
-      labels:tlLabels,
-      datasets:[
-        {label:'Rating',data:tlData,borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
-        {label:'5-Pt Avg',data:tlRoll,borderColor:'#00aaff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
-      ]
-    },
-    options:{plugins:{legend:{labels:{color:'#555',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#1a1a1a'},ticks:{color:'#444'}},x:{grid:{display:false},ticks:{color:'#444',maxTicksLimit:12}}}}
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-// CONTRARIAN INDEX
-// ══════════════════════════════════════════════════════════════
-// Bump this date whenever the Untappd ratings below are re-verified.
-// The refresh-untappd-reminder GitHub Action opens an issue every 2 weeks
-// when this stamp gets stale (>14 days old).
-const UNTAPPD_LAST_REFRESHED='2026-05-05';
-const UNTAPPD_REFRESH_INTERVAL_DAYS=14;
-
-function drawContrarian(){
-  window._ciX=true;
-  // Global Untappd averages — refreshed on UNTAPPD_LAST_REFRESHED above.
-  // Keys MUST match the exact beer names in beers[] (case + diacritics).
-  // Update every 2 weeks (the refresh workflow opens a reminder issue).
-  const globalAvgs={
-    'Grolsch':3.52,'Hertog Jan':3.58,'Coors Light':2.84,
-    'Sapporo Premium':3.51,'Kirin Ichiban':3.43,'Modelo Especial':3.55,
-    'Stella Artois':3.30,'Duvel':3.70,'Carlsberg':3.09,'Carlsberg Elephant':3.42,
-    'Harp Lager':3.42,'La Fin Du Monde':4.07,'Kronenbourg 1664':3.30,
-    'Michelob Ultra':2.84,'Guinness Draught':3.80,'Red Stripe':3.31,
-    'Heineken':3.00,'Weihenstephaner Hefeweissbier':3.80,'Negra Modelo':3.60,
-    'Hofbräu Münchner Weiße':3.80,'Hofbräu Dunkel':3.55,
-    'Bud Light':2.30,'Budweiser':2.60,'Corona Extra':3.47,
-    'Dos Equis Lager Especial':3.25,
-    'Frisse Lentebok':3.25,
-    // Apr 2026 expansion — values mirror Untappd consensus snapshots
-    // (cross-checked against IPO_WATCHLIST entries where overlap exists).
-    'Estrella Galicia':3.65,'Pilsner Urquell':3.80,'Wrench':3.95,
-    'Żywiec':3.35,'Peroni Nastro Azzurro':3.56,'Estrella Damm':3.61,
-    'Grolsch Puur Weizen':3.50,'Leffe Blonde':3.75,'Texels Skuumkoppe':3.65,
-    'Affligem Tripel':3.80,'De Koninck':3.55,'IJwit':3.50,
-    'La Chouffe Blonde':3.85,'Stiegl Goldbräu':3.35,'Modelo Oro':3.45,
-    'Super Bock':3.41,'Estrella Jalisco':3.20,'Rolling Rock Extra Pale':3.05,
-    'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
-    'Pacífico Clara':3.65,'Narragansett Lager':3.23,'Big Wave Golden Ale':3.52,
-    'Belhaven Scottish Stout':3.45,'Samuel Adams Summer Ale':3.50,
-  };
-
-  // STATS.brandList already has avg/cnt per beer — reuse it instead of
-  // rebuilding totals from STATS.brandMap.
-  const rows=STATS.brandList.filter(b=>globalAvgs[b.n]!==undefined).map(b=>{
-    const global=globalAvgs[b.n], jwal=b.avg, delta=jwal-global;
-    return {name:b.n,jwal,global,delta};
-  }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
-
-  const avgDelta=avg(rows.map(r=>r.delta));
-  const _setTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  const _setCl=(id,v)=>{const e=document.getElementById(id); if(e) e.className=v;};
-  _setTx('ciAvgDelta',(avgDelta>=0?'+':'')+avgDelta.toFixed(2));
-  _setCl('ciAvgDelta','kpi-val '+(avgDelta>0?'up':avgDelta<0?'dn':'fl'));
-
-  // Freshness indicator — turns yellow once Untappd data is older than the refresh interval.
-  const freshEl=document.getElementById('ciFreshness');
-  if(freshEl){
-    const ageMs=Date.now()-new Date(UNTAPPD_LAST_REFRESHED).getTime();
-    const ageDays=Math.floor(ageMs/86400000);
-    const stale=ageDays>UNTAPPD_REFRESH_INTERVAL_DAYS;
-    freshEl.textContent=`WORLD RATINGS · UPDATED ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · REFRESH DUE':''}`;
-    freshEl.style.color=stale?'#ffaa00':'#555';
-  }
-
-  const mostContr=rows.reduce((a,b)=>Math.abs(b.delta)>Math.abs(a.delta)?b:a);
-  _setTx('ciMostContrarian',mostContr.name);
-  _setTx('ciMostSub',`Δ${mostContr.delta>=0?'+':''}${mostContr.delta.toFixed(2)}`);
-
-  const overrater=rows.reduce((a,b)=>b.delta>a.delta?b:a);
-  _setTx('ciOverrater',overrater.name);
-  _setTx('ciOverSub',`+${overrater.delta.toFixed(2)} above world`);
-
-  const underrater=rows.reduce((a,b)=>b.delta<a.delta?b:a);
-  _setTx('ciUnderrater',underrater.name);
-  _setTx('ciUnderSub',`${underrater.delta.toFixed(2)} below world`);
-
-  const sorted=rows.slice().sort((a,b)=>b.delta-a.delta);
-  const contrarianCanvas=document.getElementById('contrarianChart');
-  if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
-  safeChart('contrarianChart',contrarianCanvas,{type:'bar',
-    data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
-      backgroundColor:sorted.map(r=>r.delta>0?'rgba(0,204,68,0.7)':'rgba(255,34,34,0.7)'),
-      borderColor:sorted.map(r=>r.delta>0?'#00cc44':'#ff2222'),borderWidth:1.5}]},
-    options:{indexAxis:'y',maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
-      scales:{x:{min:-2,max:2,grid:{color:'#1a1a1a'},ticks:{color:'#444'},title:{display:true,text:'← WORLD LIKED IT MORE   ·   I LIKED IT MORE →',color:'#555'}},
-              y:{grid:{display:false},ticks:{color:'#aaa',font:{size:9}}}}}
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-// SHARED CONSTANTS — IPO
-// ══════════════════════════════════════════════════════════════
-// 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
-const IPO_WATCHLIST=[
-  // User-specified
-  {beer:'Birra Moretti',   style:'Lager',        origin:'IT', abv:4.6, region:'Udine, Friuli-Venezia Giulia', untappd:3.58, method:'Bottle'},
-  {beer:'Peroni',          style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
-  {beer:'Blue Moon',       style:'Wheat Beer',   origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
-  {beer:'Miller Lite',     style:'Lager',        origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
-  {beer:'Estrella Damm',   style:'Lager',        origin:'ES', abv:5.4, region:'Barcelona, Catalonia',  untappd:3.61, method:'Bottle'},
-  {beer:'Estrella Galicia',style:'Lager',        origin:'ES', abv:5.5, region:'A Coruña, Galicia',     untappd:3.65, method:'Bottle'},
-  // Claude picks — one per country not yet covered
-  {beer:'Brahma',          style:'Lager',        origin:'BR', abv:4.8, region:'São Paulo, SP',         untappd:3.18, method:'Can'},
-  {beer:'Quilmes',         style:'Lager',        origin:'AR', abv:4.9, region:'Buenos Aires, BA',      untappd:3.22, method:'Bottle'},
-  {beer:'Tsingtao',        style:'Lager',        origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
-  {beer:'Castle Lager',    style:'Lager',        origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
-  {beer:'Pilsner Urquell', style:'Pilsner',      origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',       untappd:3.80, method:'Bottle'},
-  {beer:'Super Bock',      style:'Lager',        origin:'PT', abv:5.2, region:'Leça do Balio, Porto',  untappd:3.41, method:'Bottle'},
-  {beer:'Mythos',          style:'Lager',        origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
-  {beer:'Victoria Bitter', style:'Lager',        origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
-  {beer:'Norrlands Guld',  style:'Lager',        origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
-  // Additional picks
-  {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
-  {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
-  {beer:'Kronenbourg 1664',style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
-  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
-  {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
-  // Pipeline promotions
-  {beer:'Żywiec',          style:'Lager',        origin:'PL', abv:5.5, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
-  {beer:'Tyskie',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Tychy, Silesia',        untappd:3.28, method:'Can'},
-  {beer:'Chimay Blue',     style:'Belgian Ale',  origin:'BE', abv:9.0, region:'Chimay, Hainaut',       untappd:4.05, method:'Bottle'},
-  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Dinant, Namur',         untappd:3.75, method:'Bottle'},
-  {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
-  {beer:'Sam Adams Boston Lager',style:'Lager',  origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
-];
-
-// Recommendation candidates — only beers NOT already on IPO_WATCHLIST
-const IPO_CANDIDATES=[
-  {beer:'Paulaner Hefe',    style:'Wheat Beer',   origin:'DE', abv:5.5, region:'Munich',              untappd:3.87, method:'Bottle'},
-  {beer:'Augustiner Helles',style:'Lager',        origin:'DE', abv:5.2, region:'Munich',              untappd:4.10, method:'Draft'},
-  {beer:'Peroni Nastro Azzurro',style:'Lager',    origin:'IT', abv:5.1, region:'Rome, Lazio',         untappd:3.56, method:'Bottle'},
-  {beer:"Smithwick's",      style:'Red Ale',      origin:'IE', abv:4.5, region:'Kilkenny',            untappd:3.45, method:'Draft'},
-  {beer:"Tennent's",        style:'Lager',        origin:'GB', abv:4.0, region:'Glasgow, Scotland',   untappd:2.95, method:'Can'},
-  {beer:'Orion',            style:'Lager',        origin:'JP', abv:5.0, region:'Naha, Okinawa',       untappd:3.42, method:'Can'},
-  {beer:'Menabrea',         style:'Lager',        origin:'IT', abv:4.8, region:'Biella, Piedmont',    untappd:3.55, method:'Bottle'},
-  {beer:'Tuborg',           style:'Pilsner',      origin:'DK', abv:4.6, region:'Copenhagen',          untappd:3.10, method:'Can'},
-  {beer:'Sol',              style:'Lager',        origin:'MX', abv:4.5, region:'Mexico City',         untappd:3.15, method:'Bottle'},
-  {beer:'Singha',           style:'Lager',        origin:'TH', abv:5.0, region:'Bangkok',             untappd:3.25, method:'Bottle'},
-  {beer:'Tiger Beer',       style:'Lager',        origin:'SG', abv:5.0, region:'Singapore',           untappd:3.18, method:'Can'},
-];
-
-// ══════════════════════════════════════════════════════════════
-// PREDICTED RATING — shared scoring formula
-// ══════════════════════════════════════════════════════════════
-// Blends Untappd market consensus with JWAL's historical biases:
-//   50% Untappd global avg · 25% JWAL style-adjusted · 15% JWAL
-//   country-adjusted · 10% JWAL base anchor · + serving-method nudge.
-function predictRating(style,origin,untappd,method='Bottle'){
-  const g=STATS.globalAvg;
-  const sM=STATS.styleMap[style];
-  const styleAvg=sM?sM.t/sM.c:g;
-  const cM=STATS.countryMap[origin];
-  const countryAvg=cM?cM.t/cM.c:g;
-  const methodAdj=method==='Draft'?0.10:method==='Nitro'?0.05:method==='Can'?-0.10:0;
-  const t=untappd*0.50+(g+(styleAvg-g))*0.25+(g+(countryAvg-g))*0.15+g*0.10+methodAdj;
-  return Math.min(5.0,Math.max(1.0,t));
-}
-
-// ══════════════════════════════════════════════════════════════
-// RECOMMENDATIONS — "WHAT TO DRINK NEXT"
-// ══════════════════════════════════════════════════════════════
-// Ranks unreviewed candidate beers by predicted JWAL rating (taste
-// profile + Untappd consensus) and explains each pick with rationale
-// chips derived from his style / country / serving biases.
-function drawRecommendations(){
-  window._recD=true;
-  try {
-    const reviewed=new Set(beers.map(b=>b.beer));
-    const g=STATS.globalAvg;
-    const picks=IPO_CANDIDATES
-      .filter(c=>!reviewed.has(c.beer))
-      .map(c=>{
-        const pred=predictRating(c.style,c.origin,c.untappd,c.method);
-        return {...c,_pred:pred,_delta:pred-g};
-      })
-      .sort((a,b)=>b._pred-a._pred);
-
-    const cntEl=document.getElementById('rec-count');
-    if(cntEl) cntEl.textContent=picks.length+' PICK'+(picks.length!==1?'S':'');
-
-    // Rationale chips: compare each beer's attributes to JWAL's biases.
-    function rationale(c){
-      const chips=[];
-      const sM=STATS.styleMap[c.style];
-      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I LIKE ${c.style.toUpperCase()} · ${sa.toFixed(2)}`);}
-      const cM=STATS.countryMap[c.origin];
-      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} FAVOURITE · ${ca.toFixed(2)}`);}
-      if(c.method==='Draft'||c.method==='Nitro') chips.push(`BETTER ON ${c.method.toUpperCase()}`);
-      if(c._pred>=4.0) chips.push('TOP SHELF');
-      if(!chips.length) chips.push(`WORLD RATES IT ${c.untappd.toFixed(2)}`);
-      return chips.slice(0,3);
-    }
-
-    const recEl=document.getElementById('recPicks');
-    if(recEl){
-      recEl.innerHTML=picks.length?picks.map((c,i)=>{
-        const col=rC(c._pred);
-        const chips=rationale(c).map(t=>`<span class="rec-chip">${t}</span>`).join('');
-        return `<div class="ipo-top-pick rec-pick" style="border-left-color:${col}">
-          <div class="tp-head"><span class="rec-rank">#${i+1}</span> ${logoImg(c.beer,20)} <span>${c.beer}</span></div>
-          <div class="tp-style">${FLAGS[c.origin]||''} ${c.style} · ${c.abv.toFixed(1)}% · ${c.method}</div>
-          <div class="tp-row">
-            <span style="color:#bb44ff">WORLD ${c.untappd.toFixed(2)}</span>
-            <span class="tp-upside" style="color:${col}">${c._pred.toFixed(2)}</span>
-          </div>
-          <div class="tp-row" style="margin-top:4px">
-            <span style="color:${col};letter-spacing:1px">${strs(c._pred)}</span>
-            <span style="color:#444;font-size:8px">MY GUESS</span>
-          </div>
-          <div class="rec-why">${chips}</div>
-        </div>`;
-      }).join(''):'<div style="color:#333;font-size:9px;padding:10px">ALL CANDIDATES REVIEWED — NO PENDING PICKS</div>';
-    }
-  } catch(e){ console.error('Recommendations error:',e); }
-}
-
-// ══════════════════════════════════════════════════════════════
-// IPO WATCHLIST
-// ══════════════════════════════════════════════════════════════
-function drawIPO(){
-  window._ipoD=true;
-  try {
-
-  // Analyst target uses the shared predictRating() scoring formula
-  // (50% Untappd consensus · 25% style bias · 15% country bias · 10%
-  // base anchor · + serving-method nudge).
-  // Pre-compute all analyst targets (cached in a Map)
-  const targetCache=new Map();
-  IPO_WATCHLIST.forEach(w=>{
-    targetCache.set(w.beer,predictRating(w.style,w.origin,w.untappd,w.method));
-  });
-
-  const reviewed=new Set(beers.map(b=>b.beer));
-  // Enrich with target + upside, sort pending by upside descending
-  const pending=IPO_WATCHLIST.filter(w=>!reviewed.has(w.beer))
-    .map(w=>{const t=targetCache.get(w.beer);return {...w,_target:t,_upside:t-w.untappd};})
-    .sort((a,b)=>b._upside-a._upside);
-  const priced=IPO_WATCHLIST.filter(w=>reviewed.has(w.beer));
-
-  const _ipoTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  _ipoTx('ipo-pending',pending.length);
-  _ipoTx('ipo-priced',priced.length);
-  _ipoTx('ipo-watch-count',pending.length+' BEER'+(pending.length!==1?'S':'')+' QUEUED');
-
-  const allTargets=[...targetCache.values()];
-  _ipoTx('ipo-avg-analyst',(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2));
-  _ipoTx('ipo-avg-market',(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2));
-
-  // Signal helper used by table + conveyor
-  function sigOf(target){
-    const label=target>=4.0?'MUST TRY':target>=3.5?'WORTH IT':target>=3.0?'DECENT':target>=2.5?'MEH':'SKIP';
-    const color=target>=4.0?'#00cc44':target>=3.5?'#aacc00':target>=3.0?'#ffaa00':target>=2.5?'#ff6600':'#ff2222';
-    return {label,color};
-  }
-
-  {const _wb=document.getElementById('ipoWatchBody'); if(_wb) _wb.innerHTML=pending.map(w=>{
-    const target=w._target, upside=w._upside;
-    const uClass=upside>0.2?'up':upside<-0.2?'dn':'fl';
-    const {label:signal,color:sigColor}=sigOf(target);
-    return `<tr style="border-left-color:${sigColor}">
-      <td>${logoImg(w.beer,24)}</td>
-      <td style="color:#ff6600;font-weight:600">${w.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${w.style}</span></td>
-      <td>${FLAGS[w.origin]||''} <span style="color:#888">${w.origin}</span></td>
-      <td style="color:#00aaff">${w.abv.toFixed(1)}%</td>
-      <td style="color:#bb44ff;font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
-      <td style="color:#00aaff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
-      <td class="${uClass}" style="font-family:var(--mono);font-weight:700">${upside>=0?'+':''}${upside.toFixed(2)}</td>
-      <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700;letter-spacing:1px">${signal}</span></td>
-    </tr>`;
-  }).join('');}
-
-  // ── TOP-PICKS CONVEYOR (top 6 by upside)
-  const topPicksEl=document.getElementById('ipoTopPicks');
-  const topN=pending.slice(0,6);
-  const topCountEl=document.getElementById('ipo-top-count');
-  if(topCountEl) topCountEl.textContent=topN.length+' OF '+pending.length;
-  if(topPicksEl){
-    topPicksEl.innerHTML=topN.length?topN.map(w=>{
-      const {label:signal,color:sigColor}=sigOf(w._target);
-      const uClass=w._upside>0?'up':w._upside<0?'dn':'fl';
-      return `<div class="ipo-top-pick" style="border-left-color:${sigColor}">
-        <div class="tp-head">${logoImg(w.beer,20)} <span>${w.beer}</span></div>
-        <div class="tp-style">${FLAGS[w.origin]||''} ${w.style} · ${w.abv.toFixed(1)}%</div>
-        <div class="tp-row">
-          <span style="color:#00aaff">MY GUESS ${w._target.toFixed(2)}</span>
-          <span class="tp-upside ${uClass}">${w._upside>=0?'+':''}${w._upside.toFixed(2)}</span>
-        </div>
-        <div class="tp-row" style="margin-top:6px">
-          <span style="color:#bb44ff">WORLD ${w.untappd.toFixed(2)}</span>
-          <span class="tp-signal" style="border-color:${sigColor};color:${sigColor}">${signal}</span>
-        </div>
-      </div>`;
-    }).join(''):'<div style="color:#333;font-size:9px;padding:10px">TRIED EVERYTHING ON THE LIST — NOTHING PENDING</div>';
-  }
-
-  // ── UPSIDE DISTRIBUTION CHART
-  const upCanvas=document.getElementById('ipoUpsideChart');
-  if(upCanvas && pending.length){
-    const buckets=[
-      {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:'#ff2222'},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#ff6600'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#aacc00'},
-      {lbl:'+0.5…+1',lo:0.5,hi:1,color:'#00cc44'},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#00ff88'}
-    ];
-    const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
-    safeChart('ipoUpsideChart',upCanvas,{type:'bar',
-      data:{labels:buckets.map(b=>b.lbl),datasets:[{data:counts,backgroundColor:buckets.map(b=>b.color),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:'#1a1a1a'},ticks:{color:'#444',precision:0}},y:{grid:{display:false},ticks:{color:'#ff6600',font:{size:9}}}}}
-    });
-  } else if(upCanvas){
-    const prev=_charts['ipoUpsideChart']; if(prev){prev.destroy();delete _charts['ipoUpsideChart'];}
-  }
-
-  // ── PRICED PANEL (hide entirely when empty)
-  const pricedPanel=document.getElementById('ipoPricedPanel');
-  const _pb=document.getElementById('ipoPricedBody');
-  if(priced.length===0){
-    if(pricedPanel) pricedPanel.style.display='none';
-    if(_pb) _pb.innerHTML='';
-    _ipoTx('ipo-priced-count','0 BEERS');
-  } else {
-    if(pricedPanel) pricedPanel.style.display='';
-    _ipoTx('ipo-priced-count',priced.length+' BEER'+(priced.length!==1?'S':''));
-    if(_pb) _pb.innerHTML=priced.map(w=>{
-      const target=targetCache.get(w.beer);
-      const revd=BEER_REVIEWS.get(w.beer)||[];
-      const jwalPrice=avg(revd.map(b=>b.rating));
-      const vsAnalyst=jwalPrice-target;
-      const vsMkt=jwalPrice-w.untappd;
-      const verdict=vsAnalyst>0.3?'BEAT MY GUESS':vsAnalyst>-0.3?'ON TARGET':'BELOW MY GUESS';
-      const vColor=vsAnalyst>0.3?'#00cc44':vsAnalyst<-0.3?'#ff2222':'#ffaa00';
-      return `<tr>
-        <td>${logoImg(w.beer,24)}</td>
-        <td style="color:#ff6600;font-weight:600">${w.beer}<br><span style="color:#444;font-size:9px;font-weight:400">${w.style}</span></td>
-        <td>${FLAGS[w.origin]||''} <span style="color:#888">${w.origin}</span></td>
-        <td style="color:#bb44ff;font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
-        <td style="color:#00aaff;font-family:var(--mono)">${target.toFixed(2)}</td>
-        <td><span class="rb ${rbC(jwalPrice)}">${jwalPrice.toFixed(2)}</span></td>
-        <td class="${vsAnalyst>=0?'up':'dn'}" style="font-family:var(--mono)">${vsAnalyst>=0?'+':''}${vsAnalyst.toFixed(2)}</td>
-        <td class="${vsMkt>=0?'up':'dn'}" style="font-family:var(--mono)">${vsMkt>=0?'+':''}${vsMkt.toFixed(2)}</td>
-        <td><span style="font-size:8px;padding:1px 6px;border:1px solid ${vColor};color:${vColor}">${verdict}</span></td>
-      </tr>`;
-    }).join('');
-  }
-
-  } catch(e){ console.error('IPO error:',e); }
-}
-
-// ══════════════════════════════════════════════════════════════
-// COMMAND PALETTE (Ctrl+K / Cmd+K)
-// ══════════════════════════════════════════════════════════════
-(function initCommandPalette(){
-  const TABS=[
-    {id:'overview',label:'HOME',icon:'◈',key:'F1'},
-    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
-    {id:'maps',label:'MAP',icon:'◎',key:'F3'},
-    {id:'maps',label:'MAP · WHERE I DRANK THEM',icon:'🍺',key:'',mode:'drank'},
-    {id:'maps',label:'MAP · WHERE THEY\'RE BREWED',icon:'🏭',key:'',mode:'brewed'},
-    {id:'maps',label:'MAP · BREWERY → MY GLASS',icon:'✈',key:'',mode:'journey'},
-    {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
-    {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
-    {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},
-    {id:'markets',label:'INSIGHTS · WHAT TO TRY',icon:'🍺',key:''},
-  ];
-
-  let prevFocus=null;
-  function openPalette(){
-    const pal=document.getElementById('cmd-palette');
-    const inp=document.getElementById('cmd-input');
-    if(!pal||!inp) return;
-    prevFocus=document.activeElement;
-    inp.value='';
-    pal.classList.add('open');
-    // Focus after the visibility transition's first frame: focus() on an
-    // input whose computed visibility is still 'hidden' is silently ignored.
-    requestAnimationFrame(()=>requestAnimationFrame(()=>inp.focus()));
-    renderResults('');
-  }
-  function closePalette(){
-    const pal=document.getElementById('cmd-palette');
-    if(!pal||!pal.classList.contains('open')) return;
-    pal.classList.remove('open');
-    restoreFocus(prevFocus,pal);
-    prevFocus=null;
-  }
-
-  function renderResults(q){
-    const container=document.getElementById('cmd-results');
-    if(!container) return;
-    const lq=q.toLowerCase().trim();
-    let html='';
-
-    // Tabs nav
-    const matchedTabs=lq?TABS.filter(t=>t.label.toLowerCase().includes(lq)||t.id.toLowerCase().includes(lq)):TABS;
-    if(matchedTabs.length){
-      html+=`<div class="cmd-section">NAVIGATE</div>`;
-      html+=matchedTabs.slice(0,10).map(t=>`
-        <div class="cmd-item" data-tab="${t.id}"${t.mode?` data-mode="${t.mode}"`:''} data-action="tab">
-          <span class="cmd-item-icon">${t.icon}</span>
-          <span class="cmd-item-main">${t.label}</span>
-          <span class="cmd-item-badge">${t.key}</span>
-        </div>`).join('');
-    }
-
-    // Beer search
-    if(lq.length>=1){
-      const matchedBeers=[...new Map(
-        beers.filter(b=>b.beer.toLowerCase().includes(lq)||b.style.toLowerCase().includes(lq)||b.origin.toLowerCase().includes(lq))
-        .map(b=>[b.beer,b])
-      ).values()].slice(0,5);
-      if(matchedBeers.length){
-        html+=`<div class="cmd-section">BEERS</div>`;
-        html+=matchedBeers.map(b=>`
-          <div class="cmd-item" data-beer="${b.beer.replace(/"/g,'&quot;')}" data-action="beer">
-            <span class="cmd-item-icon">🍺</span>
-            <span class="cmd-item-main">${b.beer}</span>
-            <span class="cmd-item-meta">${b.style} · ${FLAGS[b.origin]||''} ${b.origin}</span>
-          </div>`).join('');
-      }
-
-      const matchedBrew=breweries.filter(b=>
-        b.name.toLowerCase().includes(lq)||
-        b.location.toLowerCase().includes(lq)||
-        b.country.toLowerCase().includes(lq)
-      ).slice(0,4);
-      if(matchedBrew.length){
-        html+=`<div class="cmd-section">BREWERIES</div>`;
-        html+=matchedBrew.map(b=>`
-          <div class="cmd-item" data-brewery="${b.name.replace(/"/g,'&quot;')}" data-action="brewery">
-            <span class="cmd-item-icon">🏭</span>
-            <span class="cmd-item-main">${b.name}</span>
-            <span class="cmd-item-meta">${b.location} · ${FLAGS[b.cc]||''}</span>
-          </div>`).join('');
-      }
-    }
-
-    if(!html) html=`<div style="padding:20px;text-align:center;font-size:10px;color:var(--dim)">NO RESULTS</div>`;
-    container.innerHTML=html;
-  }
-
-  document.addEventListener('keydown',function(ev){
-    if((ev.ctrlKey||ev.metaKey)&&ev.key==='k'){
-      ev.preventDefault();
-      const pal=document.getElementById('cmd-palette');
-      if(pal&&pal.classList.contains('open')) closePalette();
-      else openPalette();
-      return;
-    }
-    const pal=document.getElementById('cmd-palette');
-    if(!pal||!pal.classList.contains('open')) return;
-    if(ev.key==='Escape'){closePalette();return;}
-  });
-
-  const inp=document.getElementById('cmd-input');
-  if(inp) inp.addEventListener('input',e=>renderResults(e.target.value));
-
-  window.closePalette=closePalette;
-  window.openPalette=openPalette;
-})();
-
-// ══════════════════════════════════════════════════════════════
-// BREWERY DRAWER
-// ══════════════════════════════════════════════════════════════
-let _drawerMap=null;
-
-function openBreweryDrawer(name){
-  try {
-    const brewery=BREWERY_BY_NAME.get(name);
-    if(!brewery) return;
-
-    const drawer=document.getElementById('brewery-drawer');
-    const title=document.getElementById('drawer-title');
-    const body=document.getElementById('drawer-body');
-    if(!drawer||!body) return;
-
-    const avgR=avg(brewery.ratings);
-    const ratingsHTML=brewery.ratings.map(r=>`<span class="rb ${rbC(r)}" style="margin-right:3px">${r.toFixed(2)}</span>`).join('');
-
-    if(title) title.textContent=brewery.name.toUpperCase().slice(0,28);
-
-    body.innerHTML=`
-      <div class="drawer-stat"><span class="drawer-key">BREWERY</span><span class="drawer-val" style="font-size:9px;max-width:180px;text-align:right">${brewery.name}</span></div>
-      ${brewery.nativeName?`<div class="drawer-stat"><span class="drawer-key">NATIVE</span><span class="drawer-val" style="font-size:10px;max-width:180px;text-align:right">${brewery.nativeName}</span></div>`:''}
-      <div class="drawer-stat"><span class="drawer-key">LOCATION</span><span class="drawer-val" style="font-size:9px;text-align:right">${brewery.location}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">COUNTRY</span><span class="drawer-val">${FLAGS[brewery.cc]||''} ${brewery.country}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">LANGUAGE</span><span class="drawer-val" style="color:var(--cyan)">${brewery.lang.toUpperCase()}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">AVG RATING</span><span class="rb ${rbC(avgR)}" style="font-size:12px">${avgR.toFixed(2)}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">REVIEWS</span><span class="drawer-val">${brewery.ratings.length}</span></div>
-      <div class="drawer-section">RATINGS</div>
-      <div style="margin-bottom:10px;padding-top:4px">${ratingsHTML}</div>
-      <div class="drawer-section">BEERS</div>
-      <div style="font-size:10px;color:var(--white);line-height:1.9;padding-top:4px">${brewery.beers.split(' · ').map(b=>`<div>◉ ${b}</div>`).join('')}</div>
-      <div class="drawer-section">COORDINATES</div>
-      <div style="font-size:9px;color:var(--cyan);padding-top:4px">${brewery.lat.toFixed(4)}°, ${brewery.lng.toFixed(4)}°</div>
-    `;
-
-    _drawerPrevFocus=document.activeElement;
-    drawer.classList.add('open');
-    drawer.setAttribute('aria-hidden','false');
-    const dc=document.getElementById('drawer-close'); if(dc) dc.focus();
-
-    // Mini map inside drawer
-    setTimeout(()=>{
-      const mapEl=document.getElementById('drawer-map');
-      if(!mapEl) return;
-      if(!_drawerMap){
-        _drawerMap=L.map('drawer-map',{zoomControl:false,attributionControl:false,scrollWheelZoom:false,dragging:false});
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',detectRetina:true}).addTo(_drawerMap);
-      }
-      _drawerMap.setView([brewery.lat,brewery.lng],7);
-      _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});
-      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#cc3366',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
-      _drawerMap.invalidateSize();
-    },120);
-  } catch(e){ console.error('Brewery drawer error:',e); }
-}
-
-let _drawerPrevFocus=null;
-function closeBreweryDrawer(){
-  const drawer=document.getElementById('brewery-drawer');
-  if(!drawer||!drawer.classList.contains('open')) return;
-  drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');
-  restoreFocus(_drawerPrevFocus,drawer);
-  _drawerPrevFocus=null;
-}
-
-window.openBreweryDrawer=openBreweryDrawer;
-window.closeBreweryDrawer=closeBreweryDrawer;
-
-// ══════════════════════════════════════════════════════════════
-// KPI ANIMATED COUNTERS + SPARKLINES
-// ══════════════════════════════════════════════════════════════
-(function initKPISparklines(){
-  try {
-    // Compute per-month data for sparklines
-    const {months,byMonth} = getMonthlyData();
-    if(months.length<2) return; // need 2+ months for sparklines
-
-    const sparkData={
-      'spark-top': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.max(...rs):null; }),
-      'spark-avg': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?avg(rs):null; }),
-      'spark-low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
-      'spark-abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
-      'spark-brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
-      'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
-    };
-    const sparkColors={
-      'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#cc3366','spark-hit':'#00cc44'
-    };
-
-    Object.entries(sparkData).forEach(([id,data])=>{
-      const canvas=document.getElementById(id);
-      if(!canvas) return;
-      const color=sparkColors[id]||'#cc3366';
-      safeChart(id,canvas,{
-        type:'line',
-        data:{
-          labels:months,
-          datasets:[{data,borderColor:color,backgroundColor:color+'22',borderWidth:1.5,
-            pointRadius:2,pointBackgroundColor:color,fill:true,tension:0.4,spanGaps:true}]
-        },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          animation:{duration:800},
-          plugins:{legend:{display:false},tooltip:{enabled:false}},
-          scales:{x:{display:false},y:{display:false}},
-          elements:{point:{hoverRadius:0}}
-        }
-      });
-    });
-
-    // Animated count-up for KPI values
-    function animateCounter(el,target,decimals,suffix){
-      if(!el||isNaN(target)) return;
-      const duration=900,startTime=performance.now();
-      const start=0;
-      function step(now){
-        const progress=Math.min((now-startTime)/duration,1);
-        const ease=1-Math.pow(1-progress,3);
-        el.textContent=(start+(target-start)*ease).toFixed(decimals)+(suffix||'');
-        if(progress<1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    const topBeer=STATS.sorted[0];
-    const lowBeer=STATS.sorted[STATS.sorted.length-1];
-    const avgAbv=beers.reduce((s,b)=>s+b.abv,0)/beers.length;
-    const totalBrands=Object.keys(STATS.brandMap).length;
-
-    const animate=(id,val,dec,suf)=>{ const e=document.getElementById(id); if(e) animateCounter(e,val,dec,suf); };
-    animate('ov-top-val',topBeer.rating,2);
-    animate('ov-avg-val',STATS.globalAvg,2);
-    animate('ov-low-val',lowBeer.rating,2);
-    animate('ov-abv-val',avgAbv,1,'%');
-    animate('ov-brands-val',totalBrands,0);
-    animate('ov-hit-val',beers.length?beers.filter(b=>b.rating>=3).length/beers.length*100:0,0,'%');
-
-    // MoM delta chips — latest sparkline point vs the one before
-    [['ov-top-delta','spark-top',v=>v.toFixed(2)],
-     ['ov-avg-delta','spark-avg',v=>v.toFixed(2)],
-     ['ov-low-delta','spark-low',v=>v.toFixed(2)],
-     ['ov-abv-delta','spark-abv',v=>v.toFixed(1)+'pp'],
-     ['ov-brands-delta','spark-brands',v=>String(Math.round(v))],
-     ['ov-hit-delta','spark-hit',v=>Math.round(v)+'pp'],
-    ].forEach(([id,key,f])=>{
-      const el=document.getElementById(id);
-      if(!el) return;
-      const d=sparkData[key],a=d[d.length-2],b=d[d.length-1];
-      if(a==null||b==null){ el.textContent=''; return; }
-      const diff=b-a,up=diff>0.005,dn=diff<-0.005;
-      el.className='kpi-delta '+(up?'up':dn?'dn':'fl');
-      el.textContent=(up?'▲':dn?'▼':'→')+f(Math.abs(diff));
-      el.title='vs previous month';
-    });
-  } catch(e){ console.error('KPI sparklines error:',e); }
-})();
-
-// ══════════════════════════════════════════════════════════════
-// EVENT DELEGATION (replaces inline onclick handlers)
-// ══════════════════════════════════════════════════════════════
-try {
-  // Menu bar tab navigation
-  document.getElementById('menubar').addEventListener('click', function(e) {
-    const item = e.target.closest('.mb-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
-  });
-
-  // Sidebar tab navigation
-  document.getElementById('sidebar').addEventListener('click', function(e) {
-    const item = e.target.closest('.nav-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
-  });
-
-  // Bottom nav (mobile thumb-reach)
-  const bottomnav = document.getElementById('bottomnav');
-  if (bottomnav) bottomnav.addEventListener('click', function(e) {
-    const item = e.target.closest('.bn-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
-  });
-
-  // Map view switcher (drank / brewed / journey)
-  document.getElementById('maps').addEventListener('click', function(e) {
-    const btn = e.target.closest('.map-mode[data-mode]');
-    if (btn) setMapMode(btn.dataset.mode);
-  });
-
-  // Journey table rows open the beer's detail modal
-  document.getElementById('journeyTbody').addEventListener('click', function(e) {
-    const row = e.target.closest('tr[data-beer]');
-    if (row) openBeerModal(row.dataset.beer);
-  });
-
-  // Insights sub-section navigation (Places / Over time / What to try)
-  document.getElementById('insights').addEventListener('click', function(e) {
-    const btn = e.target.closest('.subtab[data-subtab]');
-    if (btn) showInsightsSubtab(btn.dataset.subtab);
-  });
-
-  // Overview — recent-activity / month-in-review rows open the beer modal
-  const ovPanel=document.getElementById('overview');
-  ovPanel.addEventListener('click', function(e) {
-    const row = e.target.closest('.feed-row[data-beer]');
-    if (row) openBeerModal(row.dataset.beer);
-  });
-  ovPanel.addEventListener('keydown', function(e) {
-    if (e.key!=='Enter' && e.key!==' ') return;
-    const row = e.target.closest('.feed-row[data-beer]');
-    if (row) { e.preventDefault(); openBeerModal(row.dataset.beer); }
-  });
-
-  // Beer modal — close on backdrop click
-  document.getElementById('beerModal').addEventListener('click', function(e) {
-    if (e.target === this) closeBeerModal();
-  });
-
-  // Beer modal — close button
-  document.getElementById('beerModalClose').addEventListener('click', closeBeerModal);
-
-  // Command palette — close on backdrop click
-  document.getElementById('cmd-palette').addEventListener('click', function(e) {
-    if (e.target === this) closePalette();
-  });
-
-  // Brewery drawer — close button
-  document.getElementById('drawer-close').addEventListener('click', closeBreweryDrawer);
-
-  // Beer filter controls (search debounced; select changes instant)
-  document.getElementById('beerSearch').addEventListener('input', applyBeerFilterDebounced);
-  ['beerStyleFilter','beerOriginFilter','beerMonthFilter'].forEach(id =>
-    document.getElementById(id).addEventListener('change', applyBeerFilter));
-
-  // Sortable column headers — click to sort, click again to reverse
-  document.getElementById('beerHead').addEventListener('click', function(e) {
-    const th = e.target.closest('th[data-sort]');
-    if (!th) return;
-    const key = th.dataset.sort;
-    if (beerSort.key === key) { beerSort.dir = -beerSort.dir; }
-    else { beerSort.key = key; beerSort.dir = (key==='abv'||key==='rating'||key==='month') ? -1 : 1; }
-    applyBeerFilter();
-  });
-
-  // Active-filter chips — ✕ removes one filter, CLEAR ALL resets everything
-  document.getElementById('beerChips').addEventListener('click', function(e) {
-    const chip = e.target.closest('[data-clear]');
-    if (!chip) return;
-    const k = chip.dataset.clear;
-    if (k === 'all') { resetBeerFilter(); return; }
-    const id = {q:'beerSearch',st:'beerStyleFilter',or:'beerOriginFilter',mo:'beerMonthFilter'}[k];
-    document.getElementById(id).value = '';
-    applyBeerFilter();
-  });
-
-  // Beer table rows (+ "clear filters" button in the empty-state row)
-  document.getElementById('beerBody').addEventListener('click', function(e) {
-    if (e.target.closest('#beerFilterReset')) { resetBeerFilter(); return; }
-    const row = e.target.closest('tr[data-beer]');
-    if (row) openBeerModal(row.dataset.beer);
-  });
-
-  // Keyboard activation for tab items (focusable divs with role="tab")
-  document.addEventListener('keydown', function(e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const el = e.target.closest ? e.target.closest('.mb-item[data-tab], .nav-item[data-tab]') : null;
-    if (el) { e.preventDefault(); showTab(el.dataset.tab, el); }
-  });
-
-  // Trap Tab inside whichever overlay is open (modal > palette > drawer)
-  document.addEventListener('keydown', function(e) {
-    if (e.key !== 'Tab') return;
-    const overlay =
-      document.getElementById('beerModal').classList.contains('open') ? document.getElementById('beerModalBox') :
-      document.getElementById('cmd-palette').classList.contains('open') ? document.getElementById('cmd-box') :
-      document.getElementById('brewery-drawer').classList.contains('open') ? document.getElementById('brewery-drawer') : null;
-    if (!overlay) return;
-    const els = [...overlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
-      .filter(el => el.offsetParent !== null);
-    if (!els.length) { e.preventDefault(); return; }
-    const first = els[0], last = els[els.length - 1];
-    const inside = overlay.contains(document.activeElement);
-    if (e.shiftKey && (!inside || document.activeElement === first)) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && (!inside || document.activeElement === last)) { e.preventDefault(); first.focus(); }
-  });
-
-  // Beer grid cards
-  document.getElementById('beerGrid').addEventListener('click', function(e) {
-    const card = e.target.closest('.beer-card[data-beer]');
-    if (card) openBeerModal(card.dataset.beer);
-  });
-
-  // Brewery table clickable names
-  document.getElementById('brewedTbody').addEventListener('click', function(e) {
-    const el = e.target.closest('.brewery-clickable[data-brewery]');
-    if (el) { openBreweryDrawer(el.dataset.brewery); e.stopPropagation(); }
-  });
-
-  // Command palette results
-  document.getElementById('cmd-results').addEventListener('click', function(e) {
-    const item = e.target.closest('.cmd-item');
-    if (!item) return;
-    // Close (and restore focus) BEFORE opening the next overlay so its own
-    // focus save/restore chains from the real underlying element.
-    if (item.dataset.action === 'beer') { closePalette(); openBeerModal(item.dataset.beer); }
-    else if (item.dataset.action === 'brewery') { closePalette(); openBreweryDrawer(item.dataset.brewery); }
-    else if (item.dataset.action === 'tab') {
-      closePalette(); showTab(item.dataset.tab);
-      // Map view entries also flip the map to that view (safe pre-init: it
-      // records the mode and initWorldMap applies it when the map builds).
-      if (item.dataset.mode) setMapMode(item.dataset.mode);
-    }
-  });
-
-  // Collapsed analytics sections render their charts at zero size while hidden;
-  // resize them the first time the section is expanded. `toggle` doesn't bubble,
-  // so listen in the capture phase.
-  document.addEventListener('toggle', function(e) {
-    const d = e.target;
-    if (!d || d.tagName !== 'DETAILS' || !d.open || !d.classList.contains('bb-collapse')) return;
-    resizeChartsIn(d);
-  }, true);
-
-  // Boot tab: honor a #hash deep link (e.g. index.html#maps), else land on
-  // Overview. Its charts render eagerly at top level, while the Leaflet maps
-  // stay lazy until the MAPS tab (F2) first becomes visible.
-  const validTab = h => TAB_PANELS.some(p => p.id === h) || INSIGHTS_SUBS.includes(h);
-  const bootHash = location.hash.slice(1);
-  showTab(validTab(bootHash) ? bootHash : 'overview');
-
-  // Manually edited hashes / external links into an open page
-  window.addEventListener('hashchange', function() {
-    const h = location.hash.slice(1);
-    const el = document.getElementById(h);
-    if (validTab(h) && el && !el.classList.contains('active')) showTab(h);
-  });
-} catch(e) { console.error('Event delegation setup error:', e); }
+  renderAll();
+  initWorldMap();
+}catch(e){console.error('Boot error:',e);}
