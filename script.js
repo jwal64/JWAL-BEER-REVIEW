@@ -93,6 +93,8 @@ let beers=[
   {beer:"Goose IPA",             style:"IPA",                  origin:"US",abv:5.9,method:"Can",   city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Almaza Pilsener",       style:"Pilsner",              origin:"LB",abv:4.2,method:"Bottle",city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Jun",monthN:6,year:2026},
   {beer:"Mythos",                style:"Lager",                origin:"GR",abv:5.0,method:"Bottle",city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Jun",monthN:6,year:2026},
+  // JUL 2026
+  {beer:"Stone IPA",             style:"IPA",                  origin:"US",abv:6.9,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Jul",monthN:7,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -185,6 +187,7 @@ let breweries=[
   {name:"Goose Island Beer Co.",     location:"Chicago, Illinois",         country:"USA",         cc:"US", lang:"en", beers:"Goose IPA",                                                 lat:41.9166,lng:-87.6530, ratings:[3.50]},
   {name:"Brasserie Almaza",          location:"Beirut, Beirut Governorate",country:"Lebanon",     cc:"LB", lang:"ar", beers:"Almaza Pilsener",                                          lat:33.8938,lng:35.5018,  ratings:[2.75], nativeName:"ألمازة"},
   {name:"Olympic Brewery",           location:"Sindos, Central Macedonia", country:"Greece",      cc:"GR", lang:"el", beers:"Mythos",                                                   lat:40.6736,lng:22.8064,  ratings:[3.25]},
+  {name:"Stone Brewing",             location:"Escondido, California",     country:"USA",         cc:"US", lang:"en", beers:"Stone IPA",                                                 lat:33.1192,lng:-117.0864,ratings:[2.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -268,6 +271,7 @@ const BRAND_DOMAINS = {
 "Sol":"solbeer.com",
 "Stella Artois":"stellaartois.com",
 "Stiegl Goldbräu":"stiegl.at",
+"Stone IPA":"stonebrewing.com",
 "Samuel Adams Summer Ale":"samueladams.com",
 "Super Bock":"superbock.pt",
 "Tennent's":"tennents.com",
