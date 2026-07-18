@@ -95,6 +95,7 @@ let beers=[
   {beer:"Mythos",                style:"Lager",                origin:"GR",abv:5.0,method:"Bottle",city:"Washington",  region:"District of Columbia",country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Jun",monthN:6,year:2026},
   // JUL 2026
   {beer:"Stone IPA",             style:"IPA",                  origin:"US",abv:6.9,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Jul",monthN:7,year:2026},
+  {beer:"Mahou Cinco Estrellas", style:"Lager",                origin:"ES",abv:5.5,method:"Bottle",city:"Boynton Beach",region:"Florida",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jul",monthN:7,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -130,6 +131,7 @@ let drunkLocs=[
   {city:"East Rutherford",region:"New Jersey",        country:"USA",         cc:"US", lat:40.8127,lng:-74.0846},
   {city:"San Juan",    region:"San Juan",             country:"Puerto Rico", cc:"PR", lat:18.4655,lng:-66.1057},
   {city:"Washington",  region:"District of Columbia", country:"USA",         cc:"US", lat:38.9072,lng:-77.0369},
+  {city:"Boynton Beach",region:"Florida",             country:"USA",         cc:"US", lat:26.5253,lng:-80.0664},
 ];
 
 let breweries=[
@@ -188,6 +190,7 @@ let breweries=[
   {name:"Brasserie Almaza",          location:"Beirut, Beirut Governorate",country:"Lebanon",     cc:"LB", lang:"ar", beers:"Almaza Pilsener",                                          lat:33.8938,lng:35.5018,  ratings:[2.75], nativeName:"ألمازة"},
   {name:"Olympic Brewery",           location:"Sindos, Central Macedonia", country:"Greece",      cc:"GR", lang:"el", beers:"Mythos",                                                   lat:40.6736,lng:22.8064,  ratings:[3.25]},
   {name:"Stone Brewing",             location:"Escondido, California",     country:"USA",         cc:"US", lang:"en", beers:"Stone IPA",                                                 lat:33.1192,lng:-117.0864,ratings:[2.50]},
+  {name:"Mahou (Grupo Mahou-San Miguel)", location:"Madrid, Madrid",      country:"Spain",       cc:"ES", lang:"es", beers:"Mahou Cinco Estrellas",                                     lat:40.4168,lng:-3.7038,  ratings:[3.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -237,6 +240,7 @@ const BRAND_DOMAINS = {
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
+"Mahou Cinco Estrellas":"mahou.es",
 "Medalla Light":"medallalight.com",
 "Menabrea":"birramenabrea.com",
 "Michelob Ultra":"michelobultra.com",
