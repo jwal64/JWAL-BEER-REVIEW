@@ -835,25 +835,31 @@ BOTTOM NAV — mobile thumb-reach (hidden on desktop)
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   background: transparent;
   border: none;
-  border-top: 2px solid transparent;
   color: var(--dim);
   font-family: var(--mono);
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.6px;
   cursor: pointer;
-  padding: 6px 2px;
-  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  padding: 5px 2px;
+  transition: color var(--transition-fast);
 }
-.bn-item .bn-icon { font-size: 16px; line-height: 1; }
-.bn-item.active {
-  color: var(--accent);
-  border-top-color: var(--accent);
-  background: rgba(45,212,191,0.07);
+.bn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 27px;
+  border-radius: 999px;
+  transition: background var(--transition-fast);
 }
+.bn-icon svg { width: 20px; height: 20px; display: block; }
+.bn-item.active { color: var(--accent); }
+.bn-item.active .bn-icon { background: var(--accent-glow); }
+.bn-item:active .bn-icon { background: rgba(255,255,255,0.06); }
 
 /* ═══════════════════════════════════════════
 STATUS BAR
@@ -906,7 +912,8 @@ z-index: 100;
   z-index: 120;
 }
 .bn-item { font-size: 10px; }
-.bn-item .bn-icon { font-size: 18px; }
+.bn-icon { width: 56px; height: 30px; }
+.bn-icon svg { width: 22px; height: 22px; }
 
 /* Header is the top identity now that the menu strip is gone — keep it pinned */
 #hdr { position: sticky; top: 0; z-index: 50; }
