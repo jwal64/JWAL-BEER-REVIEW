@@ -374,7 +374,7 @@ function cardLogo(name){
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#f5a83c','#4dc3ff','#2fd66f','#c77dff','#ffdd00','#ff4d5e','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
+const MONTH_COLORS = ['#2dd4bf','#4dc3ff','#2fd66f','#c77dff','#ffdd00','#ff4d5e','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
 
 function getMonthlyData(){
   // Single pass: group beers by year+month so the same month name in different
@@ -432,7 +432,7 @@ function computeStats(){
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#f5a83c","Dutch":"#4dc3ff","English":"#2fd66f","French":"#c77dff","Japanese":"#ff4d5e","Spanish":"#ffd166","Danish":"#66718c","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749","Arabic":"#ce1126"};
+const LANG_COLORS={"German":"#2dd4bf","Dutch":"#4dc3ff","English":"#2fd66f","French":"#c77dff","Japanese":"#ff4d5e","Spanish":"#ffd166","Danish":"#66718c","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749","Arabic":"#ce1126"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
@@ -837,7 +837,7 @@ function resizeChartsIn(el){
     if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
   }
 }
-const TT={backgroundColor:'#0c111d',borderColor:'#f5a83c',borderWidth:1,titleColor:'#3fd6c9',bodyColor:'#a4aec6',padding:8};
+const TT={backgroundColor:'#0c111d',borderColor:'#2dd4bf',borderWidth:1,titleColor:'#4dc3ff',bodyColor:'#a4aec6',padding:8};
 
 // ══════════════════════════════════════════════════════════════
 // OVERVIEW
@@ -931,17 +931,17 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
 
 // ── Charts (everything below needs Chart.js) ──
 safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
-  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#f5a83c'),borderWidth:0}]},
-  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#f5a83c',font:{size:9}}}}}
+  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#2dd4bf'),borderWidth:0}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:9}}}}}
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#f5a83c','#4dc3ff','#c77dff','#66718c'],borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},x:{grid:{display:false},ticks:{color:'#f5a83c'}}}}
+  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#2dd4bf','#4dc3ff','#c77dff','#66718c'],borderWidth:0}]},
+  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
 });
 
 safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
-  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#f5a83c'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
+  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#2dd4bf'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
     scales:{x:{title:{display:true,text:'ABV (%)',color:'#4b5671'},min:3.5,max:10,grid:{color:'#182136'},ticks:{color:'#4b5671'}},
             y:{title:{display:true,text:'RATING',color:'#4b5671'},min:1.5,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}}}}
@@ -960,7 +960,7 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
     options:{plugins:{legend:{display:false},tooltip:TT},
       scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:5}},
               y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffd166'}},
-              x:{grid:{display:false},ticks:{color:'#f5a83c'}}}}
+              x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
   });
 }
 
@@ -999,7 +999,7 @@ function renderTable(data){
     document.getElementById('beerBody').innerHTML=data.map(b=>`
       <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
         <td>${logoImg(b.beer,24)}</td>
-        <td style="color:#f5a83c;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
+        <td style="color:#2dd4bf;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
         <td style="color:#66718c;font-size:9px">${b.style}</td>
         <td>${FLAGS[b.origin]||''} ${b.origin}</td>
         <td style="color:#4dc3ff">${b.abv.toFixed(1)}%</td>
@@ -1120,7 +1120,7 @@ function openBeerModal(name){
     <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #182136;margin-bottom:12px;flex-wrap:wrap">
       <div style="width:120px;height:60px;background:#05070d;border:1px solid #26304a;display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0">${cardLogo(name)}</div>
       <div style="flex:1;min-width:160px">
-        <div style="font-size:15px;font-weight:700;color:#f5a83c;margin-bottom:4px">${name}</div>
+        <div style="font-size:15px;font-weight:700;color:#2dd4bf;margin-bottom:4px">${name}</div>
         <div style="font-size:10px;color:#66718c;margin-bottom:2px">${b0.style}</div>
         <div style="font-size:10px;color:#a4aec6">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin} · ${b0.abv}% ABV</div>
       </div>
@@ -1131,7 +1131,7 @@ function openBeerModal(name){
         <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#4dc3ff">${reviews.length}</div><div style="font-size:8px;color:#66718c;letter-spacing:1px">REVIEWS</div></div>
       </div>
     </div>
-    <div style="font-size:9px;color:#f5a83c;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
+    <div style="font-size:9px;color:#2dd4bf;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
     <table class="bb-table" style="min-width:unset">
       <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
       <tbody>${reviews.map((b,i)=>`
@@ -1178,7 +1178,7 @@ function drawCountry(){
   const cD=STATS.countryRanked;
   safeChart('countryChart',document.getElementById('countryChart'),{type:'bar',
     data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#f5a83c',font:{size:10}}}}}
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
   });
   document.getElementById('countryCards').innerHTML=cD.map(d=>`
     <div class="bb-bar-row">
@@ -1195,11 +1195,11 @@ function drawCity(){
   const cD=STATS.cityRanked;
   safeChart('cityChart',document.getElementById('cityChart'),{type:'bar',
     data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#f5a83c',font:{size:10}}}}}
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
   });
   document.getElementById('cityCards').innerHTML=cD.map(d=>`
     <div class="mini-row">
-      <div><div style="font-size:10px;color:#f5a83c;font-weight:600">${d.city}</div><div style="font-size:8px;color:#66718c">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
+      <div><div style="font-size:10px;color:#2dd4bf;font-weight:600">${d.city}</div><div style="font-size:8px;color:#66718c">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
 }
@@ -1261,10 +1261,10 @@ function drawInsights(){
   });
   const pv=k=>profAcc[k].c?profAcc[k].t/profAcc[k].c:0;
   const profile=[
-    {l:'WHEAT BEER BIAS',v:pv('wheat'),color:'#f5a83c'},
+    {l:'WHEAT BEER BIAS',v:pv('wheat'),color:'#2dd4bf'},
     {l:'DARK BEER TOLERANCE',v:pv('dark'),color:'#4b5671'},
     {l:'LAGER APPRECIATION',v:pv('lager'),color:'#2fd66f'},
-    {l:'GERMAN BEER PREMIUM',v:pv('de'),color:'#f5a83c'},
+    {l:'GERMAN BEER PREMIUM',v:pv('de'),color:'#2dd4bf'},
     {l:'AMERICAN BEER DISCOUNT',v:pv('us'),color:'#ff4d5e'},
     {l:'ARTISAN vs MACRO',v:pv('artisan'),color:'#c77dff'},
     {l:'HIGH ABV PREFERENCE',v:pv('highAbv'),color:'#4dc3ff'},
@@ -1289,8 +1289,8 @@ function drawLanguage(){
     lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
     const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
     safeChart('langChart',document.getElementById('langChart'),{type:'bar',
-      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#f5a83c'),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#f5a83c',font:{size:10}}}}}
+      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#2dd4bf'),borderWidth:0}]},
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
     });
   } catch(e){ console.error('Language init error:',e); }
 }
@@ -1401,9 +1401,9 @@ function keyHtml(mode,journeys){
   const head=`<div class="mk-head">WHAT YOU’RE LOOKING AT</div>`;
   if(mode==='drank'){
     return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#f5a83c"></span>a city where I’ve reviewed a beer</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf"></span>a city where I’ve reviewed a beer</div>
       <div class="mk-row"><span class="mk-scale"><i style="width:8px;height:8px"></i><i style="width:12px;height:12px"></i><i style="width:16px;height:16px"></i></span>bigger dot = more pours there</div>
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#f5a83c;box-shadow:0 0 0 2px #ffd166"></span>gold ring = my home turf (NY)</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf;box-shadow:0 0 0 2px #ffd166"></span>gold ring = my home turf (NY)</div>
       <div class="mk-tap">CLICK ANY DOT TO SEE WHAT I HAD THERE</div>`;
   }
   if(mode==='brewed'){
@@ -1430,10 +1430,10 @@ function buildDrankLayer(map){
     const home=HOME_CITIES.has(l.city);
     const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #182136"><span style="color:#a4aec6">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
     const html=popKicker('📍 A CITY WHERE I DRANK')+
-      `<span style="color:#f5a83c;font-weight:700;font-size:12px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:#ffd166">⌂ HOME TURF</span>':''}<br>`+
+      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:#ffd166">⌂ HOME TURF</span>':''}<br>`+
       `<span style="color:#7d88a3;font-size:10px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
       `<div style="margin-top:6px">${rows}</div>`;
-    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#f5a83c',color:home?'#ffd166':'#000',weight:home?2:1,opacity:.9,fillOpacity:.8})
+    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#2dd4bf',color:home?'#ffd166':'#000',weight:home?2:1,opacity:.9,fillOpacity:.8})
       .bindTooltip(`${l.city} · ${d.c} pour${d.c>1?'s':''}`,{direction:'top',className:'mtip'})
       .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
     bounds.push([l.lat,l.lng]);
@@ -1451,7 +1451,7 @@ function buildBrewedLayer(map){
     const logoHtml=srcs.length?`<img src="${srcs[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${onerr}>`:'';
     const beerList=b.beers.split(' · ').map(n=>`<span style="color:#a4aec6">${n}</span>`).join('<span style="color:#4b5671"> · </span>');
     const html=popKicker('🏭 A BREWERY’S HOMETOWN')+logoHtml+
-      `<span style="color:#f5a83c;font-weight:700;font-size:12px">${b.name}</span><br>`+
+      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${b.name}</span><br>`+
       `<span style="color:#7d88a3;font-size:10px">brews in ${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br>`+
       `<span style="color:#5d6883;font-size:9px">WHAT I’VE HAD:</span> <span style="font-size:10px">${beerList}</span><br>`+
       `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:#5d6883">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
@@ -1468,7 +1468,7 @@ function buildJourneyLayer(map,journeys){
   journeys.forEach(j=>{
     const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
     const html=popKicker('✈ ONE BEER’S TRIP TO MY GLASS')+
-      `<span style="color:#f5a83c;font-weight:700;font-size:12px">${j.beer}</span><br>`+
+      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${j.beer}</span><br>`+
       `<span style="color:#a4aec6">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:#66718c">→</span> <span style="color:#a4aec6">${j.loc.city} ${FLAGS[j.loc.cc]||''}</span><br>`+
       `<span style="color:#7d88a3;font-size:10px">traveled ~<b style="color:#ffd166">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
     L.polyline(pts,{color:rC(a),weight:1.6,opacity:.65})
@@ -1477,7 +1477,7 @@ function buildJourneyLayer(map,journeys){
     // endpoints: hollow ring = brewery, solid dot = where I drank it
     const p0=pts[0],p1=pts[pts.length-1];
     L.circleMarker(p0,{radius:3.5,fillColor:'#070a12',color:'#b3bdd3',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
-    L.circleMarker(p1,{radius:3.5,fillColor:'#f5a83c',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
+    L.circleMarker(p1,{radius:3.5,fillColor:'#2dd4bf',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
     bounds.push(p0,p1);
   });
   return {group,bounds};
@@ -1487,7 +1487,7 @@ function renderDrankTable(){
   const cM=drankCityData();
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
-    <td style="color:#f5a83c">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:#ffd166;font-size:8px">⌂ HOME</span>':''}</td>
+    <td style="color:#2dd4bf">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:#ffd166;font-size:8px">⌂ HOME</span>':''}</td>
     <td style="color:#66718c">${c.region}</td>
     <td style="color:#a4aec6">${FLAGS[c.cc]||''} ${c.country}</td>
     <td style="text-align:center;color:#4dc3ff">${c.count}</td>
@@ -1525,7 +1525,7 @@ function renderJourneyTable(journeys){
     const a=avg(j.ratings);
     return `<tr data-beer="${j.beer.replace(/"/g,'&quot;')}" style="cursor:pointer">
       <td style="color:#66718c">${i+1}</td>
-      <td style="color:#f5a83c;font-weight:600">${j.beer}</td>
+      <td style="color:#2dd4bf;font-weight:600">${j.beer}</td>
       <td style="color:#a4aec6">${FLAGS[j.br.cc]||''} ${j.br.location}</td>
       <td style="color:#a4aec6">${FLAGS[j.loc.cc]||''} ${j.loc.city}</td>
       <td style="text-align:right;color:#4dc3ff">${fmtMi(j.miles)}</td>
@@ -1628,7 +1628,7 @@ function drawTemporal(){
     options:{plugins:{legend:{labels:{color:'#66718c',font:{size:9},boxWidth:10}},tooltip:TT},
       scales:{y:{position:'left',grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1},title:{display:true,text:'REVIEWS',color:'#4b5671'}},
               y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffd166'},title:{display:true,text:'AVG RATING',color:'#ffd166'}},
-              x:{grid:{display:false},ticks:{color:'#f5a83c'}}}}
+              x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
   });
 
   // ── Best & worst by month
@@ -1669,7 +1669,7 @@ function drawTemporal(){
       return {label:m,data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
     })},
     options:{plugins:{legend:{labels:{color:'#66718c',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1}},x:{grid:{display:false},ticks:{color:'#f5a83c'}}}}
+      scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1}},x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
   });
 
   // ── Style-mix doughnut charts — one per month, rendered dynamically
@@ -1685,7 +1685,7 @@ function drawTemporal(){
       byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
       const labels=Object.keys(sm),data=Object.values(sm);
       safeChart(`styleChart_${i}`,document.getElementById(`styleChart_${i}`),{type:'doughnut',
-        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#f5a83c'),borderWidth:1,borderColor:'#0c111d'}]},
+        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#2dd4bf'),borderWidth:1,borderColor:'#0c111d'}]},
         options:{plugins:{legend:{position:'right',labels:{color:'#5d6883',font:{size:9},boxWidth:10}},tooltip:TT}}
       });
     });
@@ -1725,7 +1725,7 @@ function drawTemporal(){
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#66718c"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #26304a"><div style="flex:1;background:rgba(255,77,94,0.4)"></div><div style="flex:1;background:rgba(245,168,60,0.35)"></div><div style="flex:1;background:rgba(255,209,102,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(47,214,111,0.4)"></div></div><span>HIGH</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#66718c"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #26304a"><div style="flex:1;background:rgba(255,77,94,0.4)"></div><div style="flex:1;background:rgba(45,212,191,0.35)"></div><div style="flex:1;background:rgba(255,209,102,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(47,214,111,0.4)"></div></div><span>HIGH</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
@@ -1813,7 +1813,7 @@ function drawTemporal(){
               grid: { color: '#182136' },
               title: { display: true, text: 'RANK (1 = BEST)', color: '#56617f' }
             },
-            x: { grid: { display: false }, ticks: { color: '#f5a83c' } }
+            x: { grid: { display: false }, ticks: { color: '#2dd4bf' } }
           }
         }
       });
@@ -1838,7 +1838,7 @@ function drawTemporal(){
     data:{
       labels:tlLabels,
       datasets:[
-        {label:'Rating',data:tlData,borderColor:'#f5a83c',backgroundColor:'rgba(245,168,60,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
+        {label:'Rating',data:tlData,borderColor:'#2dd4bf',backgroundColor:'rgba(45,212,191,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
         {label:'5-Pt Avg',data:tlRoll,borderColor:'#4dc3ff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
@@ -2105,7 +2105,7 @@ function drawIPO(){
     const {label:signal,color:sigColor}=sigOf(target);
     return `<tr style="border-left-color:${sigColor}">
       <td>${logoImg(w.beer,24)}</td>
-      <td style="color:#f5a83c;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
+      <td style="color:#2dd4bf;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
       <td>${FLAGS[w.origin]||''} <span style="color:#7d88a3">${w.origin}</span></td>
       <td style="color:#4dc3ff">${w.abv.toFixed(1)}%</td>
       <td style="color:#c77dff;font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
@@ -2152,7 +2152,7 @@ function drawIPO(){
     const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
     safeChart('ipoUpsideChart',upCanvas,{type:'bar',
       data:{labels:buckets.map(b=>b.lbl),datasets:[{data:counts,backgroundColor:buckets.map(b=>b.color),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:'#182136'},ticks:{color:'#4b5671',precision:0}},y:{grid:{display:false},ticks:{color:'#f5a83c',font:{size:9}}}}}
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:'#182136'},ticks:{color:'#4b5671',precision:0}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:9}}}}}
     });
   } else if(upCanvas){
     const prev=_charts['ipoUpsideChart']; if(prev){prev.destroy();delete _charts['ipoUpsideChart'];}
@@ -2178,7 +2178,7 @@ function drawIPO(){
       const vColor=vsAnalyst>0.3?'#2fd66f':vsAnalyst<-0.3?'#ff4d5e':'#ffd166';
       return `<tr>
         <td>${logoImg(w.beer,24)}</td>
-        <td style="color:#f5a83c;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
+        <td style="color:#2dd4bf;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
         <td>${FLAGS[w.origin]||''} <span style="color:#7d88a3">${w.origin}</span></td>
         <td style="color:#c77dff;font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
         <td style="color:#4dc3ff;font-family:var(--mono)">${target.toFixed(2)}</td>
@@ -2356,7 +2356,7 @@ function openBreweryDrawer(name){
       }
       _drawerMap.setView([brewery.lat,brewery.lng],7);
       _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});
-      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#f5a83c',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
+      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#2dd4bf',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
       _drawerMap.invalidateSize();
     },120);
   } catch(e){ console.error('Brewery drawer error:',e); }
