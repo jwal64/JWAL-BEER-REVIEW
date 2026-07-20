@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba"};
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS INTEGRATION
@@ -96,6 +96,7 @@ let beers=[
   // JUL 2026
   {beer:"Stone IPA",             style:"IPA",                  origin:"US",abv:6.9,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Jul",monthN:7,year:2026},
   {beer:"Mahou Cinco Estrellas", style:"Lager",                origin:"ES",abv:5.5,method:"Bottle",city:"Boynton Beach",region:"Florida",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jul",monthN:7,year:2026},
+  {beer:"Hatuey Lager",          style:"Lager",                origin:"CU",abv:5.0,method:"Bottle",city:"Miami",       region:"Florida",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jul",monthN:7,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -132,6 +133,7 @@ let drunkLocs=[
   {city:"San Juan",    region:"San Juan",             country:"Puerto Rico", cc:"PR", lat:18.4655,lng:-66.1057},
   {city:"Washington",  region:"District of Columbia", country:"USA",         cc:"US", lat:38.9072,lng:-77.0369},
   {city:"Boynton Beach",region:"Florida",             country:"USA",         cc:"US", lat:26.5253,lng:-80.0664},
+  {city:"Miami",        region:"Florida",             country:"USA",         cc:"US", lat:25.7617,lng:-80.1918},
 ];
 
 let breweries=[
@@ -191,6 +193,7 @@ let breweries=[
   {name:"Olympic Brewery",           location:"Sindos, Central Macedonia", country:"Greece",      cc:"GR", lang:"el", beers:"Mythos",                                                   lat:40.6736,lng:22.8064,  ratings:[3.25]},
   {name:"Stone Brewing",             location:"Escondido, California",     country:"USA",         cc:"US", lang:"en", beers:"Stone IPA",                                                 lat:33.1192,lng:-117.0864,ratings:[2.50]},
   {name:"Mahou (Grupo Mahou-San Miguel)", location:"Madrid, Madrid",      country:"Spain",       cc:"ES", lang:"es", beers:"Mahou Cinco Estrellas",                                     lat:40.4168,lng:-3.7038,  ratings:[3.50]},
+  {name:"Cervecería Hatuey (Bacardí)", location:"Santiago de Cuba, Santiago de Cuba", country:"Cuba", cc:"CU", lang:"es", beers:"Hatuey Lager",                                       lat:20.0247,lng:-75.8219, ratings:[4.00], nativeName:"Cerveza Hatuey"},
 ];
 
 // ══════════════════════════════════════════════════════════════
