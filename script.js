@@ -935,7 +935,7 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
 // ── Charts (everything below needs Chart.js) ──
 safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
   data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#2dd4bf'),borderWidth:0}]},
-  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:9}}}}}
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:11}}}}}
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',

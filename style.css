@@ -368,6 +368,12 @@ gap: var(--s2);
 .bb-panel-head .ph-right { font-size: 10px; font-weight: 500; color: var(--dim); letter-spacing: 0.5px; }
 .bb-body { padding: var(--s3); }
 
+/* Bounded chart container: gives responsive Chart.js canvases a fixed height
+   to size against, so full-width charts don't balloon to half their width. */
+.chart-box { position: relative; width: 100%; height: 240px; }
+.chart-box-tall { height: 360px; }
+.chart-box > canvas { position: absolute; inset: 0; }
+
 /* Grid layouts */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3); }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3); }
@@ -1207,12 +1213,15 @@ select {
 .ipo-top-pick { flex: 0 0 75vw; }
 
 /* Charts — give them a sensible height on mobile */
-canvas#styleChart, canvas#methodChart, canvas#countryChart,
+canvas#methodChart, canvas#countryChart,
 canvas#langChart, canvas#cityChart, canvas#timelineChart,
 canvas#monthlyChart, canvas#bumpChart,
 canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
   max-height: 260px;
 }
+/* Bounded chart boxes get a shorter, phone-friendly height */
+.chart-box { height: 200px; }
+.chart-box-tall { height: 300px; }
 }
 
 /* iPhone Pro / narrow phones — extra polish below 430px */
