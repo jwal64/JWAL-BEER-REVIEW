@@ -1374,7 +1374,8 @@ let _worldMap=null, _mapLayers=null, _mapMode='drank';
 const MAP_MODES={
   drank:{head:'WHERE I DRANK THEM — EVERY CITY WITH A REVIEW',hint:'CLICK A DOT FOR THE POUR LIST'},
   brewed:{head:'WHERE THEY’RE BREWED — EVERY BREWERY’S HOMETOWN',hint:'CLICK A DOT FOR THE BREWERY'},
-  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'}
+  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'},
+  passport:{head:'MY BEER PASSPORT — EVERY COUNTRY, STAMPED',hint:'CLICK A DOT · SCROLL DOWN FOR THE FULL COLLECTION'}
 };
 
 // beer name → brewery record (breweries[].beers is " · "-separated)
@@ -1414,6 +1415,132 @@ function buildJourneys(){
   return [...seen.values()];
 }
 
+// One record per country that's touched EITHER end of the trip: brewed there,
+// drunk there, or both. This is the data behind the PASSPORT view.
+function passportCountries(){
+  const idx=beerBreweryIndex();
+  const rec={};
+  const ensure=cc=>{
+    if(!rec[cc]) rec[cc]={cc,country:CNAMES[cc]||cc,brewed:null,drank:null,firstYear:null,firstMonthN:null,firstMonth:null};
+    return rec[cc];
+  };
+  beers.forEach(b=>{
+    const br=idx[b.beer];
+    const bRec=ensure(b.origin);
+    if(!bRec.brewed) bRec.brewed={count:0,names:new Set()};
+    bRec.brewed.count++;
+    bRec.brewed.names.add(br?br.name:b.beer);
+
+    const dRec=ensure(b.cc);
+    if(!dRec.drank) dRec.drank={count:0,cities:new Set()};
+    dRec.drank.count++;
+    dRec.drank.cities.add(b.city);
+    if(dRec.firstYear==null||b.year<dRec.firstYear||(b.year===dRec.firstYear&&b.monthN<dRec.firstMonthN)){
+      dRec.firstYear=b.year;dRec.firstMonthN=b.monthN;dRec.firstMonth=b.month;
+    }
+  });
+  return Object.values(rec).map(r=>({
+    ...r,
+    brewed:r.brewed?{count:r.brewed.count,names:[...r.brewed.names]}:null,
+    drank:r.drank?{count:r.drank.count,cities:[...r.drank.cities]}:null
+  })).sort((a,b)=>{
+    const bothA=a.brewed&&a.drank?0:1,bothB=b.brewed&&b.drank?0:1;
+    if(bothA!==bothB) return bothA-bothB;
+    return a.country.localeCompare(b.country);
+  });
+}
+
+// FNV-1a-ish hash so every country gets the same "hand-stamped" look every
+// time (ink color, tilt, dash pattern) without needing per-country data entry.
+function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+const STAMP_INKS=['#2dd4bf','#5df08e','#ffd166','#ff8a3d','#ff4d5e','#8b7cf6','#4dc3ff','#ff6ec7'];
+function stampStyle(cc){
+  const h=stampHash(cc);
+  return {
+    ink:STAMP_INKS[h%STAMP_INKS.length],
+    rot:((h>>>4)%17)-8,
+    dash:6+((h>>>8)%9),
+    gap:3+((h>>>12)%5),
+    ribRot:((h>>>16)%9)-4
+  };
+}
+
+// Builds one self-contained SVG "ink stamp" for a country: curved country
+// name over the top, flag centered, a rotated rubber-stamp banner for the
+// role (brewed/drank/both), and a bottom serial code for texture.
+function passportStampSvg(r,sty){
+  const {ink,dash,gap,ribRot}=sty;
+  const cc=r.cc,flag=FLAGS[cc]||'',name=(r.country||cc).toUpperCase();
+  const arcId='pp-arc-'+cc.replace(/[^A-Za-z0-9]/g,'');
+  const role=r.brewed&&r.drank?'BREWED & DRANK':r.brewed?'BREWED HERE':'DRANK HERE';
+  const nameFont=name.length>16?6:name.length>11?7.5:9.5;
+  const nameLS=name.length>11?0.5:1.8;
+  const roleFont=role.length>12?7:8.5;
+  const roleLS=role.length>12?0.4:1.2;
+  const serial=String(1000+(stampHash(cc+name)%9000));
+  const lines=[];
+  if(r.drank) lines.push(`FIRST POUR ${(r.firstMonth||'').toUpperCase()} ${r.firstYear||''}`);
+  if(r.brewed) lines.push(`${r.brewed.names.length} BREWER${r.brewed.names.length===1?'Y':'IES'}`);
+  const metaSvg=lines.map((t,i)=>`<text x="65" y="${100+i*10}" text-anchor="middle" font-size="6.2" letter-spacing="0.4" fill="${ink}" opacity="0.8" font-family="var(--mono,monospace)">${t}</text>`).join('');
+  return `<svg viewBox="0 0 130 130" width="118" height="118" role="img" aria-label="${name} passport stamp">
+<defs><path id="${arcId}" d="M12,65 A53,53 0 0 1 118,65" fill="none"/></defs>
+<circle cx="65" cy="65" r="58" fill="none" stroke="${ink}" stroke-width="2.2" stroke-dasharray="${dash} ${gap}" opacity="0.85"/>
+<circle cx="65" cy="65" r="48" fill="none" stroke="${ink}" stroke-width="1" opacity="0.5"/>
+<text font-size="${nameFont}" font-weight="700" letter-spacing="${nameLS}" fill="${ink}" opacity="0.92">
+<textPath href="#${arcId}" xlink:href="#${arcId}" startOffset="50%" text-anchor="middle">${name}</textPath>
+</text>
+<text x="65" y="60" text-anchor="middle" font-size="24" opacity="0.9">${flag}</text>
+<g transform="rotate(${ribRot} 65 82)">
+<line x1="26" y1="76" x2="104" y2="76" stroke="${ink}" stroke-width="1" opacity="0.55"/>
+<text x="65" y="86" text-anchor="middle" font-size="${roleFont}" font-weight="700" letter-spacing="${roleLS}" fill="${ink}">${role}</text>
+<line x1="26" y1="92" x2="104" y2="92" stroke="${ink}" stroke-width="1" opacity="0.55"/>
+</g>
+${metaSvg}
+<text x="65" y="120" text-anchor="middle" font-size="5.5" letter-spacing="1" fill="${ink}" opacity="0.5" font-family="var(--mono,monospace)">No. ${serial}</text>
+</svg>`;
+}
+
+function passportStampCard(r){
+  const sty=stampStyle(r.cc);
+  const metaBits=[];
+  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}`);
+  if(r.brewed) metaBits.push(`${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} beer${r.brewed.count>1?'s':''}`);
+  return `<div class="stamp-card" style="--rot:${sty.rot}deg">
+    <div class="stamp-badges">
+      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">🏭</span>':''}
+      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">🍺</span>':''}
+    </div>
+    <div class="stamp-ink">${passportStampSvg(r,sty)}</div>
+    <div class="stamp-cap"><span class="stamp-flag">${FLAGS[r.cc]||''}</span><span class="stamp-name">${r.country||r.cc}</span></div>
+    <div class="stamp-meta">${metaBits.join(' · ')}</div>
+  </div>`;
+}
+
+let _passportFilter='all';
+function passportSummaryHtml(recs){
+  const chip=(v,l)=>`<span class="mh-chip"><b>${v}</b> ${l}</span>`;
+  const brewedN=recs.filter(r=>r.brewed).length,drankN=recs.filter(r=>r.drank).length,bothN=recs.filter(r=>r.brewed&&r.drank).length;
+  return chip(recs.length,'COUNTRIES STAMPED')+chip(brewedN,'BREWED IN')+chip(drankN,'DRUNK IN')+chip(bothN,'BOTH ENDS');
+}
+function passportFiltersHtml(){
+  const opts=[['all','ALL'],['brewed','BREWED'],['drank','DRANK'],['both','BOTH']];
+  return opts.map(([k,l])=>`<button class="pf-btn${_passportFilter===k?' active':''}" data-pf="${k}">${l}</button>`).join('');
+}
+function renderPassportStamps(){
+  const grid=document.getElementById('passportGrid');
+  if(!grid) return;
+  const recs=passportCountries();
+  document.getElementById('passport-summary').innerHTML=passportSummaryHtml(recs);
+  const filtEl=document.getElementById('passport-filters');
+  filtEl.innerHTML=passportFiltersHtml();
+  filtEl.querySelectorAll('.pf-btn').forEach(b=>{b.onclick=()=>{_passportFilter=b.dataset.pf;renderPassportStamps();};});
+  const shown=recs.filter(r=>_passportFilter==='all'
+    ||(_passportFilter==='brewed'&&r.brewed)
+    ||(_passportFilter==='drank'&&r.drank)
+    ||(_passportFilter==='both'&&r.brewed&&r.drank));
+  grid.innerHTML=shown.map(passportStampCard).join('');
+}
+
 function mapHeroHtml(journeys){
   const cM=drankCityData();
   const cityN=Object.keys(cM).length;
@@ -1451,12 +1578,19 @@ function keyHtml(mode,journeys){
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
       <div class="mk-tap">CLICK ANY DOT FOR THE BREWERY’S CARD</div>`;
   }
-  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+  if(mode==='journey'){
+    const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+    return head+`
+      <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
+      <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
+      <div class="mk-row mk-note">all pours added up: <b style="color:#ffd166">${fmtMi(totalMi)} beer-miles</b></div>
+      <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+  }
   return head+`
-    <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
-    <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
-    <div class="mk-row mk-note">all pours added up: <b style="color:#ffd166">${fmtMi(totalMi)} beer-miles</b></div>
-    <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf"></span>drank here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#8b7cf6"></span>brewed here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ffd166"></span>brewed AND drank here</div>
+    <div class="mk-tap">CLICK ANY DOT FOR THE STAMP · SCROLL DOWN FOR THE FULL COLLECTION</div>`;
 }
 
 function buildDrankLayer(map){
@@ -1516,6 +1650,29 @@ function buildJourneyLayer(map,journeys){
     L.circleMarker(p0,{radius:3.5,fillColor:'#070a12',color:'#b3bdd3',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
     L.circleMarker(p1,{radius:3.5,fillColor:'#2dd4bf',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
     bounds.push(p0,p1);
+  });
+  return {group,bounds};
+}
+
+function buildPassportLayer(map){
+  const group=L.layerGroup(),bounds=[];
+  passportCountries().forEach(r=>{
+    const pts=[];
+    breweries.filter(b=>b.cc===r.cc).forEach(b=>pts.push([b.lat,b.lng]));
+    drunkLocs.filter(l=>l.cc===r.cc).forEach(l=>pts.push([l.lat,l.lng]));
+    if(!pts.length) return;
+    const lat=pts.reduce((s,p)=>s+p[0],0)/pts.length,lng=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    const color=r.brewed&&r.drank?'#ffd166':r.brewed?'#8b7cf6':'#2dd4bf';
+    const roleLabel=r.brewed&&r.drank?'BREWED & DRANK HERE':r.brewed?'BREWED HERE':'DRANK HERE';
+    const html=popKicker('🛂 A STAMP IN MY PASSPORT')+
+      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${FLAGS[r.cc]||''} ${r.country}</span><br>`+
+      `<span style="color:#7d88a3;font-size:10px">${roleLabel}</span>`+
+      (r.brewed?`<div style="margin-top:4px;font-size:10px;color:#a4aec6">🏭 ${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} pour${r.brewed.count>1?'s':''}</div>`:'')+
+      (r.drank?`<div style="font-size:10px;color:#a4aec6">🍺 ${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''} · first ${r.firstMonth} ${r.firstYear}</div>`:'');
+    L.circleMarker([lat,lng],{radius:9,fillColor:color,color:'#000',weight:1,opacity:.9,fillOpacity:.85})
+      .bindTooltip(`${FLAGS[r.cc]||''} ${r.country}`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([lat,lng]);
   });
   return {group,bounds};
 }
@@ -1612,12 +1769,14 @@ function initWorldMap(){
     byMode:{
       drank:buildDrankLayer(map),
       brewed:buildBrewedLayer(map),
-      journey:buildJourneyLayer(map,journeys)
+      journey:buildJourneyLayer(map,journeys),
+      passport:buildPassportLayer(map)
     }
   };
   renderDrankTable();
   renderBrewedTable();
   renderJourneyTable(journeys);
+  renderPassportStamps();
   setMapMode(_mapMode);
 }
 
@@ -2243,6 +2402,7 @@ function drawIPO(){
     {id:'maps',label:'MAP · WHERE I DRANK THEM',icon:'🍺',key:'',mode:'drank'},
     {id:'maps',label:'MAP · WHERE THEY\'RE BREWED',icon:'🏭',key:'',mode:'brewed'},
     {id:'maps',label:'MAP · BREWERY → MY GLASS',icon:'✈',key:'',mode:'journey'},
+    {id:'maps',label:'MAP · PASSPORT',icon:'🛂',key:'',mode:'passport'},
     {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
     {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
     {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},

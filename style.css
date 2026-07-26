@@ -804,7 +804,7 @@ MAP — one world map, three self-explanatory views
 .mh-chip b { color: var(--amber); font-size: 11px; margin-right: 3px; }
 
 /* Big view-switcher cards */
-#map-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+#map-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
 .map-mode {
   display: flex; align-items: center; gap: 10px; text-align: left;
   background: var(--panel); border: 1px solid var(--border2);
@@ -876,6 +876,55 @@ MAP — one world map, three self-explanatory views
   font-size: 9px; letter-spacing: 0.5px; color: #7d88a3;
   padding: 6px 2px 10px;
 }
+
+/* PASSPORT — a grid of unique, per-country "ink stamp" cards */
+#passport-summary { margin: 2px 0 10px; }
+.passport-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.pf-btn {
+  background: var(--panel); color: var(--dim);
+  border: 1px solid var(--border2); border-radius: 999px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1.2px;
+  padding: 5px 12px; cursor: pointer; transition: border-color .12s, color .12s, background .12s;
+}
+.pf-btn:hover { border-color: var(--accent3); color: var(--accent2); }
+.pf-btn.active { background: rgba(45,212,191,0.12); border-color: var(--accent); color: var(--accent); }
+
+.passport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px 12px;
+}
+.stamp-card {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 6px 8px;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform .18s ease;
+}
+.stamp-card:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+.stamp-badges {
+  position: absolute; top: 2px; right: 4px;
+  display: flex; gap: 3px;
+}
+.stamp-badge {
+  font-size: 11px; line-height: 1;
+  background: var(--panel2); border: 1px solid var(--border2);
+  border-radius: 50%; width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.stamp-ink { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45)); }
+.stamp-ink svg { display: block; mix-blend-mode: normal; }
+.stamp-cap {
+  display: flex; align-items: center; gap: 5px; margin-top: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--white);
+  text-align: center;
+}
+.stamp-flag { font-size: 13px; }
+.stamp-meta {
+  font-size: 8px; letter-spacing: 0.4px; color: var(--dim);
+  margin-top: 2px; text-align: center;
+}
+@media (hover: none) { .stamp-card:hover { transform: rotate(var(--rot, 0deg)); } }
 
 /* Subtab strip — used inside a panel to switch between sibling sub-views */
 .subtabs { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 1px solid var(--border2); }
@@ -1298,6 +1347,7 @@ body { overscroll-behavior: none; }
 }
 #map-modes { grid-template-columns: 1fr; }
 .map-mode { min-height: 44px; }
+.passport-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px 8px; }
 
 /* FORM CONTROLS — 16px font-size to prevent iOS zoom-on-focus */
 .bb-select,
@@ -1393,6 +1443,7 @@ select {
 .g4, .g5 { grid-template-columns: 1fr 1fr; }
 .g6 { grid-template-columns: repeat(3, 1fr); }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
+#map-modes { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ═══════════════════════════════════════════
