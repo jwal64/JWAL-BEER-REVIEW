@@ -1493,22 +1493,28 @@ function perforatedEdge(x0,y0,x1,y1,bg,step,r){
 // Builds one self-contained SVG "postage stamp" for a country: a straight
 // perforated-edge rectangle around that country's flag, its 3-letter code,
 // and a "face value" line showing my average rating there (or brewery count).
+// Purely typographic — no art, no emoji. Modeled on a real stamp's
+// denomination: the country code up top, a big face-value number in a
+// value box (my average rating there, or brewery count if never drunk
+// there), and a small label underneath.
 function passportStampSvg(r,sty){
   const {ink}=sty;
   const cc=r.cc,code=code3(cc);
   const name=(r.country||cc);
   const bg='#0a0f1a';
-  const flag=FLAGS[cc]||'';
-  const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} BREWER${r.brewed.names.length===1?'Y':'IES'}`:'');
+  const big=r.drank?r.drank.avg.toFixed(2):String(r.brewed.names.length);
+  const label=r.drank?'AVG RATING':`BREWER${r.brewed.names.length===1?'':'IES'}`;
   return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
 <g fill="currentColor" stroke="currentColor" style="color:${ink}">
 <rect x="8" y="8" width="104" height="134" fill="none" stroke-width="2"/>
 <rect x="16" y="16" width="88" height="118" fill="none" stroke-width="1" opacity="0.45"/>
 ${perforatedEdge(8,8,112,142,bg,10.4,4)}
-<text x="60" y="80" text-anchor="middle" font-size="56" dominant-baseline="middle">${flag}</text>
-<line x1="20" y1="112" x2="100" y2="112" stroke-width="1" opacity="0.5"/>
-<text x="60" y="126" text-anchor="middle" font-size="13" font-weight="700" letter-spacing="2.5">${code}</text>
-<text x="60" y="136" text-anchor="middle" font-size="7" letter-spacing="0.6" opacity="0.75">${valueText}</text>
+<text x="60" y="38" text-anchor="middle" font-size="14" font-weight="700" letter-spacing="3">${code}</text>
+<line x1="26" y1="46" x2="94" y2="46" stroke-width="1" opacity="0.5"/>
+<rect x="28" y="54" width="64" height="46" fill="none" stroke-width="1" opacity="0.35"/>
+<text x="60" y="86" text-anchor="middle" font-size="28" font-weight="700">${big}</text>
+<line x1="26" y1="106" x2="94" y2="106" stroke-width="1" opacity="0.5"/>
+<text x="60" y="120" text-anchor="middle" font-size="8" letter-spacing="1.2" opacity="0.8">${label}</text>
 </g>
 </svg>`;
 }
@@ -1520,11 +1526,11 @@ function passportStampCard(r){
   if(r.brewed) metaBits.push(`${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} beer${r.brewed.count>1?'s':''}`);
   return `<div class="stamp-card" style="--rot:${sty.rot}deg">
     <div class="stamp-badges">
-      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">🏭</span>':''}
-      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">🍺</span>':''}
+      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">BREW</span>':''}
+      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">DRANK</span>':''}
     </div>
     <div class="stamp-ink">${passportStampSvg(r,sty)}</div>
-    <div class="stamp-cap"><span class="stamp-flag">${FLAGS[r.cc]||''}</span><span class="stamp-name">${r.country||r.cc}</span></div>
+    <div class="stamp-cap"><span class="stamp-name">${r.country||r.cc}</span></div>
     <div class="stamp-meta">${metaBits.join(' · ')}</div>
   </div>`;
 }
