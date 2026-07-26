@@ -1169,6 +1169,7 @@ function openBeerModal(name){
       </div>
     </div>
     <div style="font-size:9px;color:#2dd4bf;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
+    <div class="table-wrap">
     <table class="bb-table" style="min-width:unset">
       <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
       <tbody>${reviews.map((b,i)=>`
@@ -1182,7 +1183,8 @@ function openBeerModal(name){
           <td style="color:#66718c;font-size:9px">${b.month} ${b.year}</td>
         </tr>`).join('')}
       </tbody>
-    </table>`;
+    </table>
+    </div>`;
   _modalPrevFocus=document.activeElement;
   const bm=document.getElementById('beerModal');
   bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
