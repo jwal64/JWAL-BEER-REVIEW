@@ -991,10 +991,10 @@ HOME HERO — plain-language summary line
   margin-bottom: 10px;
 }
 .ov-hero-stats {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: baseline;
-  gap: 6px 18px;
+  gap: 8px 18px;
   font-family: var(--mono);
   font-size: 13px;
   color: #bbb;
@@ -1002,6 +1002,7 @@ HOME HERO — plain-language summary line
 }
 .ov-hero-stats b { color: var(--white); font-size: 16px; font-weight: 700; }
 .ov-hero-stats span { white-space: nowrap; }
+.ov-hero-stats span:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .ov-hero-sub {
   margin-top: 7px;
   font-family: var(--sans);
