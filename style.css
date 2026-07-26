@@ -891,8 +891,8 @@ MAP — one world map, three self-explanatory views
 
 .passport-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px 12px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px 12px;
 }
 .stamp-card {
   position: relative;
@@ -912,8 +912,8 @@ MAP — one world map, three self-explanatory views
   border-radius: 50%; width: 20px; height: 20px;
   display: flex; align-items: center; justify-content: center;
 }
-.stamp-ink { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45)); }
-.stamp-ink svg { display: block; mix-blend-mode: normal; }
+.stamp-ink { width: 100%; max-width: 150px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45)); }
+.stamp-ink svg { display: block; width: 100%; height: auto; mix-blend-mode: normal; }
 .stamp-cap {
   display: flex; align-items: center; gap: 5px; margin-top: 4px;
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--white);

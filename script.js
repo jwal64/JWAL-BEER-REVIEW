@@ -1460,52 +1460,339 @@ function stampStyle(cc){
   const h=stampHash(cc);
   return {
     ink:STAMP_INKS[h%STAMP_INKS.length],
-    rot:((h>>>4)%17)-8,
-    dash:6+((h>>>8)%9),
-    gap:3+((h>>>12)%5),
-    ribRot:((h>>>16)%9)-4
+    rot:((h>>>4)%13)-6,
+    dash:5+((h>>>8)%7),
+    gap:3+((h>>>12)%4)
   };
 }
 
-// Builds one self-contained SVG "ink stamp" for a country: curved country
-// name over the top, flag centered, a rotated rubber-stamp banner for the
-// role (brewed/drank/both), and a bottom serial code for texture.
+// Official-ish 3-letter codes for the passport label band. Constituent UK
+// countries have no ISO-3166 alpha-3 of their own, so the common
+// sporting/travel abbreviations (ENG/SCO/WAL/NIR) are used instead.
+const CODE3={
+  BE:'BEL',NL:'NLD',CA:'CAN',US:'USA',DE:'DEU',JP:'JPN',CZ:'CZE',IT:'ITA',ES:'ESP',
+  PT:'PRT',PR:'PRI',AT:'AUT',CU:'CUB',DK:'DNK',FR:'FRA',GR:'GRC',IE:'IRL',JM:'JAM',
+  LB:'LBN',MX:'MEX',PL:'POL','GB-ENG':'ENG','GB-SCT':'SCO','GB-WLS':'WAL','GB-NIR':'NIR',
+  GB:'GBR',BR:'BRA',CN:'CHN',ZA:'ZAF',AU:'AUS',SE:'SWE',AR:'ARG',NO:'NOR',TH:'THA',SG:'SGP'
+};
+function code3(cc){ return CODE3[cc]||cc.replace('GB-','').slice(0,3).toUpperCase(); }
+
+// One hand-drawn line-art icon per country's most recognizable landmark,
+// rendered inside a 0-120×0-150 stamp frame (icon area ≈ x14-106, y16-108).
+// Each fn(dots,bg) gets a halftone-dot fill url() for texture and the card's
+// backdrop color for "cutout" details (windows, hubs) — everything else
+// inherits currentColor (the stamp's ink) from the wrapping <g>.
+const COUNTRY_ART={
+  // Belgium — the Atomium
+  BE:(dots,bg)=>`
+    <line x1="60" y1="62" x2="60" y2="26" stroke-width="2.4"/>
+    <line x1="60" y1="62" x2="34" y2="44" stroke-width="2.4"/>
+    <line x1="60" y1="62" x2="86" y2="44" stroke-width="2.4"/>
+    <line x1="60" y1="62" x2="34" y2="90" stroke-width="2.4"/>
+    <line x1="60" y1="62" x2="86" y2="90" stroke-width="2.4"/>
+    <line x1="34" y1="44" x2="86" y2="44" stroke-width="2.4"/>
+    <line x1="34" y1="90" x2="86" y2="90" stroke-width="2.4"/>
+    <line x1="34" y1="44" x2="34" y2="90" stroke-width="2.4"/>
+    <line x1="86" y1="44" x2="86" y2="90" stroke-width="2.4"/>
+    <line x1="20" y1="104" x2="100" y2="104" stroke-width="2"/>
+    <circle cx="34" cy="44" r="6" fill="${dots}" stroke-width="1.4"/>
+    <circle cx="86" cy="44" r="6" fill="${dots}" stroke-width="1.4"/>
+    <circle cx="34" cy="90" r="6" fill="${dots}" stroke-width="1.4"/>
+    <circle cx="86" cy="90" r="6" fill="${dots}" stroke-width="1.4"/>
+    <circle cx="60" cy="26" r="6" fill="${dots}" stroke-width="1.4"/>
+    <circle cx="60" cy="62" r="9" stroke-width="1.4"/>`,
+  // Netherlands — canal houses on a bridge
+  NL:(dots,bg)=>`
+    <polygon points="20,58 33,40 46,58 46,104 20,104" />
+    <polygon points="46,46 46,36 52,36 52,28 60,22 68,28 68,36 74,36 74,46 74,104 46,104" fill="${dots}"/>
+    <path d="M74,64 Q83,44 94,64 L94,104 L74,104 Z"/>
+    <rect x="26" y="66" width="7" height="7" fill="${bg}"/>
+    <rect x="26" y="80" width="7" height="7" fill="${bg}"/>
+    <rect x="53" y="52" width="7" height="7" fill="${bg}"/>
+    <rect x="63" y="52" width="7" height="7" fill="${bg}"/>
+    <rect x="53" y="66" width="7" height="7" fill="${bg}"/>
+    <rect x="63" y="66" width="7" height="7" fill="${bg}"/>
+    <rect x="80" y="76" width="7" height="7" fill="${bg}"/>
+    <path d="M14,104 Q60,118 106,104" fill="none" stroke-width="2"/>`,
+  // Canada — maple leaf
+  CA:(dots,bg)=>`
+    <path d="M60,16 L66,36 L84,28 L76,48 L96,52 L78,63 L90,80 L68,73 L65,92 L60,80 L55,92 L52,73 L30,80 L42,63 L24,52 L44,48 L36,28 L54,36 Z"/>
+    <line x1="60" y1="60" x2="60" y2="24" stroke="${bg}" stroke-width="1" opacity="0.8"/>
+    <line x1="60" y1="60" x2="82" y2="30" stroke="${bg}" stroke-width="1" opacity="0.8"/>
+    <line x1="60" y1="60" x2="38" y2="30" stroke="${bg}" stroke-width="1" opacity="0.8"/>
+    <rect x="57" y="80" width="6" height="20" />`,
+  // USA — Statue of Liberty
+  US:(dots,bg)=>`
+    <rect x="42" y="92" width="36" height="12"/>
+    <path d="M50,50 C46,65 44,80 46,92 L74,92 C76,80 74,65 70,50 Z"/>
+    <circle cx="60" cy="40" r="8"/>
+    <polygon points="52,36 50,25 55,36"/>
+    <polygon points="58,34 60,20 62,34"/>
+    <polygon points="65,36 70,25 68,36"/>
+    <line x1="70" y1="47" x2="87" y2="26" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="88" cy="21" r="4" fill="${dots}"/>`,
+  // Germany — Brandenburg Gate
+  DE:(dots,bg)=>`
+    <rect x="16" y="96" width="88" height="6"/>
+    <rect x="16" y="42" width="88" height="6"/>
+    <polygon points="38,42 60,20 82,42" fill="${dots}"/>
+    <rect x="52" y="14" width="16" height="6"/>
+    <line x1="46" y1="20" x2="54" y2="14" stroke-width="2"/>
+    <line x1="74" y1="20" x2="66" y2="14" stroke-width="2"/>
+    <rect x="21" y="48" width="5" height="48"/>
+    <rect x="33" y="48" width="5" height="48"/>
+    <rect x="47" y="48" width="5" height="48"/>
+    <rect x="61" y="48" width="5" height="48"/>
+    <rect x="75" y="48" width="5" height="48"/>
+    <rect x="89" y="48" width="5" height="48"/>`,
+  // Japan — Fuji + torii
+  JP:(dots,bg)=>`
+    <polygon points="18,80 60,34 102,80" opacity="0.85"/>
+    <polygon points="48,54 60,38 72,54" fill="${dots}"/>
+    <rect x="30" y="84" width="6" height="24"/>
+    <rect x="84" y="84" width="6" height="24"/>
+    <path d="M22,86 L98,86 L102,80 L92,80 L92,84 L28,84 L28,80 L18,80 Z"/>
+    <rect x="32" y="96" width="56" height="4"/>`,
+  // Czech Republic — castle towers and bridge
+  CZ:(dots,bg)=>`
+    <rect x="16" y="98" width="88" height="8" fill="${dots}"/>
+    <rect x="24" y="46" width="16" height="52"/>
+    <polygon points="24,46 32,22 40,46"/>
+    <rect x="80" y="46" width="16" height="52"/>
+    <polygon points="80,46 88,22 96,46"/>
+    <rect x="44" y="66" width="32" height="34"/>
+    <path d="M54,98 L54,88 A6,6 0 0 1 66,88 L66,98 Z" fill="${bg}"/>
+    <rect x="29" y="56" width="6" height="8" fill="${bg}"/>
+    <rect x="85" y="56" width="6" height="8" fill="${bg}"/>`,
+  // Italy — the Colosseum
+  IT:(dots,bg)=>`
+    <ellipse cx="60" cy="78" rx="46" ry="26"/>
+    <ellipse cx="60" cy="78" rx="37" ry="19" fill="${bg}"/>
+    <rect x="27" y="56" width="6" height="10" fill="${bg}"/>
+    <rect x="40" y="52" width="6" height="10" fill="${bg}"/>
+    <rect x="54" y="50" width="6" height="10" fill="${bg}"/>
+    <rect x="68" y="52" width="6" height="10" fill="${bg}"/>
+    <rect x="81" y="56" width="6" height="10" fill="${bg}"/>
+    <rect x="16" y="100" width="88" height="4" fill="${dots}"/>`,
+  // Spain — Sagrada Familia spires
+  ES:(dots,bg)=>`
+    <polygon points="34,102 46,102 42,56 38,56"/>
+    <circle cx="40" cy="52" r="3" fill="${dots}"/>
+    <polygon points="50,102 66,102 61,30 55,30"/>
+    <circle cx="58" cy="26" r="4" fill="${dots}"/>
+    <polygon points="70,102 84,102 80,62 74,62"/>
+    <circle cx="77" cy="58" r="3" fill="${dots}"/>`,
+  // Portugal — the Belém Tower
+  PT:(dots,bg)=>`
+    <rect x="44" y="52" width="24" height="48" fill="${dots}"/>
+    <path d="M44,52 Q56,32 68,52 Z"/>
+    <circle cx="56" cy="30" r="2.2"/>
+    <rect x="34" y="64" width="10" height="32"/>
+    <path d="M34,64 Q39,50 44,64 Z"/>
+    <rect x="70" y="64" width="10" height="32"/>
+    <path d="M70,64 Q75,50 80,64 Z"/>
+    <rect x="50" y="60" width="6" height="10" fill="${bg}"/>
+    <rect x="50" y="78" width="6" height="10" fill="${bg}"/>
+    <rect x="30" y="96" width="54" height="8"/>
+    <rect x="32" y="92" width="6" height="5"/>
+    <rect x="44" y="92" width="6" height="5"/>
+    <rect x="56" y="92" width="6" height="5"/>
+    <rect x="68" y="92" width="6" height="5"/>
+    <path d="M12,106 q10,-6 20,0 q10,6 20,0 q10,-6 20,0 q10,6 20,0 q10,-6 20,0" fill="none" stroke-width="1.6"/>`,
+  // Puerto Rico — El Morro
+  PR:(dots,bg)=>`
+    <rect x="18" y="70" width="70" height="34" fill="${dots}"/>
+    <rect x="20" y="64" width="8" height="6"/>
+    <rect x="34" y="64" width="8" height="6"/>
+    <rect x="48" y="64" width="8" height="6"/>
+    <rect x="62" y="64" width="8" height="6"/>
+    <rect x="76" y="64" width="8" height="6"/>
+    <rect x="88" y="58" width="14" height="30"/>
+    <polygon points="88,58 95,44 102,58"/>
+    <circle cx="95" cy="42" r="2"/>
+    <path d="M12,100 q6,-4 12,0 q6,4 12,0" fill="none" stroke-width="1.5"/>
+    <path d="M84,100 q6,-4 12,0 q6,4 12,0" fill="none" stroke-width="1.5"/>`,
+  // Austria — the Riesenrad
+  AT:(dots,bg)=>`
+    <circle cx="60" cy="58" r="34" fill="none" stroke-width="3"/>
+    <line x1="26" y1="58" x2="94" y2="58" stroke-width="1.2"/>
+    <line x1="60" y1="24" x2="60" y2="92" stroke-width="1.2"/>
+    <line x1="36" y1="34" x2="84" y2="82" stroke-width="1.2"/>
+    <line x1="36" y1="82" x2="84" y2="34" stroke-width="1.2"/>
+    <circle cx="60" cy="58" r="4"/>
+    <rect x="90" y="55" width="7" height="7"/>
+    <rect x="73" y="83" width="7" height="7"/>
+    <rect x="40" y="83" width="7" height="7"/>
+    <rect x="23" y="55" width="7" height="7"/>
+    <rect x="40" y="27" width="7" height="7"/>
+    <rect x="73" y="27" width="7" height="7"/>
+    <line x1="48" y1="80" x2="40" y2="104" stroke-width="2.5"/>
+    <line x1="72" y1="80" x2="80" y2="104" stroke-width="2.5"/>
+    <line x1="30" y1="104" x2="90" y2="104" stroke-width="2"/>`,
+  // Cuba — classic car and palm
+  CU:(dots,bg)=>`
+    <path d="M14,88 Q14,74 27,72 L36,63 Q45,57 58,57 L76,57 Q86,57 90,68 L94,72 Q102,74 102,88 Z" fill="${dots}"/>
+    <polygon points="46,63 56,60 70,60 76,63" fill="${bg}"/>
+    <circle cx="32" cy="90" r="7"/>
+    <circle cx="32" cy="90" r="3" fill="${bg}"/>
+    <circle cx="84" cy="90" r="7"/>
+    <circle cx="84" cy="90" r="3" fill="${bg}"/>
+    <line x1="98" y1="104" x2="98" y2="68" stroke-width="3"/>
+    <path d="M98,68 Q82,62 72,66" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M98,68 Q86,48 88,36" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M98,68 Q108,46 110,34" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M98,68 Q114,58 119,64" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="10" y1="104" x2="106" y2="104" stroke-width="2"/>`,
+  // Denmark — a windmill
+  DK:(dots,bg)=>`
+    <polygon points="50,102 70,102 66,50 54,50" fill="${dots}"/>
+    <path d="M54,50 Q60,38 66,50 Z"/>
+    <line x1="60" y1="46" x2="34" y2="20" stroke-width="4" stroke-linecap="round"/>
+    <line x1="60" y1="46" x2="86" y2="20" stroke-width="4" stroke-linecap="round"/>
+    <line x1="60" y1="46" x2="34" y2="72" stroke-width="4" stroke-linecap="round"/>
+    <line x1="60" y1="46" x2="86" y2="72" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="46" r="3"/>
+    <rect x="56" y="90" width="8" height="12" fill="${bg}"/>`,
+  // England — Big Ben
+  'GB-ENG':(dots,bg)=>`
+    <rect x="48" y="30" width="24" height="72" fill="${dots}"/>
+    <circle cx="60" cy="44" r="9" fill="${bg}" stroke-width="1.6"/>
+    <line x1="60" y1="44" x2="60" y2="38" stroke-width="1.4"/>
+    <line x1="60" y1="44" x2="65" y2="46" stroke-width="1.4"/>
+    <polygon points="54,30 60,12 66,30"/>
+    <polygon points="48,30 45,22 51,26"/>
+    <polygon points="72,30 75,22 69,26"/>
+    <line x1="48" y1="66" x2="72" y2="66" stroke-width="1.2"/>
+    <line x1="48" y1="82" x2="72" y2="82" stroke-width="1.2"/>`,
+  // France — the Eiffel Tower
+  FR:(dots,bg)=>`
+    <path d="M20,104 L38,66 L46,66 L34,40 L42,40 L52,18 L52,12 L60,6 L68,12 L68,18 L78,40 L86,40 L74,66 L82,66 L100,104 L82,104 L72,70 L48,70 L38,104 Z"/>
+    <line x1="30" y1="90" x2="46" y2="70" stroke="${bg}" stroke-width="1" opacity="0.7"/>
+    <line x1="90" y1="90" x2="74" y2="70" stroke="${bg}" stroke-width="1" opacity="0.7"/>
+    <line x1="40" y1="55" x2="50" y2="42" stroke="${bg}" stroke-width="1" opacity="0.7"/>
+    <line x1="80" y1="55" x2="70" y2="42" stroke="${bg}" stroke-width="1" opacity="0.7"/>`,
+  // Greece — the Parthenon
+  GR:(dots,bg)=>`
+    <polygon points="18,44 60,20 102,44" fill="${dots}"/>
+    <rect x="16" y="44" width="88" height="5"/>
+    <rect x="22" y="49" width="4" height="39"/>
+    <rect x="35" y="49" width="4" height="39"/>
+    <rect x="48" y="49" width="4" height="39"/>
+    <rect x="58" y="49" width="4" height="39"/>
+    <rect x="68" y="49" width="4" height="39"/>
+    <rect x="81" y="49" width="4" height="39"/>
+    <rect x="94" y="49" width="4" height="39"/>
+    <rect x="18" y="88" width="84" height="4"/>
+    <rect x="14" y="92" width="92" height="4"/>
+    <rect x="10" y="96" width="100" height="4"/>`,
+  // Ireland — a Celtic cross
+  IE:(dots,bg)=>`
+    <circle cx="60" cy="54" r="22" fill="none" stroke-width="4"/>
+    <rect x="56" y="24" width="8" height="72"/>
+    <rect x="34" y="50" width="52" height="8"/>
+    <polygon points="42,96 78,96 84,104 36,104"/>
+    <circle cx="60" cy="28" r="2.4"/>
+    <circle cx="60" cy="92" r="2.4" fill="${bg}"/>
+    <circle cx="38" cy="54" r="2.4"/>
+    <circle cx="82" cy="54" r="2.4"/>`,
+  // Jamaica — palm, sun and waves
+  JM:(dots,bg)=>`
+    <circle cx="94" cy="22" r="8" fill="${dots}" stroke-width="1.6"/>
+    <line x1="94" y1="9" x2="94" y2="4" stroke-width="1.6"/>
+    <line x1="107" y1="22" x2="112" y2="22" stroke-width="1.6"/>
+    <path d="M55,58 Q59,80 53,104" fill="none" stroke-width="4" stroke-linecap="round"/>
+    <path d="M55,58 Q33,50 23,60" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M55,58 Q35,38 27,26" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M55,58 Q53,32 55,18" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M55,58 Q73,42 78,34" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M55,58 Q77,50 87,60" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M14,96 q10,-6 20,0 q10,6 20,0 q10,-6 20,0 q10,6 20,0" fill="none" stroke-width="1.6"/>
+    <path d="M14,104 q10,-6 20,0 q10,6 20,0 q10,-6 20,0 q10,6 20,0" fill="none" stroke-width="1.6"/>`,
+  // Lebanon — the cedar
+  LB:(dots,bg)=>`
+    <polygon points="24,104 96,104 78,84 42,84"/>
+    <polygon points="34,86 86,86 72,68 48,68" fill="${dots}"/>
+    <polygon points="44,70 76,70 66,54 54,54"/>
+    <polygon points="54,56 66,56 60,44"/>
+    <rect x="56" y="100" width="8" height="8"/>`,
+  // Mexico — a stepped pyramid
+  MX:(dots,bg)=>`
+    <circle cx="94" cy="26" r="9" fill="${dots}"/>
+    <line x1="94" y1="12" x2="94" y2="6" stroke-width="1.4"/>
+    <line x1="80" y1="26" x2="74" y2="26" stroke-width="1.4"/>
+    <rect x="20" y="92" width="80" height="12"/>
+    <rect x="28" y="80" width="64" height="12"/>
+    <rect x="36" y="68" width="48" height="12"/>
+    <rect x="44" y="56" width="32" height="12"/>
+    <rect x="50" y="44" width="20" height="12"/>
+    <rect x="57" y="48" width="6" height="8" fill="${bg}"/>
+    <line x1="57" y1="44" x2="57" y2="104" stroke="${bg}" stroke-width="1" opacity="0.7"/>
+    <line x1="63" y1="44" x2="63" y2="104" stroke="${bg}" stroke-width="1" opacity="0.7"/>`,
+  // Poland — twin basilica towers
+  PL:(dots,bg)=>`
+    <rect x="46" y="70" width="24" height="30" fill="${dots}"/>
+    <rect x="30" y="52" width="16" height="48"/>
+    <path d="M30,52 Q38,38 46,52 Z"/>
+    <line x1="38" y1="38" x2="38" y2="28" stroke-width="2"/>
+    <rect x="70" y="40" width="16" height="60"/>
+    <polygon points="70,40 78,16 86,40"/>
+    <circle cx="78" cy="13" r="2.2"/>
+    <rect x="52" y="80" width="12" height="10" fill="${bg}"/>`,
+  // Scotland — castle on the rock
+  'GB-SCT':(dots,bg)=>`
+    <polygon points="14,104 26,88 20,82 34,86 40,74 50,84 58,76 66,86 76,78 88,88 82,94 106,104" fill="${dots}"/>
+    <rect x="30" y="66" width="60" height="20"/>
+    <rect x="32" y="60" width="6" height="6"/>
+    <rect x="44" y="60" width="6" height="6"/>
+    <rect x="56" y="60" width="6" height="6"/>
+    <rect x="68" y="60" width="6" height="6"/>
+    <rect x="80" y="60" width="6" height="6"/>
+    <rect x="50" y="34" width="20" height="36"/>
+    <rect x="51" y="30" width="6" height="6"/>
+    <rect x="63" y="30" width="6" height="6"/>
+    <rect x="27" y="48" width="11" height="22"/>
+    <polygon points="27,48 32.5,36 38,48"/>`
+};
+// Generic fallback (a compass rosette) for any country without hand-drawn art yet
+function genericArt(dots,bg){
+  return `
+    <circle cx="60" cy="60" r="40" fill="none" stroke-width="2.4"/>
+    <polygon points="60,24 68,60 60,96 52,60"/>
+    <polygon points="24,60 60,52 96,60 60,68" fill="${dots}"/>
+    <circle cx="60" cy="60" r="6"/>`;
+}
+
+function dotDefs(id,ink){
+  return `<pattern id="${id}" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="${ink}"/></pattern>`;
+}
+
+// Builds one self-contained SVG "ink stamp" for a country: an arched
+// passport-stamp frame around hand-drawn art of that country's most
+// iconic landmark, with its 3-letter code stamped across the bottom band.
 function passportStampSvg(r,sty){
-  const {ink,dash,gap,ribRot}=sty;
-  const cc=r.cc,flag=FLAGS[cc]||'',name=(r.country||cc).toUpperCase();
-  const arcId='pp-arc-'+cc.replace(/[^A-Za-z0-9]/g,'');
-  const role=r.brewed&&r.drank?'BREWED & DRANK':r.brewed?'BREWED HERE':'DRANK HERE';
-  const nameFont=name.length>16?6:name.length>11?7.5:9.5;
-  const nameLS=name.length>11?0.5:1.8;
-  const roleFont=role.length>12?7:8.5;
-  const roleLS=role.length>12?0.4:1.2;
-  const serial=String(1000+(stampHash(cc+name)%9000));
-  const lines=[];
-  if(r.drank) lines.push(`FIRST POUR ${(r.firstMonth||'').toUpperCase()} ${r.firstYear||''}`);
-  if(r.brewed) lines.push(`${r.brewed.names.length} BREWER${r.brewed.names.length===1?'Y':'IES'}`);
-  const metaSvg=lines.map((t,i)=>`<text x="65" y="${100+i*10}" text-anchor="middle" font-size="6.2" letter-spacing="0.4" fill="${ink}" opacity="0.8" font-family="var(--mono,monospace)">${t}</text>`).join('');
-  return `<svg viewBox="0 0 130 130" width="118" height="118" role="img" aria-label="${name} passport stamp">
-<defs><path id="${arcId}" d="M12,65 A53,53 0 0 1 118,65" fill="none"/></defs>
-<circle cx="65" cy="65" r="58" fill="none" stroke="${ink}" stroke-width="2.2" stroke-dasharray="${dash} ${gap}" opacity="0.85"/>
-<circle cx="65" cy="65" r="48" fill="none" stroke="${ink}" stroke-width="1" opacity="0.5"/>
-<text font-size="${nameFont}" font-weight="700" letter-spacing="${nameLS}" fill="${ink}" opacity="0.92">
-<textPath href="#${arcId}" xlink:href="#${arcId}" startOffset="50%" text-anchor="middle">${name}</textPath>
-</text>
-<text x="65" y="60" text-anchor="middle" font-size="24" opacity="0.9">${flag}</text>
-<g transform="rotate(${ribRot} 65 82)">
-<line x1="26" y1="76" x2="104" y2="76" stroke="${ink}" stroke-width="1" opacity="0.55"/>
-<text x="65" y="86" text-anchor="middle" font-size="${roleFont}" font-weight="700" letter-spacing="${roleLS}" fill="${ink}">${role}</text>
-<line x1="26" y1="92" x2="104" y2="92" stroke="${ink}" stroke-width="1" opacity="0.55"/>
+  const {ink,dash,gap}=sty;
+  const cc=r.cc,code=code3(cc);
+  const name=(r.country||cc);
+  const dotsId='pp-dots-'+cc.replace(/[^A-Za-z0-9]/g,'');
+  const dots=`url(#${dotsId})`;
+  const bg='#0a0f1a';
+  const art=(COUNTRY_ART[cc]||genericArt)(dots,bg);
+  return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
+<defs>${dotDefs(dotsId,ink)}</defs>
+<g fill="currentColor" stroke="currentColor" style="color:${ink}">
+<path d="M10,140 L10,50 Q10,8 60,8 Q110,8 110,50 L110,140 Z" fill="none" stroke-width="2.5" stroke-dasharray="${dash} ${gap}" opacity="0.9"/>
+<path d="M16,134 L16,52 Q16,16 60,16 Q104,16 104,52 L104,134 Z" fill="none" stroke-width="1" opacity="0.55"/>
+<g opacity="0.95">${art}</g>
+<line x1="20" y1="112" x2="100" y2="112" stroke-width="1" opacity="0.5"/>
+<text x="60" y="127" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="2">· ${code} ·</text>
 </g>
-${metaSvg}
-<text x="65" y="120" text-anchor="middle" font-size="5.5" letter-spacing="1" fill="${ink}" opacity="0.5" font-family="var(--mono,monospace)">No. ${serial}</text>
 </svg>`;
 }
 
 function passportStampCard(r){
   const sty=stampStyle(r.cc);
   const metaBits=[];
-  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}`);
+  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}${r.firstYear?` · first ${(r.firstMonth||'').toUpperCase()} ${r.firstYear}`:''}`);
   if(r.brewed) metaBits.push(`${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} beer${r.brewed.count>1?'s':''}`);
   return `<div class="stamp-card" style="--rot:${sty.rot}deg">
     <div class="stamp-badges">
