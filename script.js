@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧","GB-ENG":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","GB-SCT":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","GB-WLS":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","GB-NIR":"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain","GB-ENG":"England","GB-SCT":"Scotland","GB-WLS":"Wales","GB-NIR":"Northern Ireland",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba"};
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS INTEGRATION
@@ -74,7 +74,7 @@ let beers=[
   {beer:"Dos Equis Lager Especial",style:"Lager",       origin:"MX",abv:4.2,method:"Draft", city:"Queens",      region:"New York",        country:"USA",         cc:"US", rating:1.75,isNew:true, month:"Apr",monthN:4,year:2026,logo:"https://thebrandinquirer.wordpress.com/wp-content/uploads/2021/05/dos-equis-nueva-imagen-logo-new-design-.jpg?w=1024"},
   {beer:"Miller Lite",      style:"Lager",              origin:"US",abv:4.2,method:"Bottle",city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.25,isNew:true, month:"Apr",monthN:4,year:2026},
   // MAY 2026
-  {beer:"Belhaven Scottish Stout",style:"Stout",        origin:"GB",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
+  {beer:"Belhaven Scottish Stout",style:"Stout",        origin:"GB-SCT",abv:5.2,method:"Nitro", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Samuel Adams Summer Ale",style:"Wheat Beer",   origin:"US",abv:5.3,method:"Draft", city:"Boston",      region:"Massachusetts",   country:"USA",         cc:"US", rating:3.00,isNew:true, month:"May",monthN:5,year:2026},
   {beer:"Pacífico Clara",   style:"Lager",              origin:"MX",abv:4.5,method:"Bottle",city:"Clemson",      region:"South Carolina",  country:"USA",         cc:"US", rating:3.75,isNew:true, month:"May",monthN:5,year:2026,logo:"https://upload.wikimedia.org/wikipedia/en/f/f7/Pacifico_Logo.png"},
   {beer:"Narragansett Lager",style:"Lager",             origin:"US",abv:5.0,method:"Can",   city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"May",monthN:5,year:2026},
@@ -97,7 +97,7 @@ let beers=[
   {beer:"Stone IPA",             style:"IPA",                  origin:"US",abv:6.9,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Jul",monthN:7,year:2026},
   {beer:"Mahou Cinco Estrellas", style:"Lager",                origin:"ES",abv:5.5,method:"Bottle",city:"Boynton Beach",region:"Florida",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jul",monthN:7,year:2026},
   {beer:"Hatuey Lager",          style:"Lager",                origin:"CU",abv:5.0,method:"Bottle",city:"Miami",       region:"Florida",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jul",monthN:7,year:2026},
-  {beer:"Pub Ale",               style:"Pale Ale",             origin:"GB",abv:4.7,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Jul",monthN:7,year:2026},
+  {beer:"Pub Ale",               style:"Pale Ale",             origin:"GB-ENG",abv:4.7,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Jul",monthN:7,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -177,7 +177,7 @@ let breweries=[
   {name:"Latrobe Brewing Company",   location:"Latrobe, Pennsylvania",     country:"USA",         cc:"US", lang:"en", beers:"Rolling Rock Extra Pale",                                              lat:40.3215,lng:-79.3795, ratings:[3.25]},
   {name:"Cervecería Cuauhtémoc Moctezuma", location:"Monterrey, Nuevo León", country:"Mexico", cc:"MX", lang:"es", beers:"Dos Equis Lager Especial", lat:25.6866,lng:-100.3161, ratings:[1.75]},
   {name:"Miller Brewing Company",    location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Miller Lite",                                              lat:43.0389,lng:-87.9065, ratings:[2.25]},
-  {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Great Britain",cc:"GB", lang:"en", beers:"Belhaven Scottish Stout",                                  lat:56.0006,lng:-2.5176,  ratings:[3.00]},
+  {name:"Belhaven Brewery",          location:"Dunbar, East Lothian",      country:"Scotland",cc:"GB-SCT", lang:"en", beers:"Belhaven Scottish Stout",                                  lat:56.0006,lng:-2.5176,  ratings:[3.00]},
   {name:"Boston Beer Company (Samuel Adams)", location:"Boston, Massachusetts", country:"USA",     cc:"US", lang:"en", beers:"Samuel Adams Summer Ale",                                  lat:42.3601,lng:-71.0589, ratings:[3.00]},
   {name:"Cervecería del Pacífico",   location:"Mazatlán, Sinaloa",         country:"Mexico",      cc:"MX", lang:"es", beers:"Pacífico Clara",                                            lat:23.2494,lng:-106.4111,ratings:[3.75]},
   {name:"Narragansett Brewing Company", location:"Cranston, Rhode Island", country:"USA",         cc:"US", lang:"en", beers:"Narragansett Lager",                                        lat:41.7798,lng:-71.4373, ratings:[3.25]},
@@ -195,7 +195,7 @@ let breweries=[
   {name:"Stone Brewing",             location:"Escondido, California",     country:"USA",         cc:"US", lang:"en", beers:"Stone IPA",                                                 lat:33.1192,lng:-117.0864,ratings:[2.50]},
   {name:"Mahou (Grupo Mahou-San Miguel)", location:"Madrid, Madrid",      country:"Spain",       cc:"ES", lang:"es", beers:"Mahou Cinco Estrellas",                                     lat:40.4168,lng:-3.7038,  ratings:[3.50]},
   {name:"Cervecería Hatuey (Bacardí)", location:"Santiago de Cuba, Santiago de Cuba", country:"Cuba", cc:"CU", lang:"es", beers:"Hatuey Lager",                                       lat:20.0247,lng:-75.8219, ratings:[4.00], nativeName:"Cerveza Hatuey"},
-  {name:"Boddington's Brewery",      location:"Manchester, Greater Manchester", country:"Great Britain", cc:"GB", lang:"en", beers:"Pub Ale",                                       lat:53.4808,lng:-2.2426,  ratings:[4.25]},
+  {name:"Boddington's Brewery",      location:"Manchester, Greater Manchester", country:"England", cc:"GB-ENG", lang:"en", beers:"Pub Ale",                                       lat:53.4808,lng:-2.2426,  ratings:[4.25]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -1998,7 +1998,7 @@ const IPO_WATCHLIST=[
   {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
   {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
   {beer:'Kronenbourg 1664',style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
-  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
+  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB-ENG', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
   {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
   // Pipeline promotions
   {beer:'Żywiec',          style:'Lager',        origin:'PL', abv:5.5, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
@@ -2015,7 +2015,7 @@ const IPO_CANDIDATES=[
   {beer:'Augustiner Helles',style:'Lager',        origin:'DE', abv:5.2, region:'Munich',              untappd:4.10, method:'Draft'},
   {beer:'Peroni Nastro Azzurro',style:'Lager',    origin:'IT', abv:5.1, region:'Rome, Lazio',         untappd:3.56, method:'Bottle'},
   {beer:"Smithwick's",      style:'Red Ale',      origin:'IE', abv:4.5, region:'Kilkenny',            untappd:3.45, method:'Draft'},
-  {beer:"Tennent's",        style:'Lager',        origin:'GB', abv:4.0, region:'Glasgow, Scotland',   untappd:2.95, method:'Can'},
+  {beer:"Tennent's",        style:'Lager',        origin:'GB-SCT', abv:4.0, region:'Glasgow, Scotland',   untappd:2.95, method:'Can'},
   {beer:'Orion',            style:'Lager',        origin:'JP', abv:5.0, region:'Naha, Okinawa',       untappd:3.42, method:'Can'},
   {beer:'Menabrea',         style:'Lager',        origin:'IT', abv:4.8, region:'Biella, Piedmont',    untappd:3.55, method:'Bottle'},
   {beer:'Tuborg',           style:'Pilsner',      origin:'DK', abv:4.6, region:'Copenhagen',          untappd:3.10, method:'Can'},

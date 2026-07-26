@@ -12,7 +12,7 @@ Each entry in the `beers[]` array requires these fields:
 {
   beer: "BeerName",           // Marketed/displayed beer name
   style: "Category",          // One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale
-  origin: "XX",              // ISO 3166-1 alpha-2 country code of the BREWERY's home country
+  origin: "XX",              // ISO 3166-1 alpha-2 country code of the BREWERY's home country (see UK exception below)
   abv: 5.0,                  // Alcohol by volume (number)
   method: "Bottle",          // "Bottle", "Can", "Draft", or "Nitro"
   city: "CityName",          // City where the beer was CONSUMED (not brewed)
@@ -26,6 +26,24 @@ Each entry in the `beers[]` array requires these fields:
   year: 2026                 // 4-digit year
 }
 ```
+
+### UK Exception: Split GB by Constituent Country
+
+For breweries based in the United Kingdom, do **not** use the plain `GB` code. Use the
+specific constituent-country code instead, based on where the brewery is actually located:
+
+| Constituent Country | `origin`/`cc` code | Full `country` name |
+|----------------------|---------------------|----------------------|
+| England              | `GB-ENG`            | England              |
+| Scotland             | `GB-SCT`            | Scotland             |
+| Wales                | `GB-WLS`            | Wales                |
+| Northern Ireland     | `GB-NIR`            | Northern Ireland     |
+
+These codes already exist in `FLAGS` and `CNAMES` in `script.js`. The plain `GB` code and
+"Great Britain" label are only a fallback for the rare case where the specific UK nation
+can't be determined — always prefer the specific code when known. This applies to the
+`origin` field on beer entries and the `cc`/`country` fields on brewery entries; `lang`
+stays `"en"` for all four.
 
 ### Step 2: Add or Update the `breweries[]` Array (REQUIRED)
 
