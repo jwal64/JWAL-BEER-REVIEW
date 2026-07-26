@@ -65,42 +65,49 @@
   <div id="drawer-body"></div>
 </div>
 
-<!-- MENU BAR -->
+<!-- ══════════════ APP SHELL ══════════════
+     A four-cell grid: brand + rail down the left, context bar across the top,
+     scrolling content in the corner. One nav surface, not three. -->
 
-<div id="menubar-wrap">
-  <div id="menubar">
-    <div class="mb-logo">JWAL'S</div>
-    <div class="mb-item active" data-tab="overview" title="Home — the highlights at a glance"><span class="fkey">F1</span>HOME</div>
-    <div class="mb-item" data-tab="beers" title="Beers — search the full list of everything I've reviewed"><span class="fkey">F2</span>BEERS</div>
-    <div class="mb-item" data-tab="maps" title="Map — where beers were brewed &amp; where I drank them"><span class="fkey">F3</span>MAP</div>
-    <div class="mb-item" data-tab="insights" title="Insights — places, trends over time &amp; what to try next"><span class="fkey">F4</span>INSIGHTS</div>
-    <div class="mb-spacer"></div>
-    <div class="mb-right" id="mb-clock">—</div>
-  </div>
+<div id="shell">
+
+<!-- BRAND (top-left corner of the shell) -->
+
+<div id="brandbar">
+  <span class="bb-mark" aria-hidden="true">🍺</span>
+  <span class="bb-word">JWAL'S<em>BREW REVIEWS</em></span>
+  <span class="bb-clock" id="mb-clock">—</span>
 </div>
 
-<!-- HEADER -->
+<!-- CONTEXT BAR — says which page you're on and what it's for -->
 
-<div id="hdr">
-  <div class="hdr-block wide">
-    <div class="hdr-title">🍺 JWAL'S BREW REVIEWS <span style="font-size:10px;color:var(--dim);font-weight:500;letter-spacing:1px">· TERMINAL v3.0</span></div>
-    <div class="hdr-sub" id="hdr-subtitle">PERSONAL BREW INTELLIGENCE SYSTEM · — REVIEWS · — MARKETS · — BRANDS</div>
+<header id="topbar">
+  <div class="tb-context">
+    <span class="tb-title" id="tb-title">HOME</span>
+    <span class="tb-desc" id="tb-desc">The highlights at a glance.</span>
   </div>
-</div>
+  <div class="tb-stats" id="hdr-subtitle"></div>
+  <button id="tb-search" type="button" aria-label="Search beers, breweries and pages">
+    <span class="tbs-ico" aria-hidden="true">⌕</span>
+    <span class="tbs-label">SEARCH</span>
+    <kbd>⌘K</kbd>
+  </button>
+</header>
 
-<!-- BODY -->
+<!-- RAIL — the single primary navigation -->
 
-<div class="terminal-body">
-
-<!-- SIDEBAR -->
-
-<div id="sidebar">
+<nav id="sidebar" aria-label="Primary">
   <div class="nav-section-head">DASHBOARD</div>
-  <div class="nav-item active" data-tab="overview"><span class="nav-icon">◈</span>HOME<span class="nkey">F1</span></div>
-  <div class="nav-item" data-tab="beers"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
-  <div class="nav-item" data-tab="maps"><span class="nav-icon">◎</span>MAP<span class="nkey">F3</span></div>
-  <div class="nav-item" data-tab="insights"><span class="nav-icon">◆</span>INSIGHTS<span class="nkey">F4</span></div>
-</div>
+  <div class="nav-item active" data-tab="overview" title="Home — the highlights at a glance"><span class="nav-icon">◈</span>HOME<span class="nkey">F1</span></div>
+  <div class="nav-item" data-tab="beers" title="Beers — search the full list of everything I've reviewed"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
+  <div class="nav-item" data-tab="maps" title="Map — where beers were brewed &amp; where I drank them"><span class="nav-icon">◎</span>MAP<span class="nkey">F3</span></div>
+  <div class="nav-item" data-tab="insights" title="Insights — places, trends over time &amp; what to try next"><span class="nav-icon">◆</span>INSIGHTS<span class="nkey">F4</span></div>
+  <div class="nav-foot">
+    <div class="nf-row"><span class="nf-dot"></span>LIVE</div>
+    <div class="nf-row nf-meta" id="nav-records">— RECORDS</div>
+    <div class="nf-row nf-meta">TERMINAL v3.0</div>
+  </div>
+</nav>
 
 <!-- MAIN CONTENT -->
 
@@ -121,16 +128,17 @@
     <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--green2)" id="ov-hit-val">—</span><span class="kpi-delta" id="ov-hit-delta"></span></div><div class="kpi-label">HIT RATE</div><div class="kpi-sub" id="ov-hit-sub">Rated ≥3.00</div><div class="kpi-sparkline-wrap"><canvas id="spark-hit"></canvas></div></div>
   </div>
 
-  <!-- The most human, friend-friendly section, kept up top -->
-  <div class="bb-panel">
-    <div class="bb-panel-head">RECENT POURS<span class="ph-right">LAST 6 · TAP ONE FOR DETAIL</span></div>
-    <div class="bb-body" id="recentFeed"></div>
-  </div>
-
-  <!-- One signature chart -->
-  <div class="bb-panel">
-    <div class="bb-panel-head">HOW EACH STYLE SCORES<span class="ph-right">AVG RATING / 5.00</span></div>
-    <div class="bb-body"><div class="chart-box chart-box-tall"><canvas id="styleChart"></canvas></div></div>
+  <!-- Signature chart and the human "what did he drink lately" feed sit side by
+       side on wide screens; they stack on narrow ones. -->
+  <div class="ov-split">
+    <div class="bb-panel">
+      <div class="bb-panel-head">HOW EACH STYLE SCORES<span class="ph-right">AVG RATING / 5.00</span></div>
+      <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="styleChart"></canvas></div></div>
+    </div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">RECENT POURS<span class="ph-right">LAST 6 · TAP ONE</span></div>
+      <div class="bb-body" id="recentFeed"></div>
+    </div>
   </div>
 
   <div class="g2">
@@ -155,15 +163,15 @@
       <div class="g3">
         <div class="bb-panel">
           <div class="bb-panel-head">REVIEWS PER MONTH<span class="ph-right">COUNT × AVG RATING</span></div>
-          <div class="bb-body"><canvas id="monthlyCombo" height="200"></canvas></div>
+          <div class="bb-body"><div class="chart-box"><canvas id="monthlyCombo"></canvas></div></div>
         </div>
         <div class="bb-panel">
           <div class="bb-panel-head">RATING DISTRIBUTION<span class="ph-right">QUARTER-POINT BUCKETS</span></div>
-          <div class="bb-body"><canvas id="ratingHist" height="200"></canvas></div>
+          <div class="bb-body"><div class="chart-box"><canvas id="ratingHist"></canvas></div></div>
         </div>
         <div class="bb-panel">
           <div class="bb-panel-head">STRONGER = BETTER?<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
-          <div class="bb-body"><canvas id="scatterChart" height="200"></canvas></div>
+          <div class="bb-body"><div class="chart-box"><canvas id="scatterChart"></canvas></div></div>
         </div>
       </div>
       <div class="bb-panel">
@@ -181,7 +189,7 @@
         </div>
         <div class="bb-panel">
           <div class="bb-panel-head">SERVING METHOD<span class="ph-right">AVG RATING</span></div>
-          <div class="bb-body"><canvas id="methodChart" height="200"></canvas></div>
+          <div class="bb-body"><div class="chart-box"><canvas id="methodChart"></canvas></div></div>
         </div>
       </div>
     </div>
@@ -236,7 +244,7 @@
     <div class="bb-panel">
       <div class="bb-panel-head">EVERY CITY I'VE POURED IN<span class="ph-right">MOST POURS FIRST</span></div>
       <div class="bb-body">
-        <div style="overflow-x:auto">
+        <div class="table-wrap">
           <table class="bb-table">
             <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>POURS</th><th>MY AVG</th><th>WHAT I HAD</th></tr></thead>
             <tbody id="drunkTbody"></tbody>
@@ -250,7 +258,7 @@
     <div class="bb-panel">
       <div class="bb-panel-head">BREWERY DIRECTORY<span class="ph-right">BEST RATED FIRST · CLICK A NAME FOR ITS CARD</span></div>
       <div class="bb-body">
-        <div style="overflow-x:auto">
+        <div class="table-wrap">
           <table class="bb-table">
             <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>HOMETOWN</th><th>COUNTRY</th><th>WHAT I'VE HAD</th><th>MY AVG</th></tr></thead>
             <tbody id="brewedTbody"></tbody>
@@ -265,7 +273,7 @@
       <div class="bb-panel-head">THE LONGEST HAULS<span class="ph-right">MILES FROM BREWERY TO MY GLASS · CLICK A BEER</span></div>
       <div class="bb-body">
         <div id="journeySummary"></div>
-        <div style="overflow-x:auto">
+        <div class="table-wrap">
           <table class="bb-table">
             <thead><tr><th style="width:30px">#</th><th>BEER</th><th>BREWED IN</th><th>DRUNK IN</th><th>MILES</th><th>MY RATING</th></tr></thead>
             <tbody id="journeyTbody"></tbody>
@@ -283,18 +291,18 @@
   <div class="bb-panel">
     <div class="bb-panel-head">ALL BEERS — FULL DATASET<span class="ph-right" id="beers-count">— ENTRIES</span></div>
     <div class="bb-body">
-      <div class="bb-ctrl" style="flex-wrap:wrap;gap:6px">
+      <div class="bb-ctrl">
         <span class="bb-ctrl-title">BEER INDEX <span class="new-tag" id="beers-new-tag"></span></span>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <div class="ctrl-fields">
           <input id="beerSearch" type="text" placeholder="SEARCH BEER, STYLE, CITY…" aria-label="Search beers">
           <select id="beerStyleFilter" class="bb-select" aria-label="Filter by style"><option value="">ALL STYLES</option></select>
           <select id="beerOriginFilter" class="bb-select" aria-label="Filter by origin"><option value="">ALL ORIGINS</option></select>
           <select id="beerMonthFilter" class="bb-select" aria-label="Filter by month consumed"><option value="">ALL MONTHS</option></select>
-          <span id="beerFilterCount" role="status" aria-live="polite" style="font-size:9px;color:#66718c"></span>
         </div>
+        <span id="beerFilterCount" role="status" aria-live="polite"></span>
       </div>
       <div id="beerChips" class="flt-chips" hidden></div>
-      <div style="overflow-x:auto">
+      <div class="table-wrap">
         <table class="bb-table">
           <thead id="beerHead"><tr><th width="30"></th><th data-sort="beer">BEER</th><th data-sort="style">STYLE</th><th data-sort="origin">ORIGIN</th><th data-sort="abv">ABV</th><th data-sort="method">METHOD</th><th data-sort="city">CITY</th><th data-sort="month">MONTH</th><th data-sort="rating">RATING</th><th>STARS</th></tr></thead>
           <tbody id="beerBody"></tbody>
@@ -326,25 +334,29 @@
 
   <section class="merged-section" data-section="countries">
     <div class="merged-section-head">◎ COUNTRIES</div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">RATINGS BY COUNTRY<span class="ph-right">AVG RATING · # OF REVIEWS</span></div>
-      <div class="bb-body"><canvas id="countryChart" height="240"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">COUNTRY BREAKDOWN</div>
-      <div class="bb-body" id="countryCards"></div>
+    <div class="ov-split ov-split-even">
+      <div class="bb-panel">
+        <div class="bb-panel-head">RATINGS BY COUNTRY<span class="ph-right">AVG RATING · # OF REVIEWS</span></div>
+        <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="countryChart"></canvas></div></div>
+      </div>
+      <div class="bb-panel">
+        <div class="bb-panel-head">COUNTRY BREAKDOWN</div>
+        <div class="bb-body" id="countryCards"></div>
+      </div>
     </div>
   </section>
 
   <section class="merged-section" data-section="city">
     <div class="merged-section-head">▣ CITIES</div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">RATINGS BY CITY<span class="ph-right">AVG RATING</span></div>
-      <div class="bb-body"><canvas id="cityChart" height="200"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">CITY STATS TABLE</div>
-      <div class="bb-body" id="cityCards"></div>
+    <div class="ov-split ov-split-even">
+      <div class="bb-panel">
+        <div class="bb-panel-head">RATINGS BY CITY<span class="ph-right">AVG RATING</span></div>
+        <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="cityChart"></canvas></div></div>
+      </div>
+      <div class="bb-panel">
+        <div class="bb-panel-head">CITY STATS TABLE</div>
+        <div class="bb-body" id="cityCards"></div>
+      </div>
     </div>
   </section>
 
@@ -352,7 +364,7 @@
     <div class="merged-section-head">◑ BREWING LANGUAGE</div>
     <div class="bb-panel">
       <div class="bb-panel-head">RATINGS BY BREWING LANGUAGE<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
-      <div class="bb-body"><canvas id="langChart" height="180"></canvas></div>
+      <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="langChart"></canvas></div></div>
     </div>
   </section>
 
@@ -365,31 +377,32 @@
   <!-- Dynamic KPI row — filled by drawTemporal() -->
   <div id="temporal-kpis" style="margin-bottom:8px"></div>
 
+  <!-- Charts pair with charts, lists with lists — pairing a 240px chart against
+       a seven-month list is what left a column-high empty well here. -->
   <div class="g2">
     <div class="bb-panel">
       <div class="bb-panel-head">MONTHLY REVIEW VOLUME &amp; AVG RATING<span class="ph-right">BAR=COUNT · LINE=AVG</span></div>
-      <div class="bb-body"><canvas id="monthlyChart" height="200"></canvas></div>
-    </div>
-    <div class="bb-panel">
-      <div class="bb-panel-head">BEST &amp; WORST BEER BY MONTH</div>
-      <div class="bb-body" id="monthBestWorst"></div>
-    </div>
-  </div>
-
-  <div class="g2">
-    <div class="bb-panel">
-      <div class="bb-panel-head">MOMENTUM — MONTH OVER MONTH<span class="ph-right">PACE · Δ RATING · REPEAT BRANDS</span></div>
-      <div class="bb-body" id="momentumPanel"></div>
+      <div class="bb-body"><div class="chart-box"><canvas id="monthlyChart"></canvas></div></div>
     </div>
     <div class="bb-panel">
       <div class="bb-panel-head">RATING DISTRIBUTION BY MONTH<span class="ph-right">COUNT PER BUCKET</span></div>
-      <div class="bb-body"><canvas id="monthDistChart" height="200"></canvas></div>
+      <div class="bb-body"><div class="chart-box"><canvas id="monthDistChart"></canvas></div></div>
     </div>
   </div>
 
   <div class="bb-panel">
+    <div class="bb-panel-head">MOMENTUM — MONTH OVER MONTH<span class="ph-right">PACE · Δ RATING · REPEAT BRANDS</span></div>
+    <div class="bb-body col-flow" id="momentumPanel"></div>
+  </div>
+
+  <div class="bb-panel">
+    <div class="bb-panel-head">BEST &amp; WORST BEER BY MONTH<span class="ph-right">ONE CARD PER MONTH</span></div>
+    <div class="bb-body card-grid" id="monthBestWorst"></div>
+  </div>
+
+  <div class="bb-panel">
     <div class="bb-panel-head">COUNTRY RANKINGS OVER TIME<span class="ph-right">EACH LINE = A COUNTRY</span></div>
-    <div class="bb-body" id="bump-chart-wrap"><canvas id="bumpChart" height="180"></canvas></div>
+    <div class="bb-body" id="bump-chart-wrap"><div class="chart-box chart-box-tall"><canvas id="bumpChart"></canvas></div></div>
   </div>
 
   <div class="bb-panel">
@@ -402,7 +415,7 @@
 
   <div class="bb-panel">
     <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
-    <div class="bb-body"><canvas id="timelineChart" height="120"></canvas></div>
+    <div class="bb-body"><div class="chart-box chart-box-short"><canvas id="timelineChart"></canvas></div></div>
   </div>
 </div>
 
@@ -428,7 +441,7 @@
           <div class="bb-panel-head">MY RATING vs THE WORLD AVERAGE<span class="ph-right">GREEN = I LIKED IT MORE THAN MOST PEOPLE</span></div>
           <div class="bb-body">
             <div id="ciFreshness" style="font-size:8px;letter-spacing:1px;margin-bottom:4px"></div>
-            <canvas id="contrarianChart" height="220"></canvas>
+            <div class="chart-box chart-box-tall"><canvas id="contrarianChart"></canvas></div>
           </div>
         </div>
 
@@ -441,7 +454,7 @@
           <div class="bb-panel">
             <div class="bb-panel-head">◈ WANT TO TRY — NOT REVIEWED YET <span class="ph-right" id="ipo-watch-count">—</span></div>
             <div class="bb-body">
-              <div style="overflow-x:auto">
+              <div class="table-wrap">
                 <table class="bb-table ipo-watch" id="ipoWatchTable">
                   <thead><tr>
                     <th style="width:36px"></th>
@@ -460,8 +473,8 @@
           </div>
           <div class="bb-panel">
             <div class="bb-panel-head">▦ HOW MY GUESSES COMPARE <span class="ph-right">MY GUESS − WORLD ★</span></div>
-            <div class="bb-body" style="height:220px">
-              <canvas id="ipoUpsideChart"></canvas>
+            <div class="bb-body">
+              <div class="chart-box chart-box-tall"><canvas id="ipoUpsideChart"></canvas></div>
             </div>
           </div>
         </div>
@@ -471,7 +484,7 @@
     <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
       <div class="bb-panel-head">✓ PREDICTION SCORECARD — BEERS I'VE NOW TRIED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
       <div class="bb-body">
-        <div style="overflow-x:auto">
+        <div class="table-wrap">
           <table class="bb-table">
             <thead><tr>
               <th style="width:36px"></th>
@@ -497,7 +510,18 @@
 
 
 </div><!-- /main -->
-</div><!-- /terminal-body -->
+
+<!-- STATUS BAR — part of the shell grid, not floating over the content -->
+
+<div id="statusbar">
+  <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
+  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v3.0</div>
+  <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
+  <div class="sb-spacer"></div>
+  <div class="sb-item" id="sb-time">--:--:--</div>
+</div>
+
+</div><!-- /shell -->
 
 <!-- BOTTOM NAV (mobile, thumb-reach) -->
 
@@ -519,16 +543,6 @@
     <span class="bn-label">INSIGHTS</span>
   </button>
 </nav>
-
-<!-- STATUS BAR -->
-
-<div id="statusbar">
-  <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
-  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v3.0</div>
-  <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
-  <div class="sb-spacer"></div>
-  <div class="sb-item" id="sb-time">--:--:--</div>
-</div>
 
 <script defer src="script.js"></script>
 

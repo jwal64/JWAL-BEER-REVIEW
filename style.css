@@ -55,6 +55,12 @@
 /* ── One soft elevation token, used sparingly, replaces the many glows ── */
 --shadow:    0 1px 3px rgba(0,0,0,0.4);
 --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+/* ── Shell geometry ── */
+--rail:      180px;
+--topbar-h:  48px;
+/* Content stops widening past this, so charts, tables and prose keep a
+   readable measure on ultrawide monitors instead of stretching edge to edge. */
+--content-max: 1520px;
 }
 
 /* Lining, equal-width digits everywhere numbers column up */
@@ -71,7 +77,10 @@ font-family: var(--mono);
 font-size: var(--fs-base);
 line-height: 1.45;
 overflow-x: hidden;
-height: 100%;
+/* min-height, not height: a fixed-height body turns <body> itself into the
+   scroll container, which on phones lets the page sit scrolled under the sticky
+   header on load. The shell pins itself to the viewport on desktop instead. */
+min-height: 100%;
 cursor: default;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
@@ -83,11 +92,11 @@ image-rendering: auto;
 text-size-adjust: 100%;
 touch-action: manipulation;
 }
-button, .mb-item, .nav-item, .subtab, .cmd-item, .beer-card,
+button, .nav-item, .subtab, .cmd-item, .beer-card,
 .bb-select, input, select { -webkit-tap-highlight-color: rgba(45,212,191,0.22); }
 
 /* Visible focus ring for keyboard navigation (mouse clicks stay clean) */
-.mb-item:focus-visible, .nav-item:focus-visible, .subtab:focus-visible,
+.nav-item:focus-visible, .subtab:focus-visible,
 button:focus-visible, .bb-select:focus-visible, input:focus-visible,
 .cmd-item:focus-visible, .beer-card:focus-visible {
   outline: 2px solid var(--cyan);
@@ -128,7 +137,6 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
 @media (hover: none) {
   .bb-panel-head:hover,
   .nav-item:hover,
-  .mb-item:hover,
   .kpi:hover,
   .beer-card:hover,
   .subtab:hover,
@@ -142,120 +150,146 @@ button:focus-visible, .bb-select:focus-visible, input:focus-visible,
 }
 
 /* ═══════════════════════════════════════════
-TOP MENU BAR — Bloomberg-style function keys
+APP SHELL — one grid owns the whole chrome:
+
+  ┌──────────┬────────────────────────┐
+  │ brandbar │ topbar (page context)  │
+  ├──────────┼────────────────────────┤
+  │ rail nav │ main (the only scroll) │
+  ├──────────┴────────────────────────┤
+  │ statusbar                          │
+  └───────────────────────────────────┘
+
+Only #main scrolls, so the nav and the page title stay put no matter how long
+the content runs.
 ═══════════════════════════════════════════ */
-#menubar {
-background: var(--black);
-display: flex;
-align-items: stretch;
-height: 22px;
-border-bottom: 1px solid var(--border2);
-user-select: none;
+#shell {
+display: grid;
+grid-template-columns: var(--rail) minmax(0, 1fr);
+grid-template-rows: var(--topbar-h) minmax(0, 1fr) auto;
+grid-template-areas:
+  "brand  top"
+  "rail   main"
+  "status status";
+height: 100dvh;
 padding-left: env(safe-area-inset-left, 0px);
 padding-right: env(safe-area-inset-right, 0px);
 }
-.mb-item {
-display: flex;
-align-items: center;
-padding: 0 8px;
-font-size: 9px;
-font-weight: 600;
-color: #8d97b2;
-border-right: 1px solid var(--border);
-cursor: pointer;
-letter-spacing: 0.5px;
-white-space: nowrap;
-transition: background 0.1s ease, color 0.1s ease;
-position: relative;
-}
-.mb-item:hover { background: rgba(45,212,191,0.08); color: var(--accent2); }
-.mb-item.active { background: rgba(45,212,191,0.14); color: var(--accent); }
-.mb-item.active::after {
-content: '';
-position: absolute;
-bottom: 0;
-left: 0;
-right: 0;
-height: 2px;
-background: var(--accent);
-}
-.mb-item .fkey {
-background: rgba(45,212,191,0.16);
-color: var(--accent);
-font-size: 8px;
-padding: 1px 4px;
-margin-right: 5px;
-font-weight: 700;
-border-radius: 3px;
-}
-.mb-item.active .fkey { background: var(--accent); color: #000; }
-.mb-logo {
-font-weight: 700;
-font-size: 11px;
-padding: 0 10px;
-border-right: 1px solid var(--border2);
-background: transparent;
-color: var(--accent);
-letter-spacing: 1.5px;
-display: flex;
-align-items: center;
-text-shadow: 0 0 8px rgba(45,212,191,0.4);
-}
-.mb-spacer { flex: 1; }
-.mb-right { display: flex; align-items: center; padding: 0 12px; font-size: 10px; color: #8d97b2; font-weight: 600; letter-spacing: 0.5px; }
 
-/* ═══════════════════════════════════════════
-HEADER BAR
-═══════════════════════════════════════════ */
-#hdr {
-background: var(--panel);
-backdrop-filter: blur(var(--glass-blur));
--webkit-backdrop-filter: blur(var(--glass-blur));
-border-bottom: 1px solid var(--border2);
-box-shadow: inset 0 -1px 0 rgba(45,212,191,0.25);
+/* ── Brand block: the shell's top-left corner ── */
+#brandbar {
+grid-area: brand;
 display: flex;
-align-items: stretch;
-height: 52px;
-}
-.hdr-block {
+align-items: center;
+gap: var(--s2);
 padding: 0 var(--s3);
+background: var(--black);
+border-right: 1px solid var(--border2);
+border-bottom: 1px solid var(--border2);
+user-select: none;
+overflow: hidden;
+}
+.bb-mark { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.bb-word {
 display: flex;
 flex-direction: column;
-justify-content: center;
-border-right: 1px solid var(--border);
-}
-.hdr-block.wide {
-flex: 1;
-padding: 0 var(--s5);
-}
-.hdr-title {
-font-size: var(--fs-lg);
+min-width: 0;
 font-weight: 700;
-color: var(--white);
-letter-spacing: 0.4px;
-line-height: 1.1;
-font-family: var(--mono);
+font-size: 12px;
+letter-spacing: 1.4px;
+color: var(--accent);
+line-height: 1.15;
+text-shadow: 0 0 10px rgba(45,212,191,0.35);
 }
-.hdr-sub {
-font-size: 9px;
-color: var(--dim);
-letter-spacing: 1.6px;
-text-transform: uppercase;
-margin-top: var(--s1);
-font-family: var(--sans);
+.bb-word em {
+font-style: normal;
+font-size: 8px;
 font-weight: 500;
+letter-spacing: 1.6px;
+color: var(--dim);
+text-shadow: none;
+}
+.bb-clock { display: none; }
+
+/* ── Context bar: which page you're on, what it's for, live totals ── */
+#topbar {
+grid-area: top;
+display: flex;
+align-items: center;
+gap: var(--s4);
+padding: 0 var(--s4);
+background: var(--panel);
+border-bottom: 1px solid var(--border2);
+box-shadow: inset 0 -1px 0 rgba(45,212,191,0.2);
+min-width: 0;
+}
+.tb-context { display: flex; align-items: baseline; gap: var(--s3); min-width: 0; }
+.tb-title {
+font-size: var(--fs-md);
+font-weight: 700;
+letter-spacing: 1.5px;
+color: var(--white);
+white-space: nowrap;
+}
+.tb-desc {
+font-family: var(--sans);
+font-size: var(--fs-xs);
+color: var(--dim);
+letter-spacing: 0.2px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.tb-stats {
+display: flex;
+align-items: center;
+gap: var(--s2);
+margin-left: auto;
+flex-shrink: 0;
+}
+.tb-stat {
+display: inline-flex;
+align-items: baseline;
+gap: 5px;
+font-size: 8px;
+letter-spacing: 1.2px;
+color: var(--dim);
+white-space: nowrap;
+}
+.tb-stat b { font-size: var(--fs-sm); font-weight: 700; color: var(--white); letter-spacing: 0.5px; }
+.tb-stat + .tb-stat { padding-left: var(--s2); border-left: 1px solid var(--border); }
+
+/* Makes the ⌘K palette discoverable instead of a secret */
+#tb-search {
+display: flex;
+align-items: center;
+gap: 6px;
+flex-shrink: 0;
+background: var(--panel2);
+border: 1px solid var(--border2);
+border-radius: 999px;
+color: var(--dim);
+font-family: var(--mono);
+font-size: 9px;
+letter-spacing: 1px;
+padding: 5px 8px 5px 10px;
+cursor: pointer;
+transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+#tb-search:hover { border-color: var(--accent); color: var(--accent2); }
+#tb-search .tbs-ico { font-size: 12px; line-height: 1; }
+#tb-search kbd {
+font-family: var(--mono);
+font-size: 8px;
+background: var(--border2);
+border-radius: 3px;
+padding: 1px 4px;
+color: var(--dim);
 }
 
-/* ═══════════════════════════════════════════
-LAYOUT
-═══════════════════════════════════════════ */
-.terminal-body {
-display: flex;
-height: calc(100vh - 90px);
-}
+/* ── Rail + scroll region ── */
 #sidebar {
-width: 168px;
-flex-shrink: 0;
+grid-area: rail;
 background: var(--glass-bg);
 backdrop-filter: blur(var(--glass-blur));
 -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -265,10 +299,10 @@ display: flex;
 flex-direction: column;
 }
 #main {
-flex: 1;
+grid-area: main;
 overflow-y: auto;
+overflow-x: hidden;
 background: var(--bg);
-padding-bottom: 20px;
 }
 
 /* ═══════════════════════════════════════════
@@ -281,6 +315,33 @@ font-size: 9px;
 color: var(--dim);
 letter-spacing: 2px;
 text-transform: uppercase;
+}
+/* Rail footer: the "is this thing on?" readout, filling what used to be
+   170px of empty column. */
+.nav-foot {
+margin-top: auto;
+padding: var(--s3);
+border-top: 1px solid var(--border);
+display: flex;
+flex-direction: column;
+gap: 3px;
+}
+.nf-row {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 8px;
+letter-spacing: 1.2px;
+color: var(--dim);
+white-space: nowrap;
+}
+.nf-meta { color: var(--dim2); }
+.nf-dot {
+width: 5px; height: 5px; border-radius: 50%;
+background: var(--cyan);
+box-shadow: 0 0 5px var(--cyan);
+animation: blink 1.2s step-end infinite;
+flex-shrink: 0;
 }
 .nav-item {
 display: flex;
@@ -295,6 +356,7 @@ letter-spacing: 0.4px;
 border-radius: var(--radius-sm);
 margin: 1px var(--s2);
 }
+.nav-item { white-space: nowrap; }
 .nav-item:hover { background: var(--panel2); color: var(--cyan); }
 .nav-item.active { background: rgba(45,212,191,0.12); color: var(--accent); font-weight: 700; box-shadow: inset 2px 0 0 var(--accent); }
 .nav-item .nkey {
@@ -312,8 +374,14 @@ flex-shrink: 0;
 /* ═══════════════════════════════════════════
 PANELS
 ═══════════════════════════════════════════ */
-.panel { display: none; padding: var(--s4); }
-.panel.active { display: block; animation: panelIn 0.18s ease; }
+.panel { display: none; padding: var(--s4); padding-bottom: var(--s6); }
+.panel.active {
+  display: block;
+  animation: panelIn 0.18s ease;
+  /* Centred, measure-capped content column */
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
 @keyframes panelIn {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
@@ -344,7 +412,11 @@ BLOOMBERG PANELS / WINDOWS
 background: var(--panel);
 border: 1px solid var(--border);
 border-radius: var(--radius);
+/* `clip` trims the corners exactly like `hidden` but without turning the panel
+   into a scroll container — which would trap the tables' sticky headers.
+   `hidden` stays first as the fallback for browsers that lack `clip`. */
 overflow: hidden;
+overflow: clip;
 margin-bottom: var(--s3);
 position: relative;
 box-shadow: var(--shadow);
@@ -368,11 +440,32 @@ gap: var(--s2);
 .bb-panel-head .ph-right { font-size: 10px; font-weight: 500; color: var(--dim); letter-spacing: 0.5px; }
 .bb-body { padding: var(--s3); }
 
-/* Bounded chart container: gives responsive Chart.js canvases a fixed height
-   to size against, so full-width charts don't balloon to half their width. */
+/* Bounded chart container. Chart.js canvases are responsive with
+   maintainAspectRatio off, so their height comes from here and nowhere else —
+   without it a full-width chart grows to ~80% of its own width and a single
+   bar chart can run 900px tall on a desktop monitor. */
 .chart-box { position: relative; width: 100%; height: 240px; }
-.chart-box-tall { height: 360px; }
-.chart-box > canvas { position: absolute; inset: 0; }
+.chart-box-short { height: 170px; }
+.chart-box-tall  { height: 340px; }
+/* Horizontal bar charts size to their row count instead: --rows is set by
+   fitBarChart() in script.js, so 8 styles and 22 countries both get a sane
+   bar thickness. Clamped so the box never collapses or runs off the screen. */
+.chart-box-auto {
+  height: clamp(200px, calc(var(--rows, 10) * 24px + 34px), 620px);
+}
+.chart-box > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+
+/* Asymmetric two-up: a chart carries the weight, a list rides alongside.
+   Collapses to a stack before the columns get too narrow to read. */
+.ov-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+.ov-split-even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.ov-split > * { min-width: 0; margin-bottom: 0; }
+@media (max-width: 1100px) { .ov-split, .ov-split-even { grid-template-columns: minmax(0, 1fr); } }
 
 /* Grid layouts */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-bottom: var(--s3); }
@@ -386,6 +479,34 @@ gap: var(--s2);
 /* Let grid items shrink below their content's intrinsic width — otherwise
    responsive Chart.js canvases lock columns at their initial render size */
 .g2 > *, .g3 > *, .g4 > *, .g5 > *, .g6 > * { min-width: 0; }
+/* Panels in a row size to their own content. Stretching a 240px chart to match
+   a 900px list next to it is what left the big empty wells on the trends page. */
+.g2, .g3 { align-items: start; }
+.g2 > *, .g3 > * { margin-bottom: 0; }
+
+/* Panel body whose repeated child blocks flow into columns instead of one long
+   ribbon — used for the per-month best/worst cards. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0 var(--s4);
+}
+.card-grid > * { min-width: 0; }
+@media (max-width: 700px) { .card-grid { grid-template-columns: 1fr; } }
+
+/* Newspaper column flow for long single-column readouts: reading order stays
+   top-to-bottom within a column, unlike a grid which would run left-to-right. */
+.col-flow { columns: 260px; column-gap: var(--s5); }
+.col-flow > * { break-inside: avoid; }
+@media (max-width: 700px) { .col-flow { columns: 1; } }
+
+/* KPI strip that flows to fit however many tiles it's given */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--s3);
+}
+@media (max-width: 700px) { .kpi-strip { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; } }
 
 /* ═══════════════════════════════════════════
 KPI TILES
@@ -435,6 +556,37 @@ text-align: left;
 border-bottom: 1px solid var(--border2);
 font-weight: 600;
 white-space: nowrap;
+/* Column labels stay readable while scrolling a long table. The bottom rule is
+   a shadow, not a border, because borders on a sticky cell scroll away with the
+   row behind it. */
+position: sticky;
+top: 0;
+z-index: 2;
+box-shadow: inset 0 -1px 0 var(--border2);
+}
+/* Table viewports. Most tables scroll sideways inside their panel; the beers
+   index doesn't need to, so it opts out and its sticky header can anchor to the
+   page scroller instead. */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+@media (min-width: 1200px) { #beers .table-wrap { overflow-x: visible; } }
+
+/* Beer index column rhythm. Auto layout hands all the slack to whichever
+   column happens to hold the longest string (the city), which opens a ragged
+   gap mid-table; fixed percentages keep the columns in the same place on every
+   screen. Scoped to desktop — the phone layout hides half these columns. */
+@media (min-width: 1200px) {
+  #beers .bb-table { table-layout: fixed; }
+  #beers .bb-table th:nth-child(1)  { width: 34px; }
+  #beers .bb-table th:nth-child(2)  { width: 20%; }
+  #beers .bb-table th:nth-child(3)  { width: 9%;  }
+  #beers .bb-table th:nth-child(4)  { width: 6%;  }
+  #beers .bb-table th:nth-child(5)  { width: 5%;  }
+  #beers .bb-table th:nth-child(6)  { width: 7%;  }
+  #beers .bb-table th:nth-child(7)  { width: 28%; }
+  #beers .bb-table th:nth-child(8)  { width: 8%;  }
+  #beers .bb-table th:nth-child(9)  { width: 7%;  }
+  #beers .bb-table th:nth-child(10) { width: 7%;  }
+  #beers .bb-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 .bb-table tbody tr {
 border-bottom: 1px solid var(--border);
@@ -489,40 +641,49 @@ SORT/FILTER BAR
 .bb-ctrl {
 display: flex;
 align-items: center;
-justify-content: space-between;
-padding: 4px 0;
-margin-bottom: 6px;
+gap: var(--s3);
+padding: var(--s2) var(--s3);
+margin: calc(-1 * var(--s3)) calc(-1 * var(--s3)) var(--s3);
+background: var(--panel2);
 border-bottom: 1px solid var(--border);
 }
-.bb-ctrl-title { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+.bb-ctrl-title { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; white-space: nowrap; }
+/* Search grows into the free space; the three selects keep an even, predictable
+   width so the toolbar reads as one control group rather than four odd pills. */
+.ctrl-fields { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.ctrl-fields .bb-select { flex: 0 0 138px; }
+#beerFilterCount { font-size: 9px; color: #66718c; white-space: nowrap; margin-left: auto; }
 #beerSearch {
-background: var(--panel2);
+background: var(--panel);
 border-radius: var(--radius-sm);
-border: 1px solid var(--border);
+border: 1px solid var(--border2);
 color: var(--accent);
 font-family: var(--mono);
-font-size: 9px;
-padding: 3px 6px;
+font-size: 10px;
+letter-spacing: 0.5px;
+padding: 5px 8px;
 outline: none;
-width: 160px;
+flex: 1 1 200px;
+min-width: 120px;
+max-width: 340px;
 }
 #beerSearch:focus { border-color: var(--accent); }
 .bb-select {
-background: var(--panel2);
+background: var(--panel);
 border-radius: var(--radius-sm);
-border: 1px solid var(--border);
+border: 1px solid var(--border2);
 color: var(--accent);
 font-family: var(--mono);
-font-size: 9px;
-padding: 3px 20px 3px 6px;
+font-size: 10px;
+padding: 5px 20px 5px 8px;
 outline: none;
 cursor: pointer;
 /* Kill the native iOS/Android pill look so selects match the sharp terminal aesthetic */
 -webkit-appearance: none;
 -moz-appearance: none;
 appearance: none;
-border-radius: 0;
-/* Custom orange caret */
+border-radius: var(--radius-sm);
+/* Custom teal caret */
 background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath fill='%232dd4bf' d='M0 0h8L4 6z'/%3E%3C/svg%3E");
 background-repeat: no-repeat;
 background-position: right 6px center;
@@ -890,9 +1051,8 @@ BOTTOM NAV — mobile thumb-reach (hidden on desktop)
 STATUS BAR
 ═══════════════════════════════════════════ */
 #statusbar {
-position: fixed;
-bottom: 0; left: 0; right: 0;
-height: calc(16px + env(safe-area-inset-bottom, 0px));
+grid-area: status;
+height: calc(18px + env(safe-area-inset-bottom, 0px));
 padding-bottom: env(safe-area-inset-bottom, 0px);
 background: #0a0f1b;
 border-top: 1px solid var(--border2);
@@ -913,14 +1073,73 @@ z-index: 100;
 .sb-spacer { flex: 1; }
 
 @media (max-width: 700px) {
+/* PHONE SHELL — the grid folds to a single column: a compact sticky header
+   (brand row + page-context row) over the scrolling content, with the bottom
+   bar as the primary nav. The rail and the desktop status bar retire. */
+#shell {
+  display: block;
+  height: auto;
+  min-height: 100dvh;
+}
 #sidebar { display: none; }
-.terminal-body { height: auto; }
-#main { width: 100%; padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
-
-/* Phone-first navigation: the bottom bar is the primary nav, so the top
-   function-key strip and the desktop status bar are redundant — retire both. */
-#menubar-wrap { display: none; }
 #statusbar { display: none; }
+#main {
+  width: 100%;
+  overflow: visible;
+  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Header rows stick together at the top of the viewport */
+#brandbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  height: calc(34px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: max(10px, env(safe-area-inset-left, 0px));
+  padding-right: max(10px, env(safe-area-inset-right, 0px));
+  border-right: none;
+  background: var(--black);
+}
+.bb-word { flex-direction: row; align-items: baseline; gap: 6px; font-size: 12px; }
+.bb-word em { font-size: 8px; }
+.bb-clock {
+  display: block;
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+#topbar {
+  position: sticky;
+  top: calc(34px + env(safe-area-inset-top, 0px));
+  z-index: 55;
+  height: 34px;
+  gap: 8px;
+  padding-left: max(10px, env(safe-area-inset-left, 0px));
+  padding-right: max(10px, env(safe-area-inset-right, 0px));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45), inset 0 -1px 0 rgba(45,212,191,0.2);
+}
+.tb-title { font-size: 11px; letter-spacing: 1.2px; }
+/* The page description and the full stat strip don't fit a phone header —
+   the hero card on each page says the same thing with room to breathe. */
+.tb-desc { display: none; }
+/* Only two totals fit a phone header, and unlabelled numbers are just noise —
+   keep REVIEWS and AVG with their labels, drop the rest. */
+.tb-stats { gap: 6px; overflow: hidden; }
+.tb-stat + .tb-stat { padding-left: 6px; }
+.tb-stat b { font-size: 11px; }
+.tb-stat:nth-child(2), .tb-stat:nth-child(3) { display: none; }
+#tb-search {
+  padding: 4px;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  justify-content: center;
+  margin-left: 0;
+}
+#tb-search .tbs-label, #tb-search kbd { display: none; }
+
 #bottomnav {
   display: flex;
   position: fixed;
@@ -940,74 +1159,6 @@ z-index: 100;
 .bn-icon { width: 56px; height: 30px; }
 .bn-icon svg { width: 22px; height: 22px; }
 
-/* Header is the top identity now that the menu strip is gone — keep it pinned */
-#hdr { position: sticky; top: 0; z-index: 50; }
-
-/* HEADER — collapse the wide title block; group the 5 stats into a tidy 3-up row */
-#hdr {
-  flex-wrap: wrap;
-  height: auto;
-  padding: 6px 8px;
-  padding-left: max(8px, env(safe-area-inset-left, 0px));
-  padding-right: max(8px, env(safe-area-inset-right, 0px));
-  gap: 4px;
-  background: linear-gradient(180deg, rgba(16,22,37,0.95) 0%, rgba(7,10,18,1) 100%);
-}
-.hdr-block.wide {
-  min-width: 100%;
-  border-right: none;
-  border-bottom: 1px solid var(--border);
-  padding: 0 0 4px 0;
-}
-.hdr-title { font-size: 13px; letter-spacing: 0.6px; }
-.hdr-title span { display: none; }
-.hdr-sub { font-size: 8px; letter-spacing: 1.2px; margin-top: 2px; }
-/* MENUBAR — scrollable horizontal with snap, larger tap targets, sticky on mobile.
-   The wrapper holds the sticky+gradient so the right-edge fade stays pinned to
-   the visible viewport instead of sliding with the scrolled content. */
-#menubar-wrap {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-#menubar-wrap::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: env(safe-area-inset-top, 0px);
-  bottom: 0;
-  width: 24px;
-  background: linear-gradient(to right, transparent, #0a0f1b);
-  pointer-events: none;
-  z-index: 1;
-}
-#menubar {
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: calc(34px + env(safe-area-inset-top, 0px));
-  padding-top: env(safe-area-inset-top, 0px);
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-}
-#menubar::-webkit-scrollbar { display: none; }
-.mb-item {
-  padding: 0 10px;
-  font-size: 10px;
-  flex-shrink: 0;
-  min-height: 34px;
-  min-width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-align: start;
-}
-.mb-item .fkey { font-size: 9px; padding: 1px 4px; }
-.mb-item.active::after { height: 2px; }
-.mb-logo { padding: 0 10px; font-size: 11px; flex-shrink: 0; min-height: 34px; }
-.mb-right { display: none; }
-.mb-spacer { display: none; }
-
 /* GRIDS — singleton on narrow screens for readability */
 .g2, .g4, .g6 { grid-template-columns: 1fr 1fr; gap: 6px; }
 .g3, .g5 { grid-template-columns: 1fr; gap: 6px; }
@@ -1024,19 +1175,6 @@ z-index: 100;
 .kpi-label { font-size: 8px; letter-spacing: 1.0px; }
 .kpi-sub { font-size: 9px; }
 
-/* STATUS BAR — fixed at bottom with safe-area, simpler info */
-#statusbar {
-  gap: 10px;
-  font-size: 8px;
-  background: var(--panel);
-  border-top: 1px solid var(--accent);
-  color: var(--dim);
-  flex-wrap: nowrap;
-  height: calc(20px + env(safe-area-inset-bottom, 0px));
-  padding-left: max(8px, env(safe-area-inset-left, 0px));
-  padding-right: max(8px, env(safe-area-inset-right, 0px));
-}
-.sb-item:nth-child(3), .sb-item:nth-child(4) { display: none; }
 body { overscroll-behavior: none; }
 
 /* BEER GRID — 2 columns with breathing room */
@@ -1182,14 +1320,15 @@ select {
   align-items: stretch !important;
   gap: 8px !important;
   padding: 8px !important;
+  margin: -8px -8px 8px !important;
 }
 .bb-ctrl .bb-ctrl-title { font-size: 11px; }
-.bb-ctrl > div {
-  display: flex !important;
+.ctrl-fields {
   flex-wrap: wrap;
   gap: 6px !important;
   width: 100%;
 }
+#beerFilterCount { margin-left: 0; }
 .bb-ctrl #beerSearch {
   flex: 1 1 100%;
   width: 100% !important;
@@ -1199,7 +1338,7 @@ select {
   padding: 8px 10px !important;
 }
 .bb-ctrl .bb-select {
-  flex: 1 1 100px;
+  flex: 1 1 100px !important;
   min-width: 100px;
   box-sizing: border-box;
   font-size: 13px !important;
@@ -1207,53 +1346,49 @@ select {
   min-height: 38px;
   background-position: right 7px center;
 }
-#beerFilterCount { flex: 1 1 100%; }
 
-/* IPO/MARKETS top picks — full-width cards on mobile */
-.ipo-top-pick { flex: 0 0 75vw; }
 
-/* Charts — give them a sensible height on mobile */
-canvas#methodChart, canvas#countryChart,
-canvas#langChart, canvas#cityChart, canvas#timelineChart,
-canvas#monthlyChart, canvas#bumpChart,
-canvas#scatterChart, canvas#contrarianChart, canvas#ipoUpsideChart {
-  max-height: 260px;
-}
-/* Bounded chart boxes get a shorter, phone-friendly height */
+/* Bounded chart boxes get shorter, phone-friendly heights */
 .chart-box { height: 200px; }
-.chart-box-tall { height: 300px; }
+.chart-box-short { height: 150px; }
+.chart-box-tall { height: 260px; }
+.chart-box-auto { height: clamp(180px, calc(var(--rows, 10) * 20px + 30px), 420px); }
 }
 
-/* iPhone Pro / narrow phones — extra polish below 430px */
+/* iPhone Pro / narrow phones — extra polish below 430px.
+   KPI tiles stay 2-up: one per row turns the home screen into four full
+   viewports of headline number before any actual content appears. */
 @media (max-width: 430px) {
-  .g2, .g4, .g6 { grid-template-columns: 1fr; }
+  .g2, .g6 { grid-template-columns: 1fr; }
+  .g4 { grid-template-columns: 1fr 1fr; gap: 6px; }
   .beer-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .beer-card { padding: 8px; min-height: 130px; }
   .bc-logo-wrap { height: 50px; }
   .panel { padding: 6px; }
   .kpi-val { font-size: 16px; }
+  .kpi-sparkline-wrap { height: 20px; }
   #worldMap { height: 320px; }
 }
 
 /* Very small / iPhone SE — keep it usable */
 @media (max-width: 360px) {
-  .hdr-title { font-size: 12px; }
+  .bb-word em { display: none; }
   .kpi-val { font-size: 14px; }
-  .mb-item { padding: 0 8px; min-width: 44px; }
+  .tb-stat:nth-child(n+2) { display: none; }
 }
 
 /* Tall iPhone Pro screens in landscape — keep the chrome tight */
 @media (max-width: 932px) and (orientation: landscape) and (hover: none) {
-  #menubar { height: calc(30px + env(safe-area-inset-top, 0px)); }
-  .mb-item { min-height: 30px; }
-  .mb-logo { min-height: 30px; }
+  #brandbar { height: calc(30px + env(safe-area-inset-top, 0px)); }
+  #topbar { top: calc(30px + env(safe-area-inset-top, 0px)); height: 30px; }
   #worldMap { height: 240px; }
 }
 
+/* Small laptops / tablets — narrow the rail and drop the split columns before
+   either side gets too cramped to read. */
 @media (max-width: 1024px) and (min-width: 701px) {
-#sidebar { width: 140px; }
-.sidebar-label { font-size: 9px; }
-.sidebar-key { display: none; }
+:root { --rail: 160px; }
+.tb-desc { display: none; }
 .g4, .g5 { grid-template-columns: 1fr 1fr; }
 .g6 { grid-template-columns: repeat(3, 1fr); }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1590,17 +1725,16 @@ canvas {
 }
 
 /* Top-picks conveyor */
+/* Recommendation cards wrap onto a second line instead of hiding half the list
+   behind a sideways scroll — on a desktop there is room to just show them. */
 .ipo-top-picks {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--s2);
   padding: 2px 2px 6px;
-  scroll-snap-type: x proximity;
 }
-.ipo-top-picks::-webkit-scrollbar { height: 6px; }
 .ipo-top-pick {
-  flex: 0 0 180px;
-  scroll-snap-align: start;
+  min-width: 0;
   background: var(--panel);
   border: 1px solid var(--border2);
   border-left-width: 3px;

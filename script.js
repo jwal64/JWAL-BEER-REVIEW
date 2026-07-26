@@ -532,9 +532,13 @@ function updateLiveStats(){
   const hitRate = beers.length?Math.round(hitCount/beers.length*100):0;
 
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  // Header bar
+  // Context bar — running totals, always visible whichever page you're on
   const sub = document.getElementById('hdr-subtitle');
-  if(sub) sub.textContent = `PERSONAL BREW INTELLIGENCE SYSTEM · ${totalReviews} REVIEWS · ${totalMarkets} MARKETS · ${totalBrands} BRANDS`;
+  if(sub) sub.innerHTML =
+    [[totalReviews,'REVIEWS'],[totalBrands,'BRANDS'],[totalMarkets,'MARKETS'],[avgRating.toFixed(2)+'★','AVG']]
+      .map(([v,l])=>`<span class="tb-stat"><b>${v}</b><span class="tb-stat-lbl">${l}</span></span>`).join('');
+  // Rail footer
+  set('nav-records', `${totalReviews} RECORDS`);
   // Home hero — plain-language summary so a first-time visitor instantly gets it
   const heroEl = document.getElementById('ov-hero');
   if(heroEl){
@@ -728,9 +732,8 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // ── TAB
 (function initTabA11y(){
   try{
-    const mb=document.getElementById('menubar'); if(mb) mb.setAttribute('role','tablist');
-    const sb=document.querySelector('.sidebar nav,#sidebar nav,nav'); if(sb) sb.setAttribute('role','tablist');
-    document.querySelectorAll('.nav-item,.mb-item').forEach(el=>{
+    const sb=document.getElementById('sidebar'); if(sb) sb.setAttribute('role','tablist');
+    document.querySelectorAll('.nav-item').forEach(el=>{
       const tab=el.dataset.tab; if(!tab) return;
       el.setAttribute('role','tab');
       el.setAttribute('tabindex','0');
@@ -742,23 +745,38 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 // Tab navigation is static after load — query once instead of on every switch.
 const TAB_PANELS=[...document.querySelectorAll('#main > .panel')];
 const NAV_ITEMS=[...document.querySelectorAll('.nav-item')];
-const MB_ITEMS=[...document.querySelectorAll('.mb-item')];
 const BN_ITEMS=[...document.querySelectorAll('#bottomnav .bn-item')];
 // Geography / Over-time / What-to-try now live as sub-sections inside the
 // single INSIGHTS tab. Asking for one of these jumps to Insights + that sub.
 const INSIGHTS_SUBS=['geo','temporal','markets'];
 let _insightsSub='geo';
+// The context bar restates where you are and what the page is for — the old
+// header said the same thing on all four tabs.
+const TAB_CONTEXT={
+  overview:['HOME','The highlights at a glance.'],
+  beers:   ['ALL BEERS','Every review, searchable and sortable.'],
+  maps:    ['MAP','Where these beers are brewed and where I drank them.'],
+  insights:['INSIGHTS','Places, trends over time and what to try next.']
+};
+function setTabContext(id){
+  const c=TAB_CONTEXT[id]; if(!c) return;
+  const t=document.getElementById('tb-title'), d=document.getElementById('tb-desc');
+  if(t) t.textContent=c[0];
+  if(d) d.textContent=c[1];
+}
 function showTab(id,btn){
   // Redirect legacy sub-section ids into the Insights tab
   if(INSIGHTS_SUBS.includes(id)){ _insightsSub=id; showTab('insights',btn); return; }
   TAB_PANELS.forEach(p=>p.classList.toggle('active',p.id===id));
+  setTabContext(id);
+  // Every panel shares one scroll position — start each at the top. #main is the
+  // scroller on desktop; on phones the shell unfolds and the window scrolls.
+  const mainEl=document.getElementById('main');
+  if(mainEl) mainEl.scrollTop=0;
+  try{ window.scrollTo(0,0); }catch(e){}
   NAV_ITEMS.forEach(n=>{n.classList.remove('active');n.setAttribute('aria-selected','false');});
-  MB_ITEMS.forEach(m=>{m.classList.remove('active');m.setAttribute('aria-selected','false');});
   BN_ITEMS.forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');});
-  // Sync menubar
-  const mbEl=MB_ITEMS.find(m=>m.dataset.tab===id);
-  if(mbEl){mbEl.classList.add('active');mbEl.setAttribute('aria-selected','true');}
-  // Sync sidebar: handles both click (btn passed) and keyboard (btn undefined)
+  // Sync the rail: handles both click (btn passed) and keyboard (btn undefined)
   const navEl=btn&&btn.classList.contains('nav-item')?btn:
     NAV_ITEMS.find(n=>n.dataset.tab===id);
   if(navEl){navEl.classList.add('active');navEl.setAttribute('aria-selected','true');}
@@ -822,6 +840,10 @@ try {
   Chart.defaults.elements.line.borderWidth=2;
   Chart.defaults.elements.bar.borderWidth=0;
   Chart.defaults.animation.duration=400;
+  // Every chart lives inside a .chart-box of known height, so the canvas takes
+  // its size from CSS. Left on (the Chart.js default), a full-width chart sizes
+  // its height from its own width and a bar chart can run 900px tall.
+  Chart.defaults.maintainAspectRatio=false;
   // Respect OS-level reduced-motion preference
   if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation=false;
 } catch(e){ console.error('Chart.defaults error:',e); }
@@ -829,6 +851,16 @@ const _charts={};
 function safeChart(key,ctx,cfg){
   if(!ctx) return null;
   if(_charts[key]) _charts[key].destroy();
+  // Horizontal bar charts have one row per label, so their container height has
+  // to follow the data — 9 styles and 22 countries can't share a fixed box.
+  // .chart-box-auto reads --rows; boxes with a fixed height simply ignore it.
+  try{
+    if(cfg&&cfg.options&&cfg.options.indexAxis==='y'){
+      const box=ctx.closest&&ctx.closest('.chart-box');
+      const rows=cfg.data&&cfg.data.labels?cfg.data.labels.length:0;
+      if(box&&rows) box.style.setProperty('--rows',rows);
+    }
+  }catch(e){}
   _charts[key]=new Chart(ctx,cfg);
   return _charts[key];
 }
@@ -1612,7 +1644,9 @@ function drawTemporal(){
   const yearLabel = firstYear===lastYear ? firstYear : `${firstYear}–${lastYear}`;
   const kpiRange = months.length > 1 ? `${monthAbbr[months[0]]} – ${monthAbbr[months[months.length-1]]}` : monthAbbr[months[0]];
 
-  document.getElementById('temporal-kpis').innerHTML = `<div class="g${Math.min(months.length+2,5)}" style="margin-bottom:0">
+  // Auto-fit strip rather than a fixed column count: the tile count is
+  // months + 2, so a hardcoded grid leaves a ragged half-empty final row.
+  document.getElementById('temporal-kpis').innerHTML = `<div class="kpi-strip">
     <div class="kpi"><div class="kpi-val" style="color:var(--accent)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${kpiRange} ${yearLabel}</div></div>
     ${months.map((m,i)=>`
     <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${monthAbbr[m].toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
@@ -1681,7 +1715,7 @@ function drawTemporal(){
     styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
       <div class="bb-panel">
         <div class="bb-panel-head">STYLE MIX — ${monthLabels[i].toUpperCase()}<span class="ph-right">${counts[i]} REVIEWS</span></div>
-        <div class="bb-body"><canvas id="styleChart_${i}" height="180"></canvas></div>
+        <div class="bb-body"><div class="chart-box chart-box-short"><canvas id="styleChart_${i}"></canvas></div></div>
       </div>`).join('')}</div>`;
     months.forEach((m,i)=>{
       const sm={};
@@ -2472,16 +2506,17 @@ window.closeBreweryDrawer=closeBreweryDrawer;
 // EVENT DELEGATION (replaces inline onclick handlers)
 // ══════════════════════════════════════════════════════════════
 try {
-  // Menu bar tab navigation
-  document.getElementById('menubar').addEventListener('click', function(e) {
-    const item = e.target.closest('.mb-item[data-tab]');
+  // Rail tab navigation (the single primary nav on desktop)
+  const railEl = document.getElementById('sidebar');
+  if (railEl) railEl.addEventListener('click', function(e) {
+    const item = e.target.closest('.nav-item[data-tab]');
     if (item) showTab(item.dataset.tab, item);
   });
 
-  // Sidebar tab navigation
-  document.getElementById('sidebar').addEventListener('click', function(e) {
-    const item = e.target.closest('.nav-item[data-tab]');
-    if (item) showTab(item.dataset.tab, item);
+  // Context-bar search button — makes the ⌘K palette discoverable by mouse
+  const searchBtn = document.getElementById('tb-search');
+  if (searchBtn) searchBtn.addEventListener('click', function() {
+    if (typeof window.openPalette === 'function') window.openPalette();
   });
 
   // Bottom nav (mobile thumb-reach)
@@ -2573,7 +2608,7 @@ try {
   // Keyboard activation for tab items (focusable divs with role="tab")
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    const el = e.target.closest ? e.target.closest('.mb-item[data-tab], .nav-item[data-tab]') : null;
+    const el = e.target.closest ? e.target.closest('.nav-item[data-tab]') : null;
     if (el) { e.preventDefault(); showTab(el.dataset.tab, el); }
   });
 
@@ -2637,6 +2672,14 @@ try {
   const validTab = h => TAB_PANELS.some(p => p.id === h) || INSIGHTS_SUBS.includes(h);
   const bootHash = location.hash.slice(1);
   showTab(validTab(bootHash) ? bootHash : 'overview');
+  // showTab writes the tab into the URL fragment while the document is still
+  // parsing, so the browser then performs its "scroll to fragment" step and
+  // lands the page a header's height down. Tabs are panels, not anchors — the
+  // right position is always the top.
+  try{ history.scrollRestoration = 'manual'; }catch(e){}
+  const toTop = () => { window.scrollTo(0,0); const m=document.getElementById('main'); if(m) m.scrollTop=0; };
+  window.addEventListener('load', toTop);
+  requestAnimationFrame(toTop);
 
   // Manually edited hashes / external links into an open page
   window.addEventListener('hashchange', function() {
