@@ -226,6 +226,13 @@
         <span class="mm-desc">Every beer's trip from where it's made to where I drank it.</span>
       </span>
     </button>
+    <button class="map-mode" data-mode="passport" role="tab" aria-selected="false">
+      <span class="mm-icon">🛂</span>
+      <span class="mm-text">
+        <span class="mm-title">PASSPORT</span>
+        <span class="mm-desc">Every country stamped — brewed there, drank there, or both.</span>
+      </span>
+    </button>
   </div>
 
   <!-- One world map; the key overlay explains the active view in plain words -->
@@ -279,6 +286,17 @@
             <tbody id="journeyTbody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mapsec-passport" class="map-sec">
+    <div class="bb-panel">
+      <div class="bb-panel-head">MY BEER PASSPORT<span class="ph-right">ONE UNIQUE STAMP PER COUNTRY · HOVER FOR DETAILS</span></div>
+      <div class="bb-body">
+        <div id="passport-summary" class="mh-chips"></div>
+        <div id="passport-filters" class="passport-filters"></div>
+        <div id="passportGrid" class="passport-grid"></div>
       </div>
     </div>
   </div>

@@ -1169,6 +1169,7 @@ function openBeerModal(name){
       </div>
     </div>
     <div style="font-size:9px;color:#2dd4bf;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
+    <div class="table-wrap">
     <table class="bb-table" style="min-width:unset">
       <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
       <tbody>${reviews.map((b,i)=>`
@@ -1182,7 +1183,8 @@ function openBeerModal(name){
           <td style="color:#66718c;font-size:9px">${b.month} ${b.year}</td>
         </tr>`).join('')}
       </tbody>
-    </table>`;
+    </table>
+    </div>`;
   _modalPrevFocus=document.activeElement;
   const bm=document.getElementById('beerModal');
   bm.classList.add('open'); bm.setAttribute('aria-hidden','false');
@@ -1374,7 +1376,8 @@ let _worldMap=null, _mapLayers=null, _mapMode='drank';
 const MAP_MODES={
   drank:{head:'WHERE I DRANK THEM — EVERY CITY WITH A REVIEW',hint:'CLICK A DOT FOR THE POUR LIST'},
   brewed:{head:'WHERE THEY’RE BREWED — EVERY BREWERY’S HOMETOWN',hint:'CLICK A DOT FOR THE BREWERY'},
-  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'}
+  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'},
+  passport:{head:'MY BEER PASSPORT — EVERY COUNTRY, STAMPED',hint:'CLICK A DOT · SCROLL DOWN FOR THE FULL COLLECTION'}
 };
 
 // beer name → brewery record (breweries[].beers is " · "-separated)
@@ -1414,6 +1417,325 @@ function buildJourneys(){
   return [...seen.values()];
 }
 
+// One record per country that's touched EITHER end of the trip: brewed there,
+// drunk there, or both. This is the data behind the PASSPORT view.
+function passportCountries(){
+  const idx=beerBreweryIndex();
+  const rec={};
+  const ensure=cc=>{
+    if(!rec[cc]) rec[cc]={cc,country:CNAMES[cc]||cc,brewed:null,drank:null,firstYear:null,firstMonthN:null,firstMonth:null};
+    return rec[cc];
+  };
+  beers.forEach(b=>{
+    const br=idx[b.beer];
+    const bRec=ensure(b.origin);
+    if(!bRec.brewed) bRec.brewed={count:0,names:new Set()};
+    bRec.brewed.count++;
+    bRec.brewed.names.add(br?br.name:b.beer);
+
+    const dRec=ensure(b.cc);
+    if(!dRec.drank) dRec.drank={count:0,cities:new Set(),ratings:[]};
+    dRec.drank.count++;
+    dRec.drank.cities.add(b.city);
+    dRec.drank.ratings.push(b.rating);
+    if(dRec.firstYear==null||b.year<dRec.firstYear||(b.year===dRec.firstYear&&b.monthN<dRec.firstMonthN)){
+      dRec.firstYear=b.year;dRec.firstMonthN=b.monthN;dRec.firstMonth=b.month;
+    }
+  });
+  return Object.values(rec).map(r=>({
+    ...r,
+    brewed:r.brewed?{count:r.brewed.count,names:[...r.brewed.names]}:null,
+    drank:r.drank?{count:r.drank.count,cities:[...r.drank.cities],avg:avg(r.drank.ratings)}:null
+  })).sort((a,b)=>{
+    const bothA=a.brewed&&a.drank?0:1,bothB=b.brewed&&b.drank?0:1;
+    if(bothA!==bothB) return bothA-bothB;
+    return a.country.localeCompare(b.country);
+  });
+}
+
+// FNV-1a-ish hash so every country gets the same "hand-stamped" look every
+// time (ink color, tilt) without needing per-country data entry.
+function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+const STAMP_INKS=['#2dd4bf','#5df08e','#ffd166','#ff8a3d','#ff4d5e','#8b7cf6','#4dc3ff','#ff6ec7'];
+function stampStyle(cc){
+  const h=stampHash(cc);
+  return {
+    ink:STAMP_INKS[h%STAMP_INKS.length],
+    rot:((h>>>4)%13)-6
+  };
+}
+
+// Official-ish 3-letter codes for the passport label band. Constituent UK
+// countries have no ISO-3166 alpha-3 of their own, so the common
+// sporting/travel abbreviations (ENG/SCO/WAL/NIR) are used instead.
+const CODE3={
+  BE:'BEL',NL:'NLD',CA:'CAN',US:'USA',DE:'DEU',JP:'JPN',CZ:'CZE',IT:'ITA',ES:'ESP',
+  PT:'PRT',PR:'PRI',AT:'AUT',CU:'CUB',DK:'DNK',FR:'FRA',GR:'GRC',IE:'IRL',JM:'JAM',
+  LB:'LBN',MX:'MEX',PL:'POL','GB-ENG':'ENG','GB-SCT':'SCO','GB-WLS':'WAL','GB-NIR':'NIR',
+  GB:'GBR',BR:'BRA',CN:'CHN',ZA:'ZAF',AU:'AUS',SE:'SWE',AR:'ARG',NO:'NOR',TH:'THA',SG:'SGP'
+};
+function code3(cc){ return CODE3[cc]||cc.replace('GB-','').slice(0,3).toUpperCase(); }
+
+// Ring of perforation notches (small backdrop-colored circles biting into the
+// border) around a rect — the classic postage-stamp edge, built once here
+// instead of a giant hand-authored path.
+function perforatedEdge(x0,y0,x1,y1,bg,step,r){
+  let s='';
+  for(let x=x0+step/2;x<x1;x+=step){
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y0}" r="${r}" fill="${bg}"/><circle cx="${x.toFixed(1)}" cy="${y1}" r="${r}" fill="${bg}"/>`;
+  }
+  for(let y=y0+step/2;y<y1;y+=step){
+    s+=`<circle cx="${x0}" cy="${y.toFixed(1)}" r="${r}" fill="${bg}"/><circle cx="${x1}" cy="${y.toFixed(1)}" r="${r}" fill="${bg}"/>`;
+  }
+  return s;
+}
+
+// Small helpers for the radially-symmetric icons (flowers, manes, spikes) —
+// generating points by angle keeps proportions honest instead of guessing
+// coordinates by hand.
+function polarPt(cx,cy,r,deg){const rad=(deg-90)*Math.PI/180;return [cx+r*Math.cos(rad),cy+r*Math.sin(rad)];}
+function starPoints(cx,cy,rOuter,rInner,spikes){
+  const pts=[];
+  for(let i=0;i<spikes*2;i++){
+    const rad=i%2===0?rOuter:rInner;
+    const [x,y]=polarPt(cx,cy,rad,i*(360/(spikes*2)));
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
+
+// One real national/cultural symbol per country — a flower, animal, or folk
+// emblem, not a landmark building — drawn as bold solid silhouettes (the
+// style that actually read well: maple leaf, Liberty, a stepped pyramid).
+// Icon area ≈ x20-100, y36-107, center (60,72). Each fn(bg) gets the card's
+// backdrop color for small cutout details (eyes, pupils); everything else
+// inherits currentColor from the wrapping <g>.
+// A plain heraldic shield outline, reused by every flag-pattern icon below —
+// stripes/crosses are 100% reliable to draw correctly (just rects and lines),
+// where the earlier animal attempts (lion, eagle, bull, swan, hummingbird)
+// kept coming out unrecognizable. clipPath keeps the pattern inside the
+// shield regardless of how generously the rects/polygons are sized.
+const SHIELD_D="M28,42 Q28,39 31,39 L89,39 Q92,39 92,42 L92,68 Q92,94 60,107 Q28,94 28,68 Z";
+function shieldIcon(cc,pattern){
+  return `<defs><clipPath id="shield-${cc}"><path d="${SHIELD_D}"/></clipPath></defs>
+<g clip-path="url(#shield-${cc})">${pattern}</g>
+<path d="${SHIELD_D}" fill="none" stroke-width="2.2"/>`;
+}
+
+const COUNTRY_ART={
+  // Belgium — a Belgian waffle (its own true cultural export, and a shape
+  // that's foolproof to draw: a grid reads as a grid at any skill level)
+  BE:(bg)=>{
+    const g=[40,52,68,80].map(x=>`<line x1="${x}" y1="30" x2="${x}" y2="115" stroke-width="2"/>`).join('')
+      +[52,64,76,88,100].map(y=>`<line x1="20" y1="${y}" x2="100" y2="${y}" stroke-width="2"/>`).join('');
+    return shieldIcon('BE',`<rect x="20" y="30" width="80" height="85" opacity="0.15"/>${g}`);
+  },
+  // Canada — the maple leaf
+  CA:(bg)=>`
+    <path d="M60,42 L65,58 L80,52 L74,68 L92,71 L77,80 L87,94 L68,88 L66,104 L60,94 L54,104 L52,88 L33,94 L43,80 L28,71 L46,68 L40,52 L55,58 Z"/>
+    <line x1="60" y1="80" x2="60" y2="50" stroke="${bg}" stroke-width="1" opacity="0.75"/>
+    <line x1="60" y1="80" x2="78" y2="56" stroke="${bg}" stroke-width="1" opacity="0.75"/>
+    <line x1="60" y1="80" x2="42" y2="56" stroke="${bg}" stroke-width="1" opacity="0.75"/>`,
+  // Italy — the tricolore
+  IT:(bg)=>shieldIcon('IT',`
+    <rect x="20" y="30" width="27" height="85" opacity="1"/>
+    <rect x="47" y="30" width="26" height="85" opacity="0.4"/>
+    <rect x="73" y="30" width="27" height="85" opacity="0.8"/>`),
+  // Netherlands — the tulip
+  NL:(bg)=>`
+    <path d="M60,96 L60,52 Q44,50 42,36 Q52,40 58,48 Q55,32 60,24 Q65,32 62,48 Q68,40 78,36 Q76,50 60,52 Z"/>
+    <rect x="57" y="94" width="6" height="12"/>`,
+  // Portugal — the flag's green-and-red field
+  PT:(bg)=>shieldIcon('PT',`
+    <rect x="20" y="30" width="30" height="85" opacity="1"/>
+    <rect x="50" y="30" width="50" height="85" opacity="0.5"/>`),
+  // Puerto Rico — the coquí
+  PR:(bg)=>`
+    <path d="M32,88 Q30,68 60,66 Q90,68 88,88 Q90,100 60,102 Q30,100 32,88 Z"/>
+    <circle cx="46" cy="60" r="9"/>
+    <circle cx="74" cy="60" r="9"/>
+    <circle cx="46" cy="60" r="3.5" fill="${bg}"/>
+    <circle cx="74" cy="60" r="3.5" fill="${bg}"/>
+    <path d="M34,84 Q22,80 18,88" fill="none" stroke-width="4" stroke-linecap="round"/>
+    <path d="M86,84 Q98,80 102,88" fill="none" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40,98 Q30,104 22,100" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <path d="M80,98 Q90,104 98,100" fill="none" stroke-width="3" stroke-linecap="round"/>`,
+  // Spain — la rojigualda (thick-thin-thick horizontal bands)
+  ES:(bg)=>shieldIcon('ES',`
+    <rect x="20" y="30" width="80" height="24" opacity="1"/>
+    <rect x="20" y="54" width="80" height="30" opacity="0.4"/>
+    <rect x="20" y="84" width="80" height="24" opacity="1"/>`),
+  // USA — the stars and stripes
+  US:(bg)=>{
+    const stripes=[0,1,2,3,4,5,6].map(i=>`<rect x="20" y="${34+i*11.5}" width="80" height="5.5" opacity="${i%2===0?1:0}"/>`).join('');
+    const stars=[0,1,2].map(row=>[0,1,2,3].map(col=>
+      `<polygon points="${starPoints(29+col*8,38+row*11,3,1.3,5)}"/>`).join('')).join('');
+    return shieldIcon('US',`${stripes}<rect x="20" y="30" width="38" height="40" opacity="0.15"/>${stars}`);
+  },
+  // Austria — the edelweiss
+  AT:(bg)=>`
+    <polygon points="${starPoints(60,72,24,10,6)}"/>
+    <circle cx="60" cy="72" r="8" opacity="0.6"/>
+    <circle cx="60" cy="72" r="8" fill="none" stroke-width="1"/>`,
+  // Cuba — the mariposa (butterfly ginger lily)
+  CU:(bg)=>`
+    <ellipse cx="60" cy="50" rx="11" ry="20"/>
+    <ellipse cx="60" cy="94" rx="11" ry="20"/>
+    <ellipse cx="38" cy="72" rx="20" ry="11"/>
+    <ellipse cx="82" cy="72" rx="20" ry="11"/>
+    <circle cx="60" cy="72" r="9" opacity="0.6"/>`,
+  // Denmark — the Dannebrog cross
+  DK:(bg)=>shieldIcon('DK',`
+    <rect x="20" y="30" width="80" height="85" opacity="0.25"/>
+    <rect x="44" y="30" width="14" height="85"/>
+    <rect x="20" y="62" width="80" height="14"/>`),
+  // England — the Tudor rose
+  'GB-ENG':(bg)=>{
+    let outer='',inner='';
+    for(let i=0;i<5;i++){
+      const a=i*72;
+      outer+=`<ellipse cx="60" cy="56" rx="9" ry="16" transform="rotate(${a} 60 72)"/>`;
+      inner+=`<ellipse cx="60" cy="62" rx="6" ry="10" transform="rotate(${a+36} 60 72)" opacity="0.55"/>`;
+    }
+    return `${outer}${inner}<circle cx="60" cy="72" r="7"/>`;
+  },
+  // France — le tricolore
+  FR:(bg)=>shieldIcon('FR',`
+    <rect x="20" y="30" width="27" height="85" opacity="0.7"/>
+    <rect x="47" y="30" width="26" height="85" opacity="0.15"/>
+    <rect x="73" y="30" width="27" height="85" opacity="1"/>`),
+  // Germany — the Schwarz-Rot-Gold
+  DE:(bg)=>shieldIcon('DE',`
+    <rect x="20" y="30" width="80" height="28" opacity="1"/>
+    <rect x="20" y="58" width="80" height="28" opacity="0.6"/>
+    <rect x="20" y="86" width="80" height="28" opacity="0.85"/>`),
+  // Greece — the blue-and-white stripes and canton cross
+  GR:(bg)=>{
+    const stripes=[0,1,2,3,4,5,6].map(i=>`<rect x="20" y="${30+i*12.1}" width="80" height="6.1" opacity="${i%2===0?1:0}"/>`).join('');
+    return shieldIcon('GR',`${stripes}
+      <rect x="20" y="30" width="34" height="34" opacity="0.15"/>
+      <rect x="33" y="30" width="7" height="34"/>
+      <rect x="20" y="43" width="34" height="7"/>`);
+  },
+  // Ireland — the shamrock
+  IE:(bg)=>`
+    <circle cx="60" cy="54" r="14"/>
+    <circle cx="47" cy="76" r="14"/>
+    <circle cx="73" cy="76" r="14"/>
+    <line x1="60" y1="86" x2="60" y2="104" stroke-width="3"/>`,
+  // Jamaica — the saltire flag, quartered black-gold-green
+  JM:(bg)=>shieldIcon('JM',`
+    <polygon points="20,30 60,68 20,107" opacity="1"/>
+    <polygon points="100,30 60,68 100,107" opacity="1"/>
+    <polygon points="20,30 60,68 100,30" opacity="0.35"/>
+    <polygon points="20,107 60,68 100,107" opacity="0.35"/>`),
+  // Japan — the cherry blossom
+  JP:(bg)=>{
+    let petals='';
+    for(let i=0;i<5;i++){
+      petals+=`<path d="M60,72 Q50,58 54,44 Q60,50 60,58 Q60,50 66,44 Q70,58 60,72 Z" transform="rotate(${i*72} 60 72)"/>`;
+    }
+    return `${petals}<circle cx="60" cy="72" r="5"/>`;
+  },
+  // Lebanon — the cedar
+  LB:(bg)=>`
+    <polygon points="24,104 96,104 78,86 42,86"/>
+    <polygon points="34,88 86,88 72,72 48,72" opacity="0.55"/>
+    <polygon points="44,74 76,74 66,60 54,60"/>
+    <polygon points="54,62 66,62 60,50"/>
+    <rect x="56" y="100" width="8" height="8"/>`,
+  // Mexico — the sombrero
+  MX:(bg)=>`
+    <ellipse cx="60" cy="88" rx="38" ry="9"/>
+    <path d="M38,88 Q38,54 60,48 Q82,54 82,88 Z"/>
+    <rect x="38" y="80" width="44" height="6" opacity="0.5"/>
+    <circle cx="60" cy="48" r="3"/>`,
+  // Poland — biało-czerwoni, white over red
+  PL:(bg)=>shieldIcon('PL',`
+    <rect x="20" y="30" width="80" height="42" opacity="0.35"/>
+    <rect x="20" y="72" width="80" height="42" opacity="1"/>`),
+  // Czech Republic — white over red, with the hoist wedge
+  CZ:(bg)=>shieldIcon('CZ',`
+    <rect x="20" y="30" width="80" height="42" opacity="0.35"/>
+    <rect x="20" y="72" width="80" height="42" opacity="1"/>
+    <polygon points="20,30 20,114 60,72" opacity="0.7"/>`),
+  // Scotland — the saltire of St Andrew
+  'GB-SCT':(bg)=>shieldIcon('SCT',`
+    <rect x="20" y="30" width="80" height="85" opacity="0.2"/>
+    <line x1="26" y1="34" x2="94" y2="111" stroke-width="8"/>
+    <line x1="94" y1="34" x2="26" y2="111" stroke-width="8"/>`)
+};
+// Generic fallback (a compass rosette) for any country without a symbol yet
+function genericArt(bg){
+  return `<polygon points="${starPoints(60,72,26,12,8)}"/><circle cx="60" cy="72" r="8" opacity="0.6"/>`;
+}
+
+// Builds one self-contained SVG "postage stamp" for a country: a straight
+// perforated-edge rectangle around that country's real national/cultural
+// symbol, its 3-letter code, and a "face value" line showing my average
+// rating there (or brewery count if never drunk there).
+function passportStampSvg(r,sty){
+  const {ink}=sty;
+  const cc=r.cc,code=code3(cc);
+  const name=(r.country||cc);
+  const bg='#0a0f1a';
+  const art=(COUNTRY_ART[cc]||genericArt)(bg);
+  const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} BREWER${r.brewed.names.length===1?'Y':'IES'}`:'');
+  return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
+<g fill="currentColor" stroke="currentColor" style="color:${ink}">
+<rect x="8" y="8" width="104" height="134" fill="none" stroke-width="2"/>
+<rect x="16" y="16" width="88" height="118" fill="none" stroke-width="1" opacity="0.45"/>
+${perforatedEdge(8,8,112,142,bg,10.4,4)}
+<text x="60" y="28" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="2.5">${code}</text>
+<line x1="26" y1="34" x2="94" y2="34" stroke-width="1" opacity="0.5"/>
+<g>${art}</g>
+<line x1="26" y1="111" x2="94" y2="111" stroke-width="1" opacity="0.5"/>
+<text x="60" y="123" text-anchor="middle" font-size="7.5" letter-spacing="0.8" opacity="0.8">${valueText}</text>
+</g>
+</svg>`;
+}
+
+function passportStampCard(r){
+  const sty=stampStyle(r.cc);
+  const metaBits=[];
+  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}${r.firstYear?` · first ${(r.firstMonth||'').toUpperCase()} ${r.firstYear}`:''}`);
+  if(r.brewed) metaBits.push(`${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} beer${r.brewed.count>1?'s':''}`);
+  return `<div class="stamp-card" style="--rot:${sty.rot}deg">
+    <div class="stamp-badges">
+      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">BREW</span>':''}
+      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">DRANK</span>':''}
+    </div>
+    <div class="stamp-ink">${passportStampSvg(r,sty)}</div>
+    <div class="stamp-cap"><span class="stamp-name">${r.country||r.cc}</span></div>
+    <div class="stamp-meta">${metaBits.join(' · ')}</div>
+  </div>`;
+}
+
+let _passportFilter='all';
+function passportSummaryHtml(recs){
+  const chip=(v,l)=>`<span class="mh-chip"><b>${v}</b> ${l}</span>`;
+  const brewedN=recs.filter(r=>r.brewed).length,drankN=recs.filter(r=>r.drank).length,bothN=recs.filter(r=>r.brewed&&r.drank).length;
+  return chip(recs.length,'COUNTRIES STAMPED')+chip(brewedN,'BREWED IN')+chip(drankN,'DRUNK IN')+chip(bothN,'BOTH ENDS');
+}
+function passportFiltersHtml(){
+  const opts=[['all','ALL'],['brewed','BREWED'],['drank','DRANK'],['both','BOTH']];
+  return opts.map(([k,l])=>`<button class="pf-btn${_passportFilter===k?' active':''}" data-pf="${k}">${l}</button>`).join('');
+}
+function renderPassportStamps(){
+  const grid=document.getElementById('passportGrid');
+  if(!grid) return;
+  const recs=passportCountries();
+  document.getElementById('passport-summary').innerHTML=passportSummaryHtml(recs);
+  const filtEl=document.getElementById('passport-filters');
+  filtEl.innerHTML=passportFiltersHtml();
+  filtEl.querySelectorAll('.pf-btn').forEach(b=>{b.onclick=()=>{_passportFilter=b.dataset.pf;renderPassportStamps();};});
+  const shown=recs.filter(r=>_passportFilter==='all'
+    ||(_passportFilter==='brewed'&&r.brewed)
+    ||(_passportFilter==='drank'&&r.drank)
+    ||(_passportFilter==='both'&&r.brewed&&r.drank));
+  grid.innerHTML=shown.map(passportStampCard).join('');
+}
+
 function mapHeroHtml(journeys){
   const cM=drankCityData();
   const cityN=Object.keys(cM).length;
@@ -1451,12 +1773,19 @@ function keyHtml(mode,journeys){
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
       <div class="mk-tap">CLICK ANY DOT FOR THE BREWERY’S CARD</div>`;
   }
-  const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+  if(mode==='journey'){
+    const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
+    return head+`
+      <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
+      <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
+      <div class="mk-row mk-note">all pours added up: <b style="color:#ffd166">${fmtMi(totalMi)} beer-miles</b></div>
+      <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+  }
   return head+`
-    <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
-    <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
-    <div class="mk-row mk-note">all pours added up: <b style="color:#ffd166">${fmtMi(totalMi)} beer-miles</b></div>
-    <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf"></span>drank here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#8b7cf6"></span>brewed here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ffd166"></span>brewed AND drank here</div>
+    <div class="mk-tap">CLICK ANY DOT FOR THE STAMP · SCROLL DOWN FOR THE FULL COLLECTION</div>`;
 }
 
 function buildDrankLayer(map){
@@ -1516,6 +1845,29 @@ function buildJourneyLayer(map,journeys){
     L.circleMarker(p0,{radius:3.5,fillColor:'#070a12',color:'#b3bdd3',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
     L.circleMarker(p1,{radius:3.5,fillColor:'#2dd4bf',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
     bounds.push(p0,p1);
+  });
+  return {group,bounds};
+}
+
+function buildPassportLayer(map){
+  const group=L.layerGroup(),bounds=[];
+  passportCountries().forEach(r=>{
+    const pts=[];
+    breweries.filter(b=>b.cc===r.cc).forEach(b=>pts.push([b.lat,b.lng]));
+    drunkLocs.filter(l=>l.cc===r.cc).forEach(l=>pts.push([l.lat,l.lng]));
+    if(!pts.length) return;
+    const lat=pts.reduce((s,p)=>s+p[0],0)/pts.length,lng=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    const color=r.brewed&&r.drank?'#ffd166':r.brewed?'#8b7cf6':'#2dd4bf';
+    const roleLabel=r.brewed&&r.drank?'BREWED & DRANK HERE':r.brewed?'BREWED HERE':'DRANK HERE';
+    const html=popKicker('🛂 A STAMP IN MY PASSPORT')+
+      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${FLAGS[r.cc]||''} ${r.country}</span><br>`+
+      `<span style="color:#7d88a3;font-size:10px">${roleLabel}</span>`+
+      (r.brewed?`<div style="margin-top:4px;font-size:10px;color:#a4aec6">🏭 ${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} pour${r.brewed.count>1?'s':''}</div>`:'')+
+      (r.drank?`<div style="font-size:10px;color:#a4aec6">🍺 ${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''} · first ${r.firstMonth} ${r.firstYear}</div>`:'');
+    L.circleMarker([lat,lng],{radius:9,fillColor:color,color:'#000',weight:1,opacity:.9,fillOpacity:.85})
+      .bindTooltip(`${FLAGS[r.cc]||''} ${r.country}`,{direction:'top',className:'mtip'})
+      .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
+    bounds.push([lat,lng]);
   });
   return {group,bounds};
 }
@@ -1612,12 +1964,14 @@ function initWorldMap(){
     byMode:{
       drank:buildDrankLayer(map),
       brewed:buildBrewedLayer(map),
-      journey:buildJourneyLayer(map,journeys)
+      journey:buildJourneyLayer(map,journeys),
+      passport:buildPassportLayer(map)
     }
   };
   renderDrankTable();
   renderBrewedTable();
   renderJourneyTable(journeys);
+  renderPassportStamps();
   setMapMode(_mapMode);
 }
 
@@ -2243,6 +2597,7 @@ function drawIPO(){
     {id:'maps',label:'MAP · WHERE I DRANK THEM',icon:'🍺',key:'',mode:'drank'},
     {id:'maps',label:'MAP · WHERE THEY\'RE BREWED',icon:'🏭',key:'',mode:'brewed'},
     {id:'maps',label:'MAP · BREWERY → MY GLASS',icon:'✈',key:'',mode:'journey'},
+    {id:'maps',label:'MAP · PASSPORT',icon:'🛂',key:'',mode:'passport'},
     {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
     {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
     {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},

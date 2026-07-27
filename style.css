@@ -804,7 +804,7 @@ MAP — one world map, three self-explanatory views
 .mh-chip b { color: var(--amber); font-size: 11px; margin-right: 3px; }
 
 /* Big view-switcher cards */
-#map-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+#map-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
 .map-mode {
   display: flex; align-items: center; gap: 10px; text-align: left;
   background: var(--panel); border: 1px solid var(--border2);
@@ -877,6 +877,56 @@ MAP — one world map, three self-explanatory views
   padding: 6px 2px 10px;
 }
 
+/* PASSPORT — a grid of unique, per-country "ink stamp" cards */
+#passport-summary { margin: 2px 0 10px; }
+.passport-filters { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.pf-btn {
+  background: var(--panel); color: var(--dim);
+  border: 1px solid var(--border2); border-radius: 999px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1.2px;
+  padding: 5px 12px; cursor: pointer; transition: border-color .12s, color .12s, background .12s;
+}
+.pf-btn:hover { border-color: var(--accent3); color: var(--accent2); }
+.pf-btn.active { background: rgba(45,212,191,0.12); border-color: var(--accent); color: var(--accent); }
+
+.passport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px 12px;
+}
+.stamp-card {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 6px 8px;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform .18s ease;
+}
+.stamp-card:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+.stamp-badges {
+  position: absolute; top: 2px; right: 4px; z-index: 2;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+}
+.stamp-badge {
+  font-size: 7px; font-weight: 700; letter-spacing: 0.5px; line-height: 1;
+  background: var(--panel2); border: 1px solid var(--border2);
+  border-radius: 3px; padding: 3px 5px;
+  color: var(--dim);
+}
+.stamp-badge.sb-brew { color: var(--cyan); border-color: var(--accent3); }
+.stamp-badge.sb-drink { color: var(--accent); border-color: var(--accent3); }
+.stamp-ink { width: 100%; max-width: 150px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45)); }
+.stamp-ink svg { display: block; width: 100%; height: auto; mix-blend-mode: normal; }
+.stamp-cap {
+  display: flex; align-items: center; gap: 5px; margin-top: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--white);
+  text-align: center;
+}
+.stamp-meta {
+  font-size: 8px; letter-spacing: 0.4px; color: var(--dim);
+  margin-top: 2px; text-align: center;
+}
+@media (hover: none) { .stamp-card:hover { transform: rotate(var(--rot, 0deg)); } }
+
 /* Subtab strip — used inside a panel to switch between sibling sub-views */
 .subtabs { display: flex; gap: 0; margin-bottom: 8px; border-bottom: 1px solid var(--border2); }
 .subtab {
@@ -893,7 +943,6 @@ MAP — one world map, three self-explanatory views
 .subtab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 .subpanel { display: none; }
 .subpanel.active { display: block; }
-@media (max-width:700px){ .subtab { font-size: 9px; padding: 6px 10px; letter-spacing: 1px; } }
 
 /* ═══════════════════════════════════════════
 LEAFLET DARK POPUP
@@ -1229,65 +1278,19 @@ body { overscroll-behavior: none; }
 #mapsec-journey .bb-table td:nth-child(3) { display: none; }
 #mapsec-drank .bb-table, #mapsec-brewed .bb-table, #mapsec-journey .bb-table { min-width: 0; }
 
-/* MODAL — near full-screen on phones */
-#beerModalBox {
-  width: 100vw;
-  max-width: 100vw;
-  max-height: 100dvh;
-  height: 100dvh;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-  border-radius: 0;
-}
-#beerModalBody {
-  max-height: none;
-  overflow-y: auto;
-  padding: 14px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  -webkit-overflow-scrolling: touch;
-}
-#beerModalHead {
-  padding: 10px 14px;
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
-  font-size: 11px;
-}
-#beerModalClose { font-size: 22px; padding: 4px 8px; min-width: 44px; min-height: 44px; }
-
-/* DRAWER — full-screen panel on phones, slides up from bottom */
-#brewery-drawer {
-  width: 100vw;
-  height: 100dvh;
-  top: 0;
-  border-left: none;
-  border-top: 2px solid var(--accent);
-}
-#drawer-head {
-  padding: 12px 14px;
-  padding-top: calc(12px + env(safe-area-inset-top, 0px));
-  font-size: 10px;
-}
-#drawer-close { font-size: 22px; padding: 4px 8px; min-width: 44px; min-height: 44px; }
-#drawer-map { height: 180px; }
-#drawer-body { padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
-
-/* COMMAND PALETTE — near full-screen on phones */
-#cmd-palette { padding-top: calc(4vh + env(safe-area-inset-top, 0px)); }
-#cmd-box {
-  width: 100vw;
-  max-width: 100vw;
-  max-height: calc(100dvh - 4vh - env(safe-area-inset-top, 0px));
-  border-left: none;
-  border-right: none;
-}
-#cmd-input { font-size: 16px; padding: 14px 0; }
-.cmd-item { padding: 12px 14px; font-size: 12px; min-height: 44px; }
-.cmd-item-main { font-size: 12px; }
-.cmd-item-icon { font-size: 14px; width: 20px; }
+/* WHAT TO TRY tables — drop origin (and the narrowest comparison column on
+   the scorecard) so the essentials fit with less horizontal scrolling. */
+#ipoWatchTable th:nth-child(3),  /* origin */
+#ipoWatchTable td:nth-child(3),
+#ipoPricedPanel .bb-table th:nth-child(3),  /* origin */
+#ipoPricedPanel .bb-table td:nth-child(3),
+#ipoPricedPanel .bb-table th:nth-child(7),  /* vs guess */
+#ipoPricedPanel .bb-table td:nth-child(7) { display: none; }
+#ipoWatchTable, #ipoPricedPanel .bb-table { min-width: 0; }
 
 /* SUB-TABS — bigger tap zone, snappier sizing */
 .subtabs { flex-wrap: wrap; }
-.subtab { font-size: 10px; padding: 10px 14px; letter-spacing: 1px; min-height: 44px; flex: 1; }
+.subtab { font-size: 9px; padding: 8px 6px; letter-spacing: 0.4px; min-height: 44px; flex: 1; white-space: nowrap; }
 
 /* MAPS — shorter on phones; key drops below the map instead of covering it */
 #worldMap { height: 360px; }
@@ -1298,6 +1301,7 @@ body { overscroll-behavior: none; }
 }
 #map-modes { grid-template-columns: 1fr; }
 .map-mode { min-height: 44px; }
+.passport-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px 8px; }
 
 /* FORM CONTROLS — 16px font-size to prevent iOS zoom-on-focus */
 .bb-select,
@@ -1393,6 +1397,7 @@ select {
 .g4, .g5 { grid-template-columns: 1fr 1fr; }
 .g6 { grid-template-columns: repeat(3, 1fr); }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
+#map-modes { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ═══════════════════════════════════════════
@@ -1652,6 +1657,69 @@ BREWERY DRAWER
 }
 .brewery-clickable:hover {
   color: var(--cyan);
+}
+
+/* Phone overrides for the modal / drawer / command palette above. These must
+   come AFTER the base rules so they win the cascade (same selectors, same
+   specificity — source order decides). Putting phone-only tweaks earlier in
+   the file, ahead of a later unguarded base rule, silently loses them. */
+@media (max-width: 700px) {
+  /* MODAL — near full-screen on phones */
+  #beerModalBox {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 100dvh;
+    height: auto;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-radius: 0;
+  }
+  #beerModalBody {
+    max-height: none;
+    overflow-y: auto;
+    padding: 14px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+  }
+  #beerModalHead {
+    padding: 10px 14px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    font-size: 11px;
+  }
+  #beerModalClose { font-size: 22px; padding: 4px 8px; min-width: 44px; min-height: 44px; }
+  #beerModalBody .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* DRAWER — full-screen panel on phones, slides up from bottom */
+  #brewery-drawer {
+    width: 100vw;
+    height: 100dvh;
+    top: 0;
+    border-left: none;
+    border-top: 2px solid var(--accent);
+  }
+  #drawer-head {
+    padding: 12px 14px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    font-size: 10px;
+  }
+  #drawer-close { font-size: 22px; padding: 4px 8px; min-width: 44px; min-height: 44px; }
+  #drawer-map { height: 180px; }
+  #drawer-body { padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+
+  /* COMMAND PALETTE — near full-screen on phones */
+  #cmd-palette { padding-top: calc(4vh + env(safe-area-inset-top, 0px)); }
+  #cmd-box {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: calc(100dvh - 4vh - env(safe-area-inset-top, 0px));
+    border-left: none;
+    border-right: none;
+  }
+  #cmd-input { font-size: 16px; padding: 14px 0; }
+  .cmd-item { padding: 12px 14px; font-size: 12px; min-height: 44px; }
+  .cmd-item-main { font-size: 12px; }
+  .cmd-item-icon { font-size: 14px; width: 20px; }
 }
 
 /* ═══════════════════════════════════════════
