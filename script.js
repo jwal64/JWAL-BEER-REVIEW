@@ -1543,8 +1543,10 @@ const COUNTRY_ART={
     <rect x="73" y="30" width="27" height="85" opacity="0.8"/>`),
   // Netherlands — the tulip
   NL:(bg)=>`
-    <path d="M60,96 L60,52 Q44,50 42,36 Q52,40 58,48 Q55,32 60,24 Q65,32 62,48 Q68,40 78,36 Q76,50 60,52 Z"/>
-    <rect x="57" y="94" width="6" height="12"/>`,
+    <path d="M40,58 Q37,40 60,30 Q83,40 80,58 Q81,73 60,79 Q39,73 40,58 Z"/>
+    <line x1="60" y1="79" x2="60" y2="103" stroke-width="4"/>
+    <path d="M60,90 Q46,88 40,97" fill="none" stroke-width="3"/>
+    <path d="M60,94 Q74,92 80,101" fill="none" stroke-width="3"/>`,
   // Portugal — the flag's green-and-red field
   PT:(bg)=>shieldIcon('PT',`
     <rect x="20" y="30" width="30" height="85" opacity="1"/>
@@ -1646,10 +1648,10 @@ const COUNTRY_ART={
     <rect x="56" y="100" width="8" height="8"/>`,
   // Mexico — the sombrero
   MX:(bg)=>`
-    <ellipse cx="60" cy="88" rx="38" ry="9"/>
-    <path d="M38,88 Q38,54 60,48 Q82,54 82,88 Z"/>
-    <rect x="38" y="80" width="44" height="6" opacity="0.5"/>
-    <circle cx="60" cy="48" r="3"/>`,
+    <ellipse cx="60" cy="90" rx="39" ry="7"/>
+    <path d="M40,90 Q40,52 60,44 Q80,52 80,90 Z"/>
+    <rect x="40" y="82" width="40" height="6" opacity="0.5"/>
+    <circle cx="60" cy="44" r="3"/>`,
   // Poland — biało-czerwoni, white over red
   PL:(bg)=>shieldIcon('PL',`
     <rect x="20" y="30" width="80" height="42" opacity="0.35"/>
