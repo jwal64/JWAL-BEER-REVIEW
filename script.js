@@ -98,6 +98,7 @@ let beers=[
   {beer:"Mahou Cinco Estrellas", style:"Lager",                origin:"ES",abv:5.5,method:"Bottle",city:"Boynton Beach",region:"Florida",        country:"USA",         cc:"US", rating:3.50,isNew:true, month:"Jul",monthN:7,year:2026},
   {beer:"Hatuey Lager",          style:"Lager",                origin:"CU",abv:5.0,method:"Bottle",city:"Miami",       region:"Florida",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Jul",monthN:7,year:2026},
   {beer:"Pub Ale",               style:"Pale Ale",             origin:"GB-ENG",abv:4.7,method:"Can",   city:"New Rochelle",region:"New York",        country:"USA",         cc:"US", rating:4.25,isNew:true, month:"Jul",monthN:7,year:2026},
+  {beer:"Spaten Oktoberfest Ur-Märzen / Winter",style:"Lager", origin:"DE",abv:5.9,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Jul",monthN:7,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -196,6 +197,7 @@ let breweries=[
   {name:"Mahou (Grupo Mahou-San Miguel)", location:"Madrid, Madrid",      country:"Spain",       cc:"ES", lang:"es", beers:"Mahou Cinco Estrellas",                                     lat:40.4168,lng:-3.7038,  ratings:[3.50]},
   {name:"Cervecería Hatuey (Bacardí)", location:"Santiago de Cuba, Santiago de Cuba", country:"Cuba", cc:"CU", lang:"es", beers:"Hatuey Lager",                                       lat:20.0247,lng:-75.8219, ratings:[4.00], nativeName:"Cerveza Hatuey"},
   {name:"Boddington's Brewery",      location:"Manchester, Greater Manchester", country:"England", cc:"GB-ENG", lang:"en", beers:"Pub Ale",                                       lat:53.4808,lng:-2.2426,  ratings:[4.25]},
+  {name:"Spaten-Franziskaner-Bräu",  location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Spaten Oktoberfest Ur-Märzen / Winter",             lat:48.1494,lng:11.5567,  ratings:[2.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
