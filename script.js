@@ -100,6 +100,7 @@ let beers=[
   {beer:"Spaten Oktoberfest Ur-Märzen / Winter",style:"Lager", origin:"DE",abv:5.9,method:"Draft", city:"New York",    region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Jul",monthN:7,year:2026},
   // AUG 2026
   {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"DAB Dortmunder Export",style:"Lager",          origin:"DE",abv:5.0,method:"Draft", city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:4.50,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -199,6 +200,7 @@ let breweries=[
   {name:"Cervecería Hatuey (Bacardí)", location:"Santiago de Cuba, Santiago de Cuba", country:"Cuba", cc:"CU", lang:"es", beers:"Hatuey Lager",                                       lat:20.0247,lng:-75.8219, ratings:[4.00], nativeName:"Cerveza Hatuey"},
   {name:"Boddington's Brewery",      location:"Manchester, Greater Manchester", country:"England", cc:"GB-ENG", lang:"en", beers:"Pub Ale",                                       lat:53.4808,lng:-2.2426,  ratings:[4.25]},
   {name:"Spaten-Franziskaner-Bräu",  location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Spaten Oktoberfest Ur-Märzen / Winter",             lat:48.1494,lng:11.5567,  ratings:[2.75]},
+  {name:"Dortmunder Actien-Brauerei (DAB)", location:"Dortmund, North Rhine-Westphalia", country:"Germany", cc:"DE", lang:"de", beers:"DAB Dortmunder Export",                     lat:51.5136,lng:7.4653,   ratings:[4.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
