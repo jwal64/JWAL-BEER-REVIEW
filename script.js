@@ -101,6 +101,8 @@ let beers=[
   // AUG 2026
   {beer:"Peroni Nastro Azzurro",style:"Lager",          origin:"IT",abv:5.1,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"DAB Dortmunder Export",style:"Lager",          origin:"DE",abv:5.0,method:"Draft", city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:4.50,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Beck's",                style:"Pilsner",        origin:"DE",abv:4.9,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Ichnusa Anima Sarda",   style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -201,6 +203,8 @@ let breweries=[
   {name:"Boddington's Brewery",      location:"Manchester, Greater Manchester", country:"England", cc:"GB-ENG", lang:"en", beers:"Pub Ale",                                       lat:53.4808,lng:-2.2426,  ratings:[4.25]},
   {name:"Spaten-Franziskaner-Bräu",  location:"Munich, Bavaria",           country:"Germany",     cc:"DE", lang:"de", beers:"Spaten Oktoberfest Ur-Märzen / Winter",             lat:48.1494,lng:11.5567,  ratings:[2.75]},
   {name:"Dortmunder Actien-Brauerei (DAB)", location:"Dortmund, North Rhine-Westphalia", country:"Germany", cc:"DE", lang:"de", beers:"DAB Dortmunder Export",                     lat:51.5136,lng:7.4653,   ratings:[4.50]},
+  {name:"Brauerei Beck & Co.",       location:"Bremen, Bremen",             country:"Germany",     cc:"DE", lang:"de", beers:"Beck's",                                                    lat:53.0793,lng:8.8017,   ratings:[3.00]},
+  {name:"Birra Ichnusa (Heineken Italia)", location:"Assemini, Sardinia",   country:"Italy",       cc:"IT", lang:"it", beers:"Ichnusa Anima Sarda",                                       lat:39.2803,lng:9.0057,   ratings:[3.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -214,7 +218,9 @@ const BRAND_DOMAINS = {
 "Asahi Super Dry":"asahibeer.com",
 "Augustiner Helles":"augustiner-braeu.de",
 "Big Wave Golden Ale":"konabrewingco.com",
+"Beck's":"becks.de",
 "Birra Moretti":"birramoretti.com",
+"Ichnusa Anima Sarda":"ichnusa.com",
 "Bloodline Blood Orange IPA":"flyingdog.com",
 "Blue Moon":"bluemoonbrewingcompany.com",
 "De Koninck":"dekoninck.be",
