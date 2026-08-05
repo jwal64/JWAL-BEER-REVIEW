@@ -103,6 +103,7 @@ let beers=[
   {beer:"DAB Dortmunder Export",style:"Lager",          origin:"DE",abv:5.0,method:"Draft", city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:4.50,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Beck's",                style:"Pilsner",        origin:"DE",abv:4.9,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Ichnusa Anima Sarda",   style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Chill Lemon",           style:"Shandy / Radler",origin:"IT",abv:2.0,method:"Bottle",city:"Capri",        region:"Campania",        country:"Italy",       cc:"IT", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -140,6 +141,7 @@ let drunkLocs=[
   {city:"Boynton Beach",region:"Florida",             country:"USA",         cc:"US", lat:26.5253,lng:-80.0664},
   {city:"Miami",        region:"Florida",             country:"USA",         cc:"US", lat:25.7617,lng:-80.1918},
   {city:"Ischia",       region:"Campania",            country:"Italy",       cc:"IT", lat:40.7333,lng:13.9500},
+  {city:"Capri",        region:"Campania",            country:"Italy",       cc:"IT", lat:40.5532,lng:14.2222},
 ];
 
 let breweries=[
@@ -169,7 +171,7 @@ let breweries=[
   {name:"Erdinger Weissbräu",  location:"Erding, Bavaria",             country:"Germany",     cc:"DE", lang:"de", beers:"Erdinger Weißbier",                                     lat:48.3063,lng:11.9071,  ratings:[3.25]},
   {name:"Industrial Arts Brewing",location:"Garnerville, New York",     country:"USA",         cc:"US", lang:"en", beers:"Wrench",                                             lat:41.2065,lng:-74.0085,  ratings:[4.00]},
   {name:"Żywiec Brewery (Grupa Żywiec)", location:"Żywiec, Silesia",   country:"Poland",      cc:"PL", lang:"pl", beers:"Żywiec",                                             lat:49.6853,lng:19.1925,  ratings:[2.75]},
-  {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni Nastro Azzurro",                                       lat:41.8902,lng:12.4922,  ratings:[3.00]},
+  {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni Nastro Azzurro · Chill Lemon",                         lat:41.8902,lng:12.4922,  ratings:[3.00,4.00]},
   {name:"S.A. Damm",                  location:"Barcelona, Catalonia",  country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Damm · Daura",                                    lat:41.3897,lng:2.1540,   ratings:[3.50,3.00]},
   {name:"Abbaye de Leffe (AB InBev)", location:"Dinant, Namur",          country:"Belgium",     cc:"BE", lang:"fr", beers:"Leffe Blonde",                                            lat:50.2611,lng:4.9122,   ratings:[4.75]},
   {name:"Texelse Bierbrouwerij",      location:"Oudeschild, North Holland",country:"Netherlands",cc:"NL", lang:"nl", beers:"Texels Skuumkoppe",                                       lat:53.0385,lng:4.8510,   ratings:[3.00]},
@@ -230,6 +232,7 @@ const BRAND_DOMAINS = {
 "Carlsberg":"carlsberg.com",
 "Carlsberg Elephant":"carlsberg.com",
 "Castle Lager":"castlelager.co.za",
+"Chill Lemon":"peroni.it",
 "Chimay Blue":"chimay.com",
 "Coopers Pale Ale":"coopers.com.au",
 "Coors Light":"coorslight.com",
@@ -350,7 +353,7 @@ rebuildLocalLogos();
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
-const sC={"Lager":"#4dc3ff","Pilsner":"#e07fa8","Wheat Beer":"#f26d8d","Belgian Ale":"#c77dff","IPA":"#ffb340","Pale Ale":"#7de26f","Stout":"#9b7bff","Brown Ale":"#b07a4e","Red Ale":"#ff6b52"};
+const sC={"Lager":"#4dc3ff","Pilsner":"#e07fa8","Wheat Beer":"#f26d8d","Belgian Ale":"#c77dff","IPA":"#ffb340","Pale Ale":"#7de26f","Stout":"#9b7bff","Brown Ale":"#b07a4e","Red Ale":"#ff6b52","Shandy / Radler":"#ffe066"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
 function rC(r){return r>=4.5?"#2fd66f":r>=4?"#55e07f":r>=3.5?"#aacc00":r>=3?"#ffc44d":r>=2.5?"#ff8a3d":"#ff4d5e";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}

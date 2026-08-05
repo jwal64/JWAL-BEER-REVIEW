@@ -11,7 +11,7 @@ Each entry in the `beers[]` array requires these fields:
 ```js
 {
   beer: "BeerName",           // Marketed/displayed beer name
-  style: "Category",          // One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale
+  style: "Category",          // One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale, Shandy / Radler
   origin: "XX",              // ISO 3166-1 alpha-2 country code of the BREWERY's home country (see UK exception below)
   abv: 5.0,                  // Alcohol by volume (number)
   method: "Bottle",          // "Bottle", "Can", "Draft", or "Nitro"
@@ -108,6 +108,7 @@ After adding a new beer, verify:
 - [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
+- [ ] If the beer introduces a brand-new `style`, that style has a color in the `sC` map in `script.js`
 
 ## Location Rule: Canonical / Most-Unique Location
 
