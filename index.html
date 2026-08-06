@@ -5,20 +5,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Jwal's Brew Reviews</title>
+<meta name="theme-color" content="#0b0d12">
 <!-- Open Graph / Link Preview -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Jwal's Brew Reviews">
-<meta property="og:description" content="Bloomberg Terminal-style beer review dashboard — ratings, trends, and analytics.">
+<meta property="og:description" content="A running log of every beer I drink — ratings, places and trends.">
 <meta property="og:image" content="og-image.jpg">
 <meta property="og:image:width" content="1170">
 <meta property="og:image:height" content="1923">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Jwal's Brew Reviews">
-<meta name="twitter:description" content="Bloomberg Terminal-style beer review dashboard — ratings, trends, and analytics.">
+<meta name="twitter:description" content="A running log of every beer I drink — ratings, places and trends.">
 <meta name="twitter:image" content="og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -31,7 +32,7 @@
 <div id="beerModal" role="dialog" aria-modal="true" aria-labelledby="beerModalTitle" aria-hidden="true">
   <div id="beerModalBox" tabindex="-1">
     <div id="beerModalHead">
-      <span id="beerModalTitle">BEER DETAIL</span>
+      <span id="beerModalTitle">Beer detail</span>
       <button id="beerModalClose" aria-label="Close beer detail">✕</button>
     </div>
     <div id="beerModalBody"></div>
@@ -39,18 +40,19 @@
 </div>
 
 <!-- COMMAND PALETTE -->
-<div id="cmd-palette" role="dialog" aria-modal="true" aria-label="Command palette">
+<div id="cmd-palette" role="dialog" aria-modal="true" aria-label="Search">
   <div id="cmd-box">
     <div id="cmd-input-wrap">
-      <span id="cmd-prompt">⌘</span>
-      <input id="cmd-input" type="text" placeholder="Search beers, tabs, breweries…" autocomplete="off" spellcheck="false">
+      <span id="cmd-prompt" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </span>
+      <input id="cmd-input" type="text" placeholder="Search beers, breweries and pages…" autocomplete="off" spellcheck="false">
     </div>
     <div id="cmd-results"></div>
     <div id="cmd-footer">
       <span class="cmd-hint"><kbd>↑↓</kbd> navigate</span>
       <span class="cmd-hint"><kbd>↵</kbd> select</span>
       <span class="cmd-hint"><kbd>Esc</kbd> close</span>
-      <span style="margin-left:auto;color:var(--accent)">⌘K</span>
     </div>
   </div>
 </div>
@@ -58,7 +60,7 @@
 <!-- BREWERY DRAWER -->
 <div id="brewery-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true" tabindex="-1">
   <div id="drawer-head">
-    <span id="drawer-title">BREWERY DETAIL</span>
+    <span id="drawer-title">Brewery</span>
     <button id="drawer-close" aria-label="Close brewery detail">✕</button>
   </div>
   <div id="drawer-map"></div>
@@ -66,48 +68,51 @@
 </div>
 
 <!-- ══════════════ APP SHELL ══════════════
-     A four-cell grid: brand + rail down the left, context bar across the top,
-     scrolling content in the corner. One nav surface, not three. -->
+     Two columns, two rows: the rail owns the full left edge (brand on top of
+     nav), the header names the page, and #main is the only scrolling region. -->
 
 <div id="shell">
 
-<!-- BRAND (top-left corner of the shell) -->
+<!-- RAIL — brand + the single primary navigation -->
 
-<div id="brandbar">
-  <span class="bb-mark" aria-hidden="true">🍺</span>
-  <span class="bb-word">JWAL'S<em>BREW REVIEWS</em></span>
-  <span class="bb-clock" id="mb-clock">—</span>
-</div>
+<nav id="sidebar" aria-label="Primary">
+  <div class="rail-brand">
+    <span class="rail-mark" aria-hidden="true">🍺</span>
+    <span class="rail-word">Jwal's<em>Brew Reviews</em></span>
+  </div>
+  <div class="nav-group">
+    <div class="nav-item active" data-tab="overview" title="The highlights at a glance">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Home
+    </div>
+    <div class="nav-item" data-tab="beers" title="Search the full list of everything I've reviewed">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 11h1a3 3 0 0 1 0 6h-1"/><path d="M9 12v6"/><path d="M13 12v6"/><path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"/><path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/></svg></span>All beers
+    </div>
+    <div class="nav-item" data-tab="maps" title="Where beers were brewed &amp; where I drank them">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>Map
+    </div>
+    <div class="nav-item" data-tab="insights" title="Places, trends over time &amp; what to try next">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Insights
+    </div>
+  </div>
+</nav>
 
-<!-- CONTEXT BAR — says which page you're on and what it's for -->
+<!-- HEADER — says which page you're on and what it's for -->
 
 <header id="topbar">
+  <span class="tb-brand" aria-hidden="true">🍺</span>
   <div class="tb-context">
-    <span class="tb-title" id="tb-title">HOME</span>
+    <span class="tb-title" id="tb-title">Home</span>
     <span class="tb-desc" id="tb-desc">The highlights at a glance.</span>
   </div>
   <div class="tb-stats" id="hdr-subtitle"></div>
   <button id="tb-search" type="button" aria-label="Search beers, breweries and pages">
-    <span class="tbs-ico" aria-hidden="true">⌕</span>
-    <span class="tbs-label">SEARCH</span>
+    <span class="tbs-ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </span>
+    <span class="tbs-label">Search</span>
     <kbd>⌘K</kbd>
   </button>
 </header>
-
-<!-- RAIL — the single primary navigation -->
-
-<nav id="sidebar" aria-label="Primary">
-  <div class="nav-section-head">DASHBOARD</div>
-  <div class="nav-item active" data-tab="overview" title="Home — the highlights at a glance"><span class="nav-icon">◈</span>HOME<span class="nkey">F1</span></div>
-  <div class="nav-item" data-tab="beers" title="Beers — search the full list of everything I've reviewed"><span class="nav-icon">◉</span>ALL BEERS<span class="nkey">F2</span></div>
-  <div class="nav-item" data-tab="maps" title="Map — where beers were brewed &amp; where I drank them"><span class="nav-icon">◎</span>MAP<span class="nkey">F3</span></div>
-  <div class="nav-item" data-tab="insights" title="Insights — places, trends over time &amp; what to try next"><span class="nav-icon">◆</span>INSIGHTS<span class="nkey">F4</span></div>
-  <div class="nav-foot">
-    <div class="nf-row"><span class="nf-dot"></span>LIVE</div>
-    <div class="nf-row nf-meta" id="nav-records">— RECORDS</div>
-    <div class="nf-row nf-meta">TERMINAL v3.0</div>
-  </div>
-</nav>
 
 <!-- MAIN CONTENT -->
 
@@ -121,74 +126,74 @@
   <div id="ov-hero"></div>
 
   <!-- Four headline numbers, no more -->
-  <div class="g4 kpi-row" style="margin-bottom:10px">
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val up" id="ov-top-val">—</span><span class="kpi-delta" id="ov-top-delta"></span></div><div class="kpi-label">BEST RATED</div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top"></canvas></div></div>
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val fl" id="ov-avg-val">—</span><span class="kpi-delta" id="ov-avg-delta"></span></div><div class="kpi-label">AVG RATING</div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg"></canvas></div></div>
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--amber)" id="ov-brands-val">—</span><span class="kpi-delta" id="ov-brands-delta"></span></div><div class="kpi-label">BRANDS TRIED</div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands"></canvas></div></div>
-    <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--green2)" id="ov-hit-val">—</span><span class="kpi-delta" id="ov-hit-delta"></span></div><div class="kpi-label">HIT RATE</div><div class="kpi-sub" id="ov-hit-sub">Rated ≥3.00</div><div class="kpi-sparkline-wrap"><canvas id="spark-hit"></canvas></div></div>
+  <div class="g4 kpi-row">
+    <div class="kpi"><div class="kpi-label">Best rated</div><div class="kpi-top"><span class="kpi-val up" id="ov-top-val">—</span><span class="kpi-delta" id="ov-top-delta"></span></div><div class="kpi-sub up" id="ov-top-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-top"></canvas></div></div>
+    <div class="kpi"><div class="kpi-label">Average rating</div><div class="kpi-top"><span class="kpi-val fl" id="ov-avg-val">—</span><span class="kpi-delta" id="ov-avg-delta"></span></div><div class="kpi-sub" id="ov-avg-sub">— total reviews</div><div class="kpi-sparkline-wrap"><canvas id="spark-avg"></canvas></div></div>
+    <div class="kpi"><div class="kpi-label">Brands tried</div><div class="kpi-top"><span class="kpi-val" style="color:var(--accent)" id="ov-brands-val">—</span><span class="kpi-delta" id="ov-brands-delta"></span></div><div class="kpi-sub" id="ov-brands-sub">Across — countries</div><div class="kpi-sparkline-wrap"><canvas id="spark-brands"></canvas></div></div>
+    <div class="kpi"><div class="kpi-label">Hit rate</div><div class="kpi-top"><span class="kpi-val" style="color:var(--pos)" id="ov-hit-val">—</span><span class="kpi-delta" id="ov-hit-delta"></span></div><div class="kpi-sub" id="ov-hit-sub">Rated 3.00 or better</div><div class="kpi-sparkline-wrap"><canvas id="spark-hit"></canvas></div></div>
   </div>
 
   <!-- Signature chart and the human "what did he drink lately" feed sit side by
        side on wide screens; they stack on narrow ones. -->
   <div class="ov-split">
     <div class="bb-panel">
-      <div class="bb-panel-head">HOW EACH STYLE SCORES<span class="ph-right">AVG RATING / 5.00</span></div>
+      <div class="bb-panel-head">How each style scores<span class="ph-right">Average rating out of 5</span></div>
       <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="styleChart"></canvas></div></div>
     </div>
     <div class="bb-panel">
-      <div class="bb-panel-head">RECENT POURS<span class="ph-right">LAST 6 · TAP ONE</span></div>
+      <div class="bb-panel-head">Recent pours<span class="ph-right">Last 6 · tap one</span></div>
       <div class="bb-body" id="recentFeed"></div>
     </div>
   </div>
 
   <div class="g2">
     <div class="bb-panel">
-      <div class="bb-panel-head">HIGHLIGHTS<span class="ph-right">WHAT STANDS OUT</span></div>
+      <div class="bb-panel-head">Highlights<span class="ph-right">What stands out</span></div>
       <div class="bb-body" id="mktPanel"></div>
     </div>
     <div class="bb-panel">
-      <div class="bb-panel-head">THIS MONTH<span class="ph-right" id="mirLabel">—</span></div>
+      <div class="bb-panel-head">This month<span class="ph-right" id="mirLabel">—</span></div>
       <div class="bb-body" id="mirPanel"></div>
     </div>
   </div>
 
   <!-- Everything denser/nerdier lives here, collapsed by default -->
   <details class="bb-collapse" id="moreStats">
-    <summary>MORE STATS — ABV · DISTRIBUTION · TASTE PROFILE · DEEP DIVE</summary>
+    <summary>More stats<span class="sum-hint">ABV · distribution · taste profile · deep dive</span></summary>
     <div class="collapse-panels">
-      <div class="g2" style="margin-bottom:8px">
-        <div class="kpi"><div class="kpi-top"><span class="kpi-val dn" id="ov-low-val">—</span><span class="kpi-delta" id="ov-low-delta"></span></div><div class="kpi-label">LOWEST RATED</div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low"></canvas></div></div>
-        <div class="kpi"><div class="kpi-top"><span class="kpi-val" style="color:var(--cyan)" id="ov-abv-val">—</span><span class="kpi-delta" id="ov-abv-delta"></span></div><div class="kpi-label">AVG ABV</div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv"></canvas></div></div>
+      <div class="g2">
+        <div class="kpi"><div class="kpi-label">Lowest rated</div><div class="kpi-top"><span class="kpi-val dn" id="ov-low-val">—</span><span class="kpi-delta" id="ov-low-delta"></span></div><div class="kpi-sub dn" id="ov-low-sub">—</div><div class="kpi-sparkline-wrap"><canvas id="spark-low"></canvas></div></div>
+        <div class="kpi"><div class="kpi-label">Average ABV</div><div class="kpi-top"><span class="kpi-val" style="color:var(--info)" id="ov-abv-val">—</span><span class="kpi-delta" id="ov-abv-delta"></span></div><div class="kpi-sub" id="ov-abv-sub">Range: —</div><div class="kpi-sparkline-wrap"><canvas id="spark-abv"></canvas></div></div>
       </div>
       <div class="g3">
         <div class="bb-panel">
-          <div class="bb-panel-head">REVIEWS PER MONTH<span class="ph-right">COUNT × AVG RATING</span></div>
+          <div class="bb-panel-head">Reviews per month<span class="ph-right">Count × average</span></div>
           <div class="bb-body"><div class="chart-box"><canvas id="monthlyCombo"></canvas></div></div>
         </div>
         <div class="bb-panel">
-          <div class="bb-panel-head">RATING DISTRIBUTION<span class="ph-right">QUARTER-POINT BUCKETS</span></div>
+          <div class="bb-panel-head">Rating distribution<span class="ph-right">Quarter-point buckets</span></div>
           <div class="bb-body"><div class="chart-box"><canvas id="ratingHist"></canvas></div></div>
         </div>
         <div class="bb-panel">
-          <div class="bb-panel-head">STRONGER = BETTER?<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
+          <div class="bb-panel-head">Stronger = better?<span class="ph-right" id="scatterCorr">r ≈ —</span></div>
           <div class="bb-body"><div class="chart-box"><canvas id="scatterChart"></canvas></div></div>
         </div>
       </div>
       <div class="bb-panel">
-        <div class="bb-panel-head">TASTE PROFILE — WHAT MY RATINGS LEAN TOWARD</div>
+        <div class="bb-panel-head">Taste profile<span class="ph-right">What my ratings lean toward</span></div>
         <div class="bb-body"><div class="g3" id="tasteProfile" style="margin-bottom:0"></div></div>
       </div>
       <div class="g3">
         <div class="bb-panel">
-          <div class="bb-panel-head">STATISTICAL SUMMARY</div>
+          <div class="bb-panel-head">Statistical summary</div>
           <div class="bb-body" id="statSummary"></div>
         </div>
         <div class="bb-panel">
-          <div class="bb-panel-head">RATING QUINTILE BREAKDOWN</div>
+          <div class="bb-panel-head">Rating quintiles</div>
           <div class="bb-body" id="quintiles"></div>
         </div>
         <div class="bb-panel">
-          <div class="bb-panel-head">SERVING METHOD<span class="ph-right">AVG RATING</span></div>
+          <div class="bb-panel-head">Serving method<span class="ph-right">Average rating</span></div>
           <div class="bb-body"><div class="chart-box"><canvas id="methodChart"></canvas></div></div>
         </div>
       </div>
@@ -203,33 +208,33 @@
   <!-- Plain-language intro: what this page maps (filled by initWorldMap) -->
   <div id="map-hero" class="bb-panel"></div>
 
-  <!-- Big self-explanatory view switcher (replaces the old tiny subtabs) -->
+  <!-- Self-explanatory view switcher -->
   <div id="map-modes" role="tablist" aria-label="Map views">
     <button class="map-mode active" data-mode="drank" role="tab" aria-selected="true">
       <span class="mm-icon">🍺</span>
       <span class="mm-text">
-        <span class="mm-title">WHERE I DRANK THEM</span>
+        <span class="mm-title">Where I drank them</span>
         <span class="mm-desc">Every city I've reviewed a beer in. Bigger dot = more pours.</span>
       </span>
     </button>
     <button class="map-mode" data-mode="brewed" role="tab" aria-selected="false">
       <span class="mm-icon">🏭</span>
       <span class="mm-text">
-        <span class="mm-title">WHERE THEY'RE BREWED</span>
+        <span class="mm-title">Where they're brewed</span>
         <span class="mm-desc">Each brewery's hometown. Dot color = my rating.</span>
       </span>
     </button>
     <button class="map-mode" data-mode="journey" role="tab" aria-selected="false">
       <span class="mm-icon">✈</span>
       <span class="mm-text">
-        <span class="mm-title">BREWERY → MY GLASS</span>
+        <span class="mm-title">Brewery to my glass</span>
         <span class="mm-desc">Every beer's trip from where it's made to where I drank it.</span>
       </span>
     </button>
     <button class="map-mode" data-mode="passport" role="tab" aria-selected="false">
       <span class="mm-icon">🛂</span>
       <span class="mm-text">
-        <span class="mm-title">PASSPORT</span>
+        <span class="mm-title">Passport</span>
         <span class="mm-desc">Every country stamped — brewed there, drank there, or both.</span>
       </span>
     </button>
@@ -237,7 +242,7 @@
 
   <!-- One world map; the key overlay explains the active view in plain words -->
   <div class="bb-panel">
-    <div class="bb-panel-head" id="map-panel-head">MAP<span class="ph-right" id="map-panel-hint"></span></div>
+    <div class="bb-panel-head" id="map-panel-head">Map<span class="ph-right" id="map-panel-hint"></span></div>
     <div class="bb-body">
       <div id="worldMapWrap">
         <div id="worldMap"></div>
@@ -249,11 +254,11 @@
   <!-- Detail table for the active view -->
   <div id="mapsec-drank" class="map-sec active">
     <div class="bb-panel">
-      <div class="bb-panel-head">EVERY CITY I'VE POURED IN<span class="ph-right">MOST POURS FIRST</span></div>
+      <div class="bb-panel-head">Every city I've poured in<span class="ph-right">Most pours first</span></div>
       <div class="bb-body">
         <div class="table-wrap">
           <table class="bb-table">
-            <thead><tr><th>CITY</th><th>REGION</th><th>COUNTRY</th><th>POURS</th><th>MY AVG</th><th>WHAT I HAD</th></tr></thead>
+            <thead><tr><th>City</th><th>Region</th><th>Country</th><th>Pours</th><th>My average</th><th>What I had</th></tr></thead>
             <tbody id="drunkTbody"></tbody>
           </table>
         </div>
@@ -263,11 +268,11 @@
 
   <div id="mapsec-brewed" class="map-sec">
     <div class="bb-panel">
-      <div class="bb-panel-head">BREWERY DIRECTORY<span class="ph-right">BEST RATED FIRST · CLICK A NAME FOR ITS CARD</span></div>
+      <div class="bb-panel-head">Brewery directory<span class="ph-right">Best rated first · click a name for its card</span></div>
       <div class="bb-body">
         <div class="table-wrap">
           <table class="bb-table">
-            <thead><tr><th style="width:36px"></th><th>BREWERY</th><th>HOMETOWN</th><th>COUNTRY</th><th>WHAT I'VE HAD</th><th>MY AVG</th></tr></thead>
+            <thead><tr><th style="width:36px"></th><th>Brewery</th><th>Hometown</th><th>Country</th><th>What I've had</th><th>My average</th></tr></thead>
             <tbody id="brewedTbody"></tbody>
           </table>
         </div>
@@ -277,12 +282,12 @@
 
   <div id="mapsec-journey" class="map-sec">
     <div class="bb-panel">
-      <div class="bb-panel-head">THE LONGEST HAULS<span class="ph-right">MILES FROM BREWERY TO MY GLASS · CLICK A BEER</span></div>
+      <div class="bb-panel-head">The longest hauls<span class="ph-right">Miles from brewery to my glass · click a beer</span></div>
       <div class="bb-body">
         <div id="journeySummary"></div>
         <div class="table-wrap">
           <table class="bb-table">
-            <thead><tr><th style="width:30px">#</th><th>BEER</th><th>BREWED IN</th><th>DRUNK IN</th><th>MILES</th><th>MY RATING</th></tr></thead>
+            <thead><tr><th style="width:30px">#</th><th>Beer</th><th>Brewed in</th><th>Drunk in</th><th>Miles</th><th>My rating</th></tr></thead>
             <tbody id="journeyTbody"></tbody>
           </table>
         </div>
@@ -292,7 +297,7 @@
 
   <div id="mapsec-passport" class="map-sec">
     <div class="bb-panel">
-      <div class="bb-panel-head">MY BEER PASSPORT<span class="ph-right">ONE UNIQUE STAMP PER COUNTRY · HOVER FOR DETAILS</span></div>
+      <div class="bb-panel-head">My beer passport<span class="ph-right">One stamp per country · hover for details</span></div>
       <div class="bb-body">
         <div id="passport-summary" class="mh-chips"></div>
         <div id="passport-filters" class="passport-filters"></div>
@@ -307,29 +312,29 @@
 
 <div id="beers" class="panel">
   <div class="bb-panel">
-    <div class="bb-panel-head">ALL BEERS — FULL DATASET<span class="ph-right" id="beers-count">— ENTRIES</span></div>
+    <div class="bb-panel-head">All beers<span class="ph-right" id="beers-count">—</span></div>
     <div class="bb-body">
       <div class="bb-ctrl">
-        <span class="bb-ctrl-title">BEER INDEX <span class="new-tag" id="beers-new-tag"></span></span>
+        <span class="bb-ctrl-title">Beer index <span class="new-tag" id="beers-new-tag"></span></span>
         <div class="ctrl-fields">
-          <input id="beerSearch" type="text" placeholder="SEARCH BEER, STYLE, CITY…" aria-label="Search beers">
-          <select id="beerStyleFilter" class="bb-select" aria-label="Filter by style"><option value="">ALL STYLES</option></select>
-          <select id="beerOriginFilter" class="bb-select" aria-label="Filter by origin"><option value="">ALL ORIGINS</option></select>
-          <select id="beerMonthFilter" class="bb-select" aria-label="Filter by month consumed"><option value="">ALL MONTHS</option></select>
+          <input id="beerSearch" type="text" placeholder="Search beer, style, city…" aria-label="Search beers">
+          <select id="beerStyleFilter" class="bb-select" aria-label="Filter by style"><option value="">All styles</option></select>
+          <select id="beerOriginFilter" class="bb-select" aria-label="Filter by origin"><option value="">All origins</option></select>
+          <select id="beerMonthFilter" class="bb-select" aria-label="Filter by month consumed"><option value="">All months</option></select>
         </div>
         <span id="beerFilterCount" role="status" aria-live="polite"></span>
       </div>
       <div id="beerChips" class="flt-chips" hidden></div>
       <div class="table-wrap">
         <table class="bb-table">
-          <thead id="beerHead"><tr><th width="30"></th><th data-sort="beer">BEER</th><th data-sort="style">STYLE</th><th data-sort="origin">ORIGIN</th><th data-sort="abv">ABV</th><th data-sort="method">METHOD</th><th data-sort="city">CITY</th><th data-sort="month">MONTH</th><th data-sort="rating">RATING</th><th>STARS</th></tr></thead>
+          <thead id="beerHead"><tr><th width="30"></th><th data-sort="beer">Beer</th><th data-sort="style">Style</th><th data-sort="origin">Origin</th><th data-sort="abv">ABV</th><th data-sort="method">Method</th><th data-sort="city">City</th><th data-sort="month">Month</th><th data-sort="rating">Rating</th><th>Stars</th></tr></thead>
           <tbody id="beerBody"></tbody>
         </table>
       </div>
     </div>
   </div>
   <div class="bb-panel" id="beerCardsPanel">
-    <div class="bb-panel-head">BEER CARDS — QUICK VIEW<span class="ph-right" id="brands-count">— UNIQUE BRANDS</span></div>
+    <div class="bb-panel-head">Beer cards<span class="ph-right" id="brands-count">—</span></div>
     <div class="bb-body">
       <div class="beer-grid" id="beerGrid"></div>
     </div>
@@ -341,9 +346,9 @@
 <div id="insights" class="panel">
 
   <div class="subtabs" role="tablist">
-    <button class="subtab active" data-subtab="geo" role="tab" aria-selected="true">🌍 PLACES</button>
-    <button class="subtab" data-subtab="temporal" role="tab" aria-selected="false">📈 OVER TIME</button>
-    <button class="subtab" data-subtab="markets" role="tab" aria-selected="false">🍺 WHAT TO TRY</button>
+    <button class="subtab active" data-subtab="geo" role="tab" aria-selected="true">Places</button>
+    <button class="subtab" data-subtab="temporal" role="tab" aria-selected="false">Over time</button>
+    <button class="subtab" data-subtab="markets" role="tab" aria-selected="false">What to try</button>
   </div>
 
 <!-- ── PLACES: countries + cities + brewing language ── -->
@@ -351,37 +356,37 @@
 <div id="geo" class="subpanel active">
 
   <section class="merged-section" data-section="countries">
-    <div class="merged-section-head">◎ COUNTRIES</div>
+    <div class="merged-section-head">Countries</div>
     <div class="ov-split ov-split-even">
       <div class="bb-panel">
-        <div class="bb-panel-head">RATINGS BY COUNTRY<span class="ph-right">AVG RATING · # OF REVIEWS</span></div>
+        <div class="bb-panel-head">Ratings by country<span class="ph-right">Average · number of reviews</span></div>
         <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="countryChart"></canvas></div></div>
       </div>
       <div class="bb-panel">
-        <div class="bb-panel-head">COUNTRY BREAKDOWN</div>
+        <div class="bb-panel-head">Country breakdown</div>
         <div class="bb-body" id="countryCards"></div>
       </div>
     </div>
   </section>
 
   <section class="merged-section" data-section="city">
-    <div class="merged-section-head">▣ CITIES</div>
+    <div class="merged-section-head">Cities</div>
     <div class="ov-split ov-split-even">
       <div class="bb-panel">
-        <div class="bb-panel-head">RATINGS BY CITY<span class="ph-right">AVG RATING</span></div>
+        <div class="bb-panel-head">Ratings by city<span class="ph-right">Average rating</span></div>
         <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="cityChart"></canvas></div></div>
       </div>
       <div class="bb-panel">
-        <div class="bb-panel-head">CITY STATS TABLE</div>
+        <div class="bb-panel-head">City stats</div>
         <div class="bb-body" id="cityCards"></div>
       </div>
     </div>
   </section>
 
   <section class="merged-section" data-section="language">
-    <div class="merged-section-head">◑ BREWING LANGUAGE</div>
+    <div class="merged-section-head">Brewing language</div>
     <div class="bb-panel">
-      <div class="bb-panel-head">RATINGS BY BREWING LANGUAGE<span class="ph-right">DUTCH = NL + FLEMISH BE</span></div>
+      <div class="bb-panel-head">Ratings by brewing language<span class="ph-right">Dutch = NL + Flemish BE</span></div>
       <div class="bb-body"><div class="chart-box chart-box-auto"><canvas id="langChart"></canvas></div></div>
     </div>
   </section>
@@ -393,38 +398,38 @@
 <div id="temporal" class="subpanel">
 
   <!-- Dynamic KPI row — filled by drawTemporal() -->
-  <div id="temporal-kpis" style="margin-bottom:8px"></div>
+  <div id="temporal-kpis"></div>
 
   <!-- Charts pair with charts, lists with lists — pairing a 240px chart against
        a seven-month list is what left a column-high empty well here. -->
   <div class="g2">
     <div class="bb-panel">
-      <div class="bb-panel-head">MONTHLY REVIEW VOLUME &amp; AVG RATING<span class="ph-right">BAR=COUNT · LINE=AVG</span></div>
+      <div class="bb-panel-head">Monthly volume &amp; average<span class="ph-right">Bars = count · line = average</span></div>
       <div class="bb-body"><div class="chart-box"><canvas id="monthlyChart"></canvas></div></div>
     </div>
     <div class="bb-panel">
-      <div class="bb-panel-head">RATING DISTRIBUTION BY MONTH<span class="ph-right">COUNT PER BUCKET</span></div>
+      <div class="bb-panel-head">Rating distribution by month<span class="ph-right">Count per bucket</span></div>
       <div class="bb-body"><div class="chart-box"><canvas id="monthDistChart"></canvas></div></div>
     </div>
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">MOMENTUM — MONTH OVER MONTH<span class="ph-right">PACE · Δ RATING · REPEAT BRANDS</span></div>
+    <div class="bb-panel-head">Momentum, month over month<span class="ph-right">Pace · Δ rating · repeat brands</span></div>
     <div class="bb-body col-flow" id="momentumPanel"></div>
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">BEST &amp; WORST BEER BY MONTH<span class="ph-right">ONE CARD PER MONTH</span></div>
+    <div class="bb-panel-head">Best &amp; worst by month<span class="ph-right">One card per month</span></div>
     <div class="bb-body card-grid" id="monthBestWorst"></div>
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">COUNTRY RANKINGS OVER TIME<span class="ph-right">EACH LINE = A COUNTRY</span></div>
+    <div class="bb-panel-head">Country rankings over time<span class="ph-right">Each line is a country</span></div>
     <div class="bb-body" id="bump-chart-wrap"><div class="chart-box chart-box-tall"><canvas id="bumpChart"></canvas></div></div>
   </div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">SEASONAL TASTE PROFILE<span class="ph-right">STYLE × MONTH · COLOR = AVG RATING</span></div>
+    <div class="bb-panel-head">Seasonal taste profile<span class="ph-right">Style × month · color = average rating</span></div>
     <div class="bb-body" id="seasonalHeatmap"></div>
   </div>
 
@@ -432,7 +437,7 @@
   <div id="temporal-style-charts"></div>
 
   <div class="bb-panel">
-    <div class="bb-panel-head">REVIEW TIMELINE — CHRONOLOGICAL TREND<span class="ph-right">BLUE = 5-REVIEW ROLLING AVG</span></div>
+    <div class="bb-panel-head">Review timeline<span class="ph-right">Blue = 5-review rolling average</span></div>
     <div class="bb-body"><div class="chart-box chart-box-short"><canvas id="timelineChart"></canvas></div></div>
   </div>
 </div>
@@ -442,47 +447,47 @@
 <div id="markets" class="subpanel">
 
   <section class="merged-section" data-section="markets">
-    <div class="merged-section-head">◆ WHAT TO DRINK NEXT</div>
+    <div class="merged-section-head">What to drink next</div>
     <p class="section-note">Beers I haven't reviewed yet, ranked by how much I'm likely to enjoy them — a blend of my own taste so far and what the world thinks on Untappd.</p>
 
-    <div class="bb-panel" style="margin-bottom:8px">
-      <div class="bb-panel-head">◈ TOP PICKS FOR ME — RANKED BY HOW MUCH I'LL LIKE THEM <span class="ph-right" id="rec-count">—</span></div>
+    <div class="bb-panel">
+      <div class="bb-panel-head">Top picks for me<span class="ph-right" id="rec-count">—</span></div>
       <div class="bb-body">
         <div class="ipo-top-picks" id="recPicks"></div>
       </div>
     </div>
 
-    <details class="bb-collapse" style="margin-bottom:8px">
-      <summary>THE NERDY BITS — HOW MY TASTE COMPARES &amp; BEERS I HAVEN'T TRIED YET</summary>
+    <details class="bb-collapse">
+      <summary>The nerdy bits<span class="sum-hint">How my taste compares &amp; beers I haven't tried yet</span></summary>
       <div class="collapse-panels">
         <div class="bb-panel">
-          <div class="bb-panel-head">MY RATING vs THE WORLD AVERAGE<span class="ph-right">GREEN = I LIKED IT MORE THAN MOST PEOPLE</span></div>
+          <div class="bb-panel-head">My rating vs the world average<span class="ph-right">Green = I liked it more than most</span></div>
           <div class="bb-body">
-            <div id="ciFreshness" style="font-size:8px;letter-spacing:1px;margin-bottom:4px"></div>
+            <div id="ciFreshness" class="freshness-note"></div>
             <div class="chart-box chart-box-tall"><canvas id="contrarianChart"></canvas></div>
           </div>
         </div>
 
         <div class="bb-panel">
-          <div class="bb-panel-head">★ MOST PROMISING TO TRY<span class="ph-right" id="ipo-top-count">—</span></div>
+          <div class="bb-panel-head">Most promising to try<span class="ph-right" id="ipo-top-count">—</span></div>
           <div class="bb-body"><div class="ipo-top-picks" id="ipoTopPicks"></div></div>
         </div>
 
         <div class="bb-grid-2">
           <div class="bb-panel">
-            <div class="bb-panel-head">◈ WANT TO TRY — NOT REVIEWED YET <span class="ph-right" id="ipo-watch-count">—</span></div>
+            <div class="bb-panel-head">Want to try<span class="ph-right" id="ipo-watch-count">—</span></div>
             <div class="bb-body">
               <div class="table-wrap">
                 <table class="bb-table ipo-watch" id="ipoWatchTable">
                   <thead><tr>
                     <th style="width:36px"></th>
-                    <th>BEER / STYLE</th>
-                    <th>ORIGIN</th>
+                    <th>Beer / style</th>
+                    <th>Origin</th>
                     <th>ABV</th>
-                    <th style="color:#c77dff">WORLD ★</th>
-                    <th style="color:#4dc3ff">MY GUESS ★</th>
-                    <th>vs WORLD</th>
-                    <th>VERDICT</th>
+                    <th class="th-world">World</th>
+                    <th class="th-guess">My guess</th>
+                    <th>vs world</th>
+                    <th>Verdict</th>
                   </tr></thead>
                   <tbody id="ipoWatchBody"></tbody>
                 </table>
@@ -490,7 +495,7 @@
             </div>
           </div>
           <div class="bb-panel">
-            <div class="bb-panel-head">▦ HOW MY GUESSES COMPARE <span class="ph-right">MY GUESS − WORLD ★</span></div>
+            <div class="bb-panel-head">How my guesses compare<span class="ph-right">My guess − world</span></div>
             <div class="bb-body">
               <div class="chart-box chart-box-tall"><canvas id="ipoUpsideChart"></canvas></div>
             </div>
@@ -499,21 +504,21 @@
       </div>
     </details>
 
-    <div class="bb-panel" id="ipoPricedPanel" style="display:none;margin-bottom:8px">
-      <div class="bb-panel-head">✓ PREDICTION SCORECARD — BEERS I'VE NOW TRIED <span class="ph-right" id="ipo-priced-count">0 BEERS</span></div>
+    <div class="bb-panel" id="ipoPricedPanel" style="display:none">
+      <div class="bb-panel-head">Prediction scorecard<span class="ph-right" id="ipo-priced-count">0 beers</span></div>
       <div class="bb-body">
         <div class="table-wrap">
           <table class="bb-table">
             <thead><tr>
               <th style="width:36px"></th>
-              <th>BEER / STYLE</th>
-              <th>ORIGIN</th>
-              <th style="color:#c77dff">WORLD ★</th>
-              <th style="color:#4dc3ff">MY GUESS ★</th>
-              <th style="color:#2dd4bf">MY RATING</th>
-              <th>vs GUESS</th>
-              <th>vs WORLD</th>
-              <th>RESULT</th>
+              <th>Beer / style</th>
+              <th>Origin</th>
+              <th class="th-world">World</th>
+              <th class="th-guess">My guess</th>
+              <th class="th-mine">My rating</th>
+              <th>vs guess</th>
+              <th>vs world</th>
+              <th>Result</th>
             </tr></thead>
             <tbody id="ipoPricedBody"></tbody>
           </table>
@@ -529,16 +534,6 @@
 
 </div><!-- /main -->
 
-<!-- STATUS BAR — part of the shell grid, not floating over the content -->
-
-<div id="statusbar">
-  <div class="sb-item"><div class="sb-dot"></div>LIVE</div>
-  <div class="sb-item">SYS: JWAL'S BREW TERMINAL v3.0</div>
-  <div class="sb-item" id="sb-stats">RECORDS: — · BRANDS: — · MKTS: —</div>
-  <div class="sb-spacer"></div>
-  <div class="sb-item" id="sb-time">--:--:--</div>
-</div>
-
 </div><!-- /shell -->
 
 <!-- BOTTOM NAV (mobile, thumb-reach) -->
@@ -546,19 +541,19 @@
 <nav id="bottomnav" role="tablist" aria-label="Primary">
   <button class="bn-item active" data-tab="overview" role="tab" aria-selected="true">
     <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-    <span class="bn-label">HOME</span>
+    <span class="bn-label">Home</span>
   </button>
   <button class="bn-item" data-tab="beers" role="tab" aria-selected="false">
     <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 11h1a3 3 0 0 1 0 6h-1"/><path d="M9 12v6"/><path d="M13 12v6"/><path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"/><path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"/></svg></span>
-    <span class="bn-label">BEERS</span>
+    <span class="bn-label">Beers</span>
   </button>
   <button class="bn-item" data-tab="maps" role="tab" aria-selected="false">
     <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-    <span class="bn-label">MAP</span>
+    <span class="bn-label">Map</span>
   </button>
   <button class="bn-item" data-tab="insights" role="tab" aria-selected="false">
     <span class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
-    <span class="bn-label">INSIGHTS</span>
+    <span class="bn-label">Insights</span>
   </button>
 </nav>
 
