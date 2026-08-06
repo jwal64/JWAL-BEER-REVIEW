@@ -353,9 +353,28 @@ rebuildLocalLogos();
 // ══════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════
-const sC={"Lager":"#4dc3ff","Pilsner":"#e07fa8","Wheat Beer":"#f26d8d","Belgian Ale":"#c77dff","IPA":"#ffb340","Pale Ale":"#7de26f","Stout":"#9b7bff","Brown Ale":"#b07a4e","Red Ale":"#ff6b52","Shandy / Radler":"#ffe066"};
+// ── DESIGN TOKENS ──
+// The single source of truth for every color JS hands to Chart.js, Leaflet or an
+// inline style. These mirror the custom properties in style.css; keep the two in
+// step. Canvas and Leaflet can't read CSS variables, hence the literal values.
+const THEME={
+  bg:'#0b0d12', surface:'#13161d', surface2:'#1a1e27', surface3:'#212632',
+  border:'#232833', borderStrong:'#2f3644',
+  text:'#e8eaef', text2:'#9aa3b2', text3:'#6b7382',
+  accent:'#f5a524', accentHi:'#ffc35c',
+  pos:'#3ecf8e', neg:'#f87171', warn:'#fbbf24', info:'#60a5fa', purple:'#a78bfa',
+  // Chart-specific roles
+  grid:'#232833',      // axis grid lines
+  tick:'#6b7382',      // numeric axis ticks
+  label:'#9aa3b2',     // category axis labels
+  axisTitle:'#6b7382'
+};
+
+// Style palette — muted, evenly spaced hues that sit on a charcoal canvas.
+const sC={"Lager":"#f0b429","Pilsner":"#e8c547","Wheat Beer":"#f6d365","Belgian Ale":"#c084fc","IPA":"#fb923c","Pale Ale":"#a3d977","Stout":"#8b7355","Brown Ale":"#b08968","Red Ale":"#ef7d6b","Shandy / Radler":"#facc15"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
-function rC(r){return r>=4.5?"#2fd66f":r>=4?"#55e07f":r>=3.5?"#aacc00":r>=3?"#ffc44d":r>=2.5?"#ff8a3d":"#ff4d5e";}
+// Rating ramp: red → amber → green. Matches the .r5….r2 badge colors in style.css.
+function rC(r){return r>=4.5?"#4ade80":r>=4?"#86d96e":r>=3.5?"#d2c94a":r>=3?"#f0b34a":r>=2.5?"#f08b52":"#f2707c";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
@@ -398,7 +417,7 @@ function cardLogo(name){
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#2dd4bf','#4dc3ff','#2fd66f','#c77dff','#ffdd00','#ff4d5e','#00ffdd','#ff88aa','#88ccff','#ffaa44','#cc88ff','#88ff88'];
+const MONTH_COLORS = ['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#fbbf24','#f87171','#2dd4bf','#f472b6','#7dd3fc','#fb923c','#c084fc','#a3d977'];
 
 function getMonthlyData(){
   // Single pass: group beers by year+month so the same month name in different
@@ -456,11 +475,11 @@ function computeStats(){
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#2dd4bf","Dutch":"#4dc3ff","English":"#2fd66f","French":"#c77dff","Japanese":"#ff4d5e","Spanish":"#ffd166","Danish":"#66718c","Czech":"#00ccaa","Italian":"#ff44aa","Polish":"#cc4444","Portuguese":"#ff8800","Swedish":"#003399","Norwegian":"#0066cc","Chinese":"#dd0000","Thai":"#9933cc","Greek":"#0088ff","Afrikaans":"#007749","Arabic":"#ce1126"};
+const LANG_COLORS={"German":"#f5a524","Dutch":"#60a5fa","English":"#3ecf8e","French":"#a78bfa","Japanese":"#f87171","Spanish":"#fbbf24","Danish":"#94a3b8","Czech":"#2dd4bf","Italian":"#f472b6","Polish":"#e06c75","Portuguese":"#fb923c","Swedish":"#7dd3fc","Norwegian":"#818cf8","Chinese":"#ef4444","Thai":"#c084fc","Greek":"#38bdf8","Afrikaans":"#4ade80","Arabic":"#fca5a5"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
-let BREWERIES_BY_CC=new Map();    // country code → [breweries]
+let breweries_BY_CC=new Map();    // country code → [breweries]
 let BEER_LANG_LOOKUP={};          // beer name → language label
 let BREW_LOC={};                  // beer name → brewery location string
 function buildIndexes(){
@@ -471,13 +490,13 @@ function buildIndexes(){
     arr.push(b);
   }
   BREWERY_BY_NAME=new Map();
-  BREWERIES_BY_CC=new Map();
+  breweries_BY_CC=new Map();
   BEER_LANG_LOOKUP={};
   BREW_LOC={};
   for(const br of breweries){
     BREWERY_BY_NAME.set(br.name,br);
-    let ccArr=BREWERIES_BY_CC.get(br.cc);
-    if(!ccArr){ccArr=[];BREWERIES_BY_CC.set(br.cc,ccArr);}
+    let ccArr=breweries_BY_CC.get(br.cc);
+    if(!ccArr){ccArr=[];breweries_BY_CC.set(br.cc,ccArr);}
     ccArr.push(br);
     const langName=LANG_NAMES_IDX[br.lang]||br.lang;
     for(const raw of br.beers.split(' · ')){
@@ -556,10 +575,8 @@ function updateLiveStats(){
   // Context bar — running totals, always visible whichever page you're on
   const sub = document.getElementById('hdr-subtitle');
   if(sub) sub.innerHTML =
-    [[totalReviews,'REVIEWS'],[totalBrands,'BRANDS'],[totalMarkets,'MARKETS'],[avgRating.toFixed(2)+'★','AVG']]
+    [[totalReviews,'reviews'],[totalBrands,'brands'],[totalMarkets,'cities'],[avgRating.toFixed(2)+'★','avg']]
       .map(([v,l])=>`<span class="tb-stat"><b>${v}</b><span class="tb-stat-lbl">${l}</span></span>`).join('');
-  // Rail footer
-  set('nav-records', `${totalReviews} RECORDS`);
   // Home hero — plain-language summary so a first-time visitor instantly gets it
   const heroEl = document.getElementById('ov-hero');
   if(heroEl){
@@ -568,33 +585,30 @@ function updateLiveStats(){
     heroEl.innerHTML =
       `<div class="ov-hero-stats">`+
         `<span><b>${totalReviews}</b> beers reviewed</span>`+
-        `<span><b>${avgRating.toFixed(2)}★</b> average</span>`+
-        `<span><b>${totalBrands}</b> brands</span>`+
         `<span><b>${totalCtry}</b> countries</span>`+
+        `<span><b>${totalMarkets}</b> cities</span>`+
         (nMonths?`<span><b>${nMonths}</b> month${nMonths===1?'':'s'} tracked</span>`:'')+
       `</div>`+
       `<div class="ov-hero-sub">A running log of every beer I drink — each one rated out of 5. Tap any beer for the full story.</div>`;
   }
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
-  set('ov-top-sub',  `▲ ${topBeer.beer} · ${topBeer.origin}`);
+  set('ov-top-sub',  `${topBeer.beer} · ${topBeer.origin}`);
   set('ov-avg-val',  avgRating.toFixed(2));
   set('ov-avg-sub',  `${totalReviews} total reviews`);
   set('ov-low-val',  lowBeer.rating.toFixed(2));
-  set('ov-low-sub',  `▼ ${lowBeer.beer} · ${lowBeer.origin}`);
+  set('ov-low-sub',  `${lowBeer.beer} · ${lowBeer.origin}`);
   set('ov-abv-val',  avgAbv.toFixed(1)+'%');
   set('ov-abv-sub',  `Range: ${minAbv.toFixed(1)}–${maxAbv.toFixed(1)}%`);
   set('ov-brands-val', totalBrands);
   set('ov-brands-sub', `Across ${totalCtry} countries`);
   set('ov-hit-val',  hitRate+'%');
-  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated ≥3.00`);
+  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated 3.00 or better`);
   // BEERS tab
-  set('beers-count', `${totalReviews} ENTRIES · +${newCount} NEW`);
-  set('brands-count', `${totalBrands} UNIQUE BRANDS`);
+  set('beers-count', `${totalReviews} reviews${newCount?` · ${newCount} new`:''}`);
+  set('brands-count', `${totalBrands} unique brands`);
   const newTag = document.getElementById('beers-new-tag');
-  if(newTag) newTag.textContent = `+${newCount} NEW`;
-  // Status bar
-  set('sb-stats', `RECORDS: ${totalReviews} · BRANDS: ${totalBrands} · MKTS: ${totalMarkets}`);
+  if(newTag) newTag.textContent = newCount ? `${newCount} new` : '';
 }
 try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 
@@ -716,24 +730,6 @@ try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
   });
 })();
 
-// ══════════════════════════════════════════════════════════════
-// CLOCK — isolated first, cannot be killed by downstream errors
-// ══════════════════════════════════════════════════════════════
-(function initClock(){
-  // Cache DOM refs once so the 1-Hz tick isn't getElementById lookups/sec
-  const mbClockEl=document.getElementById('mb-clock');
-  const sbTimeEl=document.getElementById('sb-time');
-  function updateClock(){
-    try {
-      const t=new Date().toLocaleTimeString('en-US',{hour12:false});
-      if(mbClockEl) mbClockEl.textContent=t;
-      if(sbTimeEl) sbTimeEl.textContent=t;
-    } catch(e){ /* never let clock throw */ }
-  }
-  setInterval(updateClock,1000);
-  updateClock();
-})();
-
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
   const tabMap={
@@ -774,10 +770,10 @@ let _insightsSub='geo';
 // The context bar restates where you are and what the page is for — the old
 // header said the same thing on all four tabs.
 const TAB_CONTEXT={
-  overview:['HOME','The highlights at a glance.'],
-  beers:   ['ALL BEERS','Every review, searchable and sortable.'],
-  maps:    ['MAP','Where these beers are brewed and where I drank them.'],
-  insights:['INSIGHTS','Places, trends over time and what to try next.']
+  overview:['Home','The highlights at a glance.'],
+  beers:   ['All beers','Every review, searchable and sortable.'],
+  maps:    ['Map','Where these beers are brewed and where I drank them.'],
+  insights:['Insights','Places, trends over time and what to try next.']
 };
 function setTabContext(id){
   const c=TAB_CONTEXT[id]; if(!c) return;
@@ -851,10 +847,10 @@ function showInsightsSubtab(name){
 
 // ── CHART DEFAULTS
 try {
-  Chart.defaults.color='#7d88a3';
-  Chart.defaults.borderColor='#26304a';
-  Chart.defaults.font.family="'IBM Plex Mono','Courier New',monospace";
-  Chart.defaults.font.size=11;
+  Chart.defaults.color=THEME.text2;
+  Chart.defaults.borderColor=THEME.border;
+  Chart.defaults.font.family="'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+  Chart.defaults.font.size=12;
   Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
   Chart.defaults.elements.point.radius=3;
   Chart.defaults.elements.point.hoverRadius=5;
@@ -893,7 +889,7 @@ function resizeChartsIn(el){
     if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
   }
 }
-const TT={backgroundColor:'#0c111d',borderColor:'#2dd4bf',borderWidth:1,titleColor:'#4dc3ff',bodyColor:'#a4aec6',padding:8};
+const TT={backgroundColor:THEME.surface3,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:8,displayColors:false,titleFont:{weight:'600'}};
 
 // ══════════════════════════════════════════════════════════════
 // OVERVIEW
@@ -910,7 +906,7 @@ const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
   let num=0,dx=0,dy=0;
   beers.forEach(b=>{const a=b.abv-mx,r=b.rating-my;num+=a*r;dx+=a*a;dy+=r*r;});
   const pr=dx&&dy?num/Math.sqrt(dx*dy):0,ab=Math.abs(pr);
-  const corrLabel=ab<0.2?'NO SIGNIFICANT CORRELATION':ab<0.4?'WEAK CORRELATION':ab<0.6?'MODERATE CORRELATION':'STRONG CORRELATION';
+  const corrLabel=ab<0.2?'no significant correlation':ab<0.4?'weak correlation':ab<0.6?'moderate correlation':'strong correlation';
   const corrEl=document.getElementById('scatterCorr');
   if(corrEl) corrEl.textContent=`r ≈ ${pr.toFixed(2)} · ${corrLabel}`;
 }
@@ -928,16 +924,16 @@ const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
 const last5=beers.slice(-5).map(b=>b.rating);
 const prev5=beers.slice(-10,-5).map(b=>b.rating);
 const trendDelta=last5.length&&prev5.length?avg(last5)-avg(prev5):0;
-const trendLabel=trendDelta>0.1?'▲ RISING':trendDelta<-0.1?'▼ DECLINING':'→ FLAT';
+const trendLabel=trendDelta>0.1?'Rising':trendDelta<-0.1?'Declining':'Flat';
 const trendCls=trendDelta>0.1?'up':trendDelta<-0.1?'dn':'fl';
 
 document.getElementById('mktPanel').innerHTML=`
-  <div class="insight-row"><span class="insight-key">BEST STYLE</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">WEAKEST STYLE</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP COUNTRY</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TOP MARKET</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">BEST METHOD</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">TREND</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling avg · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} markets</div></div></div>`;
+  <div class="insight-row"><span class="insight-key">Best style</span><div><div class="insight-val up">${bestStyle.s}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Weakest style</span><div><div class="insight-val dn">${worstStyle.s}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Top country</span><div><div class="insight-val">${topCountry.l}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Top city</span><div><div class="insight-val">${topCity.city}, ${topCity.region}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Best method</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Trend</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling average · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} cities</div></div></div>`;
 
 // Recent activity feed — last 6 pours, newest first (beers[] is chronological)
 const recentEl=document.getElementById('recentFeed');
@@ -945,7 +941,7 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
   <div class="feed-row" data-beer="${b.beer.replace(/"/g,'&quot;')}" role="button" tabindex="0">
     ${logoImg(b.beer,20)}
     <div class="feed-main">
-      <span class="feed-name">${b.beer}${isDisplayNew(b)?'<span class="new-tag">NEW</span>':''}</span>
+      <span class="feed-name">${b.beer}${isDisplayNew(b)?'<span class="new-tag">New</span>':''}</span>
       <span class="feed-meta">${b.style} · ${b.method} · ${b.city} · ${b.month} ${b.year}</span>
     </div>
     <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
@@ -967,7 +963,7 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
     const earlier=new Set(beers.filter(b=>!curSet.has(b)).map(b=>b.beer));
     const newBrands=[...new Set(cur.map(b=>b.beer))].filter(n=>!earlier.has(n)).length;
     const lbl=document.getElementById('mirLabel');
-    if(lbl) lbl.textContent=(mLabels[mLabels.length-1]||'').toUpperCase();
+    if(lbl) lbl.textContent=(mLabels[mLabels.length-1]||'');
     const dCls=dAvg==null?'fl':dAvg>0.05?'up':dAvg<-0.05?'dn':'fl';
     const dTxt=dAvg==null?'First month on record':`${dAvg>=0?'+':''}${dAvg.toFixed(2)} vs prior month`;
     const pourRow=(key,b,cls)=>`
@@ -978,29 +974,29 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
           <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
         </div></div>`;
     mirEl.innerHTML=`
-      <div class="insight-row"><span class="insight-key">REVIEWS</span><div><div class="insight-val">${cur.length}</div><div class="insight-sub">${newBrands} first-time brand${newBrands===1?'':'s'}</div></div></div>
-      <div class="insight-row"><span class="insight-key">MONTH AVG</span><div><div class="insight-val ${dCls}">${curAvg.toFixed(2)}</div><div class="insight-sub">${dTxt}</div></div></div>
-      ${pourRow('BEST POUR',best)}
-      ${best!==worst?pourRow('WORST POUR',worst):''}`;
+      <div class="insight-row"><span class="insight-key">Reviews</span><div><div class="insight-val">${cur.length}</div><div class="insight-sub">${newBrands} first-time brand${newBrands===1?'':'s'}</div></div></div>
+      <div class="insight-row"><span class="insight-key">Month average</span><div><div class="insight-val ${dCls}">${curAvg.toFixed(2)}</div><div class="insight-sub">${dTxt}</div></div></div>
+      ${pourRow('Best pour',best)}
+      ${best!==worst?pourRow('Worst pour',worst):''}`;
   }
 }
 
 // ── Charts (everything below needs Chart.js) ──
 safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
-  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||'#2dd4bf'),borderWidth:0}]},
-  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:11}}}}}
+  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||THEME.accent),borderWidth:0}]},
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:11}}}}}
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO,datasets:[{data:mA,backgroundColor:['#2dd4bf','#4dc3ff','#c77dff','#66718c'],borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
+  data:{labels:mO,datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,THEME.text3],borderWidth:0}]},
+  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
 });
 
 safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
-  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||'#2dd4bf'),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
+  data:{datasets:[{data:beers.map(b=>({x:b.abv,y:b.rating,label:b.beer})),backgroundColor:beers.map(b=>sC[b.style]||THEME.accent),pointRadius:5,pointHoverRadius:8,borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.label} | ${c.raw.x}% ABV | ${c.raw.y}/5`}}},
-    scales:{x:{title:{display:true,text:'ABV (%)',color:'#4b5671'},min:3.5,max:10,grid:{color:'#182136'},ticks:{color:'#4b5671'}},
-            y:{title:{display:true,text:'RATING',color:'#4b5671'},min:1.5,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}}}}
+    scales:{x:{title:{display:true,text:'ABV (%)',color:THEME.axisTitle},min:3.5,max:10,grid:{color:THEME.grid},ticks:{color:THEME.tick}},
+            y:{title:{display:true,text:'Rating',color:THEME.axisTitle},min:1.5,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}}}}
 });
 
 // Monthly flow — review volume bars + avg-rating line
@@ -1009,14 +1005,14 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
   const counts=cm.map(m=>cb[m].length);
   const avgs=cm.map(m=>+avg(cb[m].map(b=>b.rating)).toFixed(2));
   safeChart('monthlyCombo',document.getElementById('monthlyCombo'),{
-    data:{labels:cm.map(m=>ca[m].toUpperCase()),datasets:[
+    data:{labels:cm.map(m=>ca[m]),datasets:[
       {type:'bar',label:'Reviews',data:counts,backgroundColor:cc.map(c=>c+'33'),borderColor:cc,borderWidth:2,yAxisID:'y'},
-      {type:'line',label:'Avg Rating',data:avgs,borderColor:'#ffd166',backgroundColor:'transparent',pointBackgroundColor:avgs.map(r=>rC(r)),pointRadius:5,pointBorderColor:'#000',pointBorderWidth:1,tension:0.3,yAxisID:'y2'}
+      {type:'line',label:'Avg Rating',data:avgs,borderColor:THEME.warn,backgroundColor:'transparent',pointBackgroundColor:avgs.map(r=>rC(r)),pointRadius:5,pointBorderColor:THEME.bg,pointBorderWidth:1,tension:0.3,yAxisID:'y2'}
     ]},
     options:{plugins:{legend:{display:false},tooltip:TT},
-      scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:5}},
-              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffd166'}},
-              x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
+      scales:{y:{grid:{color:THEME.grid},ticks:{color:THEME.tick,stepSize:5}},
+              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:THEME.warn}},
+              x:{grid:{display:false},ticks:{color:THEME.label}}}}
   });
 }
 
@@ -1029,8 +1025,8 @@ safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter'
   safeChart('ratingHist',document.getElementById('ratingHist'),{type:'bar',
     data:{labels:histKeys,datasets:[{data:histKeys.map(k=>histCounts[k]||0),backgroundColor:histKeys.map(k=>rC(+k)+'cc'),borderWidth:0}]},
     options:{plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw} review${c.raw===1?'':'s'} @ ${c.label}`}}},
-      scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1}},
-              x:{grid:{display:false},ticks:{color:'#4b5671',font:{size:8},maxRotation:60,minRotation:60}}}}
+      scales:{y:{grid:{color:THEME.grid},ticks:{color:THEME.tick,stepSize:1}},
+              x:{grid:{display:false},ticks:{color:THEME.tick,font:{size:8},maxRotation:60,minRotation:60}}}}
   });
 }
 } catch(e){ console.error('Overview init error:',e); }
@@ -1045,25 +1041,25 @@ try { drawInsights(); } catch(e){ console.error('Insights init error:',e); }
 function renderTable(data){
   try {
     const countEl=document.getElementById('beerFilterCount');
-    if(countEl) countEl.textContent=`${data.length} / ${beers.length} ROWS`;
+    if(countEl) countEl.textContent=`${data.length} of ${beers.length}`;
     if(!data.length){
       document.getElementById('beerBody').innerHTML=
-        `<tr><td colspan="10" class="bb-empty">NO BEERS MATCH YOUR FILTERS
-          <button type="button" id="beerFilterReset">CLEAR FILTERS</button></td></tr>`;
+        `<tr><td colspan="10" class="bb-empty">No beers match your filters
+          <button type="button" id="beerFilterReset">Clear filters</button></td></tr>`;
       return;
     }
     document.getElementById('beerBody').innerHTML=data.map(b=>`
       <tr${isDisplayNew(b)?' class="new-row"':''} style="cursor:pointer" data-beer="${b.beer.replace(/"/g,'&quot;')}">
         <td>${logoImg(b.beer,24)}</td>
-        <td style="color:#2dd4bf;font-weight:600">${b.beer}${isDisplayNew(b)?`<span class="new-tag">NEW</span>`:''}</td>
-        <td style="color:#66718c;font-size:9px">${b.style}</td>
+        <td style="color:var(--text);font-weight:600"><span class="beer-name-cell">${b.beer}</span>${isDisplayNew(b)?`<span class="new-tag">New</span>`:''}</td>
+        <td style="color:var(--text-3);font-size:12px">${b.style}</td>
         <td>${FLAGS[b.origin]||''} ${b.origin}</td>
-        <td style="color:#4dc3ff">${b.abv.toFixed(1)}%</td>
-        <td style="color:#66718c">${b.method}</td>
-        <td style="color:#66718c">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</td>
-        <td style="color:#66718c">${b.month.toUpperCase()} ${b.year}</td>
+        <td style="color:var(--info)">${b.abv.toFixed(1)}%</td>
+        <td style="color:var(--text-3)">${b.method}</td>
+        <td style="color:var(--text-3)">${b.city}, ${b.region} · ${FLAGS[b.cc]||''} ${b.country}</td>
+        <td style="color:var(--text-3)">${b.month} ${b.year}</td>
         <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-        <td style="color:#ffd166;font-size:9px">${strs(b.rating)}</td>
+        <td style="color:var(--accent-hi);font-size:12px">${strs(b.rating)}</td>
       </tr>`).join('');
   } catch(e){ console.error('renderTable error:',e); }
 }
@@ -1092,13 +1088,13 @@ function renderBeerChips(f){
   const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const chips=[];
   if(f.q)chips.push({k:'q',label:`“${esc(f.q)}”`});
-  if(f.st)chips.push({k:'st',label:`STYLE: ${esc(f.st)}`});
-  if(f.or)chips.push({k:'or',label:`ORIGIN: ${FLAGS[f.or]||''} ${f.or}`});
-  if(f.mo)chips.push({k:'mo',label:`MONTH: ${esc(f.moLabel)}`});
+  if(f.st)chips.push({k:'st',label:`Style: ${esc(f.st)}`});
+  if(f.or)chips.push({k:'or',label:`Origin: ${FLAGS[f.or]||''} ${f.or}`});
+  if(f.mo)chips.push({k:'mo',label:`Month: ${esc(f.moLabel)}`});
   wrap.hidden=!chips.length;
   wrap.innerHTML=chips.map(c=>
     `<button type="button" class="flt-chip" data-clear="${c.k}">${c.label}<span class="x" aria-hidden="true">✕</span></button>`).join('')
-    +(chips.length?`<button type="button" class="flt-chip clear-all" data-clear="all">CLEAR ALL</button>`:'');
+    +(chips.length?`<button type="button" class="flt-chip clear-all" data-clear="all">Clear all</button>`:'');
 }
 function applyBeerFilter(){
   const q=(document.getElementById('beerSearch').value||'').trim().toLowerCase();
@@ -1137,7 +1133,7 @@ try {
   // Month-consumed filter — one option per month/year present in the data, chronological
   const monthEl=document.getElementById('beerMonthFilter');
   const monthMap=new Map();
-  beers.forEach(b=>monthMap.set(`${b.monthN}-${b.year}`,{label:`${b.month.toUpperCase()} ${b.year}`,ord:b.year*12+b.monthN}));
+  beers.forEach(b=>monthMap.set(`${b.monthN}-${b.year}`,{label:`${b.month} ${b.year}`,ord:b.year*12+b.monthN}));
   const mf=document.createDocumentFragment();
   [...monthMap.entries()].sort((a,b)=>a[1].ord-b[1].ord).forEach(([v,m])=>{const o=document.createElement('option');o.value=v;o.textContent=m.label;mf.appendChild(o);});
   monthEl.appendChild(mf);
@@ -1158,7 +1154,7 @@ document.getElementById('beerGrid').innerHTML=unique.map(b=>`
       <span class="bc-abv">${b.abv}%</span>
       <span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span>
     </div>
-    <div style="font-size:8px;color:#66718c;margin-top:3px">${FLAGS[b.origin]||''} ${CNAMES[b.origin]||b.origin} · ${b.method.toUpperCase()}</div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:3px">${FLAGS[b.origin]||''} ${CNAMES[b.origin]||b.origin} · ${b.method}</div>
   </div>`).join('');
 } catch(e){ console.error('beerGrid init:',e); }
 
@@ -1171,35 +1167,34 @@ function openBeerModal(name){
   const ratings=reviews.map(b=>b.rating);
   const avgR=avg(ratings),bestR=Math.max(...ratings),worstR=Math.min(...ratings);
   const b0=reviews[0];
-  document.getElementById('beerModalTitle').textContent=`${name.toUpperCase()} — DETAIL VIEW`;
+  document.getElementById('beerModalTitle').textContent=name;
   document.getElementById('beerModalBody').innerHTML=`
-    <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #182136;margin-bottom:12px;flex-wrap:wrap">
-      <div style="width:120px;height:60px;background:#05070d;border:1px solid #26304a;display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0">${cardLogo(name)}</div>
+    <div style="display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:12px;flex-wrap:wrap">
+      <div style="width:120px;height:60px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0">${cardLogo(name)}</div>
       <div style="flex:1;min-width:160px">
-        <div style="font-size:15px;font-weight:700;color:#2dd4bf;margin-bottom:4px">${name}</div>
-        <div style="font-size:10px;color:#66718c;margin-bottom:2px">${b0.style}</div>
-        <div style="font-size:10px;color:#a4aec6">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin} · ${b0.abv}% ABV</div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:2px">${b0.style}</div>
+        <div style="font-size:13px;color:var(--text-2)">${FLAGS[b0.origin]||''} ${CNAMES[b0.origin]||b0.origin} · ${b0.abv}% ABV</div>
       </div>
       <div style="display:flex;gap:16px;flex-wrap:wrap">
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(avgR)}">${avgR.toFixed(2)}</div><div style="font-size:8px;color:#66718c;letter-spacing:1px">AVG</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(bestR)}">${bestR.toFixed(2)}</div><div style="font-size:8px;color:#66718c;letter-spacing:1px">BEST</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${rC(worstR)}">${worstR.toFixed(2)}</div><div style="font-size:8px;color:#66718c;letter-spacing:1px">WORST</div></div>
-        <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#4dc3ff">${reviews.length}</div><div style="font-size:8px;color:#66718c;letter-spacing:1px">REVIEWS</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:${rC(avgR)}">${avgR.toFixed(2)}</div><div style="font-size:12px;color:var(--text-3);letter-spacing:0">Average</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:${rC(bestR)}">${bestR.toFixed(2)}</div><div style="font-size:12px;color:var(--text-3);letter-spacing:0">Best</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:${rC(worstR)}">${worstR.toFixed(2)}</div><div style="font-size:12px;color:var(--text-3);letter-spacing:0">Worst</div></div>
+        <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--info)">${reviews.length}</div><div style="font-size:12px;color:var(--text-3);letter-spacing:0">Reviews</div></div>
       </div>
     </div>
-    <div style="font-size:9px;color:#2dd4bf;letter-spacing:2px;margin-bottom:6px">ALL SESSIONS</div>
+    <div style="font-size:12px;color:var(--text);letter-spacing:0;margin-bottom:8px;font-weight:600">All sessions</div>
     <div class="table-wrap">
     <table class="bb-table" style="min-width:unset">
-      <thead><tr><th>#</th><th>RATING</th><th>STARS</th><th>METHOD</th><th>CITY</th><th>COUNTRY</th><th>DATE</th></tr></thead>
+      <thead><tr><th>#</th><th>Rating</th><th>Stars</th><th>Method</th><th>City</th><th>Country</th><th>Date</th></tr></thead>
       <tbody>${reviews.map((b,i)=>`
         <tr>
-          <td style="color:#66718c">${i+1}</td>
+          <td style="color:var(--text-3)">${i+1}</td>
           <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
-          <td style="color:#ffd166;font-size:9px">${strs(b.rating)}</td>
-          <td style="color:#66718c">${b.method}</td>
-          <td style="color:#a4aec6">${b.city}, ${b.region}</td>
+          <td style="color:var(--accent-hi);font-size:12px">${strs(b.rating)}</td>
+          <td style="color:var(--text-3)">${b.method}</td>
+          <td style="color:var(--text-2)">${b.city}, ${b.region}</td>
           <td>${FLAGS[b.cc]||''} ${b.country}</td>
-          <td style="color:#66718c;font-size:9px">${b.month} ${b.year}</td>
+          <td style="color:var(--text-3);font-size:12px">${b.month} ${b.year}</td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -1235,8 +1230,8 @@ function drawCountry(){
   window._cD=true;
   const cD=STATS.countryRanked;
   safeChart('countryChart',document.getElementById('countryChart'),{type:'bar',
-    data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*18},80%,${40-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
+    data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>rC(d.a)),borderWidth:0}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
   });
   document.getElementById('countryCards').innerHTML=cD.map(d=>`
     <div class="bb-bar-row">
@@ -1252,12 +1247,12 @@ function drawCity(){
   window._ciD=true;
   const cD=STATS.cityRanked;
   safeChart('cityChart',document.getElementById('cityChart'),{type:'bar',
-    data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map((_,i)=>`hsl(${30+i*22},75%,${42-i}%)`),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
+    data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>rC(d.a)),borderWidth:0}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
   });
   document.getElementById('cityCards').innerHTML=cD.map(d=>`
     <div class="mini-row">
-      <div><div style="font-size:10px;color:#2dd4bf;font-weight:600">${d.city}</div><div style="font-size:8px;color:#66718c">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
+      <div><div style="font-size:13px;color:var(--text);font-weight:600">${d.city}</div><div style="font-size:12px;color:var(--text-3)">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
 }
@@ -1285,23 +1280,23 @@ function drawInsights(){
   }
 
   document.getElementById('statSummary').innerHTML=[
-    ['MEAN',mean.toFixed(4),'fl'],['MEDIAN',med.toFixed(2),''],
-    ['STD DEV',stdD.toFixed(4),''],['MIN',minR.toFixed(2),'dn'],
-    ['MAX',maxR.toFixed(2),'up'],['RANGE',(maxR-minR).toFixed(2),''],
+    ['Mean',mean.toFixed(4),'fl'],['Median',med.toFixed(2),''],
+    ['Std deviation',stdD.toFixed(4),''],['Minimum',minR.toFixed(2),'dn'],
+    ['Maximum',maxR.toFixed(2),'up'],['Range',(maxR-minR).toFixed(2),''],
     ['Q1 (25th)',q1.toFixed(2),''],['Q3 (75th)',q3.toFixed(2),''],
-    ['IQR',(q3-q1).toFixed(2),''],['N',ratings.length,''],
+    ['IQR',(q3-q1).toFixed(2),''],['Count',ratings.length,''],
   ].map(([l,v,c])=>`<div class="insight-row"><span class="insight-key">${l}</span><span class="insight-val ${c}" style="font-family:var(--mono)">${v}</span></div>`).join('');
 
   document.getElementById('quintiles').innerHTML=[
-    ['▲▲ EXCELLENT (4.50–5.00)',qb[0],'up'],
-    ['▲  GOOD (4.00–4.25)',qb[1],'up'],
-    ['→  SOLID (3.50–3.75)',qb[2],'fl'],
-    ['→  AVERAGE (3.00–3.25)',qb[3],'fl'],
-    ['▼  BELOW (2.50–2.75)',qb[4],'dn'],
-    ['▼▼ POOR (<2.50)',qb[5],'dn'],
+    ['Excellent · 4.50–5.00',qb[0],'up'],
+    ['Good · 4.00–4.25',qb[1],'up'],
+    ['Solid · 3.50–3.75',qb[2],'fl'],
+    ['Average · 3.00–3.25',qb[3],'fl'],
+    ['Below par · 2.50–2.75',qb[4],'dn'],
+    ['Poor · under 2.50',qb[5],'dn'],
   ].map(([l,n,c])=>`<div class="insight-row">
     <span class="insight-key">${l}</span>
-    <span class="insight-val ${c}">${n} <span style="color:#66718c;font-size:9px">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
+    <span class="insight-val ${c}">${n} <span style="color:var(--text-3);font-weight:400">(${(n/ratings.length*100).toFixed(0)}%)</span></span>
   </div>`).join('');
 
   const profKeys=['wheat','dark','lager','de','us','artisan','highAbv','draftNitro'];
@@ -1319,14 +1314,14 @@ function drawInsights(){
   });
   const pv=k=>profAcc[k].c?profAcc[k].t/profAcc[k].c:0;
   const profile=[
-    {l:'WHEAT BEER BIAS',v:pv('wheat'),color:'#2dd4bf'},
-    {l:'DARK BEER TOLERANCE',v:pv('dark'),color:'#4b5671'},
-    {l:'LAGER APPRECIATION',v:pv('lager'),color:'#2fd66f'},
-    {l:'GERMAN BEER PREMIUM',v:pv('de'),color:'#2dd4bf'},
-    {l:'AMERICAN BEER DISCOUNT',v:pv('us'),color:'#ff4d5e'},
-    {l:'ARTISAN vs MACRO',v:pv('artisan'),color:'#c77dff'},
-    {l:'HIGH ABV PREFERENCE',v:pv('highAbv'),color:'#4dc3ff'},
-    {l:'DRAFT/NITRO PREMIUM',v:pv('draftNitro'),color:'#4dc3ff'},
+    {l:'Wheat beer bias',v:pv('wheat'),color:THEME.accent},
+    {l:'Dark beer tolerance',v:pv('dark'),color:THEME.text3},
+    {l:'Lager appreciation',v:pv('lager'),color:THEME.pos},
+    {l:'German beer premium',v:pv('de'),color:THEME.accent},
+    {l:'American beer discount',v:pv('us'),color:THEME.neg},
+    {l:'Artisan vs macro',v:pv('artisan'),color:THEME.purple},
+    {l:'High ABV preference',v:pv('highAbv'),color:THEME.info},
+    {l:'Draft & nitro premium',v:pv('draftNitro'),color:THEME.info},
   ];
   document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
     <div class="bb-bar-row">
@@ -1347,8 +1342,8 @@ function drawLanguage(){
     lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
     const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
     safeChart('langChart',document.getElementById('langChart'),{type:'bar',
-      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||'#2dd4bf'),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:'#182136'},ticks:{color:'#4b5671'}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:10}}}}}
+      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||THEME.accent),borderWidth:0}]},
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
     });
   } catch(e){ console.error('Language init error:',e); }
 }
@@ -1360,12 +1355,12 @@ function drawLanguage(){
 //   journey → an arc from each brewery to the city where I drank its beer
 // ══════════════════════════════════════════════════════════════
 function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
-function popHtml(h){return `<div style="font-family:var(--mono);font-size:11px;line-height:1.7;letter-spacing:0.2px;-webkit-font-smoothing:antialiased">${h}</div>`;}
+function popHtml(h){return `<div style="font-family:var(--mono);font-size:13px;line-height:1.7;-webkit-font-smoothing:antialiased">${h}</div>`;}
 // Overline that tells the reader what KIND of thing they just clicked
-function popKicker(t){return `<div style="font-size:8px;letter-spacing:1.5px;color:#6e7994;border-bottom:1px solid #26304a;padding-bottom:3px;margin-bottom:4px">${t}</div>`;}
+function popKicker(t){return `<div style="font-size:12px;color:var(--text-3);border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px">${t}</div>`;}
 const fmtMi=n=>Math.round(n).toLocaleString('en-US');
 // Plain-words label for a rating bucket — used by popups and the map key
-function rWord(r){return r>=4.5?'LOVED IT':r>=4?'GREAT':r>=3.5?'GOOD':r>=3?'FINE':r>=2.5?'MEH':'SKIP IT';}
+function rWord(r){return r>=4.5?'loved it':r>=4?'great':r>=3.5?'good':r>=3?'fine':r>=2.5?'meh':'skip it';}
 function distMi(aLat,aLng,bLat,bLng){
   const d=Math.PI/180,R=3958.8;
   const h=Math.sin((bLat-aLat)*d/2)**2+Math.cos(aLat*d)*Math.cos(bLat*d)*Math.sin((bLng-aLng)*d/2)**2;
@@ -1393,10 +1388,10 @@ function arcPts(aLat,aLng,bLat,bLng){
 let _worldMap=null, _mapLayers=null, _mapMode='drank';
 
 const MAP_MODES={
-  drank:{head:'WHERE I DRANK THEM — EVERY CITY WITH A REVIEW',hint:'CLICK A DOT FOR THE POUR LIST'},
-  brewed:{head:'WHERE THEY’RE BREWED — EVERY BREWERY’S HOMETOWN',hint:'CLICK A DOT FOR THE BREWERY'},
-  journey:{head:'BREWERY → MY GLASS — HOW FAR EACH BEER TRAVELED',hint:'CLICK A LINE FOR THE TRIP'},
-  passport:{head:'MY BEER PASSPORT — EVERY COUNTRY, STAMPED',hint:'CLICK A DOT · SCROLL DOWN FOR THE FULL COLLECTION'}
+  drank:{head:'Where I drank them',hint:'Every city with a review · click a dot for the pour list'},
+  brewed:{head:'Where they’re brewed',hint:'Every brewery’s hometown · click a dot for the brewery'},
+  journey:{head:'Brewery to my glass',hint:'How far each beer traveled · click a line for the trip'},
+  passport:{head:'My beer passport',hint:'Every country, stamped · scroll down for the full collection'}
 };
 
 // beer name → brewery record (breweries[].beers is " · "-separated)
@@ -1475,7 +1470,7 @@ function passportCountries(){
 // FNV-1a-ish hash so every country gets the same "hand-stamped" look every
 // time (ink color, tilt) without needing per-country data entry.
 function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-const STAMP_INKS=['#2dd4bf','#5df08e','#ffd166','#ff8a3d','#ff4d5e','#8b7cf6','#4dc3ff','#ff6ec7'];
+const STAMP_INKS=['#f5a524','#4ade80','#fbbf24','#fb923c','#f87171','#a78bfa','#60a5fa','#f472b6'];
 function stampStyle(cc){
   const h=stampHash(cc);
   return {
@@ -1699,9 +1694,9 @@ function passportStampSvg(r,sty){
   const {ink}=sty;
   const cc=r.cc,code=code3(cc);
   const name=(r.country||cc);
-  const bg='#0a0f1a';
+  const bg='#13161d';
   const art=(COUNTRY_ART[cc]||genericArt)(bg);
-  const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} BREWER${r.brewed.names.length===1?'Y':'IES'}`:'');
+  const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} brewer${r.brewed.names.length===1?'y':'ies'}`:'');
   return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
 <g fill="currentColor" stroke="currentColor" style="color:${ink}">
 <rect x="8" y="8" width="104" height="134" fill="none" stroke-width="2"/>
@@ -1719,12 +1714,12 @@ ${perforatedEdge(8,8,112,142,bg,10.4,4)}
 function passportStampCard(r){
   const sty=stampStyle(r.cc);
   const metaBits=[];
-  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}${r.firstYear?` · first ${(r.firstMonth||'').toUpperCase()} ${r.firstYear}`:''}`);
+  if(r.drank) metaBits.push(`${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''}${r.firstYear?` · first ${r.firstMonth||''} ${r.firstYear}`:''}`);
   if(r.brewed) metaBits.push(`${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} beer${r.brewed.count>1?'s':''}`);
   return `<div class="stamp-card" style="--rot:${sty.rot}deg">
     <div class="stamp-badges">
-      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">BREW</span>':''}
-      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">DRANK</span>':''}
+      ${r.brewed?'<span class="stamp-badge sb-brew" title="Brewed here">Brewed</span>':''}
+      ${r.drank?'<span class="stamp-badge sb-drink" title="Drank here">Drank</span>':''}
     </div>
     <div class="stamp-ink">${passportStampSvg(r,sty)}</div>
     <div class="stamp-cap"><span class="stamp-name">${r.country||r.cc}</span></div>
@@ -1736,10 +1731,10 @@ let _passportFilter='all';
 function passportSummaryHtml(recs){
   const chip=(v,l)=>`<span class="mh-chip"><b>${v}</b> ${l}</span>`;
   const brewedN=recs.filter(r=>r.brewed).length,drankN=recs.filter(r=>r.drank).length,bothN=recs.filter(r=>r.brewed&&r.drank).length;
-  return chip(recs.length,'COUNTRIES STAMPED')+chip(brewedN,'BREWED IN')+chip(drankN,'DRUNK IN')+chip(bothN,'BOTH ENDS');
+  return chip(recs.length,'countries stamped')+chip(brewedN,'brewed in')+chip(drankN,'drunk in')+chip(bothN,'both ends');
 }
 function passportFiltersHtml(){
-  const opts=[['all','ALL'],['brewed','BREWED'],['drank','DRANK'],['both','BOTH']];
+  const opts=[['all','All'],['brewed','Brewed there'],['drank','Drank there'],['both','Both']];
   return opts.map(([k,l])=>`<button class="pf-btn${_passportFilter===k?' active':''}" data-pf="${k}">${l}</button>`).join('');
 }
 function renderPassportStamps(){
@@ -1767,46 +1762,46 @@ function mapHeroHtml(journeys){
   return `<div class="bb-body" id="map-hero-body">
     <div class="mh-line">Every beer on this site has <b>two places</b>: where it’s <b class="mh-brew">brewed</b> and where I <b class="mh-drink">drank it</b>. Pick a view below to see either end of the trip — or the trip itself.</div>
     <div class="mh-chips">
-      ${chip(beers.length,'POURS LOGGED')}
-      ${chip(cityN,'CITIES POURED IN')}
-      ${chip(drankCountries,'COUNTRIES DRUNK IN')}
-      ${chip(breweries.length,'BREWERIES')}
-      ${chip(brewCountries,'BREWING NATIONS')}
-      ${chip(fmtMi(totalMi),'TOTAL BEER-MILES')}
+      ${chip(beers.length,'pours logged')}
+      ${chip(cityN,'cities poured in')}
+      ${chip(drankCountries,'countries drunk in')}
+      ${chip(breweries.length,'breweries')}
+      ${chip(brewCountries,'brewing nations')}
+      ${chip(fmtMi(totalMi),'total beer-miles')}
     </div>
   </div>`;
 }
 
 function keyHtml(mode,journeys){
-  const head=`<div class="mk-head">WHAT YOU’RE LOOKING AT</div>`;
+  const head=`<div class="mk-head">What you’re looking at</div>`;
   if(mode==='drank'){
     return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf"></span>a city where I’ve reviewed a beer</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--accent)"></span>a city where I’ve reviewed a beer</div>
       <div class="mk-row"><span class="mk-scale"><i style="width:8px;height:8px"></i><i style="width:12px;height:12px"></i><i style="width:16px;height:16px"></i></span>bigger dot = more pours there</div>
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf;box-shadow:0 0 0 2px #ffd166"></span>gold ring = my home turf (NY)</div>
-      <div class="mk-tap">CLICK ANY DOT TO SEE WHAT I HAD THERE</div>`;
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--accent);box-shadow:0 0 0 2px var(--accent-hi)"></span>gold ring = my home turf (NY)</div>
+      <div class="mk-tap">Click any dot to see what I had there</div>`;
   }
   if(mode==='brewed'){
-    const buckets=[[4.75,'4.5+ LOVED IT'],[4.2,'4.0+ GREAT'],[3.7,'3.5+ GOOD'],[3.2,'3.0+ FINE'],[2.7,'2.5+ MEH'],[2.0,'<2.5 SKIP IT']];
+    const buckets=[[4.75,'4.5+ loved it'],[4.2,'4.0+ great'],[3.7,'3.5+ good'],[3.2,'3.0+ fine'],[2.7,'2.5+ meh'],[2.0,'under 2.5']];
     return head+`
       <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#aacc00"></span>a brewery’s hometown</div>
       <div class="mk-row mk-note">dot color = my average rating of its beers</div>
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
-      <div class="mk-tap">CLICK ANY DOT FOR THE BREWERY’S CARD</div>`;
+      <div class="mk-tap">Click any dot for the brewery’s card</div>`;
   }
   if(mode==='journey'){
     const totalMi=journeys.reduce((s,j)=>s+j.miles*j.pours,0);
     return head+`
       <div class="mk-row"><span class="mk-jline"><i class="mk-o"></i><b></b><i class="mk-f"></i></span>one beer’s trip: ○ brewed here → ● drunk here</div>
       <div class="mk-row mk-note">line color = my rating (green = liked, red = didn’t)</div>
-      <div class="mk-row mk-note">all pours added up: <b style="color:#ffd166">${fmtMi(totalMi)} beer-miles</b></div>
-      <div class="mk-tap">CLICK ANY LINE FOR THAT BEER’S TRIP</div>`;
+      <div class="mk-row mk-note">all pours added up: <b style="color:var(--accent-hi)">${fmtMi(totalMi)} beer-miles</b></div>
+      <div class="mk-tap">Click any line for that beer’s trip</div>`;
   }
   return head+`
-    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#2dd4bf"></span>drank here only</div>
-    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#8b7cf6"></span>brewed here only</div>
-    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#ffd166"></span>brewed AND drank here</div>
-    <div class="mk-tap">CLICK ANY DOT FOR THE STAMP · SCROLL DOWN FOR THE FULL COLLECTION</div>`;
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--accent)"></span>drank here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--purple)"></span>brewed here only</div>
+    <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--pos)"></span>brewed and drank here</div>
+    <div class="mk-tap">Click any dot for the stamp · scroll down for the full collection</div>`;
 }
 
 function buildDrankLayer(map){
@@ -1815,12 +1810,12 @@ function buildDrankLayer(map){
   drunkLocs.filter(l=>cM[l.city]).forEach(l=>{
     const d=cM[l.city],a=d.t/d.c,r=Math.max(6,Math.min(16,5+d.c*1.2));
     const home=HOME_CITIES.has(l.city);
-    const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid #182136"><span style="color:#a4aec6">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
-    const html=popKicker('📍 A CITY WHERE I DRANK')+
-      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:#ffd166">⌂ HOME TURF</span>':''}<br>`+
-      `<span style="color:#7d88a3;font-size:10px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
+    const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-2)">${b.beer}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
+    const html=popKicker('📍 A city where I drank')+
+      `<span style="color:var(--text);font-weight:700;font-size:13px">${l.city}</span>, ${l.region}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${l.country}${home?' · <span style="color:var(--accent-hi)">⌂ Home turf</span>':''}<br>`+
+      `<span style="color:var(--text-2);font-size:13px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
       `<div style="margin-top:6px">${rows}</div>`;
-    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:'#2dd4bf',color:home?'#ffd166':'#000',weight:home?2:1,opacity:.9,fillOpacity:.8})
+    L.circleMarker([l.lat,l.lng],{radius:r,fillColor:THEME.accent,color:home?THEME.accentHi:THEME.bg,weight:home?2:1,opacity:.9,fillOpacity:.8})
       .bindTooltip(`${l.city} · ${d.c} pour${d.c>1?'s':''}`,{direction:'top',className:'mtip'})
       .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
     bounds.push([l.lat,l.lng]);
@@ -1836,13 +1831,13 @@ function buildBrewedLayer(map){
     const srcs=logoSources(firstBeer);
     const onerr=srcs.length>1?logoChainOnError(srcs,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
     const logoHtml=srcs.length?`<img src="${srcs[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${onerr}>`:'';
-    const beerList=b.beers.split(' · ').map(n=>`<span style="color:#a4aec6">${n}</span>`).join('<span style="color:#4b5671"> · </span>');
-    const html=popKicker('🏭 A BREWERY’S HOMETOWN')+logoHtml+
-      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${b.name}</span><br>`+
-      `<span style="color:#7d88a3;font-size:10px">brews in ${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br>`+
-      `<span style="color:#5d6883;font-size:9px">WHAT I’VE HAD:</span> <span style="font-size:10px">${beerList}</span><br>`+
-      `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:#5d6883">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
-    L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rC(a),color:'#000',weight:1,opacity:.9,fillOpacity:.85})
+    const beerList=b.beers.split(' · ').map(n=>`<span style="color:var(--text-2)">${n}</span>`).join('<span style="color:var(--text-3)"> · </span>');
+    const html=popKicker('🏭 A brewery’s hometown')+logoHtml+
+      `<span style="color:var(--text);font-weight:700;font-size:13px">${b.name}</span><br>`+
+      `<span style="color:var(--text-2);font-size:13px">brews in ${b.location} · ${FLAGS[b.cc]||''} ${b.country}</span><br>`+
+      `<span style="color:var(--text-3);font-size:12px">What I’ve had:</span> <span style="font-size:13px">${beerList}</span><br>`+
+      `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:var(--text-3)">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
+    L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rC(a),color:THEME.bg,weight:1,opacity:.9,fillOpacity:.85})
       .bindTooltip(`${b.name} · ${a.toFixed(2)}/5`,{direction:'top',className:'mtip'})
       .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
     bounds.push([b.lat,b.lng]);
@@ -1854,17 +1849,17 @@ function buildJourneyLayer(map,journeys){
   const group=L.layerGroup(),bounds=[];
   journeys.forEach(j=>{
     const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
-    const html=popKicker('✈ ONE BEER’S TRIP TO MY GLASS')+
-      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${j.beer}</span><br>`+
-      `<span style="color:#a4aec6">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:#66718c">→</span> <span style="color:#a4aec6">${j.loc.city} ${FLAGS[j.loc.cc]||''}</span><br>`+
-      `<span style="color:#7d88a3;font-size:10px">traveled ~<b style="color:#ffd166">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
+    const html=popKicker('✈ One beer’s trip to my glass')+
+      `<span style="color:var(--text);font-weight:700;font-size:13px">${j.beer}</span><br>`+
+      `<span style="color:var(--text-2)">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:var(--text-3)">→</span> <span style="color:var(--text-2)">${j.loc.city} ${FLAGS[j.loc.cc]||''}</span><br>`+
+      `<span style="color:var(--text-2);font-size:13px">traveled ~<b style="color:var(--accent-hi)">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
     L.polyline(pts,{color:rC(a),weight:1.6,opacity:.65})
       .bindTooltip(`${j.beer} · ${fmtMi(j.miles)} mi`,{sticky:true,className:'mtip'})
       .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
     // endpoints: hollow ring = brewery, solid dot = where I drank it
     const p0=pts[0],p1=pts[pts.length-1];
-    L.circleMarker(p0,{radius:3.5,fillColor:'#070a12',color:'#b3bdd3',weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
-    L.circleMarker(p1,{radius:3.5,fillColor:'#2dd4bf',color:'#000',weight:1,fillOpacity:1,interactive:false}).addTo(group);
+    L.circleMarker(p0,{radius:3.5,fillColor:THEME.bg,color:THEME.text2,weight:1.5,fillOpacity:1,interactive:false}).addTo(group);
+    L.circleMarker(p1,{radius:3.5,fillColor:THEME.accent,color:THEME.bg,weight:1,fillOpacity:1,interactive:false}).addTo(group);
     bounds.push(p0,p1);
   });
   return {group,bounds};
@@ -1878,14 +1873,14 @@ function buildPassportLayer(map){
     drunkLocs.filter(l=>l.cc===r.cc).forEach(l=>pts.push([l.lat,l.lng]));
     if(!pts.length) return;
     const lat=pts.reduce((s,p)=>s+p[0],0)/pts.length,lng=pts.reduce((s,p)=>s+p[1],0)/pts.length;
-    const color=r.brewed&&r.drank?'#ffd166':r.brewed?'#8b7cf6':'#2dd4bf';
-    const roleLabel=r.brewed&&r.drank?'BREWED & DRANK HERE':r.brewed?'BREWED HERE':'DRANK HERE';
-    const html=popKicker('🛂 A STAMP IN MY PASSPORT')+
-      `<span style="color:#2dd4bf;font-weight:700;font-size:12px">${FLAGS[r.cc]||''} ${r.country}</span><br>`+
-      `<span style="color:#7d88a3;font-size:10px">${roleLabel}</span>`+
-      (r.brewed?`<div style="margin-top:4px;font-size:10px;color:#a4aec6">🏭 ${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} pour${r.brewed.count>1?'s':''}</div>`:'')+
-      (r.drank?`<div style="font-size:10px;color:#a4aec6">🍺 ${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''} · first ${r.firstMonth} ${r.firstYear}</div>`:'');
-    L.circleMarker([lat,lng],{radius:9,fillColor:color,color:'#000',weight:1,opacity:.9,fillOpacity:.85})
+    const color=r.brewed&&r.drank?THEME.pos:r.brewed?THEME.purple:THEME.accent;
+    const roleLabel=r.brewed&&r.drank?'Brewed &amp; drank here':r.brewed?'Brewed here':'Drank here';
+    const html=popKicker('🛂 A stamp in my passport')+
+      `<span style="color:var(--text);font-weight:700;font-size:13px">${FLAGS[r.cc]||''} ${r.country}</span><br>`+
+      `<span style="color:var(--text-2);font-size:13px">${roleLabel}</span>`+
+      (r.brewed?`<div style="margin-top:4px;font-size:13px;color:var(--text-2)">🏭 ${r.brewed.names.length} brewer${r.brewed.names.length>1?'ies':'y'} · ${r.brewed.count} pour${r.brewed.count>1?'s':''}</div>`:'')+
+      (r.drank?`<div style="font-size:13px;color:var(--text-2)">🍺 ${r.drank.cities.length} cit${r.drank.cities.length>1?'ies':'y'} · ${r.drank.count} pour${r.drank.count>1?'s':''} · first ${r.firstMonth} ${r.firstYear}</div>`:'');
+    L.circleMarker([lat,lng],{radius:9,fillColor:color,color:THEME.bg,weight:1,opacity:.9,fillOpacity:.85})
       .bindTooltip(`${FLAGS[r.cc]||''} ${r.country}`,{direction:'top',className:'mtip'})
       .bindPopup(popHtml(html),{className:'dpop'}).addTo(group);
     bounds.push([lat,lng]);
@@ -1897,12 +1892,12 @@ function renderDrankTable(){
   const cM=drankCityData();
   const arr=Object.entries(cM).map(([city,d])=>({city,count:d.c,avg:d.t/d.c,beers:d.bs,region:d.region,country:d.country,cc:d.cc})).sort((a,b)=>b.count-a.count);
   document.getElementById('drunkTbody').innerHTML=arr.map(c=>`<tr>
-    <td style="color:#2dd4bf">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:#ffd166;font-size:8px">⌂ HOME</span>':''}</td>
-    <td style="color:#66718c">${c.region}</td>
-    <td style="color:#a4aec6">${FLAGS[c.cc]||''} ${c.country}</td>
-    <td style="text-align:center;color:#4dc3ff">${c.count}</td>
+    <td style="color:var(--text)">${c.city}${HOME_CITIES.has(c.city)?' <span style="color:var(--accent-hi);font-size:12px">⌂ Home</span>':''}</td>
+    <td style="color:var(--text-3)">${c.region}</td>
+    <td style="color:var(--text-2)">${FLAGS[c.cc]||''} ${c.country}</td>
+    <td style="text-align:center;color:var(--info)">${c.count}</td>
     <td><span class="rb ${rbC(c.avg)}">${c.avg.toFixed(2)}</span></td>
-    <td style="color:#66718c;font-size:9px">${c.beers.join(', ')}</td>
+    <td style="color:var(--text-3);font-size:12px">${c.beers.join(', ')}</td>
   </tr>`).join('');
 }
 
@@ -1913,9 +1908,9 @@ function renderBrewedTable(){
     return `<tr>
       <td>${logoImg(firstBeer,22)}</td>
       <td style="font-weight:600"><span class="brewery-clickable" data-brewery="${b.name.replace(/"/g,'&quot;')}">${b.name}</span></td>
-      <td style="color:#66718c;font-size:9px">${b.location}</td>
-      <td style="color:#a4aec6">${FLAGS[b.cc]||''} ${b.country}</td>
-      <td style="color:#66718c;font-size:9px">${b.beers}</td>
+      <td style="color:var(--text-3);font-size:12px">${b.location}</td>
+      <td style="color:var(--text-2)">${FLAGS[b.cc]||''} ${b.country}</td>
+      <td style="color:var(--text-3);font-size:12px">${b.beers}</td>
       <td><span class="rb ${rbC(b.avg)}">${b.avg.toFixed(2)}</span></td>
     </tr>`;
   }).join('');
@@ -1927,18 +1922,18 @@ function renderJourneyTable(journeys){
   const far=s[0],near=s[s.length-1];
   const sumEl=document.getElementById('journeySummary');
   if(sumEl&&far) sumEl.innerHTML=`<div class="jny-sum">
-    <span>🏆 LONGEST HAUL: <b style="color:#ffd166">${far.beer}</b> — ${fmtMi(far.miles)} mi (${far.br.location.split(',')[0]} → ${far.loc.city})</span>
-    <span>🏠 MOST LOCAL: <b style="color:#2fd66f">${near.beer}</b> — ${fmtMi(near.miles)} mi (${near.br.location.split(',')[0]} → ${near.loc.city})</span>
-    <span>🌍 ALL POURS COMBINED: <b style="color:#4dc3ff">${fmtMi(totalMi)} beer-miles</b></span>
+    <span>🏆 Longest haul: <b style="color:var(--accent-hi)">${far.beer}</b> — ${fmtMi(far.miles)} mi (${far.br.location.split(',')[0]} → ${far.loc.city})</span>
+    <span>🏠 Most local: <b style="color:var(--pos)">${near.beer}</b> — ${fmtMi(near.miles)} mi (${near.br.location.split(',')[0]} → ${near.loc.city})</span>
+    <span>🌍 All pours combined: <b style="color:var(--info)">${fmtMi(totalMi)} beer-miles</b></span>
   </div>`;
   document.getElementById('journeyTbody').innerHTML=s.map((j,i)=>{
     const a=avg(j.ratings);
     return `<tr data-beer="${j.beer.replace(/"/g,'&quot;')}" style="cursor:pointer">
-      <td style="color:#66718c">${i+1}</td>
-      <td style="color:#2dd4bf;font-weight:600">${j.beer}</td>
-      <td style="color:#a4aec6">${FLAGS[j.br.cc]||''} ${j.br.location}</td>
-      <td style="color:#a4aec6">${FLAGS[j.loc.cc]||''} ${j.loc.city}</td>
-      <td style="text-align:right;color:#4dc3ff">${fmtMi(j.miles)}</td>
+      <td style="color:var(--text-3)">${i+1}</td>
+      <td style="color:var(--text);font-weight:600">${j.beer}</td>
+      <td style="color:var(--text-2)">${FLAGS[j.br.cc]||''} ${j.br.location}</td>
+      <td style="color:var(--text-2)">${FLAGS[j.loc.cc]||''} ${j.loc.city}</td>
+      <td style="text-align:right;color:var(--info)">${fmtMi(j.miles)}</td>
       <td><span class="rb ${rbC(a)}">${a.toFixed(2)}</span></td>
     </tr>`;
   }).join('');
@@ -2015,7 +2010,7 @@ function drawTemporal(){
   const prev   = months[months.length - 2];
   const delta  = prev != null ? +(avgRatings[months.length-1] - avgRatings[months.length-2]).toFixed(2) : 0;
   const deltaColor = delta > 0 ? 'var(--green2)' : delta < 0 ? 'var(--red)' : 'var(--amber)';
-  const deltaLabel = delta > 0 ? '▲ IMPROVING' : delta < 0 ? '▼ DECLINING' : '→ FLAT';
+  const deltaLabel = delta > 0 ? 'Improving' : delta < 0 ? 'Declining' : 'Flat';
   const firstYear = monthYearMap[months[0]];
   const lastYear  = monthYearMap[months[months.length-1]];
   const yearLabel = firstYear===lastYear ? firstYear : `${firstYear}–${lastYear}`;
@@ -2024,10 +2019,10 @@ function drawTemporal(){
   // Auto-fit strip rather than a fixed column count: the tile count is
   // months + 2, so a hardcoded grid leaves a ragged half-empty final row.
   document.getElementById('temporal-kpis').innerHTML = `<div class="kpi-strip">
-    <div class="kpi"><div class="kpi-val" style="color:var(--accent)">${months.length}</div><div class="kpi-label">MONTHS TRACKED</div><div class="kpi-sub">${kpiRange} ${yearLabel}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--accent)">${months.length}</div><div class="kpi-label">Months tracked</div><div class="kpi-sub">${kpiRange} ${yearLabel}</div></div>
     ${months.map((m,i)=>`
-    <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${monthAbbr[m].toUpperCase()} REVIEWS</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
-    <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">MOM RATING Δ</div><div class="kpi-sub">${deltaLabel}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:${monthColors[i]}">${counts[i]}</div><div class="kpi-label">${monthAbbr[m]} reviews</div><div class="kpi-sub">Avg: ${avgRatings[i].toFixed(2)}</div></div>`).join('')}
+    <div class="kpi"><div class="kpi-val" style="color:${deltaColor}">${delta>=0?'+':''}${delta.toFixed(2)}</div><div class="kpi-label">Month-on-month Δ</div><div class="kpi-sub">${deltaLabel}</div></div>
   </div>`;
 
   // ── Monthly volume + avg rating chart
@@ -2036,13 +2031,13 @@ function drawTemporal(){
       labels: monthLabels,
       datasets: [
         {type:'bar',label:'Reviews',data:counts,backgroundColor:monthColors.map(c=>c+'33'),borderColor:monthColors,borderWidth:2,yAxisID:'y'},
-        {type:'line',label:'Avg Rating',data:avgRatings,borderColor:'#ffd166',backgroundColor:'transparent',pointBackgroundColor:avgRatings.map(r=>rC(r)),pointRadius:8,pointBorderColor:'#000',pointBorderWidth:2,tension:0.3,yAxisID:'y2'}
+        {type:'line',label:'Avg Rating',data:avgRatings,borderColor:THEME.warn,backgroundColor:'transparent',pointBackgroundColor:avgRatings.map(r=>rC(r)),pointRadius:8,pointBorderColor:THEME.bg,pointBorderWidth:2,tension:0.3,yAxisID:'y2'}
       ]
     },
-    options:{plugins:{legend:{labels:{color:'#66718c',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{position:'left',grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1},title:{display:true,text:'REVIEWS',color:'#4b5671'}},
-              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:'#ffd166'},title:{display:true,text:'AVG RATING',color:'#ffd166'}},
-              x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
+    options:{plugins:{legend:{labels:{color:THEME.tick,font:{size:9},boxWidth:10}},tooltip:TT},
+      scales:{y:{position:'left',grid:{color:THEME.grid},ticks:{color:THEME.tick,stepSize:1},title:{display:true,text:'Reviews',color:THEME.axisTitle}},
+              y2:{position:'right',min:0,max:5,grid:{display:false},ticks:{color:THEME.warn},title:{display:true,text:'Average rating',color:THEME.warn}},
+              x:{grid:{display:false},ticks:{color:THEME.label}}}}
   });
 
   // ── Best & worst by month
@@ -2053,20 +2048,20 @@ function drawTemporal(){
     const worst = mb.reduce((a,b)=>b.rating<a.rating?b:a);
     return `
       <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
-        <div style="font-size:9px;font-weight:700;color:${monthColors[i]};letter-spacing:1px;margin-bottom:6px">${monthLabels[i].toUpperCase()} · ${mb.length} REVIEWS · AVG ${avgRatings[i].toFixed(2)}</div>
+        <div style="font-size:12px;font-weight:700;color:${monthColors[i]};margin-bottom:6px">${monthLabels[i]} · ${mb.length} review${mb.length===1?'':'s'} · average ${avgRatings[i].toFixed(2)}</div>
         <div class="mini-row">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:9px;color:var(--green2);font-weight:700">▲ BEST</span>
+            <span style="font-size:12px;color:var(--green2);font-weight:700">Best</span>
             ${logoImg(best.beer,18)}
-            <span style="color:#d9dfec;font-size:10px">${best.beer}</span>
+            <span style="color:var(--text-2);font-size:13px">${best.beer}</span>
           </div>
           <span class="rb ${rbC(best.rating)}">${best.rating.toFixed(2)}</span>
         </div>
         <div class="mini-row">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:9px;color:var(--red);font-weight:700">▼ WORST</span>
+            <span style="font-size:12px;color:var(--red);font-weight:700">Worst</span>
             ${logoImg(worst.beer,18)}
-            <span style="color:#d9dfec;font-size:10px">${worst.beer}</span>
+            <span style="color:var(--text-2);font-size:13px">${worst.beer}</span>
           </div>
           <span class="rb ${rbC(worst.rating)}">${worst.rating.toFixed(2)}</span>
         </div>
@@ -2082,8 +2077,8 @@ function drawTemporal(){
       byMonth[m].forEach(b=>bkts[bucketFn(b.rating)]++);
       return {label:m,data:bkts,backgroundColor:monthColors[i]+'66',borderColor:monthColors[i],borderWidth:2};
     })},
-    options:{plugins:{legend:{labels:{color:'#66718c',font:{size:9},boxWidth:10}},tooltip:TT},
-      scales:{y:{grid:{color:'#182136'},ticks:{color:'#4b5671',stepSize:1}},x:{grid:{display:false},ticks:{color:'#2dd4bf'}}}}
+    options:{plugins:{legend:{labels:{color:THEME.tick,font:{size:9},boxWidth:10}},tooltip:TT},
+      scales:{y:{grid:{color:THEME.grid},ticks:{color:THEME.tick,stepSize:1}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
   });
 
   // ── Style-mix doughnut charts — one per month, rendered dynamically
@@ -2091,7 +2086,7 @@ function drawTemporal(){
   if(styleChartsEl){
     styleChartsEl.innerHTML = `<div class="g2">${months.map((m,i)=>`
       <div class="bb-panel">
-        <div class="bb-panel-head">STYLE MIX — ${monthLabels[i].toUpperCase()}<span class="ph-right">${counts[i]} REVIEWS</span></div>
+        <div class="bb-panel-head">Style mix — ${monthLabels[i]}<span class="ph-right">${counts[i]} review${counts[i]===1?'':'s'}</span></div>
         <div class="bb-body"><div class="chart-box chart-box-short"><canvas id="styleChart_${i}"></canvas></div></div>
       </div>`).join('')}</div>`;
     months.forEach((m,i)=>{
@@ -2099,8 +2094,8 @@ function drawTemporal(){
       byMonth[m].forEach(b=>{sm[b.style]=(sm[b.style]||0)+1;});
       const labels=Object.keys(sm),data=Object.values(sm);
       safeChart(`styleChart_${i}`,document.getElementById(`styleChart_${i}`),{type:'doughnut',
-        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||'#2dd4bf'),borderWidth:1,borderColor:'#0c111d'}]},
-        options:{plugins:{legend:{position:'right',labels:{color:'#5d6883',font:{size:9},boxWidth:10}},tooltip:TT}}
+        data:{labels,datasets:[{data,backgroundColor:labels.map(s=>sC[s]||THEME.accent),borderWidth:2,borderColor:THEME.surface}]},
+        options:{plugins:{legend:{position:'right',labels:{color:THEME.tick,font:{size:9},boxWidth:10}},tooltip:TT}}
       });
     });
   }
@@ -2118,54 +2113,55 @@ function drawTemporal(){
       }
     });
   });
+  // Same breakpoints as rC(), rendered as translucent fills over the cell.
   function heatColor(a){
-    if(a>=4.5)return'rgba(47,214,111,0.5)';if(a>=4.0)return'rgba(47,214,111,0.3)';
-    if(a>=3.5)return'rgba(170,204,0,0.25)';if(a>=3.0)return'rgba(255,209,102,0.22)';
-    if(a>=2.5)return'rgba(255,138,61,0.25)';return'rgba(255,77,94,0.3)';
+    if(a>=4.5)return'rgba(74,222,128,0.42)';if(a>=4.0)return'rgba(134,217,110,0.30)';
+    if(a>=3.5)return'rgba(210,201,74,0.26)';if(a>=3.0)return'rgba(240,179,74,0.24)';
+    if(a>=2.5)return'rgba(240,139,82,0.26)';return'rgba(242,112,124,0.30)';
   }
-  let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">STYLE</th>';
-  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m].toUpperCase()}</th>`;});
+  let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">Style</th>';
+  months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m]}</th>`;});
   heatHtml+='</tr></thead><tbody>';
   allStyles.forEach(style=>{
-    heatHtml+=`<tr><td style="text-align:left;color:${sC[style]};font-weight:600;font-size:9px;white-space:nowrap">${style}</td>`;
+    heatHtml+=`<tr><td style="text-align:left;color:${sC[style]};font-weight:600;font-size:12px;white-space:nowrap">${style}</td>`;
     months.forEach(m=>{
       const cell=heatData[style][m];
       if(cell){
-        heatHtml+=`<td style="background:${heatColor(cell.avg)};color:#eaeef7;font-size:10px;font-weight:700;padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:8px;color:#5d6883;font-weight:400">${cell.count}×</span></td>`;
+        heatHtml+=`<td style="background:${heatColor(cell.avg)};color:var(--text);font-size:13px;font-weight:700;padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:12px;color:var(--text-3);font-weight:400">${cell.count}×</span></td>`;
       }else{
-        heatHtml+='<td style="color:#3a4258;font-size:9px">—</td>';
+        heatHtml+='<td style="color:var(--text-3);font-size:12px">—</td>';
       }
     });
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:9px;color:#66718c"><span>LOW</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid #26304a"><div style="flex:1;background:rgba(255,77,94,0.4)"></div><div style="flex:1;background:rgba(45,212,191,0.35)"></div><div style="flex:1;background:rgba(255,209,102,0.3)"></div><div style="flex:1;background:rgba(170,204,0,0.35)"></div><div style="flex:1;background:rgba(47,214,111,0.4)"></div></div><span>HIGH</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(242,112,124,0.30)"></div><div style="flex:1;background:rgba(240,139,82,0.26)"></div><div style="flex:1;background:rgba(240,179,74,0.24)"></div><div style="flex:1;background:rgba(210,201,74,0.26)"></div><div style="flex:1;background:rgba(74,222,128,0.42)"></div></div><span>High</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
-  const mRow = (l,v,c) => `<div class="mini-row"><span style="font-size:9px;color:var(--accent)">${l}</span><span class="${c}" style="font-family:var(--mono);font-size:10px;font-weight:700">${v}</span></div>`;
+  const mRow = (l,v,c) => `<div class="mini-row"><span style="color:var(--text-3)">${l}</span><span class="${c}" style="font-weight:600;text-align:right">${v}</span></div>`;
   let momentum = '';
   months.forEach((m,i)=>{
     const mAvg = avgRatings[i];
     const mAbv = avg(byMonth[m].map(b=>b.abv));
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} REVIEWS`, counts[i], 'fl');
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG RATING`, mAvg.toFixed(2), 'fl');
-    momentum += mRow(`${monthAbbr[m].toUpperCase()} AVG ABV`, mAbv.toFixed(2)+'%', '');
+    momentum += mRow(`${monthAbbr[m]} reviews`, counts[i], 'fl');
+    momentum += mRow(`${monthAbbr[m]} average rating`, mAvg.toFixed(2), 'fl');
+    momentum += mRow(`${monthAbbr[m]} average ABV`, mAbv.toFixed(2)+'%', '');
     if(i < months.length - 1) {
       const nextM = months[i+1];
       const paceChg = counts[i+1] - counts[i];
       const ratingChg = avgRatings[i+1] - avgRatings[i];
       const overlap = [...new Set(byMonth[m].map(b=>b.beer))].filter(n=>byMonth[nextM].some(b=>b.beer===n));
-      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} PACE`, (paceChg>=0?'+':'')+paceChg+' REVIEWS', paceChg>=0?'up':'dn');
-      momentum += mRow(`${monthAbbr[m].toUpperCase()}→${monthAbbr[nextM].toUpperCase()} Δ RATING`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
-      momentum += mRow('REPEAT BRANDS', overlap.length?overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')':'0','');
+      momentum += mRow(`${monthAbbr[m]} → ${monthAbbr[nextM]} pace`, (paceChg>=0?'+':'')+paceChg+' review'+(Math.abs(paceChg)===1?'':'s'), paceChg>=0?'up':'dn');
+      momentum += mRow(`${monthAbbr[m]} → ${monthAbbr[nextM]} Δ rating`, (ratingChg>=0?'+':'')+ratingChg.toFixed(2), ratingChg>=0?'up':'dn');
+      momentum += mRow('Repeat brands', overlap.length?overlap.length+' ('+overlap.slice(0,3).join(', ')+(overlap.length>3?'…':'')+')':'0','');
     }
   });
   {const _mp=document.getElementById('momentumPanel'); if(_mp) _mp.innerHTML = momentum;}
 
   // ── Bump Chart — Country Rankings Over Time
   try {
-    const BUMP_COLORS=['#f26d8d','#4de0f0','#7de26f','#ffb340','#c77dff','#e07fa8','#33c4d4','#ff6b52','#a4e87c','#9b7bff'];
+    const BUMP_COLORS=['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#f87171','#f472b6','#2dd4bf','#fb923c','#a3d977','#818cf8'];
     // Get all countries that appear in at least 2 months
     const countriesByMonth = {};
     months.forEach(m => {
@@ -2215,7 +2211,7 @@ function drawTemporal(){
         },
         options: {
           plugins: {
-            legend: { labels: { color: '#56617f', font: { size: 9 }, boxWidth: 10 } },
+            legend: { labels: { color: THEME.tick, font: { size: 11 }, boxWidth: 10 } },
             tooltip: { ...TT, callbacks: { label: c => `${c.dataset.label}: Rank #${c.raw}` } }
           },
           scales: {
@@ -2223,11 +2219,11 @@ function drawTemporal(){
               reverse: true,
               min: 1,
               max: maxRank + 0.5,
-              ticks: { color: '#56617f', stepSize: 1, callback: v => '#'+v },
-              grid: { color: '#182136' },
-              title: { display: true, text: 'RANK (1 = BEST)', color: '#56617f' }
+              ticks: { color: THEME.tick, stepSize: 1, callback: v => '#'+v },
+              grid: { color: THEME.grid },
+              title: { display: true, text: 'Rank (1 = best)', color: THEME.axisTitle }
             },
-            x: { grid: { display: false }, ticks: { color: '#2dd4bf' } }
+            x: { grid: { display: false }, ticks: { color: THEME.label } }
           }
         }
       });
@@ -2252,11 +2248,11 @@ function drawTemporal(){
     data:{
       labels:tlLabels,
       datasets:[
-        {label:'Rating',data:tlData,borderColor:'#2dd4bf',backgroundColor:'rgba(45,212,191,0.06)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:'#000',pointBorderWidth:1},
-        {label:'5-Pt Avg',data:tlRoll,borderColor:'#4dc3ff',borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
+        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(245,165,36,0.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
+        {label:'5-Pt Avg',data:tlRoll,borderColor:THEME.info,borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
-    options:{plugins:{legend:{labels:{color:'#66718c',font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:'#182136'},ticks:{color:'#4b5671'}},x:{grid:{display:false},ticks:{color:'#4b5671',maxTicksLimit:12}}}}
+    options:{plugins:{legend:{labels:{color:THEME.tick,font:{size:9},boxWidth:10}},tooltip:TT},scales:{y:{min:1.5,max:5.2,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.tick,maxTicksLimit:12}}}}
   });
 }
 
@@ -2317,8 +2313,8 @@ function drawContrarian(){
     const ageMs=Date.now()-new Date(UNTAPPD_LAST_REFRESHED).getTime();
     const ageDays=Math.floor(ageMs/86400000);
     const stale=ageDays>UNTAPPD_REFRESH_INTERVAL_DAYS;
-    freshEl.textContent=`WORLD RATINGS · UPDATED ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · REFRESH DUE':''}`;
-    freshEl.style.color=stale?'#ffd166':'#66718c';
+    freshEl.textContent=`World ratings updated ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · refresh due':''}`;
+    freshEl.style.color=stale?THEME.warn:THEME.text3;
   }
 
   const mostContr=rows.reduce((a,b)=>Math.abs(b.delta)>Math.abs(a.delta)?b:a);
@@ -2338,12 +2334,12 @@ function drawContrarian(){
   if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
-      backgroundColor:sorted.map(r=>r.delta>0?'rgba(47,214,111,0.7)':'rgba(255,77,94,0.7)'),
-      borderColor:sorted.map(r=>r.delta>0?'#2fd66f':'#ff4d5e'),borderWidth:1.5}]},
+      backgroundColor:sorted.map(r=>r.delta>0?'rgba(62,207,142,0.75)':'rgba(248,113,113,0.75)'),
+      borderColor:sorted.map(r=>r.delta>0?THEME.pos:THEME.neg),borderWidth:1.5}]},
     options:{indexAxis:'y',maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
-      scales:{x:{min:-2,max:2,grid:{color:'#182136'},ticks:{color:'#4b5671'},title:{display:true,text:'← WORLD LIKED IT MORE   ·   I LIKED IT MORE →',color:'#66718c'}},
-              y:{grid:{display:false},ticks:{color:'#a4aec6',font:{size:9}}}}}
+      scales:{x:{min:-2,max:2,grid:{color:THEME.grid},ticks:{color:THEME.tick},title:{display:true,text:'← World liked it more   ·   I liked it more →',color:THEME.axisTitle}},
+              y:{grid:{display:false},ticks:{color:THEME.label,font:{size:9}}}}}
   });
 }
 
@@ -2436,18 +2432,18 @@ function drawRecommendations(){
       .sort((a,b)=>b._pred-a._pred);
 
     const cntEl=document.getElementById('rec-count');
-    if(cntEl) cntEl.textContent=picks.length+' PICK'+(picks.length!==1?'S':'');
+    if(cntEl) cntEl.textContent=picks.length+' pick'+(picks.length!==1?'s':'');
 
     // Rationale chips: compare each beer's attributes to JWAL's biases.
     function rationale(c){
       const chips=[];
       const sM=STATS.styleMap[c.style];
-      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I LIKE ${c.style.toUpperCase()} · ${sa.toFixed(2)}`);}
+      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I like ${c.style} · ${sa.toFixed(2)}`);}
       const cM=STATS.countryMap[c.origin];
-      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} FAVOURITE · ${ca.toFixed(2)}`);}
-      if(c.method==='Draft'||c.method==='Nitro') chips.push(`BETTER ON ${c.method.toUpperCase()}`);
-      if(c._pred>=4.0) chips.push('TOP SHELF');
-      if(!chips.length) chips.push(`WORLD RATES IT ${c.untappd.toFixed(2)}`);
+      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} favourite · ${ca.toFixed(2)}`);}
+      if(c.method==='Draft'||c.method==='Nitro') chips.push(`Better on ${c.method.toLowerCase()}`);
+      if(c._pred>=4.0) chips.push('Top shelf');
+      if(!chips.length) chips.push(`World rates it ${c.untappd.toFixed(2)}`);
       return chips.slice(0,3);
     }
 
@@ -2460,16 +2456,16 @@ function drawRecommendations(){
           <div class="tp-head"><span class="rec-rank">#${i+1}</span> ${logoImg(c.beer,20)} <span>${c.beer}</span></div>
           <div class="tp-style">${FLAGS[c.origin]||''} ${c.style} · ${c.abv.toFixed(1)}% · ${c.method}</div>
           <div class="tp-row">
-            <span style="color:#c77dff">WORLD ${c.untappd.toFixed(2)}</span>
+            <span style="color:var(--purple)">World ${c.untappd.toFixed(2)}</span>
             <span class="tp-upside" style="color:${col}">${c._pred.toFixed(2)}</span>
           </div>
           <div class="tp-row" style="margin-top:4px">
-            <span style="color:${col};letter-spacing:1px">${strs(c._pred)}</span>
-            <span style="color:#4b5671;font-size:8px">MY GUESS</span>
+            <span style="color:${col}">${strs(c._pred)}</span>
+            <span style="color:var(--text-3)">My guess</span>
           </div>
           <div class="rec-why">${chips}</div>
         </div>`;
-      }).join(''):'<div style="color:#3a4258;font-size:9px;padding:10px">ALL CANDIDATES REVIEWED — NO PENDING PICKS</div>';
+      }).join(''):'<div style="color:var(--text-3);padding:12px">All candidates reviewed — nothing pending.</div>';
     }
   } catch(e){ console.error('Recommendations error:',e); }
 }
@@ -2500,7 +2496,7 @@ function drawIPO(){
   const _ipoTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
   _ipoTx('ipo-pending',pending.length);
   _ipoTx('ipo-priced',priced.length);
-  _ipoTx('ipo-watch-count',pending.length+' BEER'+(pending.length!==1?'S':'')+' QUEUED');
+  _ipoTx('ipo-watch-count',pending.length+' beer'+(pending.length!==1?'s':'')+' queued');
 
   const allTargets=[...targetCache.values()];
   _ipoTx('ipo-avg-analyst',(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2));
@@ -2508,8 +2504,8 @@ function drawIPO(){
 
   // Signal helper used by table + conveyor
   function sigOf(target){
-    const label=target>=4.0?'MUST TRY':target>=3.5?'WORTH IT':target>=3.0?'DECENT':target>=2.5?'MEH':'SKIP';
-    const color=target>=4.0?'#2fd66f':target>=3.5?'#aacc00':target>=3.0?'#ffc44d':target>=2.5?'#ff8a3d':'#ff4d5e';
+    const label=target>=4.0?'Must try':target>=3.5?'Worth it':target>=3.0?'Decent':target>=2.5?'Meh':'Skip';
+    const color=target>=4.0?THEME.pos:target>=3.5?'#d2c94a':target>=3.0?'#f0b34a':target>=2.5?'#f08b52':THEME.neg;
     return {label,color};
   }
 
@@ -2519,13 +2515,13 @@ function drawIPO(){
     const {label:signal,color:sigColor}=sigOf(target);
     return `<tr style="border-left-color:${sigColor}">
       <td>${logoImg(w.beer,24)}</td>
-      <td style="color:#2dd4bf;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
-      <td>${FLAGS[w.origin]||''} <span style="color:#7d88a3">${w.origin}</span></td>
-      <td style="color:#4dc3ff">${w.abv.toFixed(1)}%</td>
-      <td style="color:#c77dff;font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
-      <td style="color:#4dc3ff;font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
+      <td style="color:var(--text);font-weight:600">${w.beer}<br><span style="color:var(--text-3);font-size:12px;font-weight:400">${w.style}</span></td>
+      <td>${FLAGS[w.origin]||''} <span style="color:var(--text-2)">${w.origin}</span></td>
+      <td style="color:var(--info)">${w.abv.toFixed(1)}%</td>
+      <td style="color:var(--purple);font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
+      <td style="color:var(--info);font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
       <td class="${uClass}" style="font-family:var(--mono);font-weight:700">${upside>=0?'+':''}${upside.toFixed(2)}</td>
-      <td><span style="font-size:8px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700;letter-spacing:1px">${signal}</span></td>
+      <td><span style="font-size:12px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700">${signal}</span></td>
     </tr>`;
   }).join('');}
 
@@ -2533,7 +2529,7 @@ function drawIPO(){
   const topPicksEl=document.getElementById('ipoTopPicks');
   const topN=pending.slice(0,6);
   const topCountEl=document.getElementById('ipo-top-count');
-  if(topCountEl) topCountEl.textContent=topN.length+' OF '+pending.length;
+  if(topCountEl) topCountEl.textContent=topN.length+' of '+pending.length;
   if(topPicksEl){
     topPicksEl.innerHTML=topN.length?topN.map(w=>{
       const {label:signal,color:sigColor}=sigOf(w._target);
@@ -2542,31 +2538,31 @@ function drawIPO(){
         <div class="tp-head">${logoImg(w.beer,20)} <span>${w.beer}</span></div>
         <div class="tp-style">${FLAGS[w.origin]||''} ${w.style} · ${w.abv.toFixed(1)}%</div>
         <div class="tp-row">
-          <span style="color:#4dc3ff">MY GUESS ${w._target.toFixed(2)}</span>
+          <span style="color:var(--info)">My guess ${w._target.toFixed(2)}</span>
           <span class="tp-upside ${uClass}">${w._upside>=0?'+':''}${w._upside.toFixed(2)}</span>
         </div>
         <div class="tp-row" style="margin-top:6px">
-          <span style="color:#c77dff">WORLD ${w.untappd.toFixed(2)}</span>
+          <span style="color:var(--purple)">World ${w.untappd.toFixed(2)}</span>
           <span class="tp-signal" style="border-color:${sigColor};color:${sigColor}">${signal}</span>
         </div>
       </div>`;
-    }).join(''):'<div style="color:#3a4258;font-size:9px;padding:10px">TRIED EVERYTHING ON THE LIST — NOTHING PENDING</div>';
+    }).join(''):'<div style="color:var(--text-3);padding:12px">Tried everything on the list — nothing pending.</div>';
   }
 
   // ── UPSIDE DISTRIBUTION CHART
   const upCanvas=document.getElementById('ipoUpsideChart');
   if(upCanvas && pending.length){
     const buckets=[
-      {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:'#ff4d5e'},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#ff8a3d'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#aacc00'},
-      {lbl:'+0.5…+1',lo:0.5,hi:1,color:'#2fd66f'},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#00ff88'}
+      {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:THEME.neg},
+      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#f08b52'},
+      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#d2c94a'},
+      {lbl:'+0.5…+1',lo:0.5,hi:1,color:THEME.pos},
+      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#4ade80'}
     ];
     const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
     safeChart('ipoUpsideChart',upCanvas,{type:'bar',
       data:{labels:buckets.map(b=>b.lbl),datasets:[{data:counts,backgroundColor:buckets.map(b=>b.color),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:'#182136'},ticks:{color:'#4b5671',precision:0}},y:{grid:{display:false},ticks:{color:'#2dd4bf',font:{size:9}}}}}
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:THEME.grid},ticks:{color:THEME.tick,precision:0}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:9}}}}}
     });
   } else if(upCanvas){
     const prev=_charts['ipoUpsideChart']; if(prev){prev.destroy();delete _charts['ipoUpsideChart'];}
@@ -2578,28 +2574,28 @@ function drawIPO(){
   if(priced.length===0){
     if(pricedPanel) pricedPanel.style.display='none';
     if(_pb) _pb.innerHTML='';
-    _ipoTx('ipo-priced-count','0 BEERS');
+    _ipoTx('ipo-priced-count','0 beers');
   } else {
     if(pricedPanel) pricedPanel.style.display='';
-    _ipoTx('ipo-priced-count',priced.length+' BEER'+(priced.length!==1?'S':''));
+    _ipoTx('ipo-priced-count',priced.length+' beer'+(priced.length!==1?'s':''));
     if(_pb) _pb.innerHTML=priced.map(w=>{
       const target=targetCache.get(w.beer);
       const revd=BEER_REVIEWS.get(w.beer)||[];
       const jwalPrice=avg(revd.map(b=>b.rating));
       const vsAnalyst=jwalPrice-target;
       const vsMkt=jwalPrice-w.untappd;
-      const verdict=vsAnalyst>0.3?'BEAT MY GUESS':vsAnalyst>-0.3?'ON TARGET':'BELOW MY GUESS';
-      const vColor=vsAnalyst>0.3?'#2fd66f':vsAnalyst<-0.3?'#ff4d5e':'#ffd166';
+      const verdict=vsAnalyst>0.3?'Beat my guess':vsAnalyst>-0.3?'On target':'Below my guess';
+      const vColor=vsAnalyst>0.3?THEME.pos:vsAnalyst<-0.3?THEME.neg:THEME.warn;
       return `<tr>
         <td>${logoImg(w.beer,24)}</td>
-        <td style="color:#2dd4bf;font-weight:600">${w.beer}<br><span style="color:#4b5671;font-size:9px;font-weight:400">${w.style}</span></td>
-        <td>${FLAGS[w.origin]||''} <span style="color:#7d88a3">${w.origin}</span></td>
-        <td style="color:#c77dff;font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
-        <td style="color:#4dc3ff;font-family:var(--mono)">${target.toFixed(2)}</td>
+        <td style="color:var(--text);font-weight:600">${w.beer}<br><span style="color:var(--text-3);font-size:12px;font-weight:400">${w.style}</span></td>
+        <td>${FLAGS[w.origin]||''} <span style="color:var(--text-2)">${w.origin}</span></td>
+        <td style="color:var(--purple);font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
+        <td style="color:var(--info);font-family:var(--mono)">${target.toFixed(2)}</td>
         <td><span class="rb ${rbC(jwalPrice)}">${jwalPrice.toFixed(2)}</span></td>
         <td class="${vsAnalyst>=0?'up':'dn'}" style="font-family:var(--mono)">${vsAnalyst>=0?'+':''}${vsAnalyst.toFixed(2)}</td>
         <td class="${vsMkt>=0?'up':'dn'}" style="font-family:var(--mono)">${vsMkt>=0?'+':''}${vsMkt.toFixed(2)}</td>
-        <td><span style="font-size:8px;padding:1px 6px;border:1px solid ${vColor};color:${vColor}">${verdict}</span></td>
+        <td><span style="font-size:12px;padding:1px 6px;border:1px solid ${vColor};color:${vColor}">${verdict}</span></td>
       </tr>`;
     }).join('');
   }
@@ -2612,17 +2608,17 @@ function drawIPO(){
 // ══════════════════════════════════════════════════════════════
 (function initCommandPalette(){
   const TABS=[
-    {id:'overview',label:'HOME',icon:'◈',key:'F1'},
-    {id:'beers',label:'ALL BEERS',icon:'◉',key:'F2'},
-    {id:'maps',label:'MAP',icon:'◎',key:'F3'},
-    {id:'maps',label:'MAP · WHERE I DRANK THEM',icon:'🍺',key:'',mode:'drank'},
-    {id:'maps',label:'MAP · WHERE THEY\'RE BREWED',icon:'🏭',key:'',mode:'brewed'},
-    {id:'maps',label:'MAP · BREWERY → MY GLASS',icon:'✈',key:'',mode:'journey'},
-    {id:'maps',label:'MAP · PASSPORT',icon:'🛂',key:'',mode:'passport'},
-    {id:'insights',label:'INSIGHTS',icon:'◆',key:'F4'},
-    {id:'geo',label:'INSIGHTS · PLACES',icon:'🌍',key:''},
-    {id:'temporal',label:'INSIGHTS · OVER TIME',icon:'📈',key:''},
-    {id:'markets',label:'INSIGHTS · WHAT TO TRY',icon:'🍺',key:''},
+    {id:'overview',label:'Home',icon:'🏠',key:'1'},
+    {id:'beers',label:'All beers',icon:'🍺',key:'2'},
+    {id:'maps',label:'Map',icon:'📍',key:'3'},
+    {id:'maps',label:'Map · where I drank them',icon:'🍺',key:'',mode:'drank'},
+    {id:'maps',label:'Map · where they\'re brewed',icon:'🏭',key:'',mode:'brewed'},
+    {id:'maps',label:'Map · brewery to my glass',icon:'✈',key:'',mode:'journey'},
+    {id:'maps',label:'Map · passport',icon:'🛂',key:'',mode:'passport'},
+    {id:'insights',label:'Insights',icon:'📊',key:'4'},
+    {id:'geo',label:'Insights · places',icon:'🌍',key:''},
+    {id:'temporal',label:'Insights · over time',icon:'📈',key:''},
+    {id:'markets',label:'Insights · what to try',icon:'🍺',key:''},
   ];
 
   let prevFocus=null;
@@ -2655,7 +2651,7 @@ function drawIPO(){
     // Tabs nav
     const matchedTabs=lq?TABS.filter(t=>t.label.toLowerCase().includes(lq)||t.id.toLowerCase().includes(lq)):TABS;
     if(matchedTabs.length){
-      html+=`<div class="cmd-section">NAVIGATE</div>`;
+      html+=`<div class="cmd-section">Navigate</div>`;
       html+=matchedTabs.slice(0,10).map(t=>`
         <div class="cmd-item" data-tab="${t.id}"${t.mode?` data-mode="${t.mode}"`:''} data-action="tab">
           <span class="cmd-item-icon">${t.icon}</span>
@@ -2671,7 +2667,7 @@ function drawIPO(){
         .map(b=>[b.beer,b])
       ).values()].slice(0,5);
       if(matchedBeers.length){
-        html+=`<div class="cmd-section">BEERS</div>`;
+        html+=`<div class="cmd-section">Beers</div>`;
         html+=matchedBeers.map(b=>`
           <div class="cmd-item" data-beer="${b.beer.replace(/"/g,'&quot;')}" data-action="beer">
             <span class="cmd-item-icon">🍺</span>
@@ -2686,7 +2682,7 @@ function drawIPO(){
         b.country.toLowerCase().includes(lq)
       ).slice(0,4);
       if(matchedBrew.length){
-        html+=`<div class="cmd-section">BREWERIES</div>`;
+        html+=`<div class="cmd-section">Breweries</div>`;
         html+=matchedBrew.map(b=>`
           <div class="cmd-item" data-brewery="${b.name.replace(/"/g,'&quot;')}" data-action="brewery">
             <span class="cmd-item-icon">🏭</span>
@@ -2696,7 +2692,7 @@ function drawIPO(){
       }
     }
 
-    if(!html) html=`<div style="padding:20px;text-align:center;font-size:10px;color:var(--dim)">NO RESULTS</div>`;
+    if(!html) html=`<div style="padding:24px;text-align:center;color:var(--text-3)">No results</div>`;
     container.innerHTML=html;
   }
 
@@ -2738,22 +2734,22 @@ function openBreweryDrawer(name){
     const avgR=avg(brewery.ratings);
     const ratingsHTML=brewery.ratings.map(r=>`<span class="rb ${rbC(r)}" style="margin-right:3px">${r.toFixed(2)}</span>`).join('');
 
-    if(title) title.textContent=brewery.name.toUpperCase().slice(0,28);
+    if(title) title.textContent=brewery.name;
 
     body.innerHTML=`
-      <div class="drawer-stat"><span class="drawer-key">BREWERY</span><span class="drawer-val" style="font-size:9px;max-width:180px;text-align:right">${brewery.name}</span></div>
-      ${brewery.nativeName?`<div class="drawer-stat"><span class="drawer-key">NATIVE</span><span class="drawer-val" style="font-size:10px;max-width:180px;text-align:right">${brewery.nativeName}</span></div>`:''}
-      <div class="drawer-stat"><span class="drawer-key">LOCATION</span><span class="drawer-val" style="font-size:9px;text-align:right">${brewery.location}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">COUNTRY</span><span class="drawer-val">${FLAGS[brewery.cc]||''} ${brewery.country}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">LANGUAGE</span><span class="drawer-val" style="color:var(--cyan)">${brewery.lang.toUpperCase()}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">AVG RATING</span><span class="rb ${rbC(avgR)}" style="font-size:12px">${avgR.toFixed(2)}</span></div>
-      <div class="drawer-stat"><span class="drawer-key">REVIEWS</span><span class="drawer-val">${brewery.ratings.length}</span></div>
-      <div class="drawer-section">RATINGS</div>
+      <div class="drawer-stat"><span class="drawer-key">Brewery</span><span class="drawer-val" style="max-width:200px">${brewery.name}</span></div>
+      ${brewery.nativeName?`<div class="drawer-stat"><span class="drawer-key">Native name</span><span class="drawer-val" style="max-width:200px">${brewery.nativeName}</span></div>`:''}
+      <div class="drawer-stat"><span class="drawer-key">Location</span><span class="drawer-val">${brewery.location}</span></div>
+      <div class="drawer-stat"><span class="drawer-key">Country</span><span class="drawer-val">${FLAGS[brewery.cc]||''} ${brewery.country}</span></div>
+      <div class="drawer-stat"><span class="drawer-key">Language</span><span class="drawer-val">${LANG_NAMES_IDX[brewery.lang]||brewery.lang}</span></div>
+      <div class="drawer-stat"><span class="drawer-key">Average rating</span><span class="rb ${rbC(avgR)}" style="font-size:13px">${avgR.toFixed(2)}</span></div>
+      <div class="drawer-stat"><span class="drawer-key">Reviews</span><span class="drawer-val">${brewery.ratings.length}</span></div>
+      <div class="drawer-section">Ratings</div>
       <div style="margin-bottom:10px;padding-top:4px">${ratingsHTML}</div>
-      <div class="drawer-section">BEERS</div>
-      <div style="font-size:10px;color:var(--white);line-height:1.9;padding-top:4px">${brewery.beers.split(' · ').map(b=>`<div>◉ ${b}</div>`).join('')}</div>
-      <div class="drawer-section">COORDINATES</div>
-      <div style="font-size:9px;color:var(--cyan);padding-top:4px">${brewery.lat.toFixed(4)}°, ${brewery.lng.toFixed(4)}°</div>
+      <div class="drawer-section">Beers</div>
+      <div style="color:var(--text-2);line-height:1.9;padding-top:4px">${brewery.beers.split(' · ').map(b=>`<div>${b}</div>`).join('')}</div>
+      <div class="drawer-section">Coordinates</div>
+      <div style="color:var(--text-3);padding-top:4px">${brewery.lat.toFixed(4)}°, ${brewery.lng.toFixed(4)}°</div>
     `;
 
     _drawerPrevFocus=document.activeElement;
@@ -2771,7 +2767,7 @@ function openBreweryDrawer(name){
       }
       _drawerMap.setView([brewery.lat,brewery.lng],7);
       _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});
-      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:'#2dd4bf',color:'#000',weight:2,fillOpacity:1}).addTo(_drawerMap);
+      L.circleMarker([brewery.lat,brewery.lng],{radius:9,fillColor:THEME.accent,color:THEME.bg,weight:2,fillOpacity:1}).addTo(_drawerMap);
       _drawerMap.invalidateSize();
     },120);
   } catch(e){ console.error('Brewery drawer error:',e); }
@@ -2807,14 +2803,14 @@ window.closeBreweryDrawer=closeBreweryDrawer;
       'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
     };
     const sparkColors={
-      'spark-top':'#80ff44','spark-avg':'#ffae00','spark-low':'#ff2d55',
-      'spark-abv':'#00f5ff','spark-brands':'#cc3366','spark-hit':'#2fd66f'
+      'spark-top':THEME.pos,'spark-avg':THEME.warn,'spark-low':THEME.neg,
+      'spark-abv':THEME.info,'spark-brands':THEME.accent,'spark-hit':THEME.pos
     };
 
     Object.entries(sparkData).forEach(([id,data])=>{
       const canvas=document.getElementById(id);
       if(!canvas) return;
-      const color=sparkColors[id]||'#cc3366';
+      const color=sparkColors[id]||THEME.accent;
       safeChart(id,canvas,{
         type:'line',
         data:{
