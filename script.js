@@ -104,6 +104,7 @@ let beers=[
   {beer:"Beck's",                style:"Pilsner",        origin:"DE",abv:4.9,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Ichnusa Anima Sarda",   style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Chill Lemon",           style:"Shandy / Radler",origin:"IT",abv:2.0,method:"Bottle",city:"Capri",        region:"Campania",        country:"Italy",       cc:"IT", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Peroni Original",       style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.25,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -171,7 +172,7 @@ let breweries=[
   {name:"Erdinger Weissbräu",  location:"Erding, Bavaria",             country:"Germany",     cc:"DE", lang:"de", beers:"Erdinger Weißbier",                                     lat:48.3063,lng:11.9071,  ratings:[3.25]},
   {name:"Industrial Arts Brewing",location:"Garnerville, New York",     country:"USA",         cc:"US", lang:"en", beers:"Wrench",                                             lat:41.2065,lng:-74.0085,  ratings:[4.00]},
   {name:"Żywiec Brewery (Grupa Żywiec)", location:"Żywiec, Silesia",   country:"Poland",      cc:"PL", lang:"pl", beers:"Żywiec",                                             lat:49.6853,lng:19.1925,  ratings:[2.75]},
-  {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni Nastro Azzurro · Chill Lemon",                         lat:41.8902,lng:12.4922,  ratings:[3.00,4.00]},
+  {name:"Birra Peroni",               location:"Rome, Lazio",           country:"Italy",       cc:"IT", lang:"it", beers:"Peroni Nastro Azzurro · Chill Lemon · Peroni Original",       lat:41.8902,lng:12.4922,  ratings:[3.00,4.00,3.25]},
   {name:"S.A. Damm",                  location:"Barcelona, Catalonia",  country:"Spain",       cc:"ES", lang:"es", beers:"Estrella Damm · Daura",                                    lat:41.3897,lng:2.1540,   ratings:[3.50,3.00]},
   {name:"Abbaye de Leffe (AB InBev)", location:"Dinant, Namur",          country:"Belgium",     cc:"BE", lang:"fr", beers:"Leffe Blonde",                                            lat:50.2611,lng:4.9122,   ratings:[4.75]},
   {name:"Texelse Bierbrouwerij",      location:"Oudeschild, North Holland",country:"Netherlands",cc:"NL", lang:"nl", beers:"Texels Skuumkoppe",                                       lat:53.0385,lng:4.8510,   ratings:[3.00]},
@@ -276,6 +277,7 @@ const BRAND_DOMAINS = {
 "Hofbräu Münchner Weiße":"hofbraeu-muenchen.de",
 "Narragansett Lager":"narragansettbeer.com",
 "Peroni Nastro Azzurro":"peroni.it",
+"Peroni Original":"peroni.it",
 "Newcastle Brown":"newcastlebrown.com",
 "Norrlands Guld":"norrlandsguld.se",
 "Ocean SJU":"oceanlabbrewing.com",
