@@ -105,6 +105,7 @@ let beers=[
   {beer:"Ichnusa Anima Sarda",   style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.75,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Chill Lemon",           style:"Shandy / Radler",origin:"IT",abv:2.0,method:"Bottle",city:"Capri",        region:"Campania",        country:"Italy",       cc:"IT", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Peroni Original",       style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.25,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Bitburger Radler",      style:"Shandy / Radler",origin:"DE",abv:2.5,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -208,6 +209,7 @@ let breweries=[
   {name:"Dortmunder Actien-Brauerei (DAB)", location:"Dortmund, North Rhine-Westphalia", country:"Germany", cc:"DE", lang:"de", beers:"DAB Dortmunder Export",                     lat:51.5136,lng:7.4653,   ratings:[4.50]},
   {name:"Brauerei Beck & Co.",       location:"Bremen, Bremen",             country:"Germany",     cc:"DE", lang:"de", beers:"Beck's",                                                    lat:53.0793,lng:8.8017,   ratings:[3.00]},
   {name:"Birra Ichnusa (Heineken Italia)", location:"Assemini, Sardinia",   country:"Italy",       cc:"IT", lang:"it", beers:"Ichnusa Anima Sarda",                                       lat:39.2803,lng:9.0057,   ratings:[3.75]},
+  {name:"Bitburger Braugruppe",      location:"Bitburg, Rhineland-Palatinate", country:"Germany", cc:"DE", lang:"de", beers:"Bitburger Radler",                                          lat:49.9739,lng:6.5334,   ratings:[4.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -224,6 +226,7 @@ const BRAND_DOMAINS = {
 "Beck's":"becks.de",
 "Birra Moretti":"birramoretti.com",
 "Ichnusa Anima Sarda":"ichnusa.com",
+"Bitburger Radler":"bitburger.de",
 "Bloodline Blood Orange IPA":"flyingdog.com",
 "Blue Moon":"bluemoonbrewingcompany.com",
 "De Koninck":"dekoninck.be",
