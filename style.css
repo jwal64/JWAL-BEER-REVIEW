@@ -595,6 +595,15 @@ white-space: nowrap;
 .r2  { --rb-c: #f2707c; --rb-bg: rgba(242,112,124,0.14); }
 
 /* ═══════════════════════════════════════════
+UNDERSAMPLED GROUPS — a country, city, language or brewery with fewer than
+MIN_N reviews behind it (script.js). It still shows, it just can't win a
+ranking, so it is drawn as a fact rather than as a result: sorted to the tail
+by rankBy() and dimmed here.
+═══════════════════════════════════════════ */
+.rank-thin { opacity: 0.5; }
+.rb-thin { opacity: 0.55; font-weight: 500; }
+
+/* ═══════════════════════════════════════════
 PROGRESS BARS
 ═══════════════════════════════════════════ */
 .bb-bar-row { margin-bottom: var(--s3); }
