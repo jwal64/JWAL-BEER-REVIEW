@@ -912,6 +912,15 @@ function safeChart(key,ctx,cfg){
       if(box&&rows) box.style.setProperty('--rows',rows);
     }
   }catch(e){}
+  // A rotated axis title needs vertical room a phone's 220px chart box doesn't
+  // have, and Chart.js clips it ("eviews") rather than dropping it. Below the
+  // phone breakpoint the titles come off — the panel heading and its hint
+  // already say what the axes are.
+  try{
+    if(window.innerWidth<=700&&cfg&&cfg.options&&cfg.options.scales){
+      for(const sc of Object.values(cfg.options.scales)) if(sc&&sc.title) sc.title.display=false;
+    }
+  }catch(e){}
   _charts[key]=new Chart(ctx,cfg);
   return _charts[key];
 }

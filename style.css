@@ -392,6 +392,16 @@ letter-spacing: 0;
 .ov-split > * { min-width: 0; margin-bottom: 0; }
 @media (max-width: 1100px) { .ov-split, .ov-split-even { grid-template-columns: minmax(0, 1fr); } }
 
+/* A ranked list paired with a chart of the same data runs far longer than the
+   chart does — 26 cities is a 620px chart next to a 1,500px list, which left a
+   column-high well of dead space beside it. Cap the list at the chart's own
+   ceiling so the pair reads as one block; only while they actually sit side by
+   side, since a scroll region nested in a phone's page scroll is worse than a
+   long list. */
+@media (min-width: 1101px) {
+  #countryCards, #cityCards { max-height: 620px; overflow-y: auto; }
+}
+
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin-bottom: var(--s4); }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s4); margin-bottom: var(--s4); }
 .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--s4); margin-bottom: var(--s4); }
@@ -498,9 +508,31 @@ box-shadow: inset 0 -1px 0 var(--border);
 /* Beer index column rhythm. Auto layout hands all the slack to whichever
    column happens to hold the longest string (the city), which opens a ragged
    gap mid-table; fixed percentages keep the columns in the same place on every
-   screen. Scoped to desktop — the phone layout hides half these columns. */
-@media (min-width: 1200px) {
+   screen. Applies from tablet up — the phone layout hides half these columns.
+   Left on auto, a tablet-width viewport squeezed all ten columns to their
+   min-content and still overflowed: every cell wrapped to two or three lines
+   AND the last three columns hid behind a sideways scroll. */
+@media (min-width: 701px) {
   #beers .bb-table { table-layout: fixed; }
+  /* Tighter gutters here than the general table: ten columns at the shared
+     12px padding is what pushed ABV under its own text width. */
+  #beers .bb-table th, #beers .bb-table td { padding-left: 8px; padding-right: 8px; }
+  #beers .bb-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* The headers are nowrap, so without this a label wider than its column (the
+     sort arrow makes "Rating" the widest) pokes out and gives the panel a
+     phantom sideways scroll of a few pixels. The columns below are sized to fit
+     every label — this only ever bites at the very bottom of the range. */
+  #beers .bb-table thead th { overflow: hidden; text-overflow: ellipsis; }
+  /* The name truncates, the NEW pill does not: without the flex split, a long
+     beer name eats the cell and the pill is what gets ellipsised away.
+     Tablet-and-up only — the phone list lets names wrap instead of ellipsising,
+     and an un-blockified .beer-name-cell there would refuse to truncate and
+     shove every other column off-screen. */
+  #beers #beerBody td:nth-child(2) { display: flex; align-items: center; gap: 6px; }
+  #beers #beerBody td:nth-child(2) .new-tag { flex-shrink: 0; margin-left: 0; }
+  #beers .beer-name-cell { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (min-width: 1200px) {
   #beers .bb-table th:nth-child(1)  { width: 40px; }
   #beers .bb-table th:nth-child(2)  { width: 21%; }
   #beers .bb-table th:nth-child(3)  { width: 9%;  }
@@ -511,18 +543,32 @@ box-shadow: inset 0 -1px 0 var(--border);
   #beers .bb-table th:nth-child(8)  { width: 8%;  }
   #beers .bb-table th:nth-child(9)  { width: 8%;  }
   #beers .bb-table th:nth-child(10) { width: 9%;  }
-  /* Tighter gutters here than the general table: ten columns at the shared
-     12px padding is what pushed ABV under its own text width. */
-  #beers .bb-table th, #beers .bb-table td { padding-left: 8px; padding-right: 8px; }
-  #beers .bb-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  /* The name truncates, the NEW pill does not: without the flex split, a long
-     beer name eats the cell and the pill is what gets ellipsised away.
-     Desktop-only — the phone list lets names wrap instead of ellipsising, and
-     an un-blockified .beer-name-cell there would refuse to truncate and shove
-     every other column off-screen. */
-  #beers #beerBody td:nth-child(2) { display: flex; align-items: center; gap: 6px; }
-  #beers #beerBody td:nth-child(2) .new-tag { flex-shrink: 0; margin-left: 0; }
-  #beers .beer-name-cell { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+/* Tablet / small laptop: seven columns fit legibly where ten do not. Method,
+   the star row and the month are the three that carry the least — the numeric
+   rating says what the stars say, the month has its own filter directly above
+   the table, and all three are in the detail modal one tap away. Keeping them
+   cost every remaining column so much width that the whole table read as
+   ellipses. */
+@media (min-width: 701px) and (max-width: 1199px) {
+  #beers #beerHead th:nth-child(6),  /* method */
+  #beers #beerHead th:nth-child(8),  /* month */
+  #beers #beerHead th:nth-child(10), /* stars */
+  #beers #beerBody td:nth-child(6),
+  #beers #beerBody td:nth-child(8),
+  #beers #beerBody td:nth-child(10) { display: none; }
+  /* All seven are percentages so the row scales evenly across the band — an
+     absolute logo column is a very different share of 445px than of 620px. */
+  #beers .bb-table th:nth-child(1) { width: 7%;  }
+  #beers .bb-table th:nth-child(2) { width: 25%; }
+  #beers .bb-table th:nth-child(3) { width: 15%; }
+  #beers .bb-table th:nth-child(4) { width: 11%; }
+  #beers .bb-table th:nth-child(5) { width: 9%;  }
+  #beers .bb-table th:nth-child(7) { width: 21%; }
+  #beers .bb-table th:nth-child(9) { width: 12%; }
+  /* The logo needs its 24px inside a column that narrow. */
+  #beers .bb-table th:nth-child(1),
+  #beers #beerBody td:nth-child(1) { padding-left: 4px; padding-right: 4px; }
 }
 .bb-table tbody tr {
 border-bottom: 1px solid var(--border);
@@ -618,6 +664,7 @@ FILTER / SORT TOOLBAR
 ═══════════════════════════════════════════ */
 .bb-ctrl {
 display: flex;
+flex-wrap: wrap;
 align-items: center;
 gap: var(--s3);
 padding: var(--s3) var(--s4);
@@ -628,8 +675,11 @@ border-bottom: 1px solid var(--border);
 .bb-ctrl-title { font-size: var(--fs-sm); font-weight: 600; color: var(--text); white-space: nowrap; }
 /* Search grows into the free space; the three selects keep an even, predictable
    width so the toolbar reads as one control group rather than four odd pills. */
-.ctrl-fields { display: flex; align-items: center; gap: var(--s2); flex: 1; min-width: 0; }
-.ctrl-fields .bb-select { flex: 0 0 150px; }
+/* The row wraps rather than running off the panel: at tablet widths the four
+   fields need more than one line, and an unwrapped row pushed the month filter
+   clean off the screen and slid the result count under the origin select. */
+.ctrl-fields { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); flex: 1; min-width: 0; }
+.ctrl-fields .bb-select { flex: 0 1 150px; }
 #beerFilterCount { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; margin-left: auto; }
 #beerSearch {
 background: var(--bg);
@@ -1405,6 +1455,11 @@ TABLET / SMALL LAPTOP
 .g3 { grid-template-columns: 1fr 1fr; }
 .beer-grid { grid-template-columns: repeat(3, 1fr); }
 #map-modes { grid-template-columns: repeat(2, 1fr); }
+/* The four fields can't share one line here. Rather than let them wrap into a
+   ragged three rows with a lone dropdown on the end, give the search its own
+   row and split the rest evenly across the next. */
+.bb-ctrl #beerSearch { flex: 1 1 100%; max-width: none; }
+.ctrl-fields .bb-select { flex: 1 1 120px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -1471,8 +1526,12 @@ body { overscroll-behavior: none; }
   padding-left: max(var(--s3), env(safe-area-inset-left, 0px));
   padding-right: max(var(--s3), env(safe-area-inset-right, 0px));
 }
-.g2, .g3, .g4, .g5, .g6 { grid-template-columns: 1fr 1fr; gap: var(--s2); }
-.g3, .g5 { grid-template-columns: 1fr; }
+/* KPI tiles are short enough to sit two-up; content panels are not. A .g2 of
+   label/value rows at 179px wide wrapped every value onto three or four lines,
+   clipped the longer ones mid-word and pushed the rating badge past the edge of
+   the screen — so anything that isn't a tile row gets the full width. */
+.g2, .g3, .g4, .g5, .g6 { grid-template-columns: 1fr; gap: var(--s2); }
+.g4, .g6, .kpi-row { grid-template-columns: 1fr 1fr; }
 .ov-split, .ov-split-even { gap: var(--s2); margin-bottom: var(--s2); }
 .bb-panel { margin-bottom: var(--s3); border-radius: var(--r); }
 /* A long title plus a long hint can't share one 390px line — let the hint drop
@@ -1631,7 +1690,7 @@ NARROW PHONES — KPI tiles stay 2-up: one per row turns the home screen into
 four full viewports of headline number before any actual content appears.
 ═══════════════════════════════════════════ */
 @media (max-width: 430px) {
-  .g2, .g4, .g6 { grid-template-columns: 1fr 1fr; gap: var(--s2); }
+  .g4, .g6, .kpi-row { grid-template-columns: 1fr 1fr; gap: var(--s2); }
   .beer-grid { grid-template-columns: 1fr 1fr; }
   .kpi-val { font-size: var(--fs-md); }
   .kpi-sparkline-wrap { height: 22px; }
