@@ -97,7 +97,7 @@
 
 /* Lining, equal-width digits everywhere numbers column up */
 .kpi-val, .kpi-delta, .rb, .bb-table tbody td, .insight-val, .drawer-val,
-.tb-stat b, .ov-hero-stats b, .tp-upside {
+.tb-stat b, .tp-upside {
   font-variant-numeric: tabular-nums;
 }
 
@@ -465,40 +465,6 @@ color: var(--text);
 .kpi-sparkline-wrap canvas { display: block; }
 
 /* ═══════════════════════════════════════════
-HOME HERO
-═══════════════════════════════════════════ */
-#ov-hero {
-  background: linear-gradient(135deg, rgba(245,165,36,0.07), rgba(245,165,36,0) 60%), var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: var(--s5);
-  margin-bottom: var(--s4);
-}
-.ov-hero-stats {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--s3) var(--s6);
-  font-size: var(--fs-sm);
-  color: var(--text-2);
-}
-.ov-hero-stats span { display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap; }
-.ov-hero-stats b {
-  color: var(--text);
-  font-size: var(--fs-xl);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.ov-hero-sub {
-  margin-top: var(--s3);
-  font-size: var(--fs-sm);
-  color: var(--text-3);
-  line-height: 1.55;
-  max-width: 62ch;
-}
-
-/* ═══════════════════════════════════════════
 TABLES
 ═══════════════════════════════════════════ */
 .bb-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
@@ -627,6 +593,15 @@ white-space: nowrap;
 .r3  { --rb-c: #f0b34a; --rb-bg: rgba(240,179,74,0.14); }
 .r25 { --rb-c: #f08b52; --rb-bg: rgba(240,139,82,0.14); }
 .r2  { --rb-c: #f2707c; --rb-bg: rgba(242,112,124,0.14); }
+
+/* ═══════════════════════════════════════════
+UNDERSAMPLED GROUPS — a country, city, language or brewery with fewer than
+MIN_N reviews behind it (script.js). It still shows, it just can't win a
+ranking, so it is drawn as a fact rather than as a result: sorted to the tail
+by rankBy() and dimmed here.
+═══════════════════════════════════════════ */
+.rank-thin { opacity: 0.5; }
+.rb-thin { opacity: 0.55; font-weight: 500; }
 
 /* ═══════════════════════════════════════════
 PROGRESS BARS
@@ -1500,15 +1475,14 @@ body { overscroll-behavior: none; }
 .g3, .g5 { grid-template-columns: 1fr; }
 .ov-split, .ov-split-even { gap: var(--s2); margin-bottom: var(--s2); }
 .bb-panel { margin-bottom: var(--s3); border-radius: var(--r); }
-.bb-panel-head { padding: var(--s3); font-size: var(--fs-sm); }
-.bb-panel-head .ph-right { font-size: 11px; }
+/* A long title plus a long hint can't share one 390px line — let the hint drop
+   to its own line rather than running off the edge of the card. */
+.bb-panel-head { padding: var(--s3); font-size: var(--fs-sm); flex-wrap: wrap; row-gap: 2px; }
+.bb-panel-head .ph-right { font-size: 11px; text-align: left; }
 .bb-body { padding: var(--s3); }
 .merged-section { margin-bottom: var(--s5); }
 .merged-section-head { font-size: var(--fs-md); }
 
-#ov-hero { padding: var(--s4); border-radius: var(--r); margin-bottom: var(--s3); }
-.ov-hero-stats { gap: var(--s2) var(--s4); font-size: var(--fs-xs); }
-.ov-hero-stats b { font-size: var(--fs-lg); }
 .kpi { padding: var(--s3); }
 .kpi-val { font-size: var(--fs-lg); }
 .kpi-row { margin-bottom: var(--s3); }
@@ -1660,7 +1634,6 @@ four full viewports of headline number before any actual content appears.
   .g2, .g4, .g6 { grid-template-columns: 1fr 1fr; gap: var(--s2); }
   .beer-grid { grid-template-columns: 1fr 1fr; }
   .kpi-val { font-size: var(--fs-md); }
-  .ov-hero-stats b { font-size: var(--fs-md); }
   .kpi-sparkline-wrap { height: 22px; }
   #worldMap { height: 320px; }
   .insight-key { width: 92px; }

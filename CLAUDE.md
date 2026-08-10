@@ -146,6 +146,53 @@ exists in `drunkLocs[]` as usual.
 > currently dormant and changes nothing visible; it activates automatically the first time a
 > beer is logged in a second city.
 
+## Ranking Rule: Minimum Sample Size (`MIN_N`)
+
+A group needs **at least `MIN_N` reviews (currently 3)** before its average is allowed to
+win or lose a ranking. Without this, a country visited once tops the table on a single
+generous pour, and a style tried once becomes "my weakest".
+
+`MIN_N` and its helpers live at the top of the stats section in `script.js`:
+
+| Helper | What it does |
+|--------|--------------|
+| `MIN_N` | The threshold. **The only place the number is written.** |
+| `thin(n)` | `true` when a count is below the threshold |
+| `rankBy(avgFn, countFn)` | Sort comparator: qualified groups first (best average first), thin ones after |
+| `rankable(list, countFn)` | The slice that may be called best/worst; falls back to the whole list if nothing qualifies |
+| `barFill(hex, n)` | Mutes a chart bar's color when the group is thin |
+| `nLabel(n)` | `"(6)"` — the sample size appended to a chart label |
+| `ttWithN(n)` | Chart tooltip that states the sample size and flags thin groups |
+| `stampMinNHints()` | Writes "3+ reviews to rank" into every `[data-minn]` caption |
+
+### What this affects
+
+- **Ordering**: style, country, city, brewing-language and brewery lists sort qualified
+  first, then thin. `STATS.styleRanked[0]` etc. are therefore always a real result.
+- **Headline callouts** (Highlights panel): best/worst style, top country, top city and
+  best serving method are picked from the qualified subset only.
+- **Country rankings over time** (bump chart): ranks the **running average** through each
+  month, and a country enters the chart the month its cumulative count reaches `MIN_N`.
+- **Seasonal heatmap**: cells under `MIN_N` are left uncolored — the color reads as a
+  verdict, so it's withheld until the sample supports one.
+- **Taste profile**: a trait below `MIN_N` shows "n reviews · need 3" instead of a bar.
+- **Recommendations** (`predictRating()` + rationale chips): a style or country average
+  only counts as signal at `MIN_N`+; below that the term falls back to the global average.
+
+### What it does not affect
+
+Nothing is hidden or dropped. Thin groups still chart, still list, and still count toward
+the totals — they sort to the tail and render muted (`.rank-thin` / `.rb-thin` in
+`style.css`). Per-beer views (the beers table, the detail modal, the contrarian chart,
+best/worst pour of a month) are single observations, not averages, so the rule never
+touches them.
+
+### Changing the threshold
+
+Edit `MIN_N` in `script.js` and everything follows, including the on-screen captions —
+they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
+hardcode "3" in HTML or CSS.
+
 ## Language Code Reference
 
 | Code | Language       | Countries                      |

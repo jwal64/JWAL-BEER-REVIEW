@@ -440,6 +440,44 @@ function getMonthlyData(){
 }
 
 // ══════════════════════════════════════════════════════════════
+// MINIMUM SAMPLE SIZE — one pour is an anecdote, not a ranking
+// ══════════════════════════════════════════════════════════════
+// A group (country, city, brewing language, style, serving method, brewery)
+// has to clear MIN_N reviews before its average is allowed to win or lose a
+// ranking. Without this, a country visited once tops the table on a single
+// generous pour and a style tried once is "my weakest".
+//
+// Thin groups are never hidden — they still chart, still list, still count
+// toward the totals. They just sort below everything that qualifies and are
+// drawn muted, so the eye reads them as "not enough data yet" rather than as
+// a result. Raise MIN_N here and every ranking plus every on-screen caption
+// follows; nothing else hardcodes the number.
+const MIN_N=3;
+const thin=n=>n<MIN_N;
+// Sort comparator for a ranked list: everything that clears MIN_N first (best
+// average first), then the thin groups among themselves. `a` and `c` are
+// accessors for a group's average and its review count.
+const rankBy=(a,c)=>(x,y)=>(thin(c(x))-thin(c(y)))||(a(y)-a(x));
+// The slice of an already-ranked list that may be called best or worst. Falls
+// back to the whole list when nothing qualifies yet, so a young dataset still
+// shows a headline instead of an em dash.
+const rankable=(list,c=o=>o.c)=>{const q=list.filter(o=>!thin(c(o)));return q.length?q:list;};
+// A thin group keeps its bar but loses its saturation — present, not ranked.
+// Every palette entry is 6-digit hex, so the alpha suffix is safe.
+const barFill=(hex,n)=>thin(n)?hex+'33':hex;
+// Sample size after a chart label. Kept to just the number so it stays legible
+// on a phone — the muted bar and the tooltip carry the "not ranked" part.
+const nLabel=n=>`(${n})`;
+// Panel captions state the rule from the same constant that enforces it.
+// <span data-minn> → "3+ reviews to rank"; data-minn="Average" prefixes it.
+function stampMinNHints(root=document){
+  root.querySelectorAll('[data-minn]').forEach(el=>{
+    const pre=el.dataset.minn;
+    el.textContent=(pre?pre+' · ':'')+`${MIN_N}+ reviews to rank`;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
 // PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
 // ══════════════════════════════════════════════════════════════
 function computeStats(){
@@ -462,12 +500,16 @@ function computeStats(){
     if(b.rating<bs.worst)bs.worst=b.rating;
   });
 
-  const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+  // Ranked lists are sorted MIN_N-qualified first, then by average — so [0] is
+  // always a result and never a one-pour outlier. Thin groups keep their place
+  // at the tail rather than being dropped.
+  const byAvg=rankBy(o=>o.a,o=>o.c);
+  const styleRanked=Object.entries(styleMap).map(([s,v])=>({s,a:v.t/v.c,c:v.c})).sort(byAvg);
   const METHOD_ORDER=['Draft','Nitro','Bottle','Can'];
   const methodAvgs=METHOD_ORDER.map(m=>methodMap[m]?+(methodMap[m].t/methodMap[m].c).toFixed(2):0);
   const methodCounts=METHOD_ORDER.map(m=>methodMap[m]?methodMap[m].c:0);
-  const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
-  const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort((a,b)=>b.a-a.a);
+  const countryRanked=Object.entries(countryMap).map(([k,v])=>({l:`${FLAGS[k]||''} ${CNAMES[k]||k}`,code:k,a:v.t/v.c,c:v.c})).sort(byAvg);
+  const cityRanked=Object.entries(cityMap).map(([k,v])=>({city:k,region:v.region,country:v.country,cc:v.cc,a:v.t/v.c,c:v.c})).sort(byAvg);
   const brandList=Object.entries(brandMap).map(([n,rs])=>({n,cnt:rs.length,avg:avg(rs),best:brandStats[n].best,worst:brandStats[n].worst,std:std(rs)})).sort((a,b)=>b.avg-a.avg);
   const sorted=[...beers].sort((a,b)=>b.rating-a.rating);
   const globalAvg=beers.length?ratingSum/beers.length:0;
@@ -582,20 +624,6 @@ function updateLiveStats(){
   if(sub) sub.innerHTML =
     [[totalReviews,'reviews'],[totalBrands,'brands'],[totalMarkets,'cities'],[avgRating.toFixed(2)+'★','avg']]
       .map(([v,l])=>`<span class="tb-stat"><b>${v}</b><span class="tb-stat-lbl">${l}</span></span>`).join('');
-  // Home hero — plain-language summary so a first-time visitor instantly gets it
-  const heroEl = document.getElementById('ov-hero');
-  if(heroEl){
-    let nMonths = 0;
-    try { nMonths = getMonthlyData().months.length; } catch(e){}
-    heroEl.innerHTML =
-      `<div class="ov-hero-stats">`+
-        `<span><b>${totalReviews}</b> beers reviewed</span>`+
-        `<span><b>${totalCtry}</b> countries</span>`+
-        `<span><b>${totalMarkets}</b> cities</span>`+
-        (nMonths?`<span><b>${nMonths}</b> month${nMonths===1?'':'s'} tracked</span>`:'')+
-      `</div>`+
-      `<div class="ov-hero-sub">A running log of every beer I drink — each one rated out of 5. Tap any beer for the full story.</div>`;
-  }
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `${topBeer.beer} · ${topBeer.origin}`);
@@ -608,7 +636,7 @@ function updateLiveStats(){
   set('ov-brands-val', totalBrands);
   set('ov-brands-sub', `Across ${totalCtry} countries`);
   set('ov-hit-val',  hitRate+'%');
-  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated 3.00 or better`);
+  set('ov-hit-sub',  `${hitCount} of ${totalReviews} rated 3★ or better`);
   // BEERS tab
   set('beers-count', `${totalReviews} reviews${newCount?` · ${newCount} new`:''}`);
   set('brands-count', `${totalBrands} unique brands`);
@@ -616,6 +644,7 @@ function updateLiveStats(){
   if(newTag) newTag.textContent = newCount ? `${newCount} new` : '';
 }
 try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
+try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS LOADER — fetches live data and refreshes the dashboard
@@ -895,6 +924,13 @@ function resizeChartsIn(el){
   }
 }
 const TT={backgroundColor:THEME.surface3,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:8,displayColors:false,titleFont:{weight:'600'}};
+// Tooltip for a ranked average: always states how many reviews are behind the
+// bar, and spells out when that's too few to count. `n` reads the sample size
+// for a bar index — either from the row objects or from a parallel count array.
+const ttWithN=n=>({...TT,callbacks:{label:c=>{
+  const k=typeof n==='function'?n(c.dataIndex):n[c.dataIndex];
+  return `${(+c.raw).toFixed(2)}/5 · ${k} review${k===1?'':'s'}${thin(k)?` · under ${MIN_N}, not ranked`:''}`;
+}}});
 
 // ══════════════════════════════════════════════════════════════
 // OVERVIEW
@@ -916,15 +952,18 @@ const mO=STATS.METHOD_ORDER, mA=STATS.methodAvgs, mCt=STATS.methodCounts;
   if(corrEl) corrEl.textContent=`r ≈ ${pr.toFixed(2)} · ${corrLabel}`;
 }
 
-// Dynamic market signals — computed from live data
-const bestStyle=STATS.styleRanked[0];
-const worstStyle=STATS.styleRanked[STATS.styleRanked.length-1];
-const topCountry=STATS.countryRanked[0];
-const topCity=STATS.cityRanked[0];
-const bestMethodIdx=mA.indexOf(Math.max(...mA.filter(a=>a>0)));
-const bestMethod=bestMethodIdx>=0?mO[bestMethodIdx]:'—';
-const bestMethodAvg=bestMethodIdx>=0?mA[bestMethodIdx]:0;
-const bestMethodCt=bestMethodIdx>=0?mCt[bestMethodIdx]:0;
+// Dynamic market signals — every "best"/"worst" here is drawn from the groups
+// that clear MIN_N, so a single 5.00 pour in a city visited once can't take the
+// headline off a market with a real track record.
+const styleQ=rankable(STATS.styleRanked);
+const bestStyle=styleQ[0];
+const worstStyle=styleQ[styleQ.length-1];
+const topCountry=rankable(STATS.countryRanked)[0];
+const topCity=rankable(STATS.cityRanked)[0];
+const methodQ=rankable(mO.map((m,i)=>({m,a:mA[i],c:mCt[i]})).filter(x=>x.c),o=>o.c)
+  .sort((x,y)=>y.a-x.a);
+const bestMethodRow=methodQ[0]||{m:'—',a:0,c:0};
+const bestMethod=bestMethodRow.m, bestMethodAvg=bestMethodRow.a, bestMethodCt=bestMethodRow.c;
 
 const last5=beers.slice(-5).map(b=>b.rating);
 const prev5=beers.slice(-10,-5).map(b=>b.rating);
@@ -988,13 +1027,13 @@ if(recentEl) recentEl.innerHTML=[...beers].slice(-6).reverse().map(b=>`
 
 // ── Charts (everything below needs Chart.js) ──
 safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
-  data:{labels:sA.map(s=>s.s.length>16?s.s.slice(0,16)+'…':s.s),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>sC[s.s]||THEME.accent),borderWidth:0}]},
-  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw.toFixed(2)}/5`}}},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:11}}}}}
+  data:{labels:sA.map(s=>`${s.s.length>16?s.s.slice(0,16)+'…':s.s} ${nLabel(s.c)}`),datasets:[{data:sA.map(s=>s.a),backgroundColor:sA.map(s=>barFill(sC[s.s]||THEME.accent,s.c)),borderWidth:0}]},
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:ttWithN(i=>sA[i].c)},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:11}}}}}
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO,datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,THEME.text3],borderWidth:0}]},
-  options:{plugins:{legend:{display:false},tooltip:TT},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
+  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,THEME.text3].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
+  options:{plugins:{legend:{display:false},tooltip:ttWithN(mCt)},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
 });
 
 safeChart('scatterChart',document.getElementById('scatterChart'),{type:'scatter',
@@ -1233,14 +1272,16 @@ function restoreFocus(prev,overlay){
 // ══════════════════════════════════════════════════════════════
 function drawCountry(){
   window._cD=true;
+  // Already sorted MIN_N-qualified first by computeStats(); countries below the
+  // line trail the list and render muted so they read as "not enough yet".
   const cD=STATS.countryRanked;
   safeChart('countryChart',document.getElementById('countryChart'),{type:'bar',
-    data:{labels:cD.map(d=>d.l),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>rC(d.a)),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
+    data:{labels:cD.map(d=>`${d.l} ${nLabel(d.c)}`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>barFill(rC(d.a),d.c)),borderWidth:0}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:ttWithN(i=>cD[i].c)},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
   });
   document.getElementById('countryCards').innerHTML=cD.map(d=>`
-    <div class="bb-bar-row">
-      <div class="bb-bar-label"><span class="name">${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x</span></div>
+    <div class="bb-bar-row${thin(d.c)?' rank-thin':''}">
+      <div class="bb-bar-label"><span class="name">${d.l}</span><span class="val">${d.a.toFixed(2)}/5 · ${d.c}x${thin(d.c)?' · unranked':''}</span></div>
       <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${d.a/5*100}%;background:${rC(d.a)}"></div></div>
     </div>`).join('');
 }
@@ -1252,12 +1293,12 @@ function drawCity(){
   window._ciD=true;
   const cD=STATS.cityRanked;
   safeChart('cityChart',document.getElementById('cityChart'),{type:'bar',
-    data:{labels:cD.map(d=>`${d.city} (${d.c})`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>rC(d.a)),borderWidth:0}]},
-    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
+    data:{labels:cD.map(d=>`${d.city} ${nLabel(d.c)}`),datasets:[{data:cD.map(d=>+d.a.toFixed(2)),backgroundColor:cD.map(d=>barFill(rC(d.a),d.c)),borderWidth:0}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:ttWithN(i=>cD[i].c)},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
   });
   document.getElementById('cityCards').innerHTML=cD.map(d=>`
-    <div class="mini-row">
-      <div><div style="font-size:13px;color:var(--text);font-weight:600">${d.city}</div><div style="font-size:12px;color:var(--text-3)">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}</div></div>
+    <div class="mini-row${thin(d.c)?' rank-thin':''}">
+      <div><div style="font-size:13px;color:var(--text);font-weight:600">${d.city}</div><div style="font-size:12px;color:var(--text-3)">${d.region} · ${FLAGS[d.cc]||''} ${d.country} · ${d.c} review${d.c>1?'s':''}${thin(d.c)?' · unranked':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
 }
@@ -1319,19 +1360,21 @@ function drawInsights(){
   });
   const pv=k=>profAcc[k].c?profAcc[k].t/profAcc[k].c:0;
   const profile=[
-    {l:'Wheat beer bias',v:pv('wheat'),color:THEME.accent},
-    {l:'Dark beer tolerance',v:pv('dark'),color:THEME.text3},
-    {l:'Lager appreciation',v:pv('lager'),color:THEME.pos},
-    {l:'German beer premium',v:pv('de'),color:THEME.accent},
-    {l:'American beer discount',v:pv('us'),color:THEME.neg},
-    {l:'Artisan vs macro',v:pv('artisan'),color:THEME.purple},
-    {l:'High ABV preference',v:pv('highAbv'),color:THEME.info},
-    {l:'Draft & nitro premium',v:pv('draftNitro'),color:THEME.info},
-  ];
+    {l:'Wheat beer bias',k:'wheat',color:THEME.accent},
+    {l:'Dark beer tolerance',k:'dark',color:THEME.text3},
+    {l:'Lager appreciation',k:'lager',color:THEME.pos},
+    {l:'German beer premium',k:'de',color:THEME.accent},
+    {l:'American beer discount',k:'us',color:THEME.neg},
+    {l:'Artisan vs macro',k:'artisan',color:THEME.purple},
+    {l:'High ABV preference',k:'highAbv',color:THEME.info},
+    {l:'Draft & nitro premium',k:'draftNitro',color:THEME.info},
+  ].map(p=>({...p,v:pv(p.k),n:profAcc[p.k].c}));
+  // A "preference" measured off one or two pours is noise — say so rather than
+  // drawing a bar that looks like a finding.
   document.getElementById('tasteProfile').innerHTML=profile.map(p=>`
-    <div class="bb-bar-row">
-      <div class="bb-bar-label"><span class="name">${p.l}</span><span class="val">${p.v.toFixed(2)}/5</span></div>
-      <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${p.v/5*100}%;background:${p.color}"></div></div>
+    <div class="bb-bar-row${thin(p.n)?' rank-thin':''}">
+      <div class="bb-bar-label"><span class="name">${p.l}</span><span class="val">${thin(p.n)?`${p.n} review${p.n===1?'':'s'} · need ${MIN_N}`:`${p.v.toFixed(2)}/5 · ${p.n}x`}</span></div>
+      <div class="bb-bar-bg"><div class="bb-bar-fill" style="width:${thin(p.n)?0:p.v/5*100}%;background:${p.color}"></div></div>
     </div>`).join('');
 }
 
@@ -1345,10 +1388,10 @@ function drawLanguage(){
     const lD=beers.map(b=>({beer:b.beer,country:b.origin,region:BREW_LOC[b.beer]||'',lang:BEER_LANG_LOOKUP[b.beer]||LANG_MAP_FALLBACK[b.origin]||b.origin,rating:b.rating}));
     const lA={};
     lD.forEach(d=>{if(!lA[d.lang])lA[d.lang]={t:0,c:0,b:[]};lA[d.lang].t+=d.rating;lA[d.lang].c++;if(!lA[d.lang].b.includes(d.beer))lA[d.lang].b.push(d.beer);});
-    const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort((a,b)=>b.a-a.a);
+    const lS=Object.entries(lA).map(([l,v])=>({l,a:v.t/v.c,c:v.c,b:v.b})).sort(rankBy(o=>o.a,o=>o.c));
     safeChart('langChart',document.getElementById('langChart'),{type:'bar',
-      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>lC[d.l]||THEME.accent),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:TT},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
+      data:{labels:lS.map(d=>`${lF[d.l]||''} ${d.l} ${nLabel(d.c)}`),datasets:[{data:lS.map(d=>+d.a.toFixed(2)),backgroundColor:lS.map(d=>barFill(lC[d.l]||THEME.accent,d.c)),borderWidth:0}]},
+      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:ttWithN(i=>lS[i].c)},scales:{x:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:10}}}}}
     });
   } catch(e){ console.error('Language init error:',e); }
 }
@@ -1907,7 +1950,11 @@ function renderDrankTable(){
 }
 
 function renderBrewedTable(){
-  const s=[...breweries].map(b=>({...b,avg:avg(b.ratings)})).sort((a,b)=>b.avg-a.avg);
+  // Most breweries here are a single beer, so "best rated first" would other-
+  // wise be a list of one-pour 5.00s. Breweries with MIN_N reviews behind them
+  // rank first; the rest follow, still sorted by average.
+  const s=[...breweries].map(b=>({...b,avg:avg(b.ratings),n:b.ratings.length}))
+    .sort(rankBy(o=>o.avg,o=>o.n));
   document.getElementById('brewedTbody').innerHTML=s.map(b=>{
     const firstBeer=b.beers.split(' · ')[0];
     return `<tr>
@@ -1916,7 +1963,7 @@ function renderBrewedTable(){
       <td style="color:var(--text-3);font-size:12px">${b.location}</td>
       <td style="color:var(--text-2)">${FLAGS[b.cc]||''} ${b.country}</td>
       <td style="color:var(--text-3);font-size:12px">${b.beers}</td>
-      <td><span class="rb ${rbC(b.avg)}">${b.avg.toFixed(2)}</span></td>
+      <td><span class="rb ${rbC(b.avg)}${thin(b.n)?' rb-thin':''}" title="${b.n} review${b.n===1?'':'s'}${thin(b.n)?` · under ${MIN_N}, not ranked`:''}">${b.avg.toFixed(2)}</span></td>
     </tr>`;
   }).join('');
 }
@@ -2132,7 +2179,10 @@ function drawTemporal(){
     months.forEach(m=>{
       const cell=heatData[style][m];
       if(cell){
-        heatHtml+=`<td style="background:${heatColor(cell.avg)};color:var(--text);font-size:13px;font-weight:700;padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:12px;color:var(--text-3);font-weight:400">${cell.count}×</span></td>`;
+        // Cell color reads as a verdict, so only color one that clears MIN_N.
+        // Thin cells still show their number, just without the heat behind it.
+        const weak=thin(cell.count);
+        heatHtml+=`<td style="background:${weak?'transparent':heatColor(cell.avg)};color:var(--text${weak?'-3':''});font-size:13px;font-weight:${weak?400:700};padding:6px 4px">${cell.avg.toFixed(2)}<br><span style="font-size:12px;color:var(--text-3);font-weight:400">${cell.count}×</span></td>`;
       }else{
         heatHtml+='<td style="color:var(--text-3);font-size:12px">—</td>';
       }
@@ -2140,7 +2190,7 @@ function drawTemporal(){
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(242,112,124,0.30)"></div><div style="flex:1;background:rgba(240,139,82,0.26)"></div><div style="flex:1;background:rgba(240,179,74,0.24)"></div><div style="flex:1;background:rgba(210,201,74,0.26)"></div><div style="flex:1;background:rgba(74,222,128,0.42)"></div></div><span>High</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(242,112,124,0.30)"></div><div style="flex:1;background:rgba(240,139,82,0.26)"></div><div style="flex:1;background:rgba(240,179,74,0.24)"></div><div style="flex:1;background:rgba(210,201,74,0.26)"></div><div style="flex:1;background:rgba(74,222,128,0.42)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
@@ -2167,31 +2217,35 @@ function drawTemporal(){
   // ── Bump Chart — Country Rankings Over Time
   try {
     const BUMP_COLORS=['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#f87171','#f472b6','#2dd4bf','#fb923c','#a3d977','#818cf8'];
-    // Get all countries that appear in at least 2 months
-    const countriesByMonth = {};
-    months.forEach(m => {
-      const cm = {};
-      byMonth[m].forEach(b => { if(!cm[b.origin]) cm[b.origin]={t:0,c:0}; cm[b.origin].t+=b.rating; cm[b.origin].c++; });
-      countriesByMonth[m] = cm;
-    });
-    const allCodes = [...new Set(beers.map(b=>b.origin))];
-    const multiMonthCodes = allCodes.filter(cc => months.filter(m=>countriesByMonth[m][cc]).length >= 2);
-    // Sort by total review count to pick top 8
-    const topCodes = multiMonthCodes.sort((a,b)=>{
-      const ta=months.reduce((s,m)=>s+(countriesByMonth[m][a]?.c||0),0);
-      const tb=months.reduce((s,m)=>s+(countriesByMonth[m][b]?.c||0),0);
-      return tb-ta;
-    }).slice(0,8);
-
-    // For each month, rank all countries present by avg rating
+    // Rank on the running average through each month, not on the month in
+    // isolation: a country rarely gets more than one pour inside a single
+    // month, so month-by-month ranks were re-shuffling on samples of one. A
+    // country joins the chart the month its cumulative count reaches MIN_N.
+    const runTotals = {};                 // cc → {t,c} accumulated to date
     const rankByMonth = {};
     months.forEach(m => {
-      const sorted=Object.entries(countriesByMonth[m]).map(([cc,v])=>({cc,a:v.t/v.c})).sort((a,b)=>b.a-a.a);
-      rankByMonth[m]={};
-      sorted.forEach((r,i)=>{ rankByMonth[m][r.cc]=i+1; });
+      byMonth[m].forEach(b => {
+        const e = runTotals[b.origin] || (runTotals[b.origin] = {t:0,c:0});
+        e.t += b.rating; e.c++;
+      });
+      rankByMonth[m] = {};
+      Object.entries(runTotals)
+        .filter(([,v]) => !thin(v.c))
+        .map(([cc,v]) => ({cc, a:v.t/v.c}))
+        .sort((a,b) => b.a-a.a)
+        .forEach((r,i) => { rankByMonth[m][r.cc] = i+1; });
     });
 
-    const maxRank = Math.max(...months.flatMap(m => Object.values(rankByMonth[m])));
+    // Lines: the countries that ever qualify, the eight most-reviewed first.
+    const totals = {};
+    beers.forEach(b => { totals[b.origin] = (totals[b.origin]||0)+1; });
+    const topCodes = Object.keys(totals)
+      .filter(cc => !thin(totals[cc]))
+      .sort((a,b) => totals[b]-totals[a])
+      .slice(0,8);
+
+    const allRanks = months.flatMap(m => Object.values(rankByMonth[m]));
+    const maxRank = allRanks.length ? Math.max(...allRanks) : 1;
 
     const bumpCtx = document.getElementById('bumpChart');
     if(bumpCtx) {
@@ -2408,10 +2462,14 @@ const IPO_CANDIDATES=[
 //   country-adjusted · 10% JWAL base anchor · + serving-method nudge.
 function predictRating(style,origin,untappd,method='Bottle'){
   const g=STATS.globalAvg;
+  // A style or country average only becomes a signal once MIN_N reviews stand
+  // behind it. Below that the term falls back to the global average, which
+  // makes it contribute nothing rather than bending the prediction toward a
+  // single pour.
   const sM=STATS.styleMap[style];
-  const styleAvg=sM?sM.t/sM.c:g;
+  const styleAvg=sM&&!thin(sM.c)?sM.t/sM.c:g;
   const cM=STATS.countryMap[origin];
-  const countryAvg=cM?cM.t/cM.c:g;
+  const countryAvg=cM&&!thin(cM.c)?cM.t/cM.c:g;
   const methodAdj=method==='Draft'?0.10:method==='Nitro'?0.05:method==='Can'?-0.10:0;
   const t=untappd*0.50+(g+(styleAvg-g))*0.25+(g+(countryAvg-g))*0.15+g*0.10+methodAdj;
   return Math.min(5.0,Math.max(1.0,t));
@@ -2442,10 +2500,11 @@ function drawRecommendations(){
     // Rationale chips: compare each beer's attributes to JWAL's biases.
     function rationale(c){
       const chips=[];
+      // Same bar as the prediction: don't claim "I like X" off one review.
       const sM=STATS.styleMap[c.style];
-      if(sM){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I like ${c.style} · ${sa.toFixed(2)}`);}
+      if(sM&&!thin(sM.c)){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I like ${c.style} · ${sa.toFixed(2)}`);}
       const cM=STATS.countryMap[c.origin];
-      if(cM){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} favourite · ${ca.toFixed(2)}`);}
+      if(cM&&!thin(cM.c)){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} favourite · ${ca.toFixed(2)}`);}
       if(c.method==='Draft'||c.method==='Nitro') chips.push(`Better on ${c.method.toLowerCase()}`);
       if(c._pred>=4.0) chips.push('Top shelf');
       if(!chips.length) chips.push(`World rates it ${c.untappd.toFixed(2)}`);
