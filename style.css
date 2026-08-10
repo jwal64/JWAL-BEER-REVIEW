@@ -97,7 +97,7 @@
 
 /* Lining, equal-width digits everywhere numbers column up */
 .kpi-val, .kpi-delta, .rb, .bb-table tbody td, .insight-val, .drawer-val,
-.tb-stat b, .ov-hero-stat b, .tp-upside {
+.tb-stat b, .tp-upside {
   font-variant-numeric: tabular-nums;
 }
 
@@ -239,9 +239,7 @@ border-bottom: 1px solid var(--border);
 min-width: 0;
 }
 .tb-brand { display: none; font-size: 20px; line-height: 1; }
-/* The auto margin lives on the title block, not on the stats, so the search
-   button still sits hard right on Home where the stat pills are switched off. */
-.tb-context { display: flex; flex-direction: column; justify-content: center; min-width: 0; gap: 1px; margin-right: auto; }
+.tb-context { display: flex; flex-direction: column; justify-content: center; min-width: 0; gap: 1px; }
 .tb-title {
 font-size: var(--fs-md);
 font-weight: 600;
@@ -258,10 +256,7 @@ overflow: hidden;
 text-overflow: ellipsis;
 line-height: 1.2;
 }
-.tb-stats { display: flex; align-items: center; gap: var(--s2); flex-shrink: 0; }
-/* Home states these totals in its hero card — setTabContext() switches the
-   pills off there so one screen never shows the same number twice. */
-.tb-stats.tb-stats-off { display: none; }
+.tb-stats { display: flex; align-items: center; gap: var(--s2); margin-left: auto; flex-shrink: 0; }
 .tb-stat {
 display: inline-flex;
 align-items: baseline;
@@ -468,50 +463,6 @@ color: var(--text);
 
 .kpi-sparkline-wrap { margin-top: var(--s2); height: 26px; position: relative; overflow: hidden; }
 .kpi-sparkline-wrap canvas { display: block; }
-
-/* ═══════════════════════════════════════════
-HOME HERO — a sentence saying what this is, then the four running totals.
-Deliberately quieter than the KPI tiles underneath: this is context, so its
-numbers sit a size down and the tiles keep the headline weight.
-═══════════════════════════════════════════ */
-#ov-hero {
-  background: linear-gradient(135deg, rgba(245,165,36,0.07), rgba(245,165,36,0) 60%), var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  /* Same inset and gap as a KPI tile, so the four totals sit in the same four
-     columns as the four tiles directly below them. */
-  padding: var(--s4);
-  margin-bottom: var(--s4);
-}
-.ov-hero-lede {
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-  color: var(--text-2);
-  max-width: 56ch;
-  margin-bottom: var(--s4);
-}
-/* A grid, not a wrapping flex row: the totals hold their columns at every
-   width instead of re-flowing into a ragged second line. */
-.ov-hero-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--s3) var(--s4);
-}
-.ov-hero-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.ov-hero-stat b {
-  color: var(--text);
-  font-size: var(--fs-lg);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-.ov-hero-stat span {
-  font-size: var(--fs-xs);
-  color: var(--text-3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* ═══════════════════════════════════════════
 TABLES
@@ -1523,12 +1474,6 @@ body { overscroll-behavior: none; }
 .merged-section { margin-bottom: var(--s5); }
 .merged-section-head { font-size: var(--fs-md); }
 
-/* Two even columns on a phone — same rhythm as the KPI tiles below, and every
-   number keeps its own column instead of wrapping wherever it happens to land. */
-#ov-hero { padding: var(--s3) var(--s4); border-radius: var(--r); margin-bottom: var(--s3); }
-.ov-hero-lede { font-size: var(--fs-xs); margin-bottom: var(--s3); }
-.ov-hero-stats { grid-template-columns: 1fr 1fr; gap: var(--s3); }
-.ov-hero-stat b { font-size: var(--fs-md); }
 .kpi { padding: var(--s3); }
 .kpi-val { font-size: var(--fs-lg); }
 .kpi-row { margin-bottom: var(--s3); }

@@ -582,23 +582,6 @@ function updateLiveStats(){
   if(sub) sub.innerHTML =
     [[totalReviews,'reviews'],[totalBrands,'brands'],[totalMarkets,'cities'],[avgRating.toFixed(2)+'★','avg']]
       .map(([v,l])=>`<span class="tb-stat"><b>${v}</b><span class="tb-stat-lbl">${l}</span></span>`).join('');
-  // Home hero — one plain-language line on what this is, then the running
-  // totals as a proper grid so they line up in columns instead of wrapping
-  // into a ragged row.
-  const heroEl = document.getElementById('ov-hero');
-  if(heroEl){
-    let nMonths = 0;
-    try { nMonths = getMonthlyData().months.length; } catch(e){}
-    const hstat = (v,l) => `<div class="ov-hero-stat"><b>${v}</b><span>${l}</span></div>`;
-    heroEl.innerHTML =
-      `<p class="ov-hero-lede">Every beer I drink, rated out of 5. Tap any beer for the full story.</p>`+
-      `<div class="ov-hero-stats">`+
-        hstat(totalReviews,'beers reviewed')+
-        hstat(totalCtry,'countries')+
-        hstat(totalMarkets,'cities')+
-        (nMonths?hstat(nMonths,`month${nMonths===1?'':'s'} tracked`):'')+
-      `</div>`;
-  }
   // Overview KPI tiles
   set('ov-top-val',  topBeer.rating.toFixed(2));
   set('ov-top-sub',  `${topBeer.beer} · ${topBeer.origin}`);
@@ -788,10 +771,6 @@ function setTabContext(id){
   const t=document.getElementById('tb-title'), d=document.getElementById('tb-desc');
   if(t) t.textContent=c[0];
   if(d) d.textContent=c[1];
-  // Home opens with the very same running totals in its hero card — one set of
-  // numbers per screen, so the header keeps its pills for the other three tabs.
-  const st=document.getElementById('hdr-subtitle');
-  if(st) st.classList.toggle('tb-stats-off', id==='overview');
 }
 function showTab(id,btn){
   // Redirect legacy sub-section ids into the Insights tab
