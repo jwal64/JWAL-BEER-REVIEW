@@ -106,7 +106,7 @@ let beers=[
   {beer:"Chill Lemon",           style:"Shandy / Radler",origin:"IT",abv:2.0,method:"Bottle",city:"Capri",        region:"Campania",        country:"Italy",       cc:"IT", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Peroni Original",       style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.25,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Bitburger Radler",      style:"Shandy / Radler",origin:"DE",abv:2.5,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
-  {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Bottle",city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Draft", city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
