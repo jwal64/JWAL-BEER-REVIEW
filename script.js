@@ -107,6 +107,7 @@ let beers=[
   {beer:"Peroni Original",       style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.25,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Bitburger Radler",      style:"Shandy / Radler",origin:"DE",abv:2.5,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Bottle",city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Chimay Blue",           style:"Belgian Ale",    origin:"BE",abv:9.0,method:"Bottle",city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -212,6 +213,7 @@ let breweries=[
   {name:"Birra Ichnusa (Heineken Italia)", location:"Assemini, Sardinia",   country:"Italy",       cc:"IT", lang:"it", beers:"Ichnusa Anima Sarda",                                       lat:39.2803,lng:9.0057,   ratings:[3.75]},
   {name:"Bitburger Braugruppe",      location:"Bitburg, Rhineland-Palatinate", country:"Germany", cc:"DE", lang:"de", beers:"Bitburger Radler",                                          lat:49.9739,lng:6.5334,   ratings:[4.00]},
   {name:"Radeberger Exportbierbrauerei", location:"Radeberg, Saxony",      country:"Germany",     cc:"DE", lang:"de", beers:"Radeberger Pilsner",                                        lat:51.1136,lng:13.9169,  ratings:[3.00]},
+  {name:"Bières de Chimay (Scourmont Abbey)", location:"Chimay, Hainaut",   country:"Belgium",     cc:"BE", lang:"fr", beers:"Chimay Blue",                                               lat:50.0489,lng:4.3183,   ratings:[4.00], nativeName:"Chimay Bleue"},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -2362,6 +2364,7 @@ function drawContrarian(){
     'Birra Moretti':3.58,'Erdinger Weißbier':3.78,'Miller Lite':2.51,
     'Pacífico Clara':3.65,'Narragansett Lager':3.23,'Big Wave Golden Ale':3.52,
     'Belhaven Scottish Stout':3.45,'Samuel Adams Summer Ale':3.50,
+    'Chimay Blue':4.05,
   };
 
   // STATS.brandList already has avg/cnt per beer — reuse it instead of

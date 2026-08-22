@@ -229,3 +229,4 @@ These beers have native-language names that differ from their marketed names:
 | Erdinger Weißbier       | Erdinger Weißbier  | German   |
 | Hofbräu Münchner Weiße  | Hofbräu Münchner Weiße | German |
 | Almaza Pilsener         | ألمازة             | Arabic   |
+| Chimay Blue             | Chimay Bleue       | French   |
