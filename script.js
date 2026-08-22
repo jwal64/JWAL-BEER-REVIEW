@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════════
 // DATA
 // ══════════════════════════════════════════════════════════════
-const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧","GB-ENG":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","GB-SCT":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","GB-WLS":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","GB-NIR":"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺"};
-const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain","GB-ENG":"England","GB-SCT":"Scotland","GB-WLS":"Wales","GB-NIR":"Northern Ireland",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba"};
+const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧","GB-ENG":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","GB-SCT":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","GB-WLS":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","GB-NIR":"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺",DO:"🇩🇴"};
+const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain","GB-ENG":"England","GB-SCT":"Scotland","GB-WLS":"Wales","GB-NIR":"Northern Ireland",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba",DO:"Dominican Republic"};
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE SHEETS INTEGRATION
@@ -107,6 +107,7 @@ let beers=[
   {beer:"Peroni Original",       style:"Lager",          origin:"IT",abv:4.7,method:"Bottle",city:"Ischia",       region:"Campania",        country:"Italy",       cc:"IT", rating:3.25,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Bitburger Radler",      style:"Shandy / Radler",origin:"DE",abv:2.5,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Bottle",city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Presidente",            style:"Pilsner",        origin:"DO",abv:5.0,method:"Bottle",city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -212,6 +213,7 @@ let breweries=[
   {name:"Birra Ichnusa (Heineken Italia)", location:"Assemini, Sardinia",   country:"Italy",       cc:"IT", lang:"it", beers:"Ichnusa Anima Sarda",                                       lat:39.2803,lng:9.0057,   ratings:[3.75]},
   {name:"Bitburger Braugruppe",      location:"Bitburg, Rhineland-Palatinate", country:"Germany", cc:"DE", lang:"de", beers:"Bitburger Radler",                                          lat:49.9739,lng:6.5334,   ratings:[4.00]},
   {name:"Radeberger Exportbierbrauerei", location:"Radeberg, Saxony",      country:"Germany",     cc:"DE", lang:"de", beers:"Radeberger Pilsner",                                        lat:51.1136,lng:13.9169,  ratings:[3.00]},
+  {name:"Cervecería Nacional Dominicana", location:"Santo Domingo, Distrito Nacional", country:"Dominican Republic", cc:"DO", lang:"es", beers:"Presidente",                lat:18.4861,lng:-69.9312, ratings:[3.00]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -293,6 +295,7 @@ const BRAND_DOMAINS = {
 "Peroni":"peroni.it",
 "Pilsner Urquell":"prazdroj.cz",
 "Pub Ale":"boddingtons.co.uk",
+"Presidente":"cnd.com.do",
 "Quilmes":"quilmes.com.ar",
 "Red Stripe":"redstripebeer.com",
 "Ringnes":"ringnes.no",
