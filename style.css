@@ -376,7 +376,8 @@ letter-spacing: 0;
    safeChart() in script.js, so 8 styles and 22 countries both get a sane
    bar thickness. Clamped so the box never collapses or runs off the screen. */
 .chart-box-auto {
-  height: clamp(200px, calc(var(--rows, 10) * 26px + 40px), 620px);
+  --row-h: 26px;
+  height: clamp(200px, calc(var(--rows, 10) * var(--row-h) + 40px), 620px);
 }
 .chart-box > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
 
@@ -471,8 +472,63 @@ color: var(--text);
 .fl { color: var(--warn); }
 .kpi-row { margin-bottom: var(--s4); }
 
-.kpi-sparkline-wrap { margin-top: var(--s2); height: 26px; position: relative; overflow: hidden; }
-.kpi-sparkline-wrap canvas { display: block; }
+/* ═══════════════════════════════════════════
+HOME (#overview) — COMPACT DENSITY
+
+The shared panel, tile and grid rules above all read the spacing scale at the
+use site (`padding: var(--s4)`, `gap: var(--s4)`, …), so redefining that scale
+on the home panel retunes the whole tab through the rules that already exist.
+Everything here is scoped to #overview: MAPS, BEERS and the rest keep the
+standard density. #overview outranks a class selector, so nothing needs
+!important.
+═══════════════════════════════════════════ */
+#overview {
+  --s3: 10px;    /* panel-head gutter, phone grid gaps */
+  --s4: 12px;    /* .bb-body + .kpi padding, every grid gap */
+  --s5: 16px;    /* .panel side gutter */
+  --s6: 20px;    /* .panel bottom padding */
+  --fs-xl: 24px; /* .kpi-val */
+  --r: 10px;     /* .bb-panel + .kpi corner */
+}
+/* Panel titles become micro-labels: the type gets out of the way so the same
+   header band can be half as tall without the panel losing its edge. */
+#overview .bb-panel-head {
+  padding: 8px var(--s4);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+#overview .bb-panel { margin-bottom: var(--s3); }
+#overview .kpi { padding: var(--s3) var(--s4); }
+#overview .kpi-label {
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+/* A tile this short can't absorb a two-line sub-caption — a long beer name would
+   put back the height the tighter padding just saved. */
+#overview .kpi-sub {
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#overview .chart-box { height: 220px; }
+#overview .chart-box-auto { --row-h: 22px; }
+/* The style chart sizes to its row count and the feed beside it to six pours, so
+   one column always ends short and leaves a well of dead space next to the
+   other — which tighter panels only make taller. Let the chart panel stretch to
+   the row and the chart fill the height it's given. Side-by-side widths only:
+   below 1100px .ov-split is a single column, where stretching does nothing but
+   make the chart tall. */
+@media (min-width: 1101px) {
+  #overview .ov-split { align-items: stretch; }
+  #overview .ov-split > .bb-panel { display: flex; flex-direction: column; }
+  #overview .ov-split .bb-body { flex: 1; min-height: 0; }
+  #overview .ov-split .chart-box-auto { height: 100%; min-height: 200px; }
+}
 
 /* ═══════════════════════════════════════════
 TABLES
@@ -1545,6 +1601,13 @@ body { overscroll-behavior: none; }
 .kpi { padding: var(--s3); }
 .kpi-val { font-size: var(--fs-lg); }
 .kpi-row { margin-bottom: var(--s3); }
+/* The home overrides outrank the phone rules above, so restate the two that
+   would otherwise leave the home tab roomier than every other page. */
+#overview .bb-panel-head { padding: var(--s3); }
+#overview .kpi { padding: var(--s3); }
+/* Two-up tiles at ~180px can't hold a caption on one line, and the sub-line is
+   the tile's only explanation — better a second line here than "rated 3★ or be…". */
+#overview .kpi-sub { white-space: normal; }
 
 .beer-grid { grid-template-columns: repeat(2, 1fr); gap: var(--s2); }
 .beer-card { padding: var(--s2); }
@@ -1693,7 +1756,6 @@ four full viewports of headline number before any actual content appears.
   .g4, .g6, .kpi-row { grid-template-columns: 1fr 1fr; gap: var(--s2); }
   .beer-grid { grid-template-columns: 1fr 1fr; }
   .kpi-val { font-size: var(--fs-md); }
-  .kpi-sparkline-wrap { height: 22px; }
   #worldMap { height: 320px; }
   .insight-key { width: 92px; }
 }
