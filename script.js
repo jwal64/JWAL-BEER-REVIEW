@@ -2864,48 +2864,23 @@ window.openBreweryDrawer=openBreweryDrawer;
 window.closeBreweryDrawer=closeBreweryDrawer;
 
 // ══════════════════════════════════════════════════════════════
-// KPI ANIMATED COUNTERS + SPARKLINES
+// KPI ANIMATED COUNTERS + MONTH-OVER-MONTH DELTAS
 // ══════════════════════════════════════════════════════════════
-(function initKPISparklines(){
+(function initKPIStats(){
   try {
-    // Compute per-month data for sparklines
+    // Per-month series behind each tile. The compact home tiles no longer draw a
+    // sparkline, so these exist purely to give the delta chips their two points.
     const {months,byMonth} = getMonthlyData();
-    if(months.length<2) return; // need 2+ months for sparklines
+    if(months.length<2) return; // need 2+ months to have anything to compare
 
-    const sparkData={
-      'spark-top': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.max(...rs):null; }),
-      'spark-avg': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?avg(rs):null; }),
-      'spark-low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
-      'spark-abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
-      'spark-brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
-      'spark-hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
+    const momSeries={
+      'top': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.max(...rs):null; }),
+      'avg': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?avg(rs):null; }),
+      'low': months.map(m=>{ const rs=byMonth[m].map(b=>b.rating); return rs.length?Math.min(...rs):null; }),
+      'abv': months.map(m=>{ const as=byMonth[m].map(b=>b.abv); return as.length?avg(as):null; }),
+      'brands': months.map(m=>{ return [...new Set(byMonth[m].map(b=>b.beer))].length; }),
+      'hit': months.map(m=>{ const rs=byMonth[m]; return rs.length?rs.filter(b=>b.rating>=3).length/rs.length*100:null; }),
     };
-    const sparkColors={
-      'spark-top':THEME.pos,'spark-avg':THEME.warn,'spark-low':THEME.neg,
-      'spark-abv':THEME.info,'spark-brands':THEME.accent,'spark-hit':THEME.pos
-    };
-
-    Object.entries(sparkData).forEach(([id,data])=>{
-      const canvas=document.getElementById(id);
-      if(!canvas) return;
-      const color=sparkColors[id]||THEME.accent;
-      safeChart(id,canvas,{
-        type:'line',
-        data:{
-          labels:months,
-          datasets:[{data,borderColor:color,backgroundColor:color+'22',borderWidth:1.5,
-            pointRadius:2,pointBackgroundColor:color,fill:true,tension:0.4,spanGaps:true}]
-        },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          animation:{duration:800},
-          plugins:{legend:{display:false},tooltip:{enabled:false}},
-          scales:{x:{display:false},y:{display:false}},
-          elements:{point:{hoverRadius:0}}
-        }
-      });
-    });
 
     // Animated count-up for KPI values
     function animateCounter(el,target,decimals,suffix){
@@ -2934,24 +2909,24 @@ window.closeBreweryDrawer=closeBreweryDrawer;
     animate('ov-brands-val',totalBrands,0);
     animate('ov-hit-val',beers.length?beers.filter(b=>b.rating>=3).length/beers.length*100:0,0,'%');
 
-    // MoM delta chips — latest sparkline point vs the one before
-    [['ov-top-delta','spark-top',v=>v.toFixed(2)],
-     ['ov-avg-delta','spark-avg',v=>v.toFixed(2)],
-     ['ov-low-delta','spark-low',v=>v.toFixed(2)],
-     ['ov-abv-delta','spark-abv',v=>v.toFixed(1)+'pp'],
-     ['ov-brands-delta','spark-brands',v=>String(Math.round(v))],
-     ['ov-hit-delta','spark-hit',v=>Math.round(v)+'pp'],
+    // MoM delta chips — latest month's value vs the one before
+    [['ov-top-delta','top',v=>v.toFixed(2)],
+     ['ov-avg-delta','avg',v=>v.toFixed(2)],
+     ['ov-low-delta','low',v=>v.toFixed(2)],
+     ['ov-abv-delta','abv',v=>v.toFixed(1)+'pp'],
+     ['ov-brands-delta','brands',v=>String(Math.round(v))],
+     ['ov-hit-delta','hit',v=>Math.round(v)+'pp'],
     ].forEach(([id,key,f])=>{
       const el=document.getElementById(id);
       if(!el) return;
-      const d=sparkData[key],a=d[d.length-2],b=d[d.length-1];
+      const d=momSeries[key],a=d[d.length-2],b=d[d.length-1];
       if(a==null||b==null){ el.textContent=''; return; }
       const diff=b-a,up=diff>0.005,dn=diff<-0.005;
       el.className='kpi-delta '+(up?'up':dn?'dn':'fl');
       el.textContent=(up?'▲':dn?'▼':'→')+f(Math.abs(diff));
       el.title='vs previous month';
     });
-  } catch(e){ console.error('KPI sparklines error:',e); }
+  } catch(e){ console.error('KPI stats error:',e); }
 })();
 
 // ══════════════════════════════════════════════════════════════
