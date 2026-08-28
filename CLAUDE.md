@@ -193,11 +193,12 @@ Edit `MIN_N` in `script.js` and everything follows, including the on-screen capt
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
 
-## Design System: Nordic Light
+## Design System: Console
 
-The UI is a Scandinavian-tech surface — warm paper ground, white cards, hairline
-rules, one burnt-malt accent, near-zero shadow. Type carries the hierarchy: every
-label is uppercase and tracked, every headline is tight and quiet.
+The UI is a dark instrument panel — near-black ground, raised cards with a lit top
+edge, electric amber, and data colors pitched to burn against the black. Two faces
+divide the work: **Space Grotesk** for words, **JetBrains Mono** for every number
+and every label.
 
 ### Where a color is written
 
@@ -212,24 +213,40 @@ for the case where the stylesheet hasn't landed — update them alongside the CS
 
 | Token | Role |
 |-------|------|
-| `--bg` | the paper the app sits on |
-| `--surface` | cards and panels — the only true white |
-| `--surface-2` / `-3` / `-4` | inset wells, hovers, tracks |
+| `--bg` | the near-black chassis |
+| `--surface` | raised cards and panels |
+| `--surface-2` / `-3` / `-4` | wells, hovers, tracks |
 | `--border` / `--border-strong` | hairlines; `-strong` for fields and edges |
-| `--text` / `--text-2` / `--text-3` | ink, secondary, captions |
-| `--accent` / `--accent-hi` | burnt malt: `--accent` fills and draws, `--accent-hi` is the darker cut that stays legible **as text** on paper |
-| `--pos` `--neg` `--warn` `--info` `--purple` | semantics, all contrast-checked on white |
+| `--text` / `--text-2` / `--text-3` | near-white body, secondary, captions |
+| `--accent` / `--accent-hi` | electric amber: `--accent` fills and draws, `--accent-hi` is the brighter cut for text and active states |
+| `--pos` `--neg` `--warn` `--info` `--purple` | luminous semantics |
+| `--edge` | the lit top edge every raised surface carries |
+| `--glow` | the bloom an accent throws |
 
-### The micro-label
+`--edge` and `--glow` are **composed, never replaced**: a rule that adds a shadow
+on hover must restate the edge (`box-shadow: var(--edge), var(--shadow-md)`) or
+the card goes flat.
 
-`--fs-label` (11px) + `--tr-label` (0.09em) uppercase is the single label style,
-used by every panel head, table head, KPI caption, section marker and drawer key.
-Reach for it rather than inventing a new small-text treatment.
+### The two repeated marks
+
+1. **The micro-label** — `--fs-label` + `--tr-label`, uppercase, in the mono face.
+   One pair of rules at the top of `style.css` assigns the mono face to every
+   label and every readout; add a new class to those selector lists rather than
+   setting a font anywhere else.
+2. **The lit leading edge** — a 2–3px accent bar on the leading edge of a thing
+   that is active or hovered: `.bb-panel-head::before`, `.nav-item.active`,
+   `.bb-table tbody tr:hover`, `.feed-row:hover`, `.cmd-item.cmd-focused`,
+   `.map-mode.active`. It is the design's signature, so don't spend that shape on
+   anything else.
+
+Glow stays on **small** marks — ticks, icons, focus rings. It was tried on the KPI
+numerals and removed: a colored bloom in `currentColor` smears the glyph edges and
+costs more legibility than it buys. `.kpi-val` uses a neutral white bloom instead.
 
 ### Categorical palettes (`script.js`)
 
-Earthy, evenly spaced hues held near one mid lightness so no series shouts on a
-white ground. A new entry must match that lightness or it will read as emphasis.
+Luminous, evenly spaced hues, all pitched bright enough to burn against near-black.
+A new entry has to carry the same brightness or it reads as a disabled bar.
 
 | Constant | Covers |
 |----------|--------|
@@ -237,8 +254,9 @@ white ground. A new entry must match that lightness or it will read as emphasis.
 | `rC(r)` | rating → color ramp; mirrors the `.r5`…`.r2` badges in `style.css` |
 | `MONTH_COLORS`, `BUMP_COLORS`, `LANG_COLORS`, `STAMP_INKS` | month, bump-chart, brewing-language and passport series |
 
-`barFill(hex, n)` washes an under-`MIN_N` bar to 40% of its own color. On paper
-that is the floor that still holds an edge — don't lower it.
+`barFill(hex, n)` dims an under-`MIN_N` bar to 70% of its own color — no further.
+Alpha over black darkens toward mud, and the sort order, the `(n)` in the label and
+the tooltip already carry the "not ranked" reading.
 
 ## Language Code Reference
 
