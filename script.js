@@ -379,38 +379,38 @@ const cssVar=(function(){
   };
 })();
 const THEME={
-  bg:          cssVar('--bg','#08090b'),
-  surface:     cssVar('--surface','#101216'),
-  surface2:    cssVar('--surface-2','#16181d'),
-  surface3:    cssVar('--surface-3','#1e2128'),
-  border:      cssVar('--border','#21242b'),
-  borderStrong:cssVar('--border-strong','#333844'),
-  text:        cssVar('--text','#f4f6fa'),
-  text2:       cssVar('--text-2','#a5accc'),
-  text3:       cssVar('--text-3','#6e7585'),
-  accent:      cssVar('--accent','#ffb020'),
-  accentHi:    cssVar('--accent-hi','#ffcb5c'),
-  pos:         cssVar('--pos','#22e88f'),
-  neg:         cssVar('--neg','#ff5c6c'),
-  warn:        cssVar('--warn','#ffc73d'),
-  info:        cssVar('--info','#35c4ff'),
-  purple:      cssVar('--purple','#a879ff')
+  bg:          cssVar('--bg','#0f0f11'),
+  surface:     cssVar('--surface','#17171a'),
+  surface2:    cssVar('--surface-2','#1c1c20'),
+  surface3:    cssVar('--surface-3','#26262b'),
+  border:      cssVar('--border','#26262b'),
+  borderStrong:cssVar('--border-strong','#3a3a42'),
+  text:        cssVar('--text','#ededef'),
+  text2:       cssVar('--text-2','#a1a1aa'),
+  text3:       cssVar('--text-3','#71717a'),
+  accent:      cssVar('--accent','#e9a23b'),
+  accentHi:    cssVar('--accent-hi','#f5c274'),
+  pos:         cssVar('--pos','#46c68a'),
+  neg:         cssVar('--neg','#e5646f'),
+  warn:        cssVar('--warn','#dfa64b'),
+  info:        cssVar('--info','#5b9fe3'),
+  purple:      cssVar('--purple','#9b87e8')
 };
-// Chart-specific roles. The grid sits at the panel hairline: on black it has
-// to be visible enough to measure against without competing with the bars.
+// Chart-specific roles. The grid sits at the panel hairline — present enough
+// to measure against, quiet enough that the bars stay the subject.
 THEME.grid      = THEME.border;
 THEME.tick      = THEME.text3;
 THEME.label     = THEME.text2;
 THEME.axisTitle = THEME.text3;
 
-// Style palette — luminous, evenly spaced hues pitched bright enough to burn
-// against near-black. A new entry has to carry the same brightness or it will
-// read as a disabled bar.
-const sC={"Lager":"#ffb020","Pilsner":"#e8d44d","Wheat Beer":"#ffd9a0","Belgian Ale":"#a879ff","IPA":"#ff7a3d","Pale Ale":"#9be55a","Stout":"#a87c5a","Brown Ale":"#d19a6a","Red Ale":"#ff6b6b","Shandy / Radler":"#f5f55c"};
+// Style palette — rich, evenly spaced hues, deliberately short of neon: full
+// saturation on a dark ground is what tips a chart into looking like a trading
+// screen. A new entry should sit at this same middle brightness.
+const sC={"Lager":"#e9a23b","Pilsner":"#d4bd52","Wheat Beer":"#e8c98e","Belgian Ale":"#9b87e8","IPA":"#e07a4c","Pale Ale":"#8ab861","Stout":"#9c7a5f","Brown Ale":"#c19472","Red Ale":"#d96a6a","Shandy / Radler":"#dcd363"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
-// Rating ramp: hot red → amber → electric green. Matches the .r5….r2 badge
-// colors in style.css, and every step stays legible on near-black.
-function rC(r){return r>=4.5?"#22e88f":r>=4?"#7de85c":r>=3.5?"#e8dc4a":r>=3?"#ffb020":r>=2.5?"#ff8a3d":"#ff5c6c";}
+// Rating ramp: rose → honey → green. Matches the .r5….r2 badge colors in
+// style.css, and every step stays legible on charcoal.
+function rC(r){return r>=4.5?"#46c68a":r>=4?"#8cc46a":r>=3.5?"#ccb44f":r>=3?"#e9a23b":r>=2.5?"#dd8555":"#e5646f";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
@@ -453,7 +453,7 @@ function cardLogo(name){
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#ffb020','#35c4ff','#22e88f','#a879ff','#ffe04d','#ff5c6c','#2de0d0','#ff6bc1','#7dc4ff','#ff7a3d','#c08bff','#9be55a'];
+const MONTH_COLORS = ['#e9a23b','#5b9fe3','#46c68a','#9b87e8','#d4bd52','#e5646f','#4bb5ad','#cf7ba4','#7fa8d4','#e07a4c','#a992e0','#8ab861'];
 
 function getMonthlyData(){
   // Single pass: group beers by year+month so the same month name in different
@@ -497,8 +497,8 @@ const rankable=(list,c=o=>o.c)=>{const q=list.filter(o=>!thin(c(o)));return q.le
 // Every palette entry is 6-digit hex, so the alpha suffix is safe.
 // A thin group's bar is drawn as a wash of its own color rather than a
 // different one — the reading stays "same series, not enough of it". It only
-// dims to 70%: alpha over black darkens toward mud, and the sort order, the
-// (n) in the label and the tooltip already carry the "not ranked" reading.
+// dims to 70%: alpha over a dark ground darkens toward mud, and the sort
+// order, the (n) in the label and the tooltip already carry "not ranked".
 const barFill=(hex,n)=>thin(n)?hex+'b3':hex;
 // Sample size after a chart label. Kept to just the number so it stays legible
 // on a phone — the muted bar and the tooltip carry the "not ranked" part.
@@ -557,7 +557,7 @@ function computeStats(){
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#ffb020","Dutch":"#35c4ff","English":"#22e88f","French":"#a879ff","Japanese":"#ff5c6c","Spanish":"#ffe04d","Danish":"#9aa7bd","Czech":"#2de0d0","Italian":"#ff6bc1","Polish":"#ff8a8a","Portuguese":"#ff7a3d","Swedish":"#7dc4ff","Norwegian":"#8f9dff","Chinese":"#ff4d4d","Thai":"#c08bff","Greek":"#5ad2ff","Afrikaans":"#9be55a","Arabic":"#ffab8f"};
+const LANG_COLORS={"German":"#e9a23b","Dutch":"#5b9fe3","English":"#46c68a","French":"#9b87e8","Japanese":"#e5646f","Spanish":"#d4bd52","Danish":"#8d94a3","Czech":"#4bb5ad","Italian":"#cf7ba4","Polish":"#d97f7f","Portuguese":"#e07a4c","Swedish":"#7fa8d4","Norwegian":"#8189cf","Chinese":"#d45a5a","Thai":"#a992e0","Greek":"#63a9cf","Afrikaans":"#8ab861","Arabic":"#d9997f"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
@@ -766,7 +766,7 @@ try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
     // Re-render the currently active tab
     const activePanel=document.querySelector('.panel.active');
     if(activePanel) showTab(activePanel.id);
-    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#22e88f');
+    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#46c68a');
   }
 
   // Fetch all 3 sheets in parallel
@@ -918,7 +918,7 @@ function showInsightsSubtab(name){
 try {
   Chart.defaults.color=THEME.text2;
   Chart.defaults.borderColor=THEME.border;
-  Chart.defaults.font.family="'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+  Chart.defaults.font.family="'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
   Chart.defaults.font.size=12;
   Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
   Chart.defaults.elements.point.radius=3;
@@ -967,7 +967,7 @@ function resizeChartsIn(el){
     if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
   }
 }
-const TT={backgroundColor:THEME.surface3,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:6,displayColors:false,titleFont:{weight:'600'}};
+const TT={backgroundColor:THEME.surface3,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:8,displayColors:false,titleFont:{weight:'600'}};
 // Tooltip for a ranked average: always states how many reviews are behind the
 // bar, and spells out when that's too few to count. `n` reads the sample size
 // for a bar index — either from the row objects or from a parallel count array.
@@ -1076,7 +1076,7 @@ safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,'#2de0d0'].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
+  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,'#4bb5ad'].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:ttWithN(mCt)},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
 });
 
@@ -1562,7 +1562,7 @@ function passportCountries(){
 // FNV-1a-ish hash so every country gets the same "hand-stamped" look every
 // time (ink color, tilt) without needing per-country data entry.
 function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-const STAMP_INKS=['#ffb020','#22e88f','#ffe04d','#ff7a3d','#ff5c6c','#a879ff','#35c4ff','#ff6bc1'];
+const STAMP_INKS=['#e9a23b','#46c68a','#d4bd52','#e07a4c','#e5646f','#9b87e8','#5b9fe3','#cf7ba4'];
 function stampStyle(cc){
   const h=stampHash(cc);
   return {
@@ -1876,7 +1876,7 @@ function keyHtml(mode,journeys){
   if(mode==='brewed'){
     const buckets=[[4.75,'4.5+ loved it'],[4.2,'4.0+ great'],[3.7,'3.5+ good'],[3.2,'3.0+ fine'],[2.7,'2.5+ meh'],[2.0,'under 2.5']];
     return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--info);box-shadow:0 0 6px var(--info)"></span>a brewery’s hometown</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--info)"></span>a brewery’s hometown</div>
       <div class="mk-row mk-note">dot color = my average rating of its beers</div>
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
       <div class="mk-tap">Click any dot for the brewery’s card</div>`;
@@ -2211,9 +2211,9 @@ function drawTemporal(){
   });
   // Same breakpoints as rC(), rendered as translucent fills over the cell.
   function heatColor(a){
-    if(a>=4.5)return'rgba(34,232,143,0.34)';if(a>=4.0)return'rgba(125,232,92,0.26)';
-    if(a>=3.5)return'rgba(232,220,74,0.24)';if(a>=3.0)return'rgba(255,176,32,0.22)';
-    if(a>=2.5)return'rgba(255,138,61,0.22)';return'rgba(255,92,108,0.22)';
+    if(a>=4.5)return'rgba(70,198,138,0.34)';if(a>=4.0)return'rgba(140,196,106,0.28)';
+    if(a>=3.5)return'rgba(204,180,79,0.26)';if(a>=3.0)return'rgba(233,162,59,0.24)';
+    if(a>=2.5)return'rgba(221,133,85,0.24)';return'rgba(229,100,111,0.24)';
   }
   let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">Style</th>';
   months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m]}</th>`;});
@@ -2234,7 +2234,7 @@ function drawTemporal(){
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(255,92,108,0.22)"></div><div style="flex:1;background:rgba(255,138,61,0.22)"></div><div style="flex:1;background:rgba(255,176,32,0.22)"></div><div style="flex:1;background:rgba(232,220,74,0.24)"></div><div style="flex:1;background:rgba(34,232,143,0.34)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(229,100,111,0.24)"></div><div style="flex:1;background:rgba(221,133,85,0.24)"></div><div style="flex:1;background:rgba(233,162,59,0.24)"></div><div style="flex:1;background:rgba(204,180,79,0.26)"></div><div style="flex:1;background:rgba(70,198,138,0.34)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
@@ -2260,7 +2260,7 @@ function drawTemporal(){
 
   // ── Bump Chart — Country Rankings Over Time
   try {
-    const BUMP_COLORS=['#ffb020','#35c4ff','#22e88f','#a879ff','#ff5c6c','#ff6bc1','#2de0d0','#ff7a3d','#9be55a','#8f9dff'];
+    const BUMP_COLORS=['#e9a23b','#5b9fe3','#46c68a','#9b87e8','#e5646f','#cf7ba4','#4bb5ad','#e07a4c','#8ab861','#8189cf'];
     // Rank on the running average through each month, not on the month in
     // isolation: a country rarely gets more than one pour inside a single
     // month, so month-by-month ranks were re-shuffling on samples of one. A
@@ -2351,7 +2351,7 @@ function drawTemporal(){
     data:{
       labels:tlLabels,
       datasets:[
-        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(255,176,32,0.10)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
+        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(233,162,59,0.10)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
         {label:'5-Pt Avg',data:tlRoll,borderColor:THEME.info,borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
@@ -2437,7 +2437,7 @@ function drawContrarian(){
   if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
-      backgroundColor:sorted.map(r=>r.delta>0?'rgba(34,232,143,0.8)':'rgba(255,92,108,0.8)'),
+      backgroundColor:sorted.map(r=>r.delta>0?'rgba(70,198,138,0.8)':'rgba(229,100,111,0.8)'),
       borderColor:sorted.map(r=>r.delta>0?THEME.pos:THEME.neg),borderWidth:1.5}]},
     options:{indexAxis:'y',maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
@@ -2613,7 +2613,7 @@ function drawIPO(){
   // Signal helper used by table + conveyor
   function sigOf(target){
     const label=target>=4.0?'Must try':target>=3.5?'Worth it':target>=3.0?'Decent':target>=2.5?'Meh':'Skip';
-    const color=target>=4.0?THEME.pos:target>=3.5?'#e8dc4a':target>=3.0?'#ffb020':target>=2.5?'#ff8a3d':THEME.neg;
+    const color=target>=4.0?THEME.pos:target>=3.5?'#ccb44f':target>=3.0?'#e9a23b':target>=2.5?'#dd8555':THEME.neg;
     return {label,color};
   }
 
@@ -2662,10 +2662,10 @@ function drawIPO(){
   if(upCanvas && pending.length){
     const buckets=[
       {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:THEME.neg},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#ff8a3d'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#e8dc4a'},
+      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#dd8555'},
+      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#ccb44f'},
       {lbl:'+0.5…+1',lo:0.5,hi:1,color:THEME.pos},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#22e88f'}
+      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#46c68a'}
     ];
     const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
     safeChart('ipoUpsideChart',upCanvas,{type:'bar',

@@ -193,12 +193,16 @@ Edit `MIN_N` in `script.js` and everything follows, including the on-screen capt
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
 
-## Design System: Console
+## Design System: Dark
 
-The UI is a dark instrument panel — near-black ground, raised cards with a lit top
-edge, electric amber, and data colors pitched to burn against the black. Two faces
-divide the work: **Space Grotesk** for words, **JetBrains Mono** for every number
-and every label.
+A calm, modern dark product surface — deep neutral charcoal ground, softly
+elevated cards, one honey accent, rich (never neon) data color. Hierarchy comes
+from size, weight and muted text. Set throughout in **Plus Jakarta Sans**, one
+family, sentence case.
+
+Three things are deliberately absent, because together they read as a trading
+terminal rather than a product: **monospace type**, **all-caps tracked labels**,
+and **glow**. Don't reintroduce them.
 
 ### Where a color is written
 
@@ -213,40 +217,36 @@ for the case where the stylesheet hasn't landed — update them alongside the CS
 
 | Token | Role |
 |-------|------|
-| `--bg` | the near-black chassis |
-| `--surface` | raised cards and panels |
-| `--surface-2` / `-3` / `-4` | wells, hovers, tracks |
+| `--bg` | the charcoal ground |
+| `--surface` | cards and panels, one step up |
+| `--surface-2` / `-3` / `-4` | hovers, wells, tracks |
 | `--border` / `--border-strong` | hairlines; `-strong` for fields and edges |
-| `--text` / `--text-2` / `--text-3` | near-white body, secondary, captions |
-| `--accent` / `--accent-hi` | electric amber: `--accent` fills and draws, `--accent-hi` is the brighter cut for text and active states |
-| `--pos` `--neg` `--warn` `--info` `--purple` | luminous semantics |
-| `--edge` | the lit top edge every raised surface carries |
-| `--glow` | the bloom an accent throws |
+| `--text` / `--text-2` / `--text-3` | body, secondary, captions |
+| `--accent` / `--accent-hi` | honey: `--accent` fills and draws, `--accent-hi` is the lighter cut for text |
+| `--pos` `--neg` `--warn` `--info` `--purple` | semantics |
+| `--edge` | the whisper of a top edge on raised surfaces |
+| `--glow` | a soft focus ring — *not* a bloom |
 
-`--edge` and `--glow` are **composed, never replaced**: a rule that adds a shadow
-on hover must restate the edge (`box-shadow: var(--edge), var(--shadow-md)`) or
-the card goes flat.
+`--edge` is **composed, never replaced**: a rule that adds a shadow on hover must
+restate it (`box-shadow: var(--edge), var(--shadow-md)`) or the card goes flat.
 
-### The two repeated marks
+### Type
 
-1. **The micro-label** — `--fs-label` + `--tr-label`, uppercase, in the mono face.
-   One pair of rules at the top of `style.css` assigns the mono face to every
-   label and every readout; add a new class to those selector lists rather than
-   setting a font anywhere else.
-2. **The lit leading edge** — a 2–3px accent bar on the leading edge of a thing
-   that is active or hovered: `.bb-panel-head::before`, `.nav-item.active`,
-   `.bb-table tbody tr:hover`, `.feed-row:hover`, `.cmd-item.cmd-focused`,
-   `.map-mode.active`. It is the design's signature, so don't spend that shape on
-   anything else.
+One family, one rule worth knowing: Plus Jakarta Sans ships an unusually narrow
+word space (~0.16em against a typical 0.25em) which closes up entirely at caption
+sizes — "Average rating" renders as one word. `body` sets `word-spacing: 0.075em`
+to correct it, and body tracking stays at normal so nothing eats back into it.
+Negative tracking belongs only on large type (`.kpi-val`, `.tb-title`,
+`.merged-section-head`).
 
-Glow stays on **small** marks — ticks, icons, focus rings. It was tried on the KPI
-numerals and removed: a colored bloom in `currentColor` smears the glyph edges and
-costs more legibility than it buys. `.kpi-val` uses a neutral white bloom instead.
+`--fs-label` (12px) is the caption size: tile labels, table heads, section
+markers. Sentence case, in `--text-3`.
 
 ### Categorical palettes (`script.js`)
 
-Luminous, evenly spaced hues, all pitched bright enough to burn against near-black.
-A new entry has to carry the same brightness or it reads as a disabled bar.
+Rich, evenly spaced hues held deliberately short of neon — full saturation on a
+dark ground is what tips a chart into looking like a trading screen. A new entry
+should sit at the same middle brightness.
 
 | Constant | Covers |
 |----------|--------|
@@ -255,8 +255,8 @@ A new entry has to carry the same brightness or it reads as a disabled bar.
 | `MONTH_COLORS`, `BUMP_COLORS`, `LANG_COLORS`, `STAMP_INKS` | month, bump-chart, brewing-language and passport series |
 
 `barFill(hex, n)` dims an under-`MIN_N` bar to 70% of its own color — no further.
-Alpha over black darkens toward mud, and the sort order, the `(n)` in the label and
-the tooltip already carry the "not ranked" reading.
+Alpha over a dark ground darkens toward mud, and the sort order, the `(n)` in the
+label and the tooltip already carry the "not ranked" reading.
 
 ## Language Code Reference
 
