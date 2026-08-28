@@ -67,7 +67,34 @@ Required brewery fields:
 }
 ```
 
-### Step 2.5: Optional — Local Logo Override
+### Step 2.5: Add the Brand Domain (REQUIRED)
+
+Every beer must have an entry in `BRAND_DOMAINS` at the top of `script.js`, or it
+renders the 🍺 placeholder forever — there is no name-based guess behind it:
+
+```js
+"Radeberger Pilsner":"radeberger.de",
+```
+
+A value is one domain, or an array of domains tried in order:
+
+```js
+"Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
+```
+
+Use the array form for a brand that lives at more than one address (brand site vs.
+the brewery that owns it, `.com` vs. the local TLD) so a miss on the first still
+resolves a real logo.
+
+**Every domain listed against a beer must belong to that brand.** A parent
+company's domain is not a fallback — Heineken's logo on an Almaza is a
+confidently wrong answer, which is worse than no logo. Leave the beer with one
+domain and let it fall through to the placeholder instead.
+
+Nothing in the repo can verify a domain: only a browser that can reach the CDNs
+can. See "Verifying logos" below.
+
+### Step 2.6: Optional — Local Logo Override
 
 Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
 
@@ -106,6 +133,8 @@ After adding a new beer, verify:
 - [ ] `nativeName` added if the native-language name differs from the marketed name
 - [ ] If beer is from a new brewery, a full brewery entry was added
 - [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
+- [ ] Beer has a `BRAND_DOMAINS` entry (the console logs `[DOMAIN CHECK]` on load if not)
+- [ ] `auditLogos()` in the browser console resolves a real logo for it
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
 - [ ] If the beer introduces a brand-new `style`, that style has a color in the `sC` map in `script.js`
@@ -192,6 +221,106 @@ touches them.
 Edit `MIN_N` in `script.js` and everything follows, including the on-screen captions —
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
+
+## Verifying Logos
+
+Beers render their real brand logo at runtime through a four-tier chain, tried in
+order until one answers:
+
+**local `logos/` override → Brandfetch CDN → Google favicons → Icon Horse → 🍺**
+
+The chain is tiered by *source*, not by domain: every domain a beer lists is tried
+at each tier before dropping to the next, because a real Brandfetch logo for a
+beer's second domain beats a 16px favicon for its first.
+
+Nothing in this repo can check whether a domain actually has a logo behind it —
+that needs a browser that can reach those CDNs. Two things do the checking:
+
+| What | When | Catches |
+|------|------|---------|
+| `[DOMAIN CHECK]` console warning | automatically on load | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES` |
+| `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
+
+`auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
+sources in the same order the `<img>` chain does, and prints a table. Read it for
+two things:
+
+- **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
+- **`suspect`** — something answered, but at favicon size (≤32px), which usually
+  means a generic globe standing in for a domain the service doesn't know.
+
+Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
+in any of the services, save the logo into `logos/` and point the beer's `logo`
+field at it (Step 2.6) — that is the only way to make a logo certain.
+
+Note that the placeholder is also what you see with no network, or behind a proxy
+that blocks those CDNs, so run the audit somewhere with open internet before
+concluding a domain is wrong.
+
+## Design System: Dark
+
+A calm, modern dark product surface — deep neutral charcoal ground, softly
+elevated cards, one honey accent, rich (never neon) data color. Hierarchy comes
+from size, weight and muted text. Set throughout in **Plus Jakarta Sans**, one
+family, sentence case.
+
+Three things are deliberately absent, because together they read as a trading
+terminal rather than a product: **monospace type**, **all-caps tracked labels**,
+and **glow**. Don't reintroduce them.
+
+### Where a color is written
+
+**`:root` in `style.css` is the only place.** Do not hardcode a hex anywhere else
+— not in CSS rules, not in inline styles in `script.js`.
+
+`script.js` reads the tokens off `:root` at boot through `cssVar()` and freezes
+them into `THEME` (canvas and Leaflet can't resolve CSS variables). So changing a
+token in `style.css` retints the charts, map markers and passport stamps too, with
+nothing to keep in sync by hand. The literals in the `THEME` object are fallbacks
+for the case where the stylesheet hasn't landed — update them alongside the CSS.
+
+| Token | Role |
+|-------|------|
+| `--bg` | the charcoal ground |
+| `--surface` | cards and panels, one step up |
+| `--surface-2` / `-3` / `-4` | hovers, wells, tracks |
+| `--border` / `--border-strong` | hairlines; `-strong` for fields and edges |
+| `--text` / `--text-2` / `--text-3` | body, secondary, captions |
+| `--accent` / `--accent-hi` | honey: `--accent` fills and draws, `--accent-hi` is the lighter cut for text |
+| `--pos` `--neg` `--warn` `--info` `--purple` | semantics |
+| `--edge` | the whisper of a top edge on raised surfaces |
+| `--glow` | a soft focus ring — *not* a bloom |
+
+`--edge` is **composed, never replaced**: a rule that adds a shadow on hover must
+restate it (`box-shadow: var(--edge), var(--shadow-md)`) or the card goes flat.
+
+### Type
+
+One family, one rule worth knowing: Plus Jakarta Sans ships an unusually narrow
+word space (~0.16em against a typical 0.25em) which closes up entirely at caption
+sizes — "Average rating" renders as one word. `body` sets `word-spacing: 0.075em`
+to correct it, and body tracking stays at normal so nothing eats back into it.
+Negative tracking belongs only on large type (`.kpi-val`, `.tb-title`,
+`.merged-section-head`).
+
+`--fs-label` (12px) is the caption size: tile labels, table heads, section
+markers. Sentence case, in `--text-3`.
+
+### Categorical palettes (`script.js`)
+
+Rich, evenly spaced hues held deliberately short of neon — full saturation on a
+dark ground is what tips a chart into looking like a trading screen. A new entry
+should sit at the same middle brightness.
+
+| Constant | Covers |
+|----------|--------|
+| `sC` | beer style → color (add a color here for any new `style`) |
+| `rC(r)` | rating → color ramp; mirrors the `.r5`…`.r2` badges in `style.css` |
+| `MONTH_COLORS`, `BUMP_COLORS`, `LANG_COLORS`, `STAMP_INKS` | month, bump-chart, brewing-language and passport series |
+
+`barFill(hex, n)` dims an under-`MIN_N` bar to 70% of its own color — no further.
+Alpha over a dark ground darkens toward mud, and the sort order, the `(n)` in the
+label and the tooltip already carry the "not ranked" reading.
 
 ## Language Code Reference
 

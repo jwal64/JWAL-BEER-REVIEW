@@ -220,6 +220,19 @@ let breweries=[
 // BRAND DOMAINS — every beer maps to its brewery's domain
 // Real logos load via Brandfetch's public CDN (no account required by end
 // users); Google's favicon service and Icon Horse provide no-auth fallbacks.
+//
+// A value is one domain, or an array of domains tried in order. Brands that
+// live at more than one address (brand site vs. the brewery that owns it,
+// .com vs. the local TLD) list both, so a miss on the first still resolves a
+// real logo instead of dropping to the 🍺 placeholder.
+//
+// Every domain listed against a beer must belong to THAT BRAND. A parent
+// company's domain is not a fallback — it renders a confidently wrong logo,
+// which is worse than no logo at all. Leave the beer with one domain and let
+// it fall through to the placeholder instead.
+//
+// Run auditLogos() in the browser console to see what each beer actually
+// resolves to; nothing in this file can verify a domain on its own.
 // ══════════════════════════════════════════════════════════════
 const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
@@ -239,7 +252,7 @@ const BRAND_DOMAINS = {
 "Budweiser":"budweiser.com",
 "Carlsberg":"carlsberg.com",
 "Carlsberg Elephant":"carlsberg.com",
-"Castle Lager":"castlelager.co.za",
+"Castle Lager":["castlelager.co.za","castlelager.com"],
 "Chill Lemon":"peroni.it",
 "Chimay Blue":"chimay.com",
 "Coopers Pale Ale":"coopers.com.au",
@@ -258,14 +271,14 @@ const BRAND_DOMAINS = {
 "Grolsch Puur Weizen":"grolsch.com",
 "Frisse Lentebok":"grolsch.com",
 "Guinness Draught":"guinness.com",
-"Harp Lager":"harplager.com",
-"Hatuey Lager":"hatuey.com",
+"Harp Lager":["harplager.com","harp.ie"],
+"Hatuey Lager":["hatuey.com","hatueybeer.com"],
 "Heineken":"heineken.com",
 "Hertog Jan":"hertogjan.nl",
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
 "Kirin Ichiban":"kirin.co.jp",
-"Kronenbourg 1664":"1664.com",
+"Kronenbourg 1664":["1664.com","kronenbourg1664.com"],
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
@@ -285,7 +298,7 @@ const BRAND_DOMAINS = {
 "Narragansett Lager":"narragansettbeer.com",
 "Peroni Nastro Azzurro":"peroni.it",
 "Peroni Original":"peroni.it",
-"Newcastle Brown":"newcastlebrown.com",
+"Newcastle Brown":["newcastlebrown.com","newcastlebrownale.com"],
 "Norrlands Guld":"norrlandsguld.se",
 "Ocean SJU":"oceanlabbrewing.com",
 "Orion":"orionbeer.co.jp",
@@ -293,10 +306,11 @@ const BRAND_DOMAINS = {
 "Paulaner Hefe":"paulaner.com",
 "Paulaner Hefe-Weißbier":"paulaner.com",
 "Peroni":"peroni.it",
-"Pilsner Urquell":"prazdroj.cz",
-"Pub Ale":"boddingtons.co.uk",
-"Presidente":"cnd.com.do",
+"Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
+"Pub Ale":["boddingtons.co.uk","boddingtons.com"],
+"Presidente":["presidente.com.do","cnd.com.do"],
 "Quilmes":"quilmes.com.ar",
+"Radeberger Pilsner":"radeberger.de",
 "Red Stripe":"redstripebeer.com",
 "Ringnes":"ringnes.no",
 "Rolling Rock Extra Pale":"rollingrock.com",
@@ -304,21 +318,21 @@ const BRAND_DOMAINS = {
 "Sapporo Premium":"sapporobeer.com",
 "Belhaven Scottish Stout":"belhaven.co.uk",
 "Singha":"singhabeer.com",
-"Smithwick's":"smithwicks.com",
-"Sol":"solbeer.com",
-"Spaten Oktoberfest Ur-Märzen / Winter":"spatenbraeu.de",
+"Smithwick's":["smithwicks.com","smithwicks.ie"],
+"Sol":["solbeer.com","cervezasol.com"],
+"Spaten Oktoberfest Ur-Märzen / Winter":["spatenbraeu.de","spaten.de"],
 "Stella Artois":"stellaartois.com",
 "Stiegl Goldbräu":"stiegl.at",
 "Stone IPA":"stonebrewing.com",
 "Samuel Adams Summer Ale":"samueladams.com",
 "Super Bock":"superbock.pt",
-"Tennent's":"tennents.com",
+"Tennent's":["tennents.com","tennents.co.uk"],
 "Texels Skuumkoppe":"texels.nl",
 "Tiger Beer":"tigerbeer.com",
 "Tsingtao":"tsingtaobeer.com",
 "Tuborg":"tuborg.com",
 "Tyskie":"tyskie.pl",
-"Victoria Bitter":"vb.com.au",
+"Victoria Bitter":["vb.com.au","victoriabitter.com.au"],
 "Weihenstephaner Hefeweissbier":"weihenstephaner.de",
 "Wrench":"industrialartsbrewing.com",
 "Żywiec":"zywiec.com.pl",
@@ -330,26 +344,33 @@ const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
 // favicons) → fallback 2 (Icon Horse, 256px PNG). Emoji renders inline if every
 // remote source fails. All endpoints requested at 2–4× the display size so
 // logos stay crisp on high-DPR screens.
-function logoURL(name){
+// A beer's domains, always as a list.
+function brandDomains(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`:null;
+  return d?(Array.isArray(d)?d:[d]):[];
 }
-function logoFallbackURL(name){
-  const d=BRAND_DOMAINS[name];
-  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=512`:null;
-}
-function logoFallback2URL(name){
-  const d=BRAND_DOMAINS[name];
-  return d?`https://icon.horse/icon/${d}`:null;
-}
+const logoURL         = d=>`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`;
+const logoFallbackURL = d=>`https://www.google.com/s2/favicons?domain=${d}&sz=512`;
+const logoFallback2URL= d=>`https://icon.horse/icon/${d}`;
 
-// Coverage warning: any beer entry without a brand domain mapping
-(function validateBeerDomains(){
-  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_DOMAINS[name]);
+// Coverage warning. It has to see the watchlist and the recommendation
+// candidates as well as beers[] — those render logos too, and a gap there is
+// just as visible. Both are declared much further down this file, so the check
+// is queued with setTimeout(0): that runs once the whole script has finished
+// executing, when every list is initialized. (`typeof` is no help here — on a
+// const still in its temporal dead zone it throws rather than reporting
+// "undefined".)
+function validateBeerDomains(){
+  const names=new Set(beers.map(b=>b.beer));
+  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
+    for(const e of list) names.add(e.beer);
+  const missing=[...names].filter(n=>!BRAND_DOMAINS[n]);
   if(missing.length){
-    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing brand domain:\n  - ${missing.join('\n  - ')}`);
+    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing a brand domain — these render the 🍺 placeholder:\n  - ${missing.join('\n  - ')}`);
   }
-})();
+  return missing;
+}
+setTimeout(()=>{ try{ validateBeerDomains(); }catch(e){ console.error('Domain check error:',e); } },0);
 
 // Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
 // entry to use a file you've placed in logos/ instead of Brandfetch. The
@@ -365,26 +386,52 @@ rebuildLocalLogos();
 // ══════════════════════════════════════════════════════════════
 // ── DESIGN TOKENS ──
 // The single source of truth for every color JS hands to Chart.js, Leaflet or an
-// inline style. These mirror the custom properties in style.css; keep the two in
-// step. Canvas and Leaflet can't read CSS variables, hence the literal values.
+// inline style. Canvas and Leaflet can't read CSS variables, so the values are
+// pulled off :root once at boot and frozen into literals — style.css stays the
+// one place a color is written, and the two files can't drift apart. The
+// fallbacks are the Nordic light palette, used if the stylesheet hasn't landed.
+const cssVar=(function(){
+  let root=null;
+  try{ root=getComputedStyle(document.documentElement); }catch(e){}
+  return function(name,fallback){
+    if(!root) return fallback;
+    const v=root.getPropertyValue(name);
+    return v&&v.trim()?v.trim():fallback;
+  };
+})();
 const THEME={
-  bg:'#0b0d12', surface:'#13161d', surface2:'#1a1e27', surface3:'#212632',
-  border:'#232833', borderStrong:'#2f3644',
-  text:'#e8eaef', text2:'#9aa3b2', text3:'#6b7382',
-  accent:'#f5a524', accentHi:'#ffc35c',
-  pos:'#3ecf8e', neg:'#f87171', warn:'#fbbf24', info:'#60a5fa', purple:'#a78bfa',
-  // Chart-specific roles
-  grid:'#232833',      // axis grid lines
-  tick:'#6b7382',      // numeric axis ticks
-  label:'#9aa3b2',     // category axis labels
-  axisTitle:'#6b7382'
+  bg:          cssVar('--bg','#0f0f11'),
+  surface:     cssVar('--surface','#17171a'),
+  surface2:    cssVar('--surface-2','#1c1c20'),
+  surface3:    cssVar('--surface-3','#26262b'),
+  border:      cssVar('--border','#26262b'),
+  borderStrong:cssVar('--border-strong','#3a3a42'),
+  text:        cssVar('--text','#ededef'),
+  text2:       cssVar('--text-2','#a1a1aa'),
+  text3:       cssVar('--text-3','#71717a'),
+  accent:      cssVar('--accent','#e9a23b'),
+  accentHi:    cssVar('--accent-hi','#f5c274'),
+  pos:         cssVar('--pos','#46c68a'),
+  neg:         cssVar('--neg','#e5646f'),
+  warn:        cssVar('--warn','#dfa64b'),
+  info:        cssVar('--info','#5b9fe3'),
+  purple:      cssVar('--purple','#9b87e8')
 };
+// Chart-specific roles. The grid sits at the panel hairline — present enough
+// to measure against, quiet enough that the bars stay the subject.
+THEME.grid      = THEME.border;
+THEME.tick      = THEME.text3;
+THEME.label     = THEME.text2;
+THEME.axisTitle = THEME.text3;
 
-// Style palette — muted, evenly spaced hues that sit on a charcoal canvas.
-const sC={"Lager":"#f0b429","Pilsner":"#e8c547","Wheat Beer":"#f6d365","Belgian Ale":"#c084fc","IPA":"#fb923c","Pale Ale":"#a3d977","Stout":"#8b7355","Brown Ale":"#b08968","Red Ale":"#ef7d6b","Shandy / Radler":"#facc15"};
+// Style palette — rich, evenly spaced hues, deliberately short of neon: full
+// saturation on a dark ground is what tips a chart into looking like a trading
+// screen. A new entry should sit at this same middle brightness.
+const sC={"Lager":"#e9a23b","Pilsner":"#d4bd52","Wheat Beer":"#e8c98e","Belgian Ale":"#9b87e8","IPA":"#e07a4c","Pale Ale":"#8ab861","Stout":"#9c7a5f","Brown Ale":"#c19472","Red Ale":"#d96a6a","Shandy / Radler":"#dcd363"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
-// Rating ramp: red → amber → green. Matches the .r5….r2 badge colors in style.css.
-function rC(r){return r>=4.5?"#4ade80":r>=4?"#86d96e":r>=3.5?"#d2c94a":r>=3?"#f0b34a":r>=2.5?"#f08b52":"#f2707c";}
+// Rating ramp: rose → honey → green. Matches the .r5….r2 badge colors in
+// style.css, and every step stays legible on charcoal.
+function rC(r){return r>=4.5?"#46c68a":r>=4?"#8cc46a":r>=3.5?"#ccb44f":r>=3?"#e9a23b":r>=2.5?"#dd8555":"#e5646f";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
@@ -392,15 +439,82 @@ const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=
 // Source chain priority: local override → Brandfetch → Google favicons → Icon
 // Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
 // the next available source.
+//
+// Tiered by SOURCE, not by domain: a real Brandfetch logo for a beer's second
+// domain is a better answer than a 16px favicon for its first, so every domain
+// is tried at each tier before dropping to the next one.
 function logoSources(name){
-  const local=LOCAL_LOGOS[name];
   const sources=[];
+  const local=LOCAL_LOGOS[name];
   if(local)sources.push(local);
-  const u=logoURL(name);if(u)sources.push(u);
-  const fb1=logoFallbackURL(name);if(fb1)sources.push(fb1);
-  const fb2=logoFallback2URL(name);if(fb2)sources.push(fb2);
+  const doms=brandDomains(name);
+  for(const d of doms) sources.push(logoURL(d));
+  for(const d of doms) sources.push(logoFallbackURL(d));
+  for(const d of doms) sources.push(logoFallback2URL(d));
   return sources;
 }
+// ── LOGO AUDIT ──
+// Nothing in this file can tell whether a domain actually has a logo behind it
+// — only a browser that can reach the CDNs can. Run auditLogos() in the console
+// to find out: it walks every beer that renders a logo anywhere in the app,
+// tries its sources in the same order the <img> chain does, and reports which
+// tier answered.
+//
+// Read the result for two things: rows marked PLACEHOLDER (no source answered —
+// the beer shows 🍺) and rows flagged `suspect` (something answered, but at
+// favicon size, which is usually a generic globe standing in for a domain the
+// service doesn't know). Both mean the brand domain needs correcting in
+// BRAND_DOMAINS above.
+function auditLogos({timeout=8000,concurrency=8}={}){
+  const names=new Set(beers.map(b=>b.beer));
+  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
+    for(const e of list) names.add(e.beer);
+
+  const tierOf=(name,url)=>{
+    if(LOCAL_LOGOS[name]===url) return 'local';
+    if(url.includes('brandfetch')) return 'brandfetch';
+    if(url.includes('google.com/s2')) return 'favicon';
+    if(url.includes('icon.horse')) return 'iconhorse';
+    return '?';
+  };
+  const tryOne=url=>new Promise(res=>{
+    const img=new Image();
+    const done=ok=>{ clearTimeout(t); img.onload=img.onerror=null; res(ok?{w:img.naturalWidth,h:img.naturalHeight}:null); };
+    const t=setTimeout(()=>done(false),timeout);
+    img.onload=()=>done(img.naturalWidth>0);
+    img.onerror=()=>done(false);
+    img.src=url;
+  });
+  const walk=async name=>{
+    const srcs=logoSources(name);
+    for(const url of srcs){
+      const hit=await tryOne(url);
+      if(hit) return {beer:name,result:tierOf(name,url),size:`${hit.w}×${hit.h}`,
+                      suspect:hit.w<=32?'yes':'',url,
+                      domains:brandDomains(name).join(', ')||'—'};
+    }
+    return {beer:name,result:srcs.length?'PLACEHOLDER':'NO DOMAIN',size:'—',suspect:'',
+            url:'',domains:brandDomains(name).join(', ')||'—'};
+  };
+
+  const queue=[...names].sort(), out=[];
+  const worker=async()=>{ while(queue.length) out.push(await walk(queue.shift())); };
+  return Promise.all(Array.from({length:concurrency},worker)).then(()=>{
+    out.sort((a,b)=>a.beer.localeCompare(b.beer));
+    const bad=out.filter(r=>r.result==='PLACEHOLDER'||r.result==='NO DOMAIN');
+    const susp=out.filter(r=>r.suspect);
+    console.table(out);
+    const by=out.reduce((m,r)=>((m[r.result]=(m[r.result]||0)+1),m),{});
+    console.log(`[LOGO AUDIT] ${out.length} beers · ` +
+      Object.entries(by).map(([k,v])=>`${k}: ${v}`).join(' · '));
+    if(bad.length)  console.warn(`[LOGO AUDIT] ${bad.length} showing the placeholder:\n  - ${bad.map(r=>r.beer).join('\n  - ')}`);
+    if(susp.length) console.warn(`[LOGO AUDIT] ${susp.length} resolved at favicon size (likely a generic icon, not the brand):\n  - ${susp.map(r=>`${r.beer} (${r.size}, ${r.domains})`).join('\n  - ')}`);
+    if(!bad.length&&!susp.length) console.log('[LOGO AUDIT] every beer resolved a real logo.');
+    return out;
+  });
+}
+window.auditLogos=auditLogos;
+
 function logoChainOnError(sources,replaceJS){
   const tail=sources.slice(1);
   let conds='';
@@ -427,7 +541,7 @@ function cardLogo(name){
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#fbbf24','#f87171','#2dd4bf','#f472b6','#7dd3fc','#fb923c','#c084fc','#a3d977'];
+const MONTH_COLORS = ['#e9a23b','#5b9fe3','#46c68a','#9b87e8','#d4bd52','#e5646f','#4bb5ad','#cf7ba4','#7fa8d4','#e07a4c','#a992e0','#8ab861'];
 
 function getMonthlyData(){
   // Single pass: group beers by year+month so the same month name in different
@@ -469,7 +583,11 @@ const rankBy=(a,c)=>(x,y)=>(thin(c(x))-thin(c(y)))||(a(y)-a(x));
 const rankable=(list,c=o=>o.c)=>{const q=list.filter(o=>!thin(c(o)));return q.length?q:list;};
 // A thin group keeps its bar but loses its saturation — present, not ranked.
 // Every palette entry is 6-digit hex, so the alpha suffix is safe.
-const barFill=(hex,n)=>thin(n)?hex+'33':hex;
+// A thin group's bar is drawn as a wash of its own color rather than a
+// different one — the reading stays "same series, not enough of it". It only
+// dims to 70%: alpha over a dark ground darkens toward mud, and the sort
+// order, the (n) in the label and the tooltip already carry "not ranked".
+const barFill=(hex,n)=>thin(n)?hex+'b3':hex;
 // Sample size after a chart label. Kept to just the number so it stays legible
 // on a phone — the muted bar and the tooltip carry the "not ranked" part.
 const nLabel=n=>`(${n})`;
@@ -527,7 +645,7 @@ function computeStats(){
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#f5a524","Dutch":"#60a5fa","English":"#3ecf8e","French":"#a78bfa","Japanese":"#f87171","Spanish":"#fbbf24","Danish":"#94a3b8","Czech":"#2dd4bf","Italian":"#f472b6","Polish":"#e06c75","Portuguese":"#fb923c","Swedish":"#7dd3fc","Norwegian":"#818cf8","Chinese":"#ef4444","Thai":"#c084fc","Greek":"#38bdf8","Afrikaans":"#4ade80","Arabic":"#fca5a5"};
+const LANG_COLORS={"German":"#e9a23b","Dutch":"#5b9fe3","English":"#46c68a","French":"#9b87e8","Japanese":"#e5646f","Spanish":"#d4bd52","Danish":"#8d94a3","Czech":"#4bb5ad","Italian":"#cf7ba4","Polish":"#d97f7f","Portuguese":"#e07a4c","Swedish":"#7fa8d4","Norwegian":"#8189cf","Chinese":"#d45a5a","Thai":"#a992e0","Greek":"#63a9cf","Afrikaans":"#8ab861","Arabic":"#d9997f"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
@@ -736,7 +854,7 @@ try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
     // Re-render the currently active tab
     const activePanel=document.querySelector('.panel.active');
     if(activePanel) showTab(activePanel.id);
-    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#00ff88');
+    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#46c68a');
   }
 
   // Fetch all 3 sheets in parallel
@@ -888,7 +1006,7 @@ function showInsightsSubtab(name){
 try {
   Chart.defaults.color=THEME.text2;
   Chart.defaults.borderColor=THEME.border;
-  Chart.defaults.font.family="'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+  Chart.defaults.font.family="'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
   Chart.defaults.font.size=12;
   Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
   Chart.defaults.elements.point.radius=3;
@@ -1046,7 +1164,7 @@ safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,THEME.text3].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
+  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,'#4bb5ad'].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:ttWithN(mCt)},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
 });
 
@@ -1532,7 +1650,7 @@ function passportCountries(){
 // FNV-1a-ish hash so every country gets the same "hand-stamped" look every
 // time (ink color, tilt) without needing per-country data entry.
 function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-const STAMP_INKS=['#f5a524','#4ade80','#fbbf24','#fb923c','#f87171','#a78bfa','#60a5fa','#f472b6'];
+const STAMP_INKS=['#e9a23b','#46c68a','#d4bd52','#e07a4c','#e5646f','#9b87e8','#5b9fe3','#cf7ba4'];
 function stampStyle(cc){
   const h=stampHash(cc);
   return {
@@ -1756,7 +1874,7 @@ function passportStampSvg(r,sty){
   const {ink}=sty;
   const cc=r.cc,code=code3(cc);
   const name=(r.country||cc);
-  const bg='#13161d';
+  const bg=THEME.surface;
   const art=(COUNTRY_ART[cc]||genericArt)(bg);
   const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} brewer${r.brewed.names.length===1?'y':'ies'}`:'');
   return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
@@ -1846,7 +1964,7 @@ function keyHtml(mode,journeys){
   if(mode==='brewed'){
     const buckets=[[4.75,'4.5+ loved it'],[4.2,'4.0+ great'],[3.7,'3.5+ good'],[3.2,'3.0+ fine'],[2.7,'2.5+ meh'],[2.0,'under 2.5']];
     return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#aacc00"></span>a brewery’s hometown</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--info)"></span>a brewery’s hometown</div>
       <div class="mk-row mk-note">dot color = my average rating of its beers</div>
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
       <div class="mk-tap">Click any dot for the brewery’s card</div>`;
@@ -2181,9 +2299,9 @@ function drawTemporal(){
   });
   // Same breakpoints as rC(), rendered as translucent fills over the cell.
   function heatColor(a){
-    if(a>=4.5)return'rgba(74,222,128,0.42)';if(a>=4.0)return'rgba(134,217,110,0.30)';
-    if(a>=3.5)return'rgba(210,201,74,0.26)';if(a>=3.0)return'rgba(240,179,74,0.24)';
-    if(a>=2.5)return'rgba(240,139,82,0.26)';return'rgba(242,112,124,0.30)';
+    if(a>=4.5)return'rgba(70,198,138,0.34)';if(a>=4.0)return'rgba(140,196,106,0.28)';
+    if(a>=3.5)return'rgba(204,180,79,0.26)';if(a>=3.0)return'rgba(233,162,59,0.24)';
+    if(a>=2.5)return'rgba(221,133,85,0.24)';return'rgba(229,100,111,0.24)';
   }
   let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">Style</th>';
   months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m]}</th>`;});
@@ -2204,7 +2322,7 @@ function drawTemporal(){
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(242,112,124,0.30)"></div><div style="flex:1;background:rgba(240,139,82,0.26)"></div><div style="flex:1;background:rgba(240,179,74,0.24)"></div><div style="flex:1;background:rgba(210,201,74,0.26)"></div><div style="flex:1;background:rgba(74,222,128,0.42)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(229,100,111,0.24)"></div><div style="flex:1;background:rgba(221,133,85,0.24)"></div><div style="flex:1;background:rgba(233,162,59,0.24)"></div><div style="flex:1;background:rgba(204,180,79,0.26)"></div><div style="flex:1;background:rgba(70,198,138,0.34)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
@@ -2230,7 +2348,7 @@ function drawTemporal(){
 
   // ── Bump Chart — Country Rankings Over Time
   try {
-    const BUMP_COLORS=['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#f87171','#f472b6','#2dd4bf','#fb923c','#a3d977','#818cf8'];
+    const BUMP_COLORS=['#e9a23b','#5b9fe3','#46c68a','#9b87e8','#e5646f','#cf7ba4','#4bb5ad','#e07a4c','#8ab861','#8189cf'];
     // Rank on the running average through each month, not on the month in
     // isolation: a country rarely gets more than one pour inside a single
     // month, so month-by-month ranks were re-shuffling on samples of one. A
@@ -2321,7 +2439,7 @@ function drawTemporal(){
     data:{
       labels:tlLabels,
       datasets:[
-        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(245,165,36,0.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
+        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(233,162,59,0.10)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
         {label:'5-Pt Avg',data:tlRoll,borderColor:THEME.info,borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
@@ -2407,7 +2525,7 @@ function drawContrarian(){
   if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
-      backgroundColor:sorted.map(r=>r.delta>0?'rgba(62,207,142,0.75)':'rgba(248,113,113,0.75)'),
+      backgroundColor:sorted.map(r=>r.delta>0?'rgba(70,198,138,0.8)':'rgba(229,100,111,0.8)'),
       borderColor:sorted.map(r=>r.delta>0?THEME.pos:THEME.neg),borderWidth:1.5}]},
     options:{indexAxis:'y',maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
@@ -2583,7 +2701,7 @@ function drawIPO(){
   // Signal helper used by table + conveyor
   function sigOf(target){
     const label=target>=4.0?'Must try':target>=3.5?'Worth it':target>=3.0?'Decent':target>=2.5?'Meh':'Skip';
-    const color=target>=4.0?THEME.pos:target>=3.5?'#d2c94a':target>=3.0?'#f0b34a':target>=2.5?'#f08b52':THEME.neg;
+    const color=target>=4.0?THEME.pos:target>=3.5?'#ccb44f':target>=3.0?'#e9a23b':target>=2.5?'#dd8555':THEME.neg;
     return {label,color};
   }
 
@@ -2632,10 +2750,10 @@ function drawIPO(){
   if(upCanvas && pending.length){
     const buckets=[
       {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:THEME.neg},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#f08b52'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#d2c94a'},
+      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#dd8555'},
+      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#ccb44f'},
       {lbl:'+0.5…+1',lo:0.5,hi:1,color:THEME.pos},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#4ade80'}
+      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#46c68a'}
     ];
     const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
     safeChart('ipoUpsideChart',upCanvas,{type:'bar',
