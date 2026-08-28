@@ -1,37 +1,43 @@
 /* ═══════════════════════════════════════════════════════════════
-   JWAL'S BREW REVIEWS — modern dark app
+   JWAL'S BREW REVIEWS — Nordic light
+
+   A Scandinavian-tech surface: warm paper ground, white cards, hairline
+   rules, one burnt-malt accent and near-zero shadow. Type does the work —
+   micro-labels are uppercase and tracked, headlines are tight and quiet.
    Fonts load via <link> in index.html so the fetch parallelizes with CSS parsing.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-/* ── Surfaces: soft charcoal, not black ── */
---bg:         #0b0d12;
---surface:    #13161d;
---surface-2:  #1a1e27;
---surface-3:  #212632;
---surface-4:  #2a3040;
+/* ── Paper: a warm, low-glare ground. Cards are the only true white,
+      so every panel lifts off the page without needing a shadow. ── */
+--bg:         #f3f2ee;
+--surface:    #ffffff;
+--surface-2:  #faf9f5;
+--surface-3:  #f0eee7;
+--surface-4:  #e3e0d7;
 
-/* ── Lines ── */
---border:        #232833;
---border-strong: #2f3644;
+/* ── Hairlines ── */
+--border:        #e6e3da;
+--border-strong: #d4d0c4;
 
-/* ── Text ── */
---text:   #e8eaef;
---text-2: #9aa3b2;
---text-3: #6b7382;
+/* ── Ink ── */
+--text:   #1c1f1b;
+--text-2: #5b6058;
+--text-3: #8a8f86;
 
-/* ── One accent: malt amber ── */
---accent:      #f5a524;
---accent-hi:   #ffc35c;
---accent-soft: rgba(245,165,36,0.12);
---accent-line: rgba(245,165,36,0.34);
+/* ── One accent: burnt malt. --accent fills and draws, --accent-hi is the
+      darker cut that stays legible as text on paper. ── */
+--accent:      #b4711c;
+--accent-hi:   #8a5310;
+--accent-soft: rgba(180,113,28,0.10);
+--accent-line: rgba(180,113,28,0.28);
 
-/* ── Semantics ── */
---pos:  #3ecf8e;
---neg:  #f87171;
---warn: #fbbf24;
---info: #60a5fa;
---purple: #a78bfa;
+/* ── Semantics: muted, all contrast-checked against white ── */
+--pos:  #2e7d5b;
+--neg:  #b23a32;
+--warn: #a9812a;
+--info: #2c6e8f;
+--purple: #6b5ca5;
 
 /* ── Legacy aliases: script.js emits var(--token) inline. Repointed, not removed. ── */
 --black:   var(--bg);
@@ -53,8 +59,9 @@
 --cyan:    var(--info);
 --cyan2:   var(--info);
 
-/* ── Type ── */
---sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+/* ── Type: Schibsted Grotesk, a Norwegian grotesque — open apertures,
+      slightly narrow, at home in dense data screens. ── */
+--sans: 'Schibsted Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 /* Kept as an alias: inline styles in script.js still ask for var(--mono).
    It resolves to the UI face so no terminal type leaks back in. */
 --mono: var(--sans);
@@ -63,9 +70,15 @@
 --fs-sm:   13px;
 --fs-base: 14px;
 --fs-md:   16px;
---fs-lg:   20px;
---fs-xl:   28px;
---fs-2xl:  36px;
+--fs-lg:   22px;
+--fs-xl:   30px;
+--fs-2xl:  40px;
+
+/* The micro-label: every panel head, table head, tile caption and section
+   marker is this one size and tracking. It is what makes the screen read as
+   a system rather than a stack of headings. */
+--fs-label: 11px;
+--tr-label: 0.09em;
 
 /* ── Spacing: 4px rhythm ── */
 --s1: 4px;
@@ -74,24 +87,27 @@
 --s4: 16px;
 --s5: 24px;
 --s6: 32px;
+--s7: 48px;
 
 /* ── Shape & depth ── */
---r-sm:   8px;
---r:     12px;
---r-lg:  16px;
+--r-sm:  10px;
+--r:     14px;
+--r-lg:  20px;
 --r-pill: 999px;
 --radius:    var(--r);
 --radius-sm: var(--r-sm);
---shadow:    0 1px 2px rgba(0,0,0,0.30);
---shadow-md: 0 4px 12px rgba(0,0,0,0.35);
---shadow-lg: 0 12px 32px rgba(0,0,0,0.45);
+/* Barely-there depth: a hairline does most of the separating, shadow only
+   lifts what genuinely floats (menus, overlays). */
+--shadow:    0 1px 2px rgba(24,26,22,0.04);
+--shadow-md: 0 6px 20px -6px rgba(24,26,22,0.10);
+--shadow-lg: 0 28px 64px -20px rgba(24,26,22,0.22);
 
 --transition-fast: 0.14s ease;
 --transition-med:  0.22s ease;
 
 /* ── Shell geometry ── */
---rail:     220px;
---topbar-h: 60px;
+--rail:     244px;
+--topbar-h: 68px;
 --content-max: 1520px;
 }
 
@@ -108,13 +124,14 @@ background: var(--bg);
 color: var(--text);
 font-family: var(--sans);
 font-size: var(--fs-base);
-line-height: 1.5;
+line-height: 1.55;
+letter-spacing: -0.003em;
 overflow-x: hidden;
 min-height: 100%;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
 text-rendering: optimizeLegibility;
--webkit-tap-highlight-color: rgba(245,165,36,0.16);
+-webkit-tap-highlight-color: rgba(180,113,28,0.14);
 -webkit-text-size-adjust: 100%;
 text-size-adjust: 100%;
 touch-action: manipulation;
@@ -174,7 +191,9 @@ padding-right: env(safe-area-inset-right, 0px);
 /* ── Rail: brand on top of the primary nav ── */
 #sidebar {
 grid-area: rail;
-background: var(--surface);
+/* The rail sits on the paper rather than on its own panel — the hairline is
+   the whole divide, which is what keeps the left edge quiet. */
+background: transparent;
 border-right: 1px solid var(--border);
 overflow-y: auto;
 display: flex;
@@ -190,41 +209,52 @@ padding: 0 var(--s4);
 flex-shrink: 0;
 user-select: none;
 }
-.rail-mark { font-size: 20px; line-height: 1; }
+.rail-mark { display: flex; flex-shrink: 0; color: var(--accent); }
+.rail-mark svg { width: 22px; height: 22px; display: block; }
 .rail-word {
 display: flex;
 flex-direction: column;
 min-width: 0;
 font-size: var(--fs-md);
-font-weight: 700;
-letter-spacing: -0.01em;
+font-weight: 600;
+letter-spacing: -0.025em;
 color: var(--text);
 line-height: 1.15;
 }
 .rail-word em {
 font-style: normal;
-font-size: var(--fs-xs);
-font-weight: 500;
-letter-spacing: 0;
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: var(--tr-label);
 color: var(--text-3);
+margin-top: 3px;
 }
 .nav-group { display: flex; flex-direction: column; gap: 2px; padding: var(--s2) var(--s2) 0; }
 .nav-item {
 display: flex;
 align-items: center;
 gap: 10px;
-padding: 9px var(--s3);
+padding: 10px var(--s3);
 border-radius: var(--r-sm);
 cursor: pointer;
 font-size: var(--fs-sm);
 font-weight: 500;
 color: var(--text-2);
 white-space: nowrap;
-transition: background var(--transition-fast), color var(--transition-fast);
+transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .nav-item:hover { background: var(--surface-2); color: var(--text); }
-.nav-item.active { background: var(--accent-soft); color: var(--accent-hi); font-weight: 600; }
-.nav-icon { display: flex; align-items: center; justify-content: center; width: 18px; flex-shrink: 0; }
+/* Active reads as a card lifted out of the paper, not as a colored slab —
+   the hairline ring is drawn with a shadow so the item never changes size. */
+.nav-item.active {
+background: var(--surface);
+color: var(--text);
+font-weight: 600;
+box-shadow: inset 0 0 0 1px var(--border), var(--shadow);
+}
+.nav-item.active .nav-icon { color: var(--accent); }
+.nav-icon { display: flex; align-items: center; justify-content: center; width: 18px; flex-shrink: 0; color: var(--text-3); }
 .nav-icon svg { width: 17px; height: 17px; display: block; }
 
 /* ── Header: which page you're on, what it's for, running totals ── */
@@ -238,12 +268,13 @@ background: var(--bg);
 border-bottom: 1px solid var(--border);
 min-width: 0;
 }
-.tb-brand { display: none; font-size: 20px; line-height: 1; }
+.tb-brand { display: none; color: var(--accent); flex-shrink: 0; }
+.tb-brand svg { width: 22px; height: 22px; display: block; }
 .tb-context { display: flex; flex-direction: column; justify-content: center; min-width: 0; gap: 1px; }
 .tb-title {
 font-size: var(--fs-md);
 font-weight: 600;
-letter-spacing: -0.01em;
+letter-spacing: -0.025em;
 color: var(--text);
 white-space: nowrap;
 line-height: 1.2;
@@ -265,11 +296,19 @@ padding: 4px 10px;
 border-radius: var(--r-pill);
 background: var(--surface);
 border: 1px solid var(--border);
-font-size: var(--fs-xs);
+font-size: 10px;
+text-transform: uppercase;
+letter-spacing: 0.06em;
 color: var(--text-3);
 white-space: nowrap;
 }
-.tb-stat b { font-size: var(--fs-sm); font-weight: 600; color: var(--text); }
+.tb-stat b {
+font-size: var(--fs-sm);
+font-weight: 600;
+text-transform: none;
+letter-spacing: -0.02em;
+color: var(--text);
+}
 
 #tb-search {
 display: flex;
@@ -292,7 +331,7 @@ transition: border-color var(--transition-fast), color var(--transition-fast);
 font-family: inherit;
 font-size: 11px;
 background: var(--surface-3);
-border-radius: 5px;
+border-radius: 6px;
 padding: 2px 6px;
 color: var(--text-3);
 }
@@ -319,13 +358,15 @@ PANELS & LAYOUT
   to   { opacity: 1; transform: none; }
 }
 
-.merged-section { margin-bottom: var(--s6); }
+.merged-section { margin-bottom: var(--s7); }
 .merged-section-head {
   font-size: var(--fs-lg);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   color: var(--text);
-  margin-bottom: var(--s3);
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--border);
 }
 .section-note {
   font-size: var(--fs-sm);
@@ -346,13 +387,16 @@ overflow: clip;
 margin-bottom: var(--s4);
 position: relative;
 }
+/* Every panel head is the same micro-label — uppercase, tracked, quiet.
+   The content underneath is the loud part. */
 .bb-panel-head {
-color: var(--text);
+color: var(--text-2);
 border-bottom: 1px solid var(--border);
-font-size: var(--fs-base);
+font-size: var(--fs-label);
 font-weight: 600;
-letter-spacing: -0.01em;
-padding: var(--s3) var(--s4);
+text-transform: uppercase;
+letter-spacing: var(--tr-label);
+padding: 13px var(--s4);
 display: flex;
 align-items: baseline;
 justify-content: space-between;
@@ -363,9 +407,10 @@ font-size: var(--fs-xs);
 font-weight: 400;
 color: var(--text-3);
 text-align: right;
+text-transform: none;
 letter-spacing: 0;
 }
-.bb-body { padding: var(--s4); }
+.bb-body { padding: var(--s5); }
 
 /* Bounded chart container. Chart.js canvases are responsive with
    maintainAspectRatio off, so their height comes from here and nowhere else. */
@@ -447,21 +492,23 @@ KPI TILES — label first, then the number
 background: var(--surface);
 border: 1px solid var(--border);
 border-radius: var(--r);
-padding: var(--s4);
-transition: border-color var(--transition-fast), transform var(--transition-fast);
+padding: var(--s5);
+transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-.kpi:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.kpi:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
 .kpi-label {
-font-size: var(--fs-xs);
-font-weight: 500;
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: var(--tr-label);
 color: var(--text-3);
-margin-bottom: 6px;
+margin-bottom: var(--s2);
 }
 .kpi-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
 .kpi-val {
 font-size: var(--fs-xl);
 font-weight: 600;
-letter-spacing: -0.02em;
+letter-spacing: -0.035em;
 line-height: 1.1;
 color: var(--text);
 }
@@ -487,26 +534,14 @@ standard density. #overview outranks a class selector, so nothing needs
   --s4: 12px;    /* .bb-body + .kpi padding, every grid gap */
   --s5: 16px;    /* .panel side gutter */
   --s6: 20px;    /* .panel bottom padding */
-  --fs-xl: 24px; /* .kpi-val */
-  --r: 10px;     /* .bb-panel + .kpi corner */
+  --fs-xl: 26px; /* .kpi-val */
+  --r: 12px;     /* .bb-panel + .kpi corner */
 }
-/* Panel titles become micro-labels: the type gets out of the way so the same
-   header band can be half as tall without the panel losing its edge. */
-#overview .bb-panel-head {
-  padding: 8px var(--s4);
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-2);
-}
+/* The micro-label is the global panel head now; home only tightens its band. */
+#overview .bb-panel-head { padding: 9px var(--s4); }
 #overview .bb-panel { margin-bottom: var(--s3); }
 #overview .kpi { padding: var(--s3) var(--s4); }
-#overview .kpi-label {
-  margin-bottom: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
+#overview .kpi-label { margin-bottom: 3px; }
 /* A tile this short can't absorb a two-line sub-caption — a long beer name would
    put back the height the tighter padding just saved. */
 #overview .kpi-sub {
@@ -537,9 +572,11 @@ TABLES
 .bb-table thead th {
 background: var(--surface);
 color: var(--text-3);
-font-size: var(--fs-xs);
-font-weight: 500;
-padding: 10px var(--s3);
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.07em;
+padding: 11px var(--s3);
 text-align: left;
 border-bottom: 1px solid var(--border);
 white-space: nowrap;
@@ -631,13 +668,13 @@ border-bottom: 1px solid var(--border);
 transition: background 0.1s ease;
 }
 .bb-table tbody tr:last-child { border-bottom: none; }
-.bb-table tbody tr:hover { background: var(--surface-2); }
+.bb-table tbody tr:hover { background: var(--surface-3); }
 .bb-table tbody td {
 padding: 10px var(--s3);
 color: var(--text-2);
 vertical-align: middle;
 }
-.bb-table tbody tr.new-row { background: rgba(62,207,142,0.06); }
+.bb-table tbody tr.new-row { background: rgba(46,125,91,0.045); }
 
 /* Sortable column headers — click to sort, arrow marks the active column */
 .bb-table thead th[data-sort] { cursor: pointer; user-select: none; }
@@ -663,15 +700,16 @@ vertical-align: middle;
   margin-left: var(--s2);
   cursor: pointer;
 }
-.bb-empty button:hover { border-color: var(--accent); color: var(--accent-hi); }
+.bb-empty button:hover { border-color: var(--accent); color: var(--accent-hi); background: var(--accent-soft); }
 
 .new-tag {
 background: var(--pos);
-color: #08130d;
+color: #ffffff;
 border-radius: 5px;
 font-size: 10px;
-font-weight: 700;
-padding: 2px 5px;
+font-weight: 600;
+letter-spacing: 0.05em;
+padding: 2px 6px;
 margin-left: 6px;
 vertical-align: middle;
 }
@@ -681,20 +719,20 @@ RATING BADGES — soft filled pills
 ═══════════════════════════════════════════ */
 .rb {
 display: inline-block;
-border-radius: 6px;
-padding: 3px 8px;
+border-radius: var(--r-pill);
+padding: 3px 9px;
 font-size: var(--fs-xs);
 font-weight: 600;
 color: var(--rb-c);
 background: var(--rb-bg);
 white-space: nowrap;
 }
-.r5  { --rb-c: #4ade80; --rb-bg: rgba(74,222,128,0.14); }
-.r4  { --rb-c: #86d96e; --rb-bg: rgba(134,217,110,0.14); }
-.r35 { --rb-c: #d2c94a; --rb-bg: rgba(210,201,74,0.14); }
-.r3  { --rb-c: #f0b34a; --rb-bg: rgba(240,179,74,0.14); }
-.r25 { --rb-c: #f08b52; --rb-bg: rgba(240,139,82,0.14); }
-.r2  { --rb-c: #f2707c; --rb-bg: rgba(242,112,124,0.14); }
+.r5  { --rb-c: #2e7d5b; --rb-bg: rgba(46,125,91,0.10); }
+.r4  { --rb-c: #5c8a45; --rb-bg: rgba(92,138,69,0.10); }
+.r35 { --rb-c: #92802a; --rb-bg: rgba(146,128,42,0.11); }
+.r3  { --rb-c: #b0761f; --rb-bg: rgba(176,118,31,0.11); }
+.r25 { --rb-c: #b4602c; --rb-bg: rgba(180,96,44,0.10); }
+.r2  { --rb-c: #b23a32; --rb-bg: rgba(178,58,50,0.09); }
 
 /* ═══════════════════════════════════════════
 UNDERSAMPLED GROUPS — a country, city, language or brewery with fewer than
@@ -702,8 +740,8 @@ MIN_N reviews behind it (script.js). It still shows, it just can't win a
 ranking, so it is drawn as a fact rather than as a result: sorted to the tail
 by rankBy() and dimmed here.
 ═══════════════════════════════════════════ */
-.rank-thin { opacity: 0.5; }
-.rb-thin { opacity: 0.55; font-weight: 500; }
+.rank-thin { opacity: 0.62; }
+.rb-thin { opacity: 0.65; font-weight: 500; }
 
 /* ═══════════════════════════════════════════
 PROGRESS BARS
@@ -728,7 +766,14 @@ margin: calc(-1 * var(--s4)) calc(-1 * var(--s4)) var(--s4);
 background: var(--surface-2);
 border-bottom: 1px solid var(--border);
 }
-.bb-ctrl-title { font-size: var(--fs-sm); font-weight: 600; color: var(--text); white-space: nowrap; }
+.bb-ctrl-title {
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: var(--tr-label);
+color: var(--text-2);
+white-space: nowrap;
+}
 /* Search grows into the free space; the three selects keep an even, predictable
    width so the toolbar reads as one control group rather than four odd pills. */
 /* The row wraps rather than running off the panel: at tablet widths the four
@@ -738,7 +783,7 @@ border-bottom: 1px solid var(--border);
 .ctrl-fields .bb-select { flex: 0 1 150px; }
 #beerFilterCount { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; margin-left: auto; }
 #beerSearch {
-background: var(--bg);
+background: var(--surface);
 border-radius: var(--r-sm);
 border: 1px solid var(--border-strong);
 color: var(--text);
@@ -753,7 +798,7 @@ transition: border-color var(--transition-fast);
 #beerSearch::placeholder { color: var(--text-3); }
 #beerSearch:focus { border-color: var(--accent); }
 .bb-select {
-background-color: var(--bg);
+background-color: var(--surface);
 border-radius: var(--r-sm);
 border: 1px solid var(--border-strong);
 color: var(--text-2);
@@ -764,7 +809,7 @@ cursor: pointer;
 -webkit-appearance: none;
 -moz-appearance: none;
 appearance: none;
-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%236b7382' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='none' stroke='%238a8f86' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
 background-repeat: no-repeat;
 background-position: right 10px center;
 transition: border-color var(--transition-fast);
@@ -788,7 +833,7 @@ transition: border-color var(--transition-fast);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
-.flt-chip:hover { background: rgba(245,165,36,0.2); }
+.flt-chip:hover { background: rgba(180,113,28,0.17); }
 .flt-chip .x { opacity: 0.65; }
 .flt-chip.clear-all { background: transparent; border-color: var(--border-strong); color: var(--text-3); }
 .flt-chip.clear-all:hover { border-color: var(--text-3); color: var(--text-2); }
@@ -798,22 +843,23 @@ BEER CARDS
 ═══════════════════════════════════════════ */
 .beer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--s3); }
 .beer-card {
-background: var(--surface-2);
+background: var(--surface);
 border: 1px solid var(--border);
 border-radius: var(--r);
 padding: var(--s3);
 cursor: pointer;
-transition: border-color var(--transition-fast), transform var(--transition-fast);
+transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 position: relative;
 }
-.beer-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+.beer-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .bc-logo-wrap {
 width: 100%;
 height: 76px;
 display: flex;
 align-items: center;
 justify-content: center;
-background: var(--bg);
+background: var(--surface-2);
+border: 1px solid var(--border);
 border-radius: var(--r-sm);
 margin-bottom: var(--s3);
 padding: var(--s2);
@@ -822,13 +868,13 @@ overflow: hidden;
 .bc-logo { max-width: 92%; max-height: 62px; object-fit: contain; }
 .bc-emoji { font-size: 2.1rem; line-height: 1; }
 .bc-ticker { font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.bc-style { font-size: var(--fs-xs); color: var(--text-3); margin-bottom: var(--s3); }
+.bc-style { font-size: 10px; color: var(--text-3); margin-bottom: var(--s3); text-transform: uppercase; letter-spacing: 0.05em; }
 .bc-bottom { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); }
 .bc-abv { font-size: var(--fs-xs); color: var(--text-3); }
 .bc-new {
 position: absolute; top: 8px; right: 8px;
-background: var(--pos); color: #08130d;
-font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 5px;
+background: var(--pos); color: #ffffff;
+font-size: 10px; font-weight: 600; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 5px;
 }
 
 /* ═══════════════════════════════════════════
@@ -853,7 +899,16 @@ font-size: var(--fs-sm);
 }
 .insight-row:first-child { padding-top: 0; }
 .insight-row:last-child { border-bottom: none; padding-bottom: 0; }
-.insight-key { color: var(--text-3); width: 132px; flex-shrink: 0; font-size: var(--fs-xs); padding-top: 2px; }
+.insight-key {
+color: var(--text-3);
+width: 132px;
+flex-shrink: 0;
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+padding-top: 3px;
+}
 .insight-val { color: var(--text); font-weight: 600; }
 .insight-sub { color: var(--text-3); font-size: var(--fs-xs); margin-top: 2px; }
 
@@ -874,7 +929,7 @@ padding: 8px 0; border-bottom: 1px solid var(--border); font-size: var(--fs-sm);
   transition: background var(--transition-fast);
 }
 .feed-row + .feed-row { box-shadow: inset 0 1px 0 var(--border); }
-.feed-row:hover { background: var(--surface-2); box-shadow: none; }
+.feed-row:hover { background: var(--surface-3); box-shadow: none; }
 .feed-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .feed-name { color: var(--text); font-weight: 500; font-size: var(--fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .feed-meta { color: var(--text-3); font-size: var(--fs-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -890,8 +945,8 @@ SEGMENTED SUB-TABS
   display: inline-flex;
   gap: 2px;
   margin-bottom: var(--s5);
-  padding: 3px;
-  background: var(--surface-2);
+  padding: 4px;
+  background: var(--surface-3);
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
 }
@@ -908,7 +963,7 @@ SEGMENTED SUB-TABS
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 .subtab:hover { color: var(--text-2); }
-.subtab.active { background: var(--surface-4); color: var(--text); font-weight: 600; }
+.subtab.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
 .subpanel { display: none; }
 .subpanel.active { display: block; }
 
@@ -925,10 +980,12 @@ COLLAPSIBLE SECTIONS
 .bb-collapse > summary {
   list-style: none;
   cursor: pointer;
-  padding: var(--s3) var(--s4);
-  font-size: var(--fs-base);
+  padding: 13px var(--s4);
+  font-size: var(--fs-label);
   font-weight: 600;
-  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-label);
+  color: var(--text-2);
   user-select: none;
   display: flex;
   align-items: center;
@@ -949,8 +1006,8 @@ COLLAPSIBLE SECTIONS
 }
 .bb-collapse[open] > summary::before { transform: rotate(45deg); }
 .bb-collapse[open] > summary { border-bottom: 1px solid var(--border); }
-.bb-collapse > summary:hover { background: var(--surface-2); }
-.sum-hint { font-size: var(--fs-xs); font-weight: 400; color: var(--text-3); margin-left: auto; text-align: right; }
+.bb-collapse > summary:hover { background: var(--surface-2); color: var(--text); }
+.sum-hint { font-size: var(--fs-xs); font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-3); margin-left: auto; text-align: right; }
 .bb-collapse-body { padding: var(--s4); font-size: var(--fs-sm); color: var(--text-3); line-height: 1.7; }
 /* Full panels nested inside a collapsible section (vs. the small text body) */
 .bb-collapse > .collapse-panels { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s4); }
@@ -964,10 +1021,11 @@ MAP — one world map, four self-explanatory views
   width: 100%;
   height: 540px;
   border-radius: var(--r-sm);
-  background: var(--bg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
 }
 /* Mute only the basemap tiles — markers & lines keep their true colors */
-#worldMap .leaflet-tile-pane { filter: grayscale(24%) brightness(0.92) contrast(1.04); }
+#worldMap .leaflet-tile-pane { filter: saturate(0.55) contrast(0.96); }
 
 /* Plain-language intro above the map */
 #map-hero { margin-bottom: var(--s3); }
@@ -1008,8 +1066,8 @@ MAP — one world map, four self-explanatory views
 #map-key {
   position: absolute; top: var(--s3); right: var(--s3); z-index: 650;
   max-width: 250px;
-  background: rgba(19,22,29,0.94);
-  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,0.93);
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   padding: var(--s3);
@@ -1017,7 +1075,14 @@ MAP — one world map, four self-explanatory views
   pointer-events: none;
   box-shadow: var(--shadow-md);
 }
-.mk-head { font-size: var(--fs-xs); font-weight: 600; color: var(--text); margin-bottom: var(--s2); }
+.mk-head {
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: var(--tr-label);
+color: var(--text-2);
+margin-bottom: var(--s2);
+}
 .mk-row { display: flex; align-items: center; gap: var(--s2); margin-bottom: 5px; }
 .mk-row.mk-note { color: var(--text-3); }
 .mk-dot { display: inline-block; border-radius: 50%; flex-shrink: 0; }
@@ -1034,9 +1099,9 @@ MAP — one world map, four self-explanatory views
 
 /* Marker hover labels */
 .mtip {
-  background: var(--surface-3) !important; color: var(--text) !important;
+  background: var(--surface) !important; color: var(--text) !important;
   border: 1px solid var(--border-strong) !important;
-  border-radius: 6px !important;
+  border-radius: var(--r-sm) !important;
   font-family: var(--sans) !important; font-size: var(--fs-xs) !important;
   padding: 3px 8px !important;
   box-shadow: var(--shadow-md) !important;
@@ -1047,7 +1112,7 @@ MAP — one world map, four self-explanatory views
 .map-reset {
   display: block; width: 30px; height: 30px; line-height: 30px;
   text-align: center; margin-top: 5px;
-  background: var(--surface-2); color: var(--text-2);
+  background: var(--surface); color: var(--text-2);
   border: 1px solid var(--border-strong); border-radius: var(--r-sm); font-size: 14px; cursor: pointer;
 }
 .map-reset:hover { background: var(--surface-3); color: var(--text); }
@@ -1065,7 +1130,7 @@ MAP — one world map, four self-explanatory views
 #passport-summary { margin: 0 0 var(--s4); }
 .passport-filters { display: flex; gap: var(--s2); margin-bottom: var(--s4); flex-wrap: wrap; }
 .pf-btn {
-  background: var(--surface-2); color: var(--text-3);
+  background: var(--surface); color: var(--text-3);
   border: 1px solid var(--border); border-radius: var(--r-pill);
   font-size: var(--fs-xs); font-weight: 500;
   padding: 6px 14px; cursor: pointer;
@@ -1093,13 +1158,14 @@ MAP — one world map, four self-explanatory views
 }
 .stamp-badge {
   font-size: 10px; font-weight: 600; line-height: 1;
-  background: var(--surface-2); border: 1px solid var(--border);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: 5px; padding: 3px 6px;
   color: var(--text-3);
 }
-.stamp-badge.sb-brew  { color: var(--info); border-color: rgba(96,165,250,0.4); }
+.stamp-badge.sb-brew  { color: var(--info); border-color: rgba(44,110,143,0.35); }
 .stamp-badge.sb-drink { color: var(--accent-hi); border-color: var(--accent-line); }
-.stamp-ink { width: 100%; max-width: 150px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+.stamp-ink { width: 100%; max-width: 150px; filter: drop-shadow(0 2px 6px rgba(24,26,22,0.14)); }
 .stamp-ink svg { display: block; width: 100%; height: auto; }
 .stamp-cap {
   display: flex; align-items: center; gap: 6px; margin-top: var(--s2);
@@ -1113,23 +1179,23 @@ MAP — one world map, four self-explanatory views
 LEAFLET POPUPS
 ═══════════════════════════════════════════ */
 .dpop .leaflet-popup-content-wrapper {
-background: var(--surface-2);
+background: var(--surface);
 border: 1px solid var(--border-strong);
 border-radius: var(--r);
 box-shadow: var(--shadow-lg);
 }
-.dpop .leaflet-popup-tip { background: var(--surface-2); border: 1px solid var(--border-strong); }
+.dpop .leaflet-popup-tip { background: var(--surface); border: 1px solid var(--border-strong); }
 .dpop .leaflet-popup-close-button { color: var(--text-3) !important; }
 .dpop .leaflet-popup-close-button:hover { color: var(--text) !important; }
 .dpop .leaflet-popup-content { margin: var(--s3) var(--s4); font-family: var(--sans); font-size: var(--fs-sm); color: var(--text); line-height: 1.6; }
 .leaflet-control-zoom a {
-  background: var(--surface-2) !important;
+  background: var(--surface) !important;
   color: var(--text-2) !important;
   border-color: var(--border-strong) !important;
 }
 .leaflet-control-zoom a:hover { background: var(--surface-3) !important; color: var(--text) !important; }
 .leaflet-container { font-family: var(--sans); }
-.leaflet-control-attribution { background: rgba(11,13,18,0.75) !important; color: var(--text-3) !important; }
+.leaflet-control-attribution { background: rgba(255,255,255,0.78) !important; color: var(--text-3) !important; }
 .leaflet-control-attribution a { color: var(--text-2) !important; }
 .leaflet-overlay-pane svg { shape-rendering: geometricPrecision; }
 
@@ -1141,8 +1207,8 @@ BEER DETAIL MODAL
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(5,7,11,0.72);
-  backdrop-filter: blur(4px);
+  background: rgba(28,31,27,0.28);
+  backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(4px);
   align-items: center;
   justify-content: center;
@@ -1156,7 +1222,7 @@ BEER DETAIL MODAL
 #beerModal.open { opacity: 1; visibility: visible; pointer-events: auto; }
 #beerModalBox {
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
   width: min(780px, 94vw);
@@ -1173,6 +1239,7 @@ BEER DETAIL MODAL
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-md);
   font-weight: 600;
+  letter-spacing: -0.025em;
   padding: var(--s4) var(--s5);
   display: flex;
   align-items: center;
@@ -1205,8 +1272,8 @@ COMMAND PALETTE (⌘K)
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(5,7,11,0.72);
-  backdrop-filter: blur(4px);
+  background: rgba(28,31,27,0.28);
+  backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(4px);
   align-items: flex-start;
   justify-content: center;
@@ -1219,7 +1286,7 @@ COMMAND PALETTE (⌘K)
 #cmd-palette.open { opacity: 1; visibility: visible; pointer-events: auto; }
 #cmd-box {
   background: var(--surface);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
   width: min(600px, 92vw);
@@ -1254,8 +1321,10 @@ COMMAND PALETTE (⌘K)
 #cmd-results { overflow-y: auto; max-height: 56vh; padding: var(--s2); }
 .cmd-section {
   padding: var(--s3) var(--s3) 5px;
-  font-size: var(--fs-xs);
-  font-weight: 500;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-label);
   color: var(--text-3);
 }
 .cmd-item {
@@ -1269,6 +1338,7 @@ COMMAND PALETTE (⌘K)
   transition: background 0.08s;
 }
 .cmd-item:hover, .cmd-item.cmd-focused { background: var(--surface-3); }
+.cmd-item.cmd-focused { box-shadow: inset 2px 0 0 var(--accent); }
 .cmd-item-icon { font-size: var(--fs-base); width: 20px; text-align: center; flex-shrink: 0; color: var(--text-3); }
 .cmd-item-main { flex: 1; min-width: 0; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cmd-item-meta { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; }
@@ -1318,12 +1388,15 @@ BREWERY DRAWER
   flex-direction: column;
   overflow: hidden;
 }
-#brewery-drawer.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+/* A right-edge panel needs its shadow thrown leftward, or it reads as a
+   seamless continuation of the page it's covering. */
+#brewery-drawer.open { transform: translateX(0); box-shadow: -24px 0 56px -24px rgba(24,26,22,0.20); }
 #drawer-head {
   color: var(--text);
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-md);
   font-weight: 600;
+  letter-spacing: -0.025em;
   padding: var(--s4);
   display: flex;
   align-items: center;
@@ -1334,10 +1407,10 @@ BREWERY DRAWER
 #drawer-map {
   height: 170px;
   flex-shrink: 0;
-  background: var(--bg);
+  background: var(--surface-2);
   border-bottom: 1px solid var(--border);
 }
-#drawer-map .leaflet-tile-pane { filter: grayscale(24%) brightness(0.92) contrast(1.04); }
+#drawer-map .leaflet-tile-pane { filter: saturate(0.55) contrast(0.96); }
 #drawer-body { flex: 1; overflow-y: auto; padding: var(--s4); }
 .drawer-stat {
   display: flex;
@@ -1349,12 +1422,21 @@ BREWERY DRAWER
   font-size: var(--fs-sm);
 }
 .drawer-stat:last-child { border-bottom: none; }
-.drawer-key { color: var(--text-3); font-size: var(--fs-xs); flex-shrink: 0; }
+.drawer-key {
+color: var(--text-3);
+font-size: var(--fs-label);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+flex-shrink: 0;
+}
 .drawer-val { color: var(--text); font-weight: 500; text-align: right; }
 .drawer-section {
-  margin: var(--s4) 0 var(--s2);
-  font-size: var(--fs-xs);
+  margin: var(--s5) 0 var(--s2);
+  font-size: var(--fs-label);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-label);
   color: var(--text-3);
   border-bottom: 1px solid var(--border);
   padding-bottom: 5px;
@@ -1385,6 +1467,7 @@ RECOMMENDATIONS / WATCHLIST
   min-width: 0;
   background: var(--surface-2);
   border: 1px solid var(--border);
+  border-radius: var(--r);
   border-left-width: 3px;
   border-radius: var(--r-sm);
   padding: var(--s3) var(--s4);
@@ -1421,11 +1504,11 @@ RECOMMENDATIONS / WATCHLIST
 }
 .rec-rank {
   font-size: 11px;
-  font-weight: 700;
-  color: #241703;
+  font-weight: 600;
+  color: #ffffff;
   background: var(--accent);
-  padding: 1px 6px;
-  border-radius: 5px;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
   flex: 0 0 auto;
 }
 .rec-pick .rec-why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--s2); }
@@ -1481,7 +1564,7 @@ BOTTOM NAV — mobile thumb-reach (hidden on desktop)
   transition: background var(--transition-fast);
 }
 .bn-icon svg { width: 21px; height: 21px; display: block; }
-.bn-item.active { color: var(--accent-hi); }
+.bn-item.active { color: var(--accent-hi); font-weight: 600; }
 .bn-item.active .bn-icon { background: var(--accent-soft); }
 .bn-item:active .bn-icon { background: var(--surface-3); }
 
@@ -1496,7 +1579,7 @@ SCROLLBARS
   border: 3px solid var(--bg);
   border-radius: var(--r-pill);
 }
-::-webkit-scrollbar-thumb:hover { background: #3a4152; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 ::-webkit-scrollbar-corner { background: transparent; }
 
 /* ═══════════════════════════════════════════
@@ -1541,8 +1624,8 @@ body { overscroll-behavior: none; }
   padding-left: max(var(--s4), env(safe-area-inset-left, 0px));
   padding-right: max(var(--s4), env(safe-area-inset-right, 0px));
   gap: var(--s3);
-  background: rgba(11,13,18,0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(243,242,238,0.93);
+  backdrop-filter: blur(14px) saturate(1.4);
   -webkit-backdrop-filter: blur(12px);
 }
 .tb-brand { display: block; }
@@ -1570,9 +1653,9 @@ body { overscroll-behavior: none; }
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
-  background: rgba(19,22,29,0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
   border-top: 1px solid var(--border);
   z-index: 120;
 }
@@ -1595,7 +1678,7 @@ body { overscroll-behavior: none; }
 .bb-panel-head { padding: var(--s3); font-size: var(--fs-sm); flex-wrap: wrap; row-gap: 2px; }
 .bb-panel-head .ph-right { font-size: 11px; text-align: left; }
 .bb-body { padding: var(--s3); }
-.merged-section { margin-bottom: var(--s5); }
+.merged-section { margin-bottom: var(--s6); }
 .merged-section-head { font-size: var(--fs-md); }
 
 .kpi { padding: var(--s3); }

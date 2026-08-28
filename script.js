@@ -365,26 +365,51 @@ rebuildLocalLogos();
 // ══════════════════════════════════════════════════════════════
 // ── DESIGN TOKENS ──
 // The single source of truth for every color JS hands to Chart.js, Leaflet or an
-// inline style. These mirror the custom properties in style.css; keep the two in
-// step. Canvas and Leaflet can't read CSS variables, hence the literal values.
+// inline style. Canvas and Leaflet can't read CSS variables, so the values are
+// pulled off :root once at boot and frozen into literals — style.css stays the
+// one place a color is written, and the two files can't drift apart. The
+// fallbacks are the Nordic light palette, used if the stylesheet hasn't landed.
+const cssVar=(function(){
+  let root=null;
+  try{ root=getComputedStyle(document.documentElement); }catch(e){}
+  return function(name,fallback){
+    if(!root) return fallback;
+    const v=root.getPropertyValue(name);
+    return v&&v.trim()?v.trim():fallback;
+  };
+})();
 const THEME={
-  bg:'#0b0d12', surface:'#13161d', surface2:'#1a1e27', surface3:'#212632',
-  border:'#232833', borderStrong:'#2f3644',
-  text:'#e8eaef', text2:'#9aa3b2', text3:'#6b7382',
-  accent:'#f5a524', accentHi:'#ffc35c',
-  pos:'#3ecf8e', neg:'#f87171', warn:'#fbbf24', info:'#60a5fa', purple:'#a78bfa',
-  // Chart-specific roles
-  grid:'#232833',      // axis grid lines
-  tick:'#6b7382',      // numeric axis ticks
-  label:'#9aa3b2',     // category axis labels
-  axisTitle:'#6b7382'
+  bg:          cssVar('--bg','#f3f2ee'),
+  surface:     cssVar('--surface','#ffffff'),
+  surface2:    cssVar('--surface-2','#faf9f5'),
+  surface3:    cssVar('--surface-3','#f0eee7'),
+  border:      cssVar('--border','#e6e3da'),
+  borderStrong:cssVar('--border-strong','#d4d0c4'),
+  text:        cssVar('--text','#1c1f1b'),
+  text2:       cssVar('--text-2','#5b6058'),
+  text3:       cssVar('--text-3','#8a8f86'),
+  accent:      cssVar('--accent','#b4711c'),
+  accentHi:    cssVar('--accent-hi','#8a5310'),
+  pos:         cssVar('--pos','#2e7d5b'),
+  neg:         cssVar('--neg','#b23a32'),
+  warn:        cssVar('--warn','#a9812a'),
+  info:        cssVar('--info','#2c6e8f'),
+  purple:      cssVar('--purple','#6b5ca5')
 };
+// Chart-specific roles. Grid lines have to be lighter than a panel hairline —
+// on paper a full-strength rule behind the data reads as part of the data.
+THEME.grid      = THEME.border;
+THEME.tick      = THEME.text3;
+THEME.label     = THEME.text2;
+THEME.axisTitle = THEME.text3;
 
-// Style palette — muted, evenly spaced hues that sit on a charcoal canvas.
-const sC={"Lager":"#f0b429","Pilsner":"#e8c547","Wheat Beer":"#f6d365","Belgian Ale":"#c084fc","IPA":"#fb923c","Pale Ale":"#a3d977","Stout":"#8b7355","Brown Ale":"#b08968","Red Ale":"#ef7d6b","Shandy / Radler":"#facc15"};
+// Style palette — earthy, evenly spaced hues held at one mid lightness so no
+// bar shouts louder than its neighbour on a white ground.
+const sC={"Lager":"#c08a2e","Pilsner":"#b39a34","Wheat Beer":"#cfa761","Belgian Ale":"#7b6aa8","IPA":"#c4703a","Pale Ale":"#7d9a4c","Stout":"#6b5544","Brown Ale":"#9a7355","Red Ale":"#b8574a","Shandy / Radler":"#c2ab3f"};
 function rbC(r){return r>=4.5?"r5":r>=4?"r4":r>=3.5?"r35":r>=3?"r3":r>=2.5?"r25":"r2";}
-// Rating ramp: red → amber → green. Matches the .r5….r2 badge colors in style.css.
-function rC(r){return r>=4.5?"#4ade80":r>=4?"#86d96e":r>=3.5?"#d2c94a":r>=3?"#f0b34a":r>=2.5?"#f08b52":"#f2707c";}
+// Rating ramp: terracotta → gold → pine. Matches the .r5….r2 badge colors in
+// style.css, and every step clears 4.5:1 against paper.
+function rC(r){return r>=4.5?"#2e7d5b":r>=4?"#5c8a45":r>=3.5?"#92802a":r>=3?"#b0761f":r>=2.5?"#b4602c":"#b23a32";}
 function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½":"")+"☆".repeat(5-f-(h?1:0));}
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
@@ -427,7 +452,7 @@ function cardLogo(name){
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-const MONTH_COLORS = ['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#fbbf24','#f87171','#2dd4bf','#f472b6','#7dd3fc','#fb923c','#c084fc','#a3d977'];
+const MONTH_COLORS = ['#b4711c','#2c6e8f','#2e7d5b','#6b5ca5','#a9812a','#b23a32','#3f8c86','#a55a7d','#5d87a8','#c4703a','#8b6aa8','#7d9a4c'];
 
 function getMonthlyData(){
   // Single pass: group beers by year+month so the same month name in different
@@ -469,7 +494,11 @@ const rankBy=(a,c)=>(x,y)=>(thin(c(x))-thin(c(y)))||(a(y)-a(x));
 const rankable=(list,c=o=>o.c)=>{const q=list.filter(o=>!thin(c(o)));return q.length?q:list;};
 // A thin group keeps its bar but loses its saturation — present, not ranked.
 // Every palette entry is 6-digit hex, so the alpha suffix is safe.
-const barFill=(hex,n)=>thin(n)?hex+'33':hex;
+// A thin group's bar is drawn as a wash of its own color rather than a
+// different one — the reading stays "same series, not enough of it". 40% is
+// the floor that still holds an edge against paper; the dark theme's 20% went
+// invisible here.
+const barFill=(hex,n)=>thin(n)?hex+'66':hex;
 // Sample size after a chart label. Kept to just the number so it stays legible
 // on a phone — the muted bar and the tooltip carry the "not ranked" part.
 const nLabel=n=>`(${n})`;
@@ -527,7 +556,7 @@ function computeStats(){
 const LANG_NAMES_IDX={en:"English",de:"German",nl:"Dutch",fr:"French",ja:"Japanese",es:"Spanish",da:"Danish",cs:"Czech",it:"Italian",pl:"Polish",pt:"Portuguese",sv:"Swedish",no:"Norwegian",zh:"Chinese",th:"Thai",el:"Greek",af:"Afrikaans",ar:"Arabic"};
 // Language tab — country-code → language fallback when a beer's brewery has no lang
 const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"English",JM:"English",CA:"French",FR:"French",JP:"Japanese",MX:"Spanish",DK:"Danish",ES:"Spanish",CZ:"Czech",IT:"Italian",PL:"Polish",PT:"Portuguese",AT:"German",LB:"Arabic",GR:"Greek"};
-const LANG_COLORS={"German":"#f5a524","Dutch":"#60a5fa","English":"#3ecf8e","French":"#a78bfa","Japanese":"#f87171","Spanish":"#fbbf24","Danish":"#94a3b8","Czech":"#2dd4bf","Italian":"#f472b6","Polish":"#e06c75","Portuguese":"#fb923c","Swedish":"#7dd3fc","Norwegian":"#818cf8","Chinese":"#ef4444","Thai":"#c084fc","Greek":"#38bdf8","Afrikaans":"#4ade80","Arabic":"#fca5a5"};
+const LANG_COLORS={"German":"#b4711c","Dutch":"#2c6e8f","English":"#2e7d5b","French":"#6b5ca5","Japanese":"#b23a32","Spanish":"#a9812a","Danish":"#7a8894","Czech":"#3f8c86","Italian":"#a55a7d","Polish":"#a24c4c","Portuguese":"#c4703a","Swedish":"#5d87a8","Norwegian":"#6274ac","Chinese":"#b0473c","Thai":"#8b6aa8","Greek":"#3b7fa6","Afrikaans":"#5c8a45","Arabic":"#b8756b"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
@@ -736,7 +765,7 @@ try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
     // Re-render the currently active tab
     const activePanel=document.querySelector('.panel.active');
     if(activePanel) showTab(activePanel.id);
-    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#00ff88');
+    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#2e7d5b');
   }
 
   // Fetch all 3 sheets in parallel
@@ -888,7 +917,7 @@ function showInsightsSubtab(name){
 try {
   Chart.defaults.color=THEME.text2;
   Chart.defaults.borderColor=THEME.border;
-  Chart.defaults.font.family="'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+  Chart.defaults.font.family="'Schibsted Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
   Chart.defaults.font.size=12;
   Chart.defaults.devicePixelRatio=Math.max(window.devicePixelRatio||1,2);
   Chart.defaults.elements.point.radius=3;
@@ -937,7 +966,7 @@ function resizeChartsIn(el){
     if(ch&&ch.canvas&&el.contains(ch.canvas)) ch.resize();
   }
 }
-const TT={backgroundColor:THEME.surface3,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:8,displayColors:false,titleFont:{weight:'600'}};
+const TT={backgroundColor:THEME.surface,borderColor:THEME.borderStrong,borderWidth:1,titleColor:THEME.text,bodyColor:THEME.text2,padding:10,cornerRadius:10,displayColors:false,titleFont:{weight:'600'}};
 // Tooltip for a ranked average: always states how many reviews are behind the
 // bar, and spells out when that's too few to count. `n` reads the sample size
 // for a bar index — either from the row objects or from a parallel count array.
@@ -1046,7 +1075,7 @@ safeChart('styleChart',document.getElementById('styleChart'),{type:'bar',
 });
 
 safeChart('methodChart',document.getElementById('methodChart'),{type:'bar',
-  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,THEME.text3].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
+  data:{labels:mO.map((m,i)=>`${m} ${nLabel(mCt[i])}`),datasets:[{data:mA,backgroundColor:[THEME.accent,THEME.info,THEME.purple,'#3f8c86'].map((c,i)=>barFill(c,mCt[i])),borderWidth:0}]},
   options:{plugins:{legend:{display:false},tooltip:ttWithN(mCt)},scales:{y:{min:0,max:5,grid:{color:THEME.grid},ticks:{color:THEME.tick}},x:{grid:{display:false},ticks:{color:THEME.label}}}}
 });
 
@@ -1416,7 +1445,7 @@ function drawLanguage(){
 //   brewed  → every brewery's hometown (color = my rating)
 //   journey → an arc from each brewery to the city where I drank its beer
 // ══════════════════════════════════════════════════════════════
-function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
+function addTiles(map){L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:20,subdomains:'abcd',detectRetina:true}).addTo(map);}
 function popHtml(h){return `<div style="font-family:var(--mono);font-size:13px;line-height:1.7;-webkit-font-smoothing:antialiased">${h}</div>`;}
 // Overline that tells the reader what KIND of thing they just clicked
 function popKicker(t){return `<div style="font-size:12px;color:var(--text-3);border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:4px">${t}</div>`;}
@@ -1532,7 +1561,7 @@ function passportCountries(){
 // FNV-1a-ish hash so every country gets the same "hand-stamped" look every
 // time (ink color, tilt) without needing per-country data entry.
 function stampHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-const STAMP_INKS=['#f5a524','#4ade80','#fbbf24','#fb923c','#f87171','#a78bfa','#60a5fa','#f472b6'];
+const STAMP_INKS=['#b4711c','#2e7d5b','#a9812a','#c4703a','#b23a32','#6b5ca5','#2c6e8f','#a55a7d'];
 function stampStyle(cc){
   const h=stampHash(cc);
   return {
@@ -1756,7 +1785,7 @@ function passportStampSvg(r,sty){
   const {ink}=sty;
   const cc=r.cc,code=code3(cc);
   const name=(r.country||cc);
-  const bg='#13161d';
+  const bg=THEME.surface;
   const art=(COUNTRY_ART[cc]||genericArt)(bg);
   const valueText=r.drank?`${r.drank.avg.toFixed(2)} ★`:(r.brewed?`${r.brewed.names.length} brewer${r.brewed.names.length===1?'y':'ies'}`:'');
   return `<svg viewBox="0 0 120 150" width="128" height="160" role="img" aria-label="${name} passport stamp">
@@ -1846,7 +1875,7 @@ function keyHtml(mode,journeys){
   if(mode==='brewed'){
     const buckets=[[4.75,'4.5+ loved it'],[4.2,'4.0+ great'],[3.7,'3.5+ good'],[3.2,'3.0+ fine'],[2.7,'2.5+ meh'],[2.0,'under 2.5']];
     return head+`
-      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:#aacc00"></span>a brewery’s hometown</div>
+      <div class="mk-row"><span class="mk-dot" style="width:9px;height:9px;background:var(--info)"></span>a brewery’s hometown</div>
       <div class="mk-row mk-note">dot color = my average rating of its beers</div>
       <div class="mk-swatches">${buckets.map(([v,l])=>`<span class="mk-sw"><i style="background:${rC(v)}"></i>${l}</span>`).join('')}</div>
       <div class="mk-tap">Click any dot for the brewery’s card</div>`;
@@ -2181,9 +2210,9 @@ function drawTemporal(){
   });
   // Same breakpoints as rC(), rendered as translucent fills over the cell.
   function heatColor(a){
-    if(a>=4.5)return'rgba(74,222,128,0.42)';if(a>=4.0)return'rgba(134,217,110,0.30)';
-    if(a>=3.5)return'rgba(210,201,74,0.26)';if(a>=3.0)return'rgba(240,179,74,0.24)';
-    if(a>=2.5)return'rgba(240,139,82,0.26)';return'rgba(242,112,124,0.30)';
+    if(a>=4.5)return'rgba(46,125,91,0.30)';if(a>=4.0)return'rgba(92,138,69,0.24)';
+    if(a>=3.5)return'rgba(146,128,42,0.22)';if(a>=3.0)return'rgba(176,118,31,0.20)';
+    if(a>=2.5)return'rgba(180,96,44,0.20)';return'rgba(178,58,50,0.18)';
   }
   let heatHtml='<table class="bb-table" style="text-align:center"><thead><tr><th style="text-align:left">Style</th>';
   months.forEach((m,i)=>{heatHtml+=`<th style="color:${monthColors[i]}">${monthAbbr[m]}</th>`;});
@@ -2204,7 +2233,7 @@ function drawTemporal(){
     heatHtml+='</tr>';
   });
   heatHtml+='</tbody></table>';
-  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(242,112,124,0.30)"></div><div style="flex:1;background:rgba(240,139,82,0.26)"></div><div style="flex:1;background:rgba(240,179,74,0.24)"></div><div style="flex:1;background:rgba(210,201,74,0.26)"></div><div style="flex:1;background:rgba(74,222,128,0.42)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
+  heatHtml+=`<div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-3)"><span>Low</span><div style="display:flex;height:10px;flex:1;max-width:200px;border:1px solid var(--border)"><div style="flex:1;background:rgba(178,58,50,0.18)"></div><div style="flex:1;background:rgba(180,96,44,0.20)"></div><div style="flex:1;background:rgba(176,118,31,0.20)"></div><div style="flex:1;background:rgba(146,128,42,0.22)"></div><div style="flex:1;background:rgba(46,125,91,0.30)"></div></div><span>High</span><span style="margin-left:auto">Cells under ${MIN_N} reviews are left uncolored</span></div>`;
   document.getElementById('seasonalHeatmap').innerHTML=heatHtml;
 
   // ── Momentum panel — compares latest two months
@@ -2230,7 +2259,7 @@ function drawTemporal(){
 
   // ── Bump Chart — Country Rankings Over Time
   try {
-    const BUMP_COLORS=['#f5a524','#60a5fa','#3ecf8e','#a78bfa','#f87171','#f472b6','#2dd4bf','#fb923c','#a3d977','#818cf8'];
+    const BUMP_COLORS=['#b4711c','#2c6e8f','#2e7d5b','#6b5ca5','#b23a32','#a55a7d','#3f8c86','#c4703a','#7d9a4c','#6274ac'];
     // Rank on the running average through each month, not on the month in
     // isolation: a country rarely gets more than one pour inside a single
     // month, so month-by-month ranks were re-shuffling on samples of one. A
@@ -2321,7 +2350,7 @@ function drawTemporal(){
     data:{
       labels:tlLabels,
       datasets:[
-        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(245,165,36,0.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
+        {label:'Rating',data:tlData,borderColor:THEME.accent,backgroundColor:'rgba(180,113,28,0.09)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:tlColors,pointBorderColor:THEME.bg,pointBorderWidth:1},
         {label:'5-Pt Avg',data:tlRoll,borderColor:THEME.info,borderDash:[3,3],tension:.3,pointRadius:0,fill:false},
       ]
     },
@@ -2407,7 +2436,7 @@ function drawContrarian(){
   if(contrarianCanvas) contrarianCanvas.style.height=Math.max(280,sorted.length*22)+'px';
   safeChart('contrarianChart',contrarianCanvas,{type:'bar',
     data:{labels:sorted.map(r=>r.name),datasets:[{label:'Me vs World',data:sorted.map(r=>+r.delta.toFixed(2)),
-      backgroundColor:sorted.map(r=>r.delta>0?'rgba(62,207,142,0.75)':'rgba(248,113,113,0.75)'),
+      backgroundColor:sorted.map(r=>r.delta>0?'rgba(46,125,91,0.78)':'rgba(178,58,50,0.78)'),
       borderColor:sorted.map(r=>r.delta>0?THEME.pos:THEME.neg),borderWidth:1.5}]},
     options:{indexAxis:'y',maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`${c.raw>=0?'+':''}${c.raw} · Me: ${sorted[c.dataIndex].jwal.toFixed(2)} · World: ${sorted[c.dataIndex].global.toFixed(2)}`}}},
@@ -2583,7 +2612,7 @@ function drawIPO(){
   // Signal helper used by table + conveyor
   function sigOf(target){
     const label=target>=4.0?'Must try':target>=3.5?'Worth it':target>=3.0?'Decent':target>=2.5?'Meh':'Skip';
-    const color=target>=4.0?THEME.pos:target>=3.5?'#d2c94a':target>=3.0?'#f0b34a':target>=2.5?'#f08b52':THEME.neg;
+    const color=target>=4.0?THEME.pos:target>=3.5?'#92802a':target>=3.0?'#b0761f':target>=2.5?'#b4602c':THEME.neg;
     return {label,color};
   }
 
@@ -2632,10 +2661,10 @@ function drawIPO(){
   if(upCanvas && pending.length){
     const buckets=[
       {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:THEME.neg},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#f08b52'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#d2c94a'},
+      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#b4602c'},
+      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#92802a'},
       {lbl:'+0.5…+1',lo:0.5,hi:1,color:THEME.pos},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#4ade80'}
+      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#2e7d5b'}
     ];
     const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
     safeChart('ipoUpsideChart',upCanvas,{type:'bar',
@@ -2841,7 +2870,7 @@ function openBreweryDrawer(name){
       if(!mapEl) return;
       if(!_drawerMap){
         _drawerMap=L.map('drawer-map',{zoomControl:false,attributionControl:false,scrollWheelZoom:false,dragging:false});
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',detectRetina:true}).addTo(_drawerMap);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',detectRetina:true}).addTo(_drawerMap);
       }
       _drawerMap.setView([brewery.lat,brewery.lng],7);
       _drawerMap.eachLayer(l=>{if(l instanceof L.CircleMarker)_drawerMap.removeLayer(l);});

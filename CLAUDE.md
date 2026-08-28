@@ -193,6 +193,53 @@ Edit `MIN_N` in `script.js` and everything follows, including the on-screen capt
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
 
+## Design System: Nordic Light
+
+The UI is a Scandinavian-tech surface — warm paper ground, white cards, hairline
+rules, one burnt-malt accent, near-zero shadow. Type carries the hierarchy: every
+label is uppercase and tracked, every headline is tight and quiet.
+
+### Where a color is written
+
+**`:root` in `style.css` is the only place.** Do not hardcode a hex anywhere else
+— not in CSS rules, not in inline styles in `script.js`.
+
+`script.js` reads the tokens off `:root` at boot through `cssVar()` and freezes
+them into `THEME` (canvas and Leaflet can't resolve CSS variables). So changing a
+token in `style.css` retints the charts, map markers and passport stamps too, with
+nothing to keep in sync by hand. The literals in the `THEME` object are fallbacks
+for the case where the stylesheet hasn't landed — update them alongside the CSS.
+
+| Token | Role |
+|-------|------|
+| `--bg` | the paper the app sits on |
+| `--surface` | cards and panels — the only true white |
+| `--surface-2` / `-3` / `-4` | inset wells, hovers, tracks |
+| `--border` / `--border-strong` | hairlines; `-strong` for fields and edges |
+| `--text` / `--text-2` / `--text-3` | ink, secondary, captions |
+| `--accent` / `--accent-hi` | burnt malt: `--accent` fills and draws, `--accent-hi` is the darker cut that stays legible **as text** on paper |
+| `--pos` `--neg` `--warn` `--info` `--purple` | semantics, all contrast-checked on white |
+
+### The micro-label
+
+`--fs-label` (11px) + `--tr-label` (0.09em) uppercase is the single label style,
+used by every panel head, table head, KPI caption, section marker and drawer key.
+Reach for it rather than inventing a new small-text treatment.
+
+### Categorical palettes (`script.js`)
+
+Earthy, evenly spaced hues held near one mid lightness so no series shouts on a
+white ground. A new entry must match that lightness or it will read as emphasis.
+
+| Constant | Covers |
+|----------|--------|
+| `sC` | beer style → color (add a color here for any new `style`) |
+| `rC(r)` | rating → color ramp; mirrors the `.r5`…`.r2` badges in `style.css` |
+| `MONTH_COLORS`, `BUMP_COLORS`, `LANG_COLORS`, `STAMP_INKS` | month, bump-chart, brewing-language and passport series |
+
+`barFill(hex, n)` washes an under-`MIN_N` bar to 40% of its own color. On paper
+that is the floor that still holds an edge — don't lower it.
+
 ## Language Code Reference
 
 | Code | Language       | Countries                      |
