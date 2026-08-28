@@ -220,6 +220,19 @@ let breweries=[
 // BRAND DOMAINS — every beer maps to its brewery's domain
 // Real logos load via Brandfetch's public CDN (no account required by end
 // users); Google's favicon service and Icon Horse provide no-auth fallbacks.
+//
+// A value is one domain, or an array of domains tried in order. Brands that
+// live at more than one address (brand site vs. the brewery that owns it,
+// .com vs. the local TLD) list both, so a miss on the first still resolves a
+// real logo instead of dropping to the 🍺 placeholder.
+//
+// Every domain listed against a beer must belong to THAT BRAND. A parent
+// company's domain is not a fallback — it renders a confidently wrong logo,
+// which is worse than no logo at all. Leave the beer with one domain and let
+// it fall through to the placeholder instead.
+//
+// Run auditLogos() in the browser console to see what each beer actually
+// resolves to; nothing in this file can verify a domain on its own.
 // ══════════════════════════════════════════════════════════════
 const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
@@ -239,7 +252,7 @@ const BRAND_DOMAINS = {
 "Budweiser":"budweiser.com",
 "Carlsberg":"carlsberg.com",
 "Carlsberg Elephant":"carlsberg.com",
-"Castle Lager":"castlelager.co.za",
+"Castle Lager":["castlelager.co.za","castlelager.com"],
 "Chill Lemon":"peroni.it",
 "Chimay Blue":"chimay.com",
 "Coopers Pale Ale":"coopers.com.au",
@@ -258,14 +271,14 @@ const BRAND_DOMAINS = {
 "Grolsch Puur Weizen":"grolsch.com",
 "Frisse Lentebok":"grolsch.com",
 "Guinness Draught":"guinness.com",
-"Harp Lager":"harplager.com",
-"Hatuey Lager":"hatuey.com",
+"Harp Lager":["harplager.com","harp.ie"],
+"Hatuey Lager":["hatuey.com","hatueybeer.com"],
 "Heineken":"heineken.com",
 "Hertog Jan":"hertogjan.nl",
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
 "Kirin Ichiban":"kirin.co.jp",
-"Kronenbourg 1664":"1664.com",
+"Kronenbourg 1664":["1664.com","kronenbourg1664.com"],
 "La Chouffe Blonde":"achouffe.be",
 "La Fin Du Monde":"unibroue.com",
 "Leffe Blonde":"leffe.com",
@@ -285,7 +298,7 @@ const BRAND_DOMAINS = {
 "Narragansett Lager":"narragansettbeer.com",
 "Peroni Nastro Azzurro":"peroni.it",
 "Peroni Original":"peroni.it",
-"Newcastle Brown":"newcastlebrown.com",
+"Newcastle Brown":["newcastlebrown.com","newcastlebrownale.com"],
 "Norrlands Guld":"norrlandsguld.se",
 "Ocean SJU":"oceanlabbrewing.com",
 "Orion":"orionbeer.co.jp",
@@ -293,10 +306,11 @@ const BRAND_DOMAINS = {
 "Paulaner Hefe":"paulaner.com",
 "Paulaner Hefe-Weißbier":"paulaner.com",
 "Peroni":"peroni.it",
-"Pilsner Urquell":"prazdroj.cz",
-"Pub Ale":"boddingtons.co.uk",
-"Presidente":"cnd.com.do",
+"Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
+"Pub Ale":["boddingtons.co.uk","boddingtons.com"],
+"Presidente":["presidente.com.do","cnd.com.do"],
 "Quilmes":"quilmes.com.ar",
+"Radeberger Pilsner":"radeberger.de",
 "Red Stripe":"redstripebeer.com",
 "Ringnes":"ringnes.no",
 "Rolling Rock Extra Pale":"rollingrock.com",
@@ -304,21 +318,21 @@ const BRAND_DOMAINS = {
 "Sapporo Premium":"sapporobeer.com",
 "Belhaven Scottish Stout":"belhaven.co.uk",
 "Singha":"singhabeer.com",
-"Smithwick's":"smithwicks.com",
-"Sol":"solbeer.com",
-"Spaten Oktoberfest Ur-Märzen / Winter":"spatenbraeu.de",
+"Smithwick's":["smithwicks.com","smithwicks.ie"],
+"Sol":["solbeer.com","cervezasol.com"],
+"Spaten Oktoberfest Ur-Märzen / Winter":["spatenbraeu.de","spaten.de"],
 "Stella Artois":"stellaartois.com",
 "Stiegl Goldbräu":"stiegl.at",
 "Stone IPA":"stonebrewing.com",
 "Samuel Adams Summer Ale":"samueladams.com",
 "Super Bock":"superbock.pt",
-"Tennent's":"tennents.com",
+"Tennent's":["tennents.com","tennents.co.uk"],
 "Texels Skuumkoppe":"texels.nl",
 "Tiger Beer":"tigerbeer.com",
 "Tsingtao":"tsingtaobeer.com",
 "Tuborg":"tuborg.com",
 "Tyskie":"tyskie.pl",
-"Victoria Bitter":"vb.com.au",
+"Victoria Bitter":["vb.com.au","victoriabitter.com.au"],
 "Weihenstephaner Hefeweissbier":"weihenstephaner.de",
 "Wrench":"industrialartsbrewing.com",
 "Żywiec":"zywiec.com.pl",
@@ -330,26 +344,33 @@ const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
 // favicons) → fallback 2 (Icon Horse, 256px PNG). Emoji renders inline if every
 // remote source fails. All endpoints requested at 2–4× the display size so
 // logos stay crisp on high-DPR screens.
-function logoURL(name){
+// A beer's domains, always as a list.
+function brandDomains(name){
   const d=BRAND_DOMAINS[name];
-  return d?`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`:null;
+  return d?(Array.isArray(d)?d:[d]):[];
 }
-function logoFallbackURL(name){
-  const d=BRAND_DOMAINS[name];
-  return d?`https://www.google.com/s2/favicons?domain=${d}&sz=512`:null;
-}
-function logoFallback2URL(name){
-  const d=BRAND_DOMAINS[name];
-  return d?`https://icon.horse/icon/${d}`:null;
-}
+const logoURL         = d=>`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`;
+const logoFallbackURL = d=>`https://www.google.com/s2/favicons?domain=${d}&sz=512`;
+const logoFallback2URL= d=>`https://icon.horse/icon/${d}`;
 
-// Coverage warning: any beer entry without a brand domain mapping
-(function validateBeerDomains(){
-  const missing=[...new Set(beers.map(b=>b.beer))].filter(name=>!BRAND_DOMAINS[name]);
+// Coverage warning. It has to see the watchlist and the recommendation
+// candidates as well as beers[] — those render logos too, and a gap there is
+// just as visible. Both are declared much further down this file, so the check
+// is queued with setTimeout(0): that runs once the whole script has finished
+// executing, when every list is initialized. (`typeof` is no help here — on a
+// const still in its temporal dead zone it throws rather than reporting
+// "undefined".)
+function validateBeerDomains(){
+  const names=new Set(beers.map(b=>b.beer));
+  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
+    for(const e of list) names.add(e.beer);
+  const missing=[...names].filter(n=>!BRAND_DOMAINS[n]);
   if(missing.length){
-    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing brand domain:\n  - ${missing.join('\n  - ')}`);
+    console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing a brand domain — these render the 🍺 placeholder:\n  - ${missing.join('\n  - ')}`);
   }
-})();
+  return missing;
+}
+setTimeout(()=>{ try{ validateBeerDomains(); }catch(e){ console.error('Domain check error:',e); } },0);
 
 // Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
 // entry to use a file you've placed in logos/ instead of Brandfetch. The
@@ -418,15 +439,82 @@ const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=
 // Source chain priority: local override → Brandfetch → Google favicons → Icon
 // Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
 // the next available source.
+//
+// Tiered by SOURCE, not by domain: a real Brandfetch logo for a beer's second
+// domain is a better answer than a 16px favicon for its first, so every domain
+// is tried at each tier before dropping to the next one.
 function logoSources(name){
-  const local=LOCAL_LOGOS[name];
   const sources=[];
+  const local=LOCAL_LOGOS[name];
   if(local)sources.push(local);
-  const u=logoURL(name);if(u)sources.push(u);
-  const fb1=logoFallbackURL(name);if(fb1)sources.push(fb1);
-  const fb2=logoFallback2URL(name);if(fb2)sources.push(fb2);
+  const doms=brandDomains(name);
+  for(const d of doms) sources.push(logoURL(d));
+  for(const d of doms) sources.push(logoFallbackURL(d));
+  for(const d of doms) sources.push(logoFallback2URL(d));
   return sources;
 }
+// ── LOGO AUDIT ──
+// Nothing in this file can tell whether a domain actually has a logo behind it
+// — only a browser that can reach the CDNs can. Run auditLogos() in the console
+// to find out: it walks every beer that renders a logo anywhere in the app,
+// tries its sources in the same order the <img> chain does, and reports which
+// tier answered.
+//
+// Read the result for two things: rows marked PLACEHOLDER (no source answered —
+// the beer shows 🍺) and rows flagged `suspect` (something answered, but at
+// favicon size, which is usually a generic globe standing in for a domain the
+// service doesn't know). Both mean the brand domain needs correcting in
+// BRAND_DOMAINS above.
+function auditLogos({timeout=8000,concurrency=8}={}){
+  const names=new Set(beers.map(b=>b.beer));
+  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
+    for(const e of list) names.add(e.beer);
+
+  const tierOf=(name,url)=>{
+    if(LOCAL_LOGOS[name]===url) return 'local';
+    if(url.includes('brandfetch')) return 'brandfetch';
+    if(url.includes('google.com/s2')) return 'favicon';
+    if(url.includes('icon.horse')) return 'iconhorse';
+    return '?';
+  };
+  const tryOne=url=>new Promise(res=>{
+    const img=new Image();
+    const done=ok=>{ clearTimeout(t); img.onload=img.onerror=null; res(ok?{w:img.naturalWidth,h:img.naturalHeight}:null); };
+    const t=setTimeout(()=>done(false),timeout);
+    img.onload=()=>done(img.naturalWidth>0);
+    img.onerror=()=>done(false);
+    img.src=url;
+  });
+  const walk=async name=>{
+    const srcs=logoSources(name);
+    for(const url of srcs){
+      const hit=await tryOne(url);
+      if(hit) return {beer:name,result:tierOf(name,url),size:`${hit.w}×${hit.h}`,
+                      suspect:hit.w<=32?'yes':'',url,
+                      domains:brandDomains(name).join(', ')||'—'};
+    }
+    return {beer:name,result:srcs.length?'PLACEHOLDER':'NO DOMAIN',size:'—',suspect:'',
+            url:'',domains:brandDomains(name).join(', ')||'—'};
+  };
+
+  const queue=[...names].sort(), out=[];
+  const worker=async()=>{ while(queue.length) out.push(await walk(queue.shift())); };
+  return Promise.all(Array.from({length:concurrency},worker)).then(()=>{
+    out.sort((a,b)=>a.beer.localeCompare(b.beer));
+    const bad=out.filter(r=>r.result==='PLACEHOLDER'||r.result==='NO DOMAIN');
+    const susp=out.filter(r=>r.suspect);
+    console.table(out);
+    const by=out.reduce((m,r)=>((m[r.result]=(m[r.result]||0)+1),m),{});
+    console.log(`[LOGO AUDIT] ${out.length} beers · ` +
+      Object.entries(by).map(([k,v])=>`${k}: ${v}`).join(' · '));
+    if(bad.length)  console.warn(`[LOGO AUDIT] ${bad.length} showing the placeholder:\n  - ${bad.map(r=>r.beer).join('\n  - ')}`);
+    if(susp.length) console.warn(`[LOGO AUDIT] ${susp.length} resolved at favicon size (likely a generic icon, not the brand):\n  - ${susp.map(r=>`${r.beer} (${r.size}, ${r.domains})`).join('\n  - ')}`);
+    if(!bad.length&&!susp.length) console.log('[LOGO AUDIT] every beer resolved a real logo.');
+    return out;
+  });
+}
+window.auditLogos=auditLogos;
+
 function logoChainOnError(sources,replaceJS){
   const tail=sources.slice(1);
   let conds='';

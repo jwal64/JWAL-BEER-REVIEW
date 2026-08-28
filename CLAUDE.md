@@ -67,7 +67,34 @@ Required brewery fields:
 }
 ```
 
-### Step 2.5: Optional — Local Logo Override
+### Step 2.5: Add the Brand Domain (REQUIRED)
+
+Every beer must have an entry in `BRAND_DOMAINS` at the top of `script.js`, or it
+renders the 🍺 placeholder forever — there is no name-based guess behind it:
+
+```js
+"Radeberger Pilsner":"radeberger.de",
+```
+
+A value is one domain, or an array of domains tried in order:
+
+```js
+"Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
+```
+
+Use the array form for a brand that lives at more than one address (brand site vs.
+the brewery that owns it, `.com` vs. the local TLD) so a miss on the first still
+resolves a real logo.
+
+**Every domain listed against a beer must belong to that brand.** A parent
+company's domain is not a fallback — Heineken's logo on an Almaza is a
+confidently wrong answer, which is worse than no logo. Leave the beer with one
+domain and let it fall through to the placeholder instead.
+
+Nothing in the repo can verify a domain: only a browser that can reach the CDNs
+can. See "Verifying logos" below.
+
+### Step 2.6: Optional — Local Logo Override
 
 Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
 
@@ -106,6 +133,8 @@ After adding a new beer, verify:
 - [ ] `nativeName` added if the native-language name differs from the marketed name
 - [ ] If beer is from a new brewery, a full brewery entry was added
 - [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
+- [ ] Beer has a `BRAND_DOMAINS` entry (the console logs `[DOMAIN CHECK]` on load if not)
+- [ ] `auditLogos()` in the browser console resolves a real logo for it
 - [ ] Consumption city exists in `drunkLocs[]`
 - [ ] Country code exists in `FLAGS` and `CNAMES`
 - [ ] If the beer introduces a brand-new `style`, that style has a color in the `sC` map in `script.js`
@@ -192,6 +221,41 @@ touches them.
 Edit `MIN_N` in `script.js` and everything follows, including the on-screen captions —
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
+
+## Verifying Logos
+
+Beers render their real brand logo at runtime through a four-tier chain, tried in
+order until one answers:
+
+**local `logos/` override → Brandfetch CDN → Google favicons → Icon Horse → 🍺**
+
+The chain is tiered by *source*, not by domain: every domain a beer lists is tried
+at each tier before dropping to the next, because a real Brandfetch logo for a
+beer's second domain beats a 16px favicon for its first.
+
+Nothing in this repo can check whether a domain actually has a logo behind it —
+that needs a browser that can reach those CDNs. Two things do the checking:
+
+| What | When | Catches |
+|------|------|---------|
+| `[DOMAIN CHECK]` console warning | automatically on load | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES` |
+| `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
+
+`auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
+sources in the same order the `<img>` chain does, and prints a table. Read it for
+two things:
+
+- **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
+- **`suspect`** — something answered, but at favicon size (≤32px), which usually
+  means a generic globe standing in for a domain the service doesn't know.
+
+Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
+in any of the services, save the logo into `logos/` and point the beer's `logo`
+field at it (Step 2.6) — that is the only way to make a logo certain.
+
+Note that the placeholder is also what you see with no network, or behind a proxy
+that blocks those CDNs, so run the audit somewhere with open internet before
+concluding a domain is wrong.
 
 ## Design System: Dark
 
