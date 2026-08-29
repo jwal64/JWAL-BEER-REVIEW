@@ -108,6 +108,7 @@ let beers=[
   {beer:"Bitburger Radler",      style:"Shandy / Radler",origin:"DE",abv:2.5,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:4.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Bottle",city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Presidente",            style:"Pilsner",        origin:"DO",abv:5.0,method:"Bottle",city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  {beer:"Heineken Silver",       style:"Lager",          origin:"NL",abv:4.0,method:"Draft", city:"Queens",       region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
 ];
 
 // Merge user-added beers from localStorage
@@ -155,7 +156,7 @@ let breweries=[
   {name:"Harp / Diageo",          location:"Dundalk, County Louth",     country:"Ireland",     cc:"IE", lang:"en", beers:"Harp Lager",                                        lat:54.0039,lng:-6.3703, ratings:[4.25]},
   {name:"Duvel Moortgat",         location:"Puurs-Sint-Amands, Antwerp",country:"Belgium",     cc:"BE", lang:"nl", beers:"Duvel",                                             lat:51.0727,lng:4.2897,  ratings:[4.25]},
   {name:"AB InBev (Stella)",      location:"Leuven, Flemish Brabant",   country:"Belgium",     cc:"BE", lang:"nl", beers:"Stella Artois",                                     lat:50.8798,lng:4.7005,  ratings:[2.75]},
-  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken",                                          lat:52.3578,lng:4.8918,  ratings:[3.25]},
+  {name:"Heineken",               location:"Amsterdam, Noord-Holland",  country:"Netherlands", cc:"NL", lang:"nl", beers:"Heineken · Heineken Silver",                        lat:52.3578,lng:4.8918,  ratings:[3.25,3.00]},
   {name:"Grolsch",                location:"Enschede, Overijssel",      country:"Netherlands", cc:"NL", lang:"nl", beers:"Grolsch · Grolsch Puur Weizen · Frisse Lentebok",   lat:52.2215,lng:6.8937,  ratings:[3.50,5.00,3.25]},
   {name:"Bavaria NV (Hertog Jan)",location:"Arcen, Limburg",            country:"Netherlands", cc:"NL", lang:"nl", beers:"Hertog Jan",                                        lat:51.4862,lng:6.1741,  ratings:[2.00]},
   {name:"Anheuser-Busch",         location:"St. Louis, Missouri",       country:"USA",         cc:"US", lang:"en", beers:"Budweiser · Bud Light · Michelob Ultra",            lat:38.6072,lng:-90.2124, ratings:[3.00,3.00,2.50]},
@@ -274,6 +275,7 @@ const BRAND_DOMAINS = {
 "Harp Lager":["harplager.com","harp.ie"],
 "Hatuey Lager":["hatuey.com","hatueybeer.com"],
 "Heineken":"heineken.com",
+"Heineken Silver":["heinekensilver.com","heineken.com"],
 "Hertog Jan":"hertogjan.nl",
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
