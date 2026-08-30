@@ -1,0 +1,214 @@
+{
+  "lastRefreshed": "2026-05-05",
+  "refreshIntervalDays": 14,
+  "averages": [
+    {
+      "beer": "Grolsch",
+      "untappdAvg": 3.52
+    },
+    {
+      "beer": "Hertog Jan",
+      "untappdAvg": 3.58
+    },
+    {
+      "beer": "Coors Light",
+      "untappdAvg": 2.84
+    },
+    {
+      "beer": "Sapporo Premium",
+      "untappdAvg": 3.51
+    },
+    {
+      "beer": "Kirin Ichiban",
+      "untappdAvg": 3.43
+    },
+    {
+      "beer": "Modelo Especial",
+      "untappdAvg": 3.55
+    },
+    {
+      "beer": "Stella Artois",
+      "untappdAvg": 3.3
+    },
+    {
+      "beer": "Duvel",
+      "untappdAvg": 3.7
+    },
+    {
+      "beer": "Carlsberg",
+      "untappdAvg": 3.09
+    },
+    {
+      "beer": "Carlsberg Elephant",
+      "untappdAvg": 3.42
+    },
+    {
+      "beer": "Harp Lager",
+      "untappdAvg": 3.42
+    },
+    {
+      "beer": "La Fin Du Monde",
+      "untappdAvg": 4.07
+    },
+    {
+      "beer": "Kronenbourg 1664",
+      "untappdAvg": 3.3
+    },
+    {
+      "beer": "Michelob Ultra",
+      "untappdAvg": 2.84
+    },
+    {
+      "beer": "Guinness Draught",
+      "untappdAvg": 3.8
+    },
+    {
+      "beer": "Red Stripe",
+      "untappdAvg": 3.31
+    },
+    {
+      "beer": "Heineken",
+      "untappdAvg": 3
+    },
+    {
+      "beer": "Weihenstephaner Hefeweissbier",
+      "untappdAvg": 3.8
+    },
+    {
+      "beer": "Negra Modelo",
+      "untappdAvg": 3.6
+    },
+    {
+      "beer": "Hofbräu Münchner Weiße",
+      "untappdAvg": 3.8
+    },
+    {
+      "beer": "Hofbräu Dunkel",
+      "untappdAvg": 3.55
+    },
+    {
+      "beer": "Bud Light",
+      "untappdAvg": 2.3
+    },
+    {
+      "beer": "Budweiser",
+      "untappdAvg": 2.6
+    },
+    {
+      "beer": "Corona Extra",
+      "untappdAvg": 3.47
+    },
+    {
+      "beer": "Dos Equis Lager Especial",
+      "untappdAvg": 3.25
+    },
+    {
+      "beer": "Frisse Lentebok",
+      "untappdAvg": 3.25
+    },
+    {
+      "beer": "Estrella Galicia",
+      "untappdAvg": 3.65
+    },
+    {
+      "beer": "Pilsner Urquell",
+      "untappdAvg": 3.8
+    },
+    {
+      "beer": "Wrench",
+      "untappdAvg": 3.95
+    },
+    {
+      "beer": "Żywiec",
+      "untappdAvg": 3.35
+    },
+    {
+      "beer": "Peroni Nastro Azzurro",
+      "untappdAvg": 3.56
+    },
+    {
+      "beer": "Estrella Damm",
+      "untappdAvg": 3.61
+    },
+    {
+      "beer": "Grolsch Puur Weizen",
+      "untappdAvg": 3.5
+    },
+    {
+      "beer": "Leffe Blonde",
+      "untappdAvg": 3.75
+    },
+    {
+      "beer": "Texels Skuumkoppe",
+      "untappdAvg": 3.65
+    },
+    {
+      "beer": "Affligem Tripel",
+      "untappdAvg": 3.8
+    },
+    {
+      "beer": "De Koninck",
+      "untappdAvg": 3.55
+    },
+    {
+      "beer": "IJwit",
+      "untappdAvg": 3.5
+    },
+    {
+      "beer": "La Chouffe Blonde",
+      "untappdAvg": 3.85
+    },
+    {
+      "beer": "Stiegl Goldbräu",
+      "untappdAvg": 3.35
+    },
+    {
+      "beer": "Modelo Oro",
+      "untappdAvg": 3.45
+    },
+    {
+      "beer": "Super Bock",
+      "untappdAvg": 3.41
+    },
+    {
+      "beer": "Estrella Jalisco",
+      "untappdAvg": 3.2
+    },
+    {
+      "beer": "Rolling Rock Extra Pale",
+      "untappdAvg": 3.05
+    },
+    {
+      "beer": "Birra Moretti",
+      "untappdAvg": 3.58
+    },
+    {
+      "beer": "Erdinger Weißbier",
+      "untappdAvg": 3.78
+    },
+    {
+      "beer": "Miller Lite",
+      "untappdAvg": 2.51
+    },
+    {
+      "beer": "Pacífico Clara",
+      "untappdAvg": 3.65
+    },
+    {
+      "beer": "Narragansett Lager",
+      "untappdAvg": 3.23
+    },
+    {
+      "beer": "Big Wave Golden Ale",
+      "untappdAvg": 3.52
+    },
+    {
+      "beer": "Belhaven Scottish Stout",
+      "untappdAvg": 3.45
+    },
+    {
+      "beer": "Samuel Adams Summer Ale",
+      "untappdAvg": 3.5
+    }
+  ]
+}

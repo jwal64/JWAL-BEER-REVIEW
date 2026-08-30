@@ -1,0 +1,35 @@
+name: Data check
+
+# The site has no build step, so nothing would otherwise notice a beer added
+# with a country code that has no flag, a brewery that was never registered or
+# a brand domain that was never added. This runs the same checks CLAUDE.md
+# asks a contributor to run, on every push and pull request.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No dependencies to install — the tools are plain Node.
+      - name: Validate the data
+        run: node tools/validate-data.mjs
+
+      - name: Check data/ is in step with data.js
+        run: node tools/export-data.mjs --check
+
+      - name: Syntax-check the browser scripts
+        run: node --check data.js && node --check app.js

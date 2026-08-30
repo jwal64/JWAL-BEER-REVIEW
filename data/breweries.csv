@@ -1,0 +1,66 @@
+name,location,country,cc,lang,nativeName,lat,lng,beers,ratings
+Weihenstephaner,"Freising, Bavaria",Germany,DE,de,,48.3953,11.7291,Weihenstephaner Hefeweissbier,4.5
+Hofbräu München,"Munich, Bavaria",Germany,DE,de,,48.1351,11.582,Hofbräu Münchner Weiße · Hofbräu Dunkel,4.75 · 2.75
+Guinness (St. James's Gate),"Dublin, Leinster",Ireland,IE,en,,53.3418,-6.2868,Guinness Draught,4
+Harp / Diageo,"Dundalk, County Louth",Ireland,IE,en,,54.0039,-6.3703,Harp Lager,4.25
+Duvel Moortgat,"Puurs-Sint-Amands, Antwerp",Belgium,BE,nl,,51.0727,4.2897,Duvel,4.25
+AB InBev (Stella),"Leuven, Flemish Brabant",Belgium,BE,nl,,50.8798,4.7005,Stella Artois,2.75
+Heineken,"Amsterdam, Noord-Holland",Netherlands,NL,nl,,52.3578,4.8918,Heineken · Heineken Silver,3.25 · 3
+Grolsch,"Enschede, Overijssel",Netherlands,NL,nl,,52.2215,6.8937,Grolsch · Grolsch Puur Weizen · Frisse Lentebok,3.5 · 5 · 3.25
+Bavaria NV (Hertog Jan),"Arcen, Limburg",Netherlands,NL,nl,,51.4862,6.1741,Hertog Jan,2
+Anheuser-Busch,"St. Louis, Missouri",USA,US,en,,38.6072,-90.2124,Budweiser · Bud Light · Michelob Ultra,3 · 3 · 2.5
+Molson Coors,"Golden, Colorado",USA,US,en,,39.7555,-105.2211,Coors Light,3
+Grupo Modelo,"Mexico City, CDMX",Mexico,MX,es,,19.4274,-99.1677,Modelo Especial · Negra Modelo · Corona Extra · Modelo Oro,3.25 · 3 · 3.75 · 3
+Cervecería Estrella Jalisco,"Guadalajara, Jalisco",Mexico,MX,es,,20.6597,-103.3496,Estrella Jalisco,3.75
+Carlsberg,"Copenhagen, Capital Region",Denmark,DK,da,,55.6614,12.5361,Carlsberg · Carlsberg Elephant,3 · 3.5
+Unibroue,"Chambly, Quebec",Canada,CA,fr,,45.4412,-73.2615,La Fin Du Monde,3.75
+Kronenbourg,"Obernai, Alsace",France,FR,fr,,48.4637,7.4845,Kronenbourg 1664,3
+Sapporo Brewery,"Sapporo, Hokkaido",Japan,JP,ja,サッポロビール,43.0685,141.3544,Sapporo Premium,3.5
+Kirin Brewery,"Yokohama, Kanagawa",Japan,JP,ja,キリン一番搾り,35.4634,139.622,Kirin Ichiban,3
+Asahi Breweries,"Suita, Osaka",Japan,JP,ja,アサヒスーパードライ,34.7615,135.5158,Asahi Super Dry,3.5
+Red Stripe (D&G),"Kingston, Surrey",Jamaica,JM,en,,17.9972,-76.7939,Red Stripe,3.75
+Estrella Galicia,"A Coruña, Galicia",Spain,ES,es,,43.3623,-8.4115,Estrella Galicia,4.25
+Pilsner Urquell,"Pilsen, Bohemia",Czech Republic,CZ,cs,Plzeňský Prazdroj,49.7479,13.3756,Pilsner Urquell,3.25
+Birra Moretti (Heineken Italia),"Udine, Friuli-Venezia Giulia",Italy,IT,it,,46.064,13.235,Birra Moretti,3.75
+Erdinger Weissbräu,"Erding, Bavaria",Germany,DE,de,,48.3063,11.9071,Erdinger Weißbier,3.25
+Industrial Arts Brewing,"Garnerville, New York",USA,US,en,,41.2065,-74.0085,Wrench,4
+Żywiec Brewery (Grupa Żywiec),"Żywiec, Silesia",Poland,PL,pl,,49.6853,19.1925,Żywiec,2.75
+Birra Peroni,"Rome, Lazio",Italy,IT,it,,41.8902,12.4922,Peroni Nastro Azzurro · Chill Lemon · Peroni Original,3 · 4 · 3.25
+S.A. Damm,"Barcelona, Catalonia",Spain,ES,es,,41.3897,2.154,Estrella Damm · Daura,3.5 · 3
+Abbaye de Leffe (AB InBev),"Dinant, Namur",Belgium,BE,fr,,50.2611,4.9122,Leffe Blonde,4.75
+Texelse Bierbrouwerij,"Oudeschild, North Holland",Netherlands,NL,nl,,53.0385,4.851,Texels Skuumkoppe,3
+Affligem Brewery (Heineken),"Opwijk, Flemish Brabant",Belgium,BE,nl,,50.9786,4.1868,Affligem Tripel,3.75
+De Koninck Brewery,"Antwerp, Antwerp",Belgium,BE,nl,,51.2157,4.4156,De Koninck,2.75
+Brouwerij 't IJ,"Amsterdam, Noord-Holland",Netherlands,NL,nl,,52.3657,4.9196,IJwit,3.75
+Brasserie d'Achouffe,"Achouffe, Luxembourg Province (Wallonia)",Belgium,BE,fr,,50.1417,5.8125,La Chouffe Blonde,4.25
+Stieglbrauerei zu Salzburg,"Salzburg, Land Salzburg",Austria,AT,de,,47.8095,13.055,Stiegl Goldbräu,2.75
+Super Bock Group,"Leça do Balio, Porto",Portugal,PT,pt,,41.2142,-8.6254,Super Bock,3
+Latrobe Brewing Company,"Latrobe, Pennsylvania",USA,US,en,,40.3215,-79.3795,Rolling Rock Extra Pale,3.25
+Cervecería Cuauhtémoc Moctezuma,"Monterrey, Nuevo León",Mexico,MX,es,,25.6866,-100.3161,Dos Equis Lager Especial,1.75
+Miller Brewing Company,"Milwaukee, Wisconsin",USA,US,en,,43.0389,-87.9065,Miller Lite,2.25
+Belhaven Brewery,"Dunbar, East Lothian",Scotland,GB-SCT,en,,56.0006,-2.5176,Belhaven Scottish Stout,3
+Boston Beer Company (Samuel Adams),"Boston, Massachusetts",USA,US,en,,42.3601,-71.0589,Samuel Adams Summer Ale,3
+Cervecería del Pacífico,"Mazatlán, Sinaloa",Mexico,MX,es,,23.2494,-106.4111,Pacífico Clara,3.75
+Narragansett Brewing Company,"Cranston, Rhode Island",USA,US,en,,41.7798,-71.4373,Narragansett Lager,3.25
+Kona Brewing Company,"Kailua-Kona, Hawaii",USA,US,en,,19.6406,-155.9969,Big Wave Golden Ale,3.75
+Blue Moon Brewing Company,"Denver, Colorado",USA,US,en,,39.7392,-104.9903,Blue Moon,3.5
+Smithwick's (St. Francis Abbey),"Kilkenny, Leinster",Ireland,IE,en,,52.6541,-7.2448,Smithwick's,2.75
+Captain Lawrence Brewing Company,"Elmsford, New York",USA,US,en,,41.054,-73.8201,Hop Commander,3
+Paulaner Brauerei,"Munich, Bavaria",Germany,DE,de,,48.1234,11.5808,Paulaner Hefe-Weißbier,4
+Compañía Cervecera de Puerto Rico,"Mayagüez, Puerto Rico",Puerto Rico,PR,es,,18.2011,-67.1397,Medalla Light · Magna,4 · 4
+Ocean Lab Brewing Co.,"Carolina (Isla Verde), Puerto Rico",Puerto Rico,PR,es,,18.4486,-66.0203,Ocean SJU,2.5
+Flying Dog Brewery,"Frederick, Maryland",USA,US,en,,39.4143,-77.4105,Bloodline Blood Orange IPA,3.5
+Goose Island Beer Co.,"Chicago, Illinois",USA,US,en,,41.9166,-87.653,Goose IPA,3.5
+Brasserie Almaza,"Beirut, Beirut Governorate",Lebanon,LB,ar,ألمازة,33.8938,35.5018,Almaza Pilsener,2.75
+Olympic Brewery,"Sindos, Central Macedonia",Greece,GR,el,,40.6736,22.8064,Mythos,3.25
+Stone Brewing,"Escondido, California",USA,US,en,,33.1192,-117.0864,Stone IPA,2.5
+Mahou (Grupo Mahou-San Miguel),"Madrid, Madrid",Spain,ES,es,,40.4168,-3.7038,Mahou Cinco Estrellas,3.5
+Cervecería Hatuey (Bacardí),"Santiago de Cuba, Santiago de Cuba",Cuba,CU,es,Cerveza Hatuey,20.0247,-75.8219,Hatuey Lager,4
+Boddington's Brewery,"Manchester, Greater Manchester",England,GB-ENG,en,,53.4808,-2.2426,Pub Ale,4.25
+Spaten-Franziskaner-Bräu,"Munich, Bavaria",Germany,DE,de,,48.1494,11.5567,Spaten Oktoberfest Ur-Märzen / Winter,2.75
+Dortmunder Actien-Brauerei (DAB),"Dortmund, North Rhine-Westphalia",Germany,DE,de,,51.5136,7.4653,DAB Dortmunder Export,4.5
+Brauerei Beck & Co.,"Bremen, Bremen",Germany,DE,de,,53.0793,8.8017,Beck's,3
+Birra Ichnusa (Heineken Italia),"Assemini, Sardinia",Italy,IT,it,,39.2803,9.0057,Ichnusa Anima Sarda,3.75
+Bitburger Braugruppe,"Bitburg, Rhineland-Palatinate",Germany,DE,de,,49.9739,6.5334,Bitburger Radler,4
+Radeberger Exportbierbrauerei,"Radeberg, Saxony",Germany,DE,de,,51.1136,13.9169,Radeberger Pilsner,3
+Cervecería Nacional Dominicana,"Santo Domingo, Distrito Nacional",Dominican Republic,DO,es,,18.4861,-69.9312,Presidente,3

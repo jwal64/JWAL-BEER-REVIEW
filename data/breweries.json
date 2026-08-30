@@ -1,0 +1,1039 @@
+[
+  {
+    "name": "Weihenstephaner",
+    "location": "Freising, Bavaria",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 48.3953,
+    "lng": 11.7291,
+    "beers": [
+      {
+        "beer": "Weihenstephaner Hefeweissbier",
+        "rating": 4.5
+      }
+    ]
+  },
+  {
+    "name": "Hofbräu München",
+    "location": "Munich, Bavaria",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 48.1351,
+    "lng": 11.582,
+    "beers": [
+      {
+        "beer": "Hofbräu Münchner Weiße",
+        "rating": 4.75
+      },
+      {
+        "beer": "Hofbräu Dunkel",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Guinness (St. James's Gate)",
+    "location": "Dublin, Leinster",
+    "country": "Ireland",
+    "cc": "IE",
+    "lang": "en",
+    "lat": 53.3418,
+    "lng": -6.2868,
+    "beers": [
+      {
+        "beer": "Guinness Draught",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Harp / Diageo",
+    "location": "Dundalk, County Louth",
+    "country": "Ireland",
+    "cc": "IE",
+    "lang": "en",
+    "lat": 54.0039,
+    "lng": -6.3703,
+    "beers": [
+      {
+        "beer": "Harp Lager",
+        "rating": 4.25
+      }
+    ]
+  },
+  {
+    "name": "Duvel Moortgat",
+    "location": "Puurs-Sint-Amands, Antwerp",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "nl",
+    "lat": 51.0727,
+    "lng": 4.2897,
+    "beers": [
+      {
+        "beer": "Duvel",
+        "rating": 4.25
+      }
+    ]
+  },
+  {
+    "name": "AB InBev (Stella)",
+    "location": "Leuven, Flemish Brabant",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "nl",
+    "lat": 50.8798,
+    "lng": 4.7005,
+    "beers": [
+      {
+        "beer": "Stella Artois",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Heineken",
+    "location": "Amsterdam, Noord-Holland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 52.3578,
+    "lng": 4.8918,
+    "beers": [
+      {
+        "beer": "Heineken",
+        "rating": 3.25
+      },
+      {
+        "beer": "Heineken Silver",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Grolsch",
+    "location": "Enschede, Overijssel",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 52.2215,
+    "lng": 6.8937,
+    "beers": [
+      {
+        "beer": "Grolsch",
+        "rating": 3.5
+      },
+      {
+        "beer": "Grolsch Puur Weizen",
+        "rating": 5
+      },
+      {
+        "beer": "Frisse Lentebok",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Bavaria NV (Hertog Jan)",
+    "location": "Arcen, Limburg",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 51.4862,
+    "lng": 6.1741,
+    "beers": [
+      {
+        "beer": "Hertog Jan",
+        "rating": 2
+      }
+    ]
+  },
+  {
+    "name": "Anheuser-Busch",
+    "location": "St. Louis, Missouri",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 38.6072,
+    "lng": -90.2124,
+    "beers": [
+      {
+        "beer": "Budweiser",
+        "rating": 3
+      },
+      {
+        "beer": "Bud Light",
+        "rating": 3
+      },
+      {
+        "beer": "Michelob Ultra",
+        "rating": 2.5
+      }
+    ]
+  },
+  {
+    "name": "Molson Coors",
+    "location": "Golden, Colorado",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 39.7555,
+    "lng": -105.2211,
+    "beers": [
+      {
+        "beer": "Coors Light",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Grupo Modelo",
+    "location": "Mexico City, CDMX",
+    "country": "Mexico",
+    "cc": "MX",
+    "lang": "es",
+    "lat": 19.4274,
+    "lng": -99.1677,
+    "beers": [
+      {
+        "beer": "Modelo Especial",
+        "rating": 3.25
+      },
+      {
+        "beer": "Negra Modelo",
+        "rating": 3
+      },
+      {
+        "beer": "Corona Extra",
+        "rating": 3.75
+      },
+      {
+        "beer": "Modelo Oro",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Cervecería Estrella Jalisco",
+    "location": "Guadalajara, Jalisco",
+    "country": "Mexico",
+    "cc": "MX",
+    "lang": "es",
+    "lat": 20.6597,
+    "lng": -103.3496,
+    "beers": [
+      {
+        "beer": "Estrella Jalisco",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Carlsberg",
+    "location": "Copenhagen, Capital Region",
+    "country": "Denmark",
+    "cc": "DK",
+    "lang": "da",
+    "lat": 55.6614,
+    "lng": 12.5361,
+    "beers": [
+      {
+        "beer": "Carlsberg",
+        "rating": 3
+      },
+      {
+        "beer": "Carlsberg Elephant",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Unibroue",
+    "location": "Chambly, Quebec",
+    "country": "Canada",
+    "cc": "CA",
+    "lang": "fr",
+    "lat": 45.4412,
+    "lng": -73.2615,
+    "beers": [
+      {
+        "beer": "La Fin Du Monde",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Kronenbourg",
+    "location": "Obernai, Alsace",
+    "country": "France",
+    "cc": "FR",
+    "lang": "fr",
+    "lat": 48.4637,
+    "lng": 7.4845,
+    "beers": [
+      {
+        "beer": "Kronenbourg 1664",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Sapporo Brewery",
+    "location": "Sapporo, Hokkaido",
+    "country": "Japan",
+    "cc": "JP",
+    "lang": "ja",
+    "nativeName": "サッポロビール",
+    "lat": 43.0685,
+    "lng": 141.3544,
+    "beers": [
+      {
+        "beer": "Sapporo Premium",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Kirin Brewery",
+    "location": "Yokohama, Kanagawa",
+    "country": "Japan",
+    "cc": "JP",
+    "lang": "ja",
+    "nativeName": "キリン一番搾り",
+    "lat": 35.4634,
+    "lng": 139.622,
+    "beers": [
+      {
+        "beer": "Kirin Ichiban",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Asahi Breweries",
+    "location": "Suita, Osaka",
+    "country": "Japan",
+    "cc": "JP",
+    "lang": "ja",
+    "nativeName": "アサヒスーパードライ",
+    "lat": 34.7615,
+    "lng": 135.5158,
+    "beers": [
+      {
+        "beer": "Asahi Super Dry",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Red Stripe (D&G)",
+    "location": "Kingston, Surrey",
+    "country": "Jamaica",
+    "cc": "JM",
+    "lang": "en",
+    "lat": 17.9972,
+    "lng": -76.7939,
+    "beers": [
+      {
+        "beer": "Red Stripe",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Estrella Galicia",
+    "location": "A Coruña, Galicia",
+    "country": "Spain",
+    "cc": "ES",
+    "lang": "es",
+    "lat": 43.3623,
+    "lng": -8.4115,
+    "beers": [
+      {
+        "beer": "Estrella Galicia",
+        "rating": 4.25
+      }
+    ]
+  },
+  {
+    "name": "Pilsner Urquell",
+    "location": "Pilsen, Bohemia",
+    "country": "Czech Republic",
+    "cc": "CZ",
+    "lang": "cs",
+    "nativeName": "Plzeňský Prazdroj",
+    "lat": 49.7479,
+    "lng": 13.3756,
+    "beers": [
+      {
+        "beer": "Pilsner Urquell",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Birra Moretti (Heineken Italia)",
+    "location": "Udine, Friuli-Venezia Giulia",
+    "country": "Italy",
+    "cc": "IT",
+    "lang": "it",
+    "lat": 46.064,
+    "lng": 13.235,
+    "beers": [
+      {
+        "beer": "Birra Moretti",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Erdinger Weissbräu",
+    "location": "Erding, Bavaria",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 48.3063,
+    "lng": 11.9071,
+    "beers": [
+      {
+        "beer": "Erdinger Weißbier",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Industrial Arts Brewing",
+    "location": "Garnerville, New York",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 41.2065,
+    "lng": -74.0085,
+    "beers": [
+      {
+        "beer": "Wrench",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Żywiec Brewery (Grupa Żywiec)",
+    "location": "Żywiec, Silesia",
+    "country": "Poland",
+    "cc": "PL",
+    "lang": "pl",
+    "lat": 49.6853,
+    "lng": 19.1925,
+    "beers": [
+      {
+        "beer": "Żywiec",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Birra Peroni",
+    "location": "Rome, Lazio",
+    "country": "Italy",
+    "cc": "IT",
+    "lang": "it",
+    "lat": 41.8902,
+    "lng": 12.4922,
+    "beers": [
+      {
+        "beer": "Peroni Nastro Azzurro",
+        "rating": 3
+      },
+      {
+        "beer": "Chill Lemon",
+        "rating": 4
+      },
+      {
+        "beer": "Peroni Original",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "S.A. Damm",
+    "location": "Barcelona, Catalonia",
+    "country": "Spain",
+    "cc": "ES",
+    "lang": "es",
+    "lat": 41.3897,
+    "lng": 2.154,
+    "beers": [
+      {
+        "beer": "Estrella Damm",
+        "rating": 3.5
+      },
+      {
+        "beer": "Daura",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Abbaye de Leffe (AB InBev)",
+    "location": "Dinant, Namur",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "fr",
+    "lat": 50.2611,
+    "lng": 4.9122,
+    "beers": [
+      {
+        "beer": "Leffe Blonde",
+        "rating": 4.75
+      }
+    ]
+  },
+  {
+    "name": "Texelse Bierbrouwerij",
+    "location": "Oudeschild, North Holland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 53.0385,
+    "lng": 4.851,
+    "beers": [
+      {
+        "beer": "Texels Skuumkoppe",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Affligem Brewery (Heineken)",
+    "location": "Opwijk, Flemish Brabant",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "nl",
+    "lat": 50.9786,
+    "lng": 4.1868,
+    "beers": [
+      {
+        "beer": "Affligem Tripel",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "De Koninck Brewery",
+    "location": "Antwerp, Antwerp",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "nl",
+    "lat": 51.2157,
+    "lng": 4.4156,
+    "beers": [
+      {
+        "beer": "De Koninck",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Brouwerij 't IJ",
+    "location": "Amsterdam, Noord-Holland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 52.3657,
+    "lng": 4.9196,
+    "beers": [
+      {
+        "beer": "IJwit",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Brasserie d'Achouffe",
+    "location": "Achouffe, Luxembourg Province (Wallonia)",
+    "country": "Belgium",
+    "cc": "BE",
+    "lang": "fr",
+    "lat": 50.1417,
+    "lng": 5.8125,
+    "beers": [
+      {
+        "beer": "La Chouffe Blonde",
+        "rating": 4.25
+      }
+    ]
+  },
+  {
+    "name": "Stieglbrauerei zu Salzburg",
+    "location": "Salzburg, Land Salzburg",
+    "country": "Austria",
+    "cc": "AT",
+    "lang": "de",
+    "lat": 47.8095,
+    "lng": 13.055,
+    "beers": [
+      {
+        "beer": "Stiegl Goldbräu",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Super Bock Group",
+    "location": "Leça do Balio, Porto",
+    "country": "Portugal",
+    "cc": "PT",
+    "lang": "pt",
+    "lat": 41.2142,
+    "lng": -8.6254,
+    "beers": [
+      {
+        "beer": "Super Bock",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Latrobe Brewing Company",
+    "location": "Latrobe, Pennsylvania",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 40.3215,
+    "lng": -79.3795,
+    "beers": [
+      {
+        "beer": "Rolling Rock Extra Pale",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Cervecería Cuauhtémoc Moctezuma",
+    "location": "Monterrey, Nuevo León",
+    "country": "Mexico",
+    "cc": "MX",
+    "lang": "es",
+    "lat": 25.6866,
+    "lng": -100.3161,
+    "beers": [
+      {
+        "beer": "Dos Equis Lager Especial",
+        "rating": 1.75
+      }
+    ]
+  },
+  {
+    "name": "Miller Brewing Company",
+    "location": "Milwaukee, Wisconsin",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 43.0389,
+    "lng": -87.9065,
+    "beers": [
+      {
+        "beer": "Miller Lite",
+        "rating": 2.25
+      }
+    ]
+  },
+  {
+    "name": "Belhaven Brewery",
+    "location": "Dunbar, East Lothian",
+    "country": "Scotland",
+    "cc": "GB-SCT",
+    "lang": "en",
+    "lat": 56.0006,
+    "lng": -2.5176,
+    "beers": [
+      {
+        "beer": "Belhaven Scottish Stout",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Boston Beer Company (Samuel Adams)",
+    "location": "Boston, Massachusetts",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 42.3601,
+    "lng": -71.0589,
+    "beers": [
+      {
+        "beer": "Samuel Adams Summer Ale",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Cervecería del Pacífico",
+    "location": "Mazatlán, Sinaloa",
+    "country": "Mexico",
+    "cc": "MX",
+    "lang": "es",
+    "lat": 23.2494,
+    "lng": -106.4111,
+    "beers": [
+      {
+        "beer": "Pacífico Clara",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Narragansett Brewing Company",
+    "location": "Cranston, Rhode Island",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 41.7798,
+    "lng": -71.4373,
+    "beers": [
+      {
+        "beer": "Narragansett Lager",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Kona Brewing Company",
+    "location": "Kailua-Kona, Hawaii",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 19.6406,
+    "lng": -155.9969,
+    "beers": [
+      {
+        "beer": "Big Wave Golden Ale",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Blue Moon Brewing Company",
+    "location": "Denver, Colorado",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 39.7392,
+    "lng": -104.9903,
+    "beers": [
+      {
+        "beer": "Blue Moon",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Smithwick's (St. Francis Abbey)",
+    "location": "Kilkenny, Leinster",
+    "country": "Ireland",
+    "cc": "IE",
+    "lang": "en",
+    "lat": 52.6541,
+    "lng": -7.2448,
+    "beers": [
+      {
+        "beer": "Smithwick's",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Captain Lawrence Brewing Company",
+    "location": "Elmsford, New York",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 41.054,
+    "lng": -73.8201,
+    "beers": [
+      {
+        "beer": "Hop Commander",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Paulaner Brauerei",
+    "location": "Munich, Bavaria",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 48.1234,
+    "lng": 11.5808,
+    "beers": [
+      {
+        "beer": "Paulaner Hefe-Weißbier",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Compañía Cervecera de Puerto Rico",
+    "location": "Mayagüez, Puerto Rico",
+    "country": "Puerto Rico",
+    "cc": "PR",
+    "lang": "es",
+    "lat": 18.2011,
+    "lng": -67.1397,
+    "beers": [
+      {
+        "beer": "Medalla Light",
+        "rating": 4
+      },
+      {
+        "beer": "Magna",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Ocean Lab Brewing Co.",
+    "location": "Carolina (Isla Verde), Puerto Rico",
+    "country": "Puerto Rico",
+    "cc": "PR",
+    "lang": "es",
+    "lat": 18.4486,
+    "lng": -66.0203,
+    "beers": [
+      {
+        "beer": "Ocean SJU",
+        "rating": 2.5
+      }
+    ]
+  },
+  {
+    "name": "Flying Dog Brewery",
+    "location": "Frederick, Maryland",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 39.4143,
+    "lng": -77.4105,
+    "beers": [
+      {
+        "beer": "Bloodline Blood Orange IPA",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Goose Island Beer Co.",
+    "location": "Chicago, Illinois",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 41.9166,
+    "lng": -87.653,
+    "beers": [
+      {
+        "beer": "Goose IPA",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Brasserie Almaza",
+    "location": "Beirut, Beirut Governorate",
+    "country": "Lebanon",
+    "cc": "LB",
+    "lang": "ar",
+    "nativeName": "ألمازة",
+    "lat": 33.8938,
+    "lng": 35.5018,
+    "beers": [
+      {
+        "beer": "Almaza Pilsener",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Olympic Brewery",
+    "location": "Sindos, Central Macedonia",
+    "country": "Greece",
+    "cc": "GR",
+    "lang": "el",
+    "lat": 40.6736,
+    "lng": 22.8064,
+    "beers": [
+      {
+        "beer": "Mythos",
+        "rating": 3.25
+      }
+    ]
+  },
+  {
+    "name": "Stone Brewing",
+    "location": "Escondido, California",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 33.1192,
+    "lng": -117.0864,
+    "beers": [
+      {
+        "beer": "Stone IPA",
+        "rating": 2.5
+      }
+    ]
+  },
+  {
+    "name": "Mahou (Grupo Mahou-San Miguel)",
+    "location": "Madrid, Madrid",
+    "country": "Spain",
+    "cc": "ES",
+    "lang": "es",
+    "lat": 40.4168,
+    "lng": -3.7038,
+    "beers": [
+      {
+        "beer": "Mahou Cinco Estrellas",
+        "rating": 3.5
+      }
+    ]
+  },
+  {
+    "name": "Cervecería Hatuey (Bacardí)",
+    "location": "Santiago de Cuba, Santiago de Cuba",
+    "country": "Cuba",
+    "cc": "CU",
+    "lang": "es",
+    "nativeName": "Cerveza Hatuey",
+    "lat": 20.0247,
+    "lng": -75.8219,
+    "beers": [
+      {
+        "beer": "Hatuey Lager",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Boddington's Brewery",
+    "location": "Manchester, Greater Manchester",
+    "country": "England",
+    "cc": "GB-ENG",
+    "lang": "en",
+    "lat": 53.4808,
+    "lng": -2.2426,
+    "beers": [
+      {
+        "beer": "Pub Ale",
+        "rating": 4.25
+      }
+    ]
+  },
+  {
+    "name": "Spaten-Franziskaner-Bräu",
+    "location": "Munich, Bavaria",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 48.1494,
+    "lng": 11.5567,
+    "beers": [
+      {
+        "beer": "Spaten Oktoberfest Ur-Märzen / Winter",
+        "rating": 2.75
+      }
+    ]
+  },
+  {
+    "name": "Dortmunder Actien-Brauerei (DAB)",
+    "location": "Dortmund, North Rhine-Westphalia",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 51.5136,
+    "lng": 7.4653,
+    "beers": [
+      {
+        "beer": "DAB Dortmunder Export",
+        "rating": 4.5
+      }
+    ]
+  },
+  {
+    "name": "Brauerei Beck & Co.",
+    "location": "Bremen, Bremen",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 53.0793,
+    "lng": 8.8017,
+    "beers": [
+      {
+        "beer": "Beck's",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Birra Ichnusa (Heineken Italia)",
+    "location": "Assemini, Sardinia",
+    "country": "Italy",
+    "cc": "IT",
+    "lang": "it",
+    "lat": 39.2803,
+    "lng": 9.0057,
+    "beers": [
+      {
+        "beer": "Ichnusa Anima Sarda",
+        "rating": 3.75
+      }
+    ]
+  },
+  {
+    "name": "Bitburger Braugruppe",
+    "location": "Bitburg, Rhineland-Palatinate",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 49.9739,
+    "lng": 6.5334,
+    "beers": [
+      {
+        "beer": "Bitburger Radler",
+        "rating": 4
+      }
+    ]
+  },
+  {
+    "name": "Radeberger Exportbierbrauerei",
+    "location": "Radeberg, Saxony",
+    "country": "Germany",
+    "cc": "DE",
+    "lang": "de",
+    "lat": 51.1136,
+    "lng": 13.9169,
+    "beers": [
+      {
+        "beer": "Radeberger Pilsner",
+        "rating": 3
+      }
+    ]
+  },
+  {
+    "name": "Cervecería Nacional Dominicana",
+    "location": "Santo Domingo, Distrito Nacional",
+    "country": "Dominican Republic",
+    "cc": "DO",
+    "lang": "es",
+    "lat": 18.4861,
+    "lng": -69.9312,
+    "beers": [
+      {
+        "beer": "Presidente",
+        "rating": 3
+      }
+    ]
+  }
+]

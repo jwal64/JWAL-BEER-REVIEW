@@ -1,0 +1,628 @@
+[
+  {
+    "beer": "Affligem Tripel",
+    "domains": [
+      "affligembeer.be"
+    ]
+  },
+  {
+    "beer": "Almaza Pilsener",
+    "domains": [
+      "almaza.com"
+    ]
+  },
+  {
+    "beer": "Asahi Super Dry",
+    "domains": [
+      "asahibeer.com"
+    ]
+  },
+  {
+    "beer": "Augustiner Helles",
+    "domains": [
+      "augustiner-braeu.de"
+    ]
+  },
+  {
+    "beer": "Big Wave Golden Ale",
+    "domains": [
+      "konabrewingco.com"
+    ]
+  },
+  {
+    "beer": "Beck's",
+    "domains": [
+      "becks.de"
+    ]
+  },
+  {
+    "beer": "Birra Moretti",
+    "domains": [
+      "birramoretti.com"
+    ]
+  },
+  {
+    "beer": "Ichnusa Anima Sarda",
+    "domains": [
+      "ichnusa.com"
+    ]
+  },
+  {
+    "beer": "Bitburger Radler",
+    "domains": [
+      "bitburger.de"
+    ]
+  },
+  {
+    "beer": "Bloodline Blood Orange IPA",
+    "domains": [
+      "flyingdog.com"
+    ]
+  },
+  {
+    "beer": "Blue Moon",
+    "domains": [
+      "bluemoonbrewingcompany.com"
+    ]
+  },
+  {
+    "beer": "De Koninck",
+    "domains": [
+      "dekoninck.be"
+    ]
+  },
+  {
+    "beer": "Brahma",
+    "domains": [
+      "brahma.com.br"
+    ]
+  },
+  {
+    "beer": "Bud Light",
+    "domains": [
+      "budlight.com"
+    ]
+  },
+  {
+    "beer": "Budweiser",
+    "domains": [
+      "budweiser.com"
+    ]
+  },
+  {
+    "beer": "Carlsberg",
+    "domains": [
+      "carlsberg.com"
+    ]
+  },
+  {
+    "beer": "Carlsberg Elephant",
+    "domains": [
+      "carlsberg.com"
+    ]
+  },
+  {
+    "beer": "Castle Lager",
+    "domains": [
+      "castlelager.co.za",
+      "castlelager.com"
+    ]
+  },
+  {
+    "beer": "Chill Lemon",
+    "domains": [
+      "peroni.it"
+    ]
+  },
+  {
+    "beer": "Chimay Blue",
+    "domains": [
+      "chimay.com"
+    ]
+  },
+  {
+    "beer": "Coopers Pale Ale",
+    "domains": [
+      "coopers.com.au"
+    ]
+  },
+  {
+    "beer": "Coors Light",
+    "domains": [
+      "coorslight.com"
+    ]
+  },
+  {
+    "beer": "Corona Extra",
+    "domains": [
+      "coronausa.com"
+    ]
+  },
+  {
+    "beer": "DAB Dortmunder Export",
+    "domains": [
+      "dab.de"
+    ]
+  },
+  {
+    "beer": "Dos Equis Lager Especial",
+    "domains": [
+      "dosequis.com"
+    ]
+  },
+  {
+    "beer": "Daura",
+    "domains": [
+      "estrelladamm.com"
+    ]
+  },
+  {
+    "beer": "Duvel",
+    "domains": [
+      "duvel.com"
+    ]
+  },
+  {
+    "beer": "Erdinger Weißbier",
+    "domains": [
+      "erdinger.de"
+    ]
+  },
+  {
+    "beer": "Estrella Damm",
+    "domains": [
+      "estrelladamm.com"
+    ]
+  },
+  {
+    "beer": "Estrella Galicia",
+    "domains": [
+      "estrellagalicia.com"
+    ]
+  },
+  {
+    "beer": "Estrella Jalisco",
+    "domains": [
+      "estrellajalisco.com"
+    ]
+  },
+  {
+    "beer": "Goose IPA",
+    "domains": [
+      "gooseisland.com"
+    ]
+  },
+  {
+    "beer": "Grolsch",
+    "domains": [
+      "grolsch.com"
+    ]
+  },
+  {
+    "beer": "Grolsch Puur Weizen",
+    "domains": [
+      "grolsch.com"
+    ]
+  },
+  {
+    "beer": "Frisse Lentebok",
+    "domains": [
+      "grolsch.com"
+    ]
+  },
+  {
+    "beer": "Guinness Draught",
+    "domains": [
+      "guinness.com"
+    ]
+  },
+  {
+    "beer": "Harp Lager",
+    "domains": [
+      "harplager.com",
+      "harp.ie"
+    ]
+  },
+  {
+    "beer": "Hatuey Lager",
+    "domains": [
+      "hatuey.com",
+      "hatueybeer.com"
+    ]
+  },
+  {
+    "beer": "Heineken",
+    "domains": [
+      "heineken.com"
+    ]
+  },
+  {
+    "beer": "Heineken Silver",
+    "domains": [
+      "heinekensilver.com",
+      "heineken.com"
+    ]
+  },
+  {
+    "beer": "Hertog Jan",
+    "domains": [
+      "hertogjan.nl"
+    ]
+  },
+  {
+    "beer": "Hoegaarden",
+    "domains": [
+      "hoegaarden.com"
+    ]
+  },
+  {
+    "beer": "IJwit",
+    "domains": [
+      "brouwerijhetij.nl"
+    ]
+  },
+  {
+    "beer": "Kirin Ichiban",
+    "domains": [
+      "kirin.co.jp"
+    ]
+  },
+  {
+    "beer": "Kronenbourg 1664",
+    "domains": [
+      "1664.com",
+      "kronenbourg1664.com"
+    ]
+  },
+  {
+    "beer": "La Chouffe Blonde",
+    "domains": [
+      "achouffe.be"
+    ]
+  },
+  {
+    "beer": "La Fin Du Monde",
+    "domains": [
+      "unibroue.com"
+    ]
+  },
+  {
+    "beer": "Leffe Blonde",
+    "domains": [
+      "leffe.com"
+    ]
+  },
+  {
+    "beer": "Magna",
+    "domains": [
+      "cerveceradepr.com"
+    ]
+  },
+  {
+    "beer": "Mahou Cinco Estrellas",
+    "domains": [
+      "mahou.es"
+    ]
+  },
+  {
+    "beer": "Medalla Light",
+    "domains": [
+      "medallalight.com"
+    ]
+  },
+  {
+    "beer": "Menabrea",
+    "domains": [
+      "birramenabrea.com"
+    ]
+  },
+  {
+    "beer": "Michelob Ultra",
+    "domains": [
+      "michelobultra.com"
+    ]
+  },
+  {
+    "beer": "Miller Lite",
+    "domains": [
+      "millerlite.com"
+    ]
+  },
+  {
+    "beer": "Modelo Especial",
+    "domains": [
+      "modelousa.com"
+    ]
+  },
+  {
+    "beer": "Negra Modelo",
+    "domains": [
+      "modelousa.com"
+    ]
+  },
+  {
+    "beer": "Modelo Oro",
+    "domains": [
+      "modelousa.com"
+    ]
+  },
+  {
+    "beer": "Mythos",
+    "domains": [
+      "mythosbrewery.gr"
+    ]
+  },
+  {
+    "beer": "Hofbräu Dunkel",
+    "domains": [
+      "hofbraeu-muenchen.de"
+    ]
+  },
+  {
+    "beer": "Hop Commander",
+    "domains": [
+      "captainlawrencebrewing.com"
+    ]
+  },
+  {
+    "beer": "Hofbräu Münchner Weiße",
+    "domains": [
+      "hofbraeu-muenchen.de"
+    ]
+  },
+  {
+    "beer": "Narragansett Lager",
+    "domains": [
+      "narragansettbeer.com"
+    ]
+  },
+  {
+    "beer": "Peroni Nastro Azzurro",
+    "domains": [
+      "peroni.it"
+    ]
+  },
+  {
+    "beer": "Peroni Original",
+    "domains": [
+      "peroni.it"
+    ]
+  },
+  {
+    "beer": "Newcastle Brown",
+    "domains": [
+      "newcastlebrown.com",
+      "newcastlebrownale.com"
+    ]
+  },
+  {
+    "beer": "Norrlands Guld",
+    "domains": [
+      "norrlandsguld.se"
+    ]
+  },
+  {
+    "beer": "Ocean SJU",
+    "domains": [
+      "oceanlabbrewing.com"
+    ]
+  },
+  {
+    "beer": "Orion",
+    "domains": [
+      "orionbeer.co.jp"
+    ]
+  },
+  {
+    "beer": "Pacífico Clara",
+    "domains": [
+      "drinkpacifico.com"
+    ]
+  },
+  {
+    "beer": "Paulaner Hefe",
+    "domains": [
+      "paulaner.com"
+    ]
+  },
+  {
+    "beer": "Paulaner Hefe-Weißbier",
+    "domains": [
+      "paulaner.com"
+    ]
+  },
+  {
+    "beer": "Peroni",
+    "domains": [
+      "peroni.it"
+    ]
+  },
+  {
+    "beer": "Pilsner Urquell",
+    "domains": [
+      "pilsnerurquell.com",
+      "prazdroj.cz"
+    ]
+  },
+  {
+    "beer": "Pub Ale",
+    "domains": [
+      "boddingtons.co.uk",
+      "boddingtons.com"
+    ]
+  },
+  {
+    "beer": "Presidente",
+    "domains": [
+      "presidente.com.do",
+      "cnd.com.do"
+    ]
+  },
+  {
+    "beer": "Quilmes",
+    "domains": [
+      "quilmes.com.ar"
+    ]
+  },
+  {
+    "beer": "Radeberger Pilsner",
+    "domains": [
+      "radeberger.de"
+    ]
+  },
+  {
+    "beer": "Red Stripe",
+    "domains": [
+      "redstripebeer.com"
+    ]
+  },
+  {
+    "beer": "Ringnes",
+    "domains": [
+      "ringnes.no"
+    ]
+  },
+  {
+    "beer": "Rolling Rock Extra Pale",
+    "domains": [
+      "rollingrock.com"
+    ]
+  },
+  {
+    "beer": "Sam Adams Boston Lager",
+    "domains": [
+      "samueladams.com"
+    ]
+  },
+  {
+    "beer": "Sapporo Premium",
+    "domains": [
+      "sapporobeer.com"
+    ]
+  },
+  {
+    "beer": "Belhaven Scottish Stout",
+    "domains": [
+      "belhaven.co.uk"
+    ]
+  },
+  {
+    "beer": "Singha",
+    "domains": [
+      "singhabeer.com"
+    ]
+  },
+  {
+    "beer": "Smithwick's",
+    "domains": [
+      "smithwicks.com",
+      "smithwicks.ie"
+    ]
+  },
+  {
+    "beer": "Sol",
+    "domains": [
+      "solbeer.com",
+      "cervezasol.com"
+    ]
+  },
+  {
+    "beer": "Spaten Oktoberfest Ur-Märzen / Winter",
+    "domains": [
+      "spatenbraeu.de",
+      "spaten.de"
+    ]
+  },
+  {
+    "beer": "Stella Artois",
+    "domains": [
+      "stellaartois.com"
+    ]
+  },
+  {
+    "beer": "Stiegl Goldbräu",
+    "domains": [
+      "stiegl.at"
+    ]
+  },
+  {
+    "beer": "Stone IPA",
+    "domains": [
+      "stonebrewing.com"
+    ]
+  },
+  {
+    "beer": "Samuel Adams Summer Ale",
+    "domains": [
+      "samueladams.com"
+    ]
+  },
+  {
+    "beer": "Super Bock",
+    "domains": [
+      "superbock.pt"
+    ]
+  },
+  {
+    "beer": "Tennent's",
+    "domains": [
+      "tennents.com",
+      "tennents.co.uk"
+    ]
+  },
+  {
+    "beer": "Texels Skuumkoppe",
+    "domains": [
+      "texels.nl"
+    ]
+  },
+  {
+    "beer": "Tiger Beer",
+    "domains": [
+      "tigerbeer.com"
+    ]
+  },
+  {
+    "beer": "Tsingtao",
+    "domains": [
+      "tsingtaobeer.com"
+    ]
+  },
+  {
+    "beer": "Tuborg",
+    "domains": [
+      "tuborg.com"
+    ]
+  },
+  {
+    "beer": "Tyskie",
+    "domains": [
+      "tyskie.pl"
+    ]
+  },
+  {
+    "beer": "Victoria Bitter",
+    "domains": [
+      "vb.com.au",
+      "victoriabitter.com.au"
+    ]
+  },
+  {
+    "beer": "Weihenstephaner Hefeweissbier",
+    "domains": [
+      "weihenstephaner.de"
+    ]
+  },
+  {
+    "beer": "Wrench",
+    "domains": [
+      "industrialartsbrewing.com"
+    ]
+  },
+  {
+    "beer": "Żywiec",
+    "domains": [
+      "zywiec.com.pl"
+    ]
+  }
+]
