@@ -14,7 +14,7 @@ server.
 | `style.css` | The design system. `:root` is the only place a colour is written. |
 | `data/` | Generated exports of `data.js` as JSON and CSV — see below. |
 | `tools/` | Plain Node scripts. No dependencies, nothing to install. |
-| `logos/` | Optional local logo files for beers whose brand no logo service knows. |
+| `logos/` | Local logo files. `npm run logos -- --save` fills this from the CDNs so the logos stop depending on them. |
 
 Chart.js and Leaflet load from a CDN, pinned to an exact version and locked to a
 `integrity` hash, so a compromised CDN can't swap the library out.
@@ -38,6 +38,7 @@ domain fails the build instead of quietly rendering wrong.
 |---------|--------------|
 | `npm run check` | Validates the data and confirms `data/` is in step with `data.js` |
 | `npm run export` | Regenerates `data/` from `data.js` |
+| `npm run logos` | Checks what logo every beer actually resolves to, and at what resolution (needs the open internet) |
 | `npm run sri` | Re-derives the CDN `integrity` hashes from npm (`-- --write` to fix them) |
 | `npm run smoke` | Opens the page in a real browser and checks it works (needs `npm install`) |
 

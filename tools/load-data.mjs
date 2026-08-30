@@ -37,3 +37,18 @@ export function loadStyleColors(root = ROOT) {
   if (!m) throw new Error('could not find the `const sC={…};` style-colour map in app.js');
   return vm.runInNewContext(`${m[0]}\n;sC;`, Object.create(null), { filename: 'app.js' });
 }
+
+// The logo chain's shape lives in app.js, next to the code that renders it.
+// Reading it back out — rather than restating the URLs here — is what keeps the
+// audit honest: it checks the sources the page will actually request.
+export function loadLogoConfig(root = ROOT) {
+  const src = readFileSync(join(root, 'app.js'), 'utf8');
+  const want = ['BRANDFETCH_CLIENT_ID', 'logoURL', 'logoFallbackURL', 'logoFallback2URL', 'LOGO_MIN_PX'];
+  const lines = want.map(name => {
+    const m = src.match(new RegExp(`^const ${name}\\s*=.*$`, 'm'));
+    if (!m) throw new Error(`could not find \`const ${name}\` in app.js`);
+    return m[0];
+  });
+  return vm.runInNewContext(`${lines.join('\n')}\n;({${want.join(',')}});`,
+    Object.create(null), { filename: 'app.js' });
+}

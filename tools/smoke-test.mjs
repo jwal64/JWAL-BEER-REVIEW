@@ -12,6 +12,7 @@
 // the two libraries (a node_modules with chart.js and leaflet in it will do):
 //     SMOKE_LIB_DIR=./node_modules npm run smoke
 import { createServer } from 'node:http';
+import { deflateSync } from 'node:zlib';
 import { readFile, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, extname, normalize } from 'node:path';
@@ -52,7 +53,31 @@ if (LIB) {
   await serve('**/leaflet.js', join(LIB, 'leaflet/dist/leaflet.js'), 'text/javascript');
   await serve('**/leaflet.css', join(LIB, 'leaflet/dist/leaflet.css'), 'text/css');
 }
-// Logos, fonts and map tiles are decoration: the page is expected to render
+// The logo chain is served from fixtures rather than the real CDNs, so the
+// assertion below is about the walk, not about what Brandfetch happens to hold
+// today: Brandfetch answers nothing, the favicon service answers with a 16px
+// icon, and Icon Horse has the real 256px logo. The chain must end on the 256.
+const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+const crc = b => { let c = 0xffffffff; for (const x of b) c = crcTable[(c ^ x) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+const chunk = (type, data) => {
+  const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+  const c = Buffer.alloc(4); c.writeUInt32BE(crc(body));
+  return Buffer.concat([len, body, c]);
+};
+const png = size => {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(size, 0); ihdr.writeUInt32BE(size, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const raw = Buffer.concat(Array.from({ length: size }, () => Buffer.alloc(1 + size * 3)));
+  return Buffer.concat([Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]),
+    chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
+};
+const servePng = size => r => r.fulfill({ contentType: 'image/png', body: png(size) });
+await page.route('**cdn.brandfetch.io/**', r => r.fulfill({ status: 404, body: '' }));
+await page.route('**google.com/s2/favicons**', servePng(16));
+await page.route('**icon.horse/**', servePng(256));
+
+// Fonts and map tiles are decoration: the page is expected to render
 // without them, so failures there are not the test's business.
 const DECORATION = /brandfetch|google|icon\.horse|tile|cartocdn|fonts|wikimedia|\.png|\.jpg/;
 const NOISE = /Failed to load resource|ERR_FAILED|ERR_TUNNEL|ERR_NAME_NOT_RESOLVED/;
@@ -111,6 +136,22 @@ await page.fill('#cmd-input', 'duvel');
 await page.waitForTimeout(200);
 await check('command palette search', async () => `${await page.locator('#cmd-results .cmd-item').count()} results`);
 await page.keyboard.press('Escape');
+
+await check('logo chain settles on the largest source', () => page.evaluate(async () => {
+  const img = document.querySelector('#recentFeed img[data-logo]');
+  if (!img) return false;
+  for (let i = 0; i < 60 && !img.dataset.done; i++) await new Promise(r => setTimeout(r, 50));
+  return img.dataset.done && img.naturalWidth === 256 && img.src.includes('icon.horse')
+    && `${img.naturalWidth}px, past the 16px favicon`;
+}));
+
+await check('a resolved logo is reused, not re-walked', () => page.evaluate(() => {
+  const name = [...LOGO_RESOLVED.keys()][0];
+  if (!name) return false;
+  const html = cardLogo(name);
+  return html.includes('data-done="1"') && html.includes(LOGO_RESOLVED.get(name))
+    && 'second render starts at the settled source';
+}));
 
 // esc(): a name that is markup must reach the page as text, and must still
 // round-trip through the data-beer attribute the click handler reads.

@@ -1,26 +1,43 @@
 # logos/
 
-Drop brewery/beer logo files here to override the runtime Brandfetch fetch for specific beers.
+Local logo files. A file here is the **only** logo source that can't 404,
+rate-limit, or quietly start returning a different brand's mark — and it is the
+only one that works with no network at all.
 
-## Workflow
+## Filling it automatically
 
-1. Save a logo file in this directory, e.g. `logos/heineken.svg` (any image format browsers support works: `.svg`, `.png`, `.webp`, `.jpg`).
-2. In `script.js`, add a `logo` field to that beer's entry in `beers[]`:
+```sh
+npm run logos              # what does each beer actually resolve to, and how big?
+npm run logos -- --save    # download the best source for every beer into logos/
+                           # and point each beer's `logo` field at the file
+```
+
+`--save` writes `logos/<beer-slug>.<ext>` and adds `logo:"logos/…"` to that
+beer's entries in `data.js`. Re-running it is safe: an existing override is
+repointed, not duplicated. Run `npm run check` and read the diff afterwards.
+
+Both need the open internet — they request the same URLs the page does.
+
+## Adding one by hand
+
+1. Save the file here, e.g. `logos/heineken.svg` (`.svg`, `.png`, `.webp`, `.jpg`).
+   Prefer SVG: a vector is sharp at every size the site draws it.
+2. Add a `logo` field to that beer's entries in `beers[]` in `data.js`:
    ```js
    {beer:"Heineken", ..., year:2026, logo:"logos/heineken.svg"},
    ```
-3. That beer now uses your local file as the primary logo source. If the file 404s for any reason, the existing Brandfetch → Google favicons → Icon Horse → 🍺 fallback chain still kicks in.
 
-## When to reach for this
-
-A local file is the only way to make a logo *certain*. Use it when `auditLogos()`
-(run in the browser console) reports a beer as `PLACEHOLDER` or `suspect` and no
-correct brand domain exists in `BRAND_DOMAINS` to fix it — some small breweries
-simply aren't in Brandfetch or the favicon services.
+That file becomes the beer's first source. The Brandfetch → favicon → Icon Horse
+chain stays behind it as fallback if the file is ever missing or renamed.
 
 ## Notes
 
-- Beers without a `logo` field keep using the Brandfetch chain (real brand logos online, 🍺 offline).
-- The filename is up to you. The slug suggested by the original SOP is `lowercase-with-hyphens` but anything works.
-- Files in this directory aren't auto-discovered — you must add the `logo` field on the beer entry for the override to take effect.
-- A local override does **not** remove the need for a `BRAND_DOMAINS` entry: the remote chain is still the fallback if the file is ever missing or renamed.
+- A `logo` field pointing at a **remote URL** works, but it is a hotlink to
+  someone else's server. `npm run check` warns about those; `--save` turns them
+  into local files.
+- Files here are not auto-discovered — a beer uses one only via its `logo` field.
+- A local override does **not** remove the need for a `BRAND_DOMAINS` entry: the
+  remote chain is still the fallback.
+- Anything below `LOGO_MIN_PX` (128px, set in `app.js`) is treated as a favicon
+  rather than a logo, so a small file here will be skipped in favour of a larger
+  remote one.
