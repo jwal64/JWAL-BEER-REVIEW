@@ -18,7 +18,7 @@ It is now two files, loaded in that order by `index.html`:
 | File | Holds | Roughly |
 |------|-------|---------|
 | `data.js` | Every review, brewery, location, brand domain, Untappd average and watchlist entry. No behaviour. | 422 lines |
-| `app.js` | Statistics, tables, charts, maps, search, the command palette. No beer data. | 2,728 lines |
+| `app.js` | Statistics, tables, charts, maps, search, the command palette. No beer data. | 2,744 lines |
 
 Git records this as a rename (`script.js` → `app.js`, ~70% similar) plus a new
 `data.js`.
