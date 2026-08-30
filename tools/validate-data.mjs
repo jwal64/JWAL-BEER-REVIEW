@@ -7,7 +7,7 @@
 // Errors fail the run; warnings are printed and tolerated.
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadData, loadStyleColors, ROOT } from './load-data.mjs';
+import { loadData, loadStyleColors, loadAppConst, ROOT } from './load-data.mjs';
 
 const METHODS = ['Bottle', 'Can', 'Draft', 'Nitro'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -24,9 +24,13 @@ const isQuarter = v => isNum(v) && v >= 0 && v <= 5 && Math.round(v * 4) === v *
 
 const D = loadData();
 const sC = loadStyleColors();
+// app.js's own name normaliser — the one the page uses to decide whether a
+// shortlist entry has already been drunk. Loaded rather than copied so the two
+// can never disagree about it.
+const wtNorm = loadAppConst('wtNorm');
 const { FLAGS, CNAMES, beers, drunkLocs, breweries, BRAND_DOMAINS,
         UNTAPPD_GLOBAL_AVGS, UNTAPPD_LAST_REFRESHED, UNTAPPD_REFRESH_INTERVAL_DAYS,
-        IPO_WATCHLIST, IPO_CANDIDATES } = D;
+        WANT_TO_TRY } = D;
 
 // A country code has to carry both a flag and a display name — one without the
 // other renders a blank or the literal code.
@@ -135,8 +139,7 @@ drunkLocs.forEach((l, i) => {
 });
 
 // ── BRAND DOMAINS ─────────────────────────────────────────────
-const logoBeers = new Set([...beerNames,
-  ...IPO_WATCHLIST.map(e => e.beer), ...IPO_CANDIDATES.map(e => e.beer)]);
+const logoBeers = new Set([...beerNames, ...WANT_TO_TRY.map(e => e.beer)]);
 for (const [name, value] of Object.entries(BRAND_DOMAINS)) {
   const where = `BRAND_DOMAINS["${name}"]`;
   const list = Array.isArray(value) ? value : [value];
@@ -145,7 +148,7 @@ for (const [name, value] of Object.entries(BRAND_DOMAINS)) {
     if (!isStr(d)) err(where, 'domain must be a non-empty string');
     else if (!DOMAIN_RE.test(d)) err(where, `"${d}" is not a bare domain (no scheme or path)`);
   }
-  if (!logoBeers.has(name)) warn(where, 'no beer, watchlist or candidate entry uses this domain');
+  if (!logoBeers.has(name)) warn(where, 'no beer or shortlist entry uses this domain');
 }
 for (const name of logoBeers)
   if (!BRAND_DOMAINS[name]) err(`BRAND_DOMAINS`, `"${name}" renders a logo but has no entry`);
@@ -161,24 +164,52 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(String(UNTAPPD_LAST_REFRESHED)))
 if (!Number.isInteger(UNTAPPD_REFRESH_INTERVAL_DAYS) || UNTAPPD_REFRESH_INTERVAL_DAYS < 1)
   err('UNTAPPD_REFRESH_INTERVAL_DAYS', 'must be a positive whole number of days');
 
-// ── WATCHLIST / CANDIDATES ────────────────────────────────────
-const watchNames = new Set(IPO_WATCHLIST.map(e => e.beer));
-for (const [label, list] of [['IPO_WATCHLIST', IPO_WATCHLIST], ['IPO_CANDIDATES', IPO_CANDIDATES]]) {
-  list.forEach((e, i) => {
-    const where = `${label}[${i}] ${e.beer || '(unnamed)'}`;
-    if (!isStr(e.beer)) err(where, 'beer name is missing');
-    if (!sC[e.style]) err(where, `style "${e.style}" has no colour in the sC map in app.js`);
-    checkCC(where, 'origin', e.origin);
-    if (!isNum(e.abv) || e.abv <= 0 || e.abv > 20) err(where, `abv ${e.abv} is not a plausible number`);
-    if (!isNum(e.untappd) || e.untappd < 0 || e.untappd > 5) err(where, `untappd ${e.untappd} is not a 0–5 rating`);
-    if (!METHODS.includes(e.method)) err(where, `method "${e.method}" is not one of ${METHODS.join(', ')}`);
-    if (label === 'IPO_CANDIDATES' && watchNames.has(e.beer))
-      err(where, 'is already on IPO_WATCHLIST — candidates are the beers that are not');
-  });
-}
+// ── WANT TO TRY ───────────────────────────────────────────────
+// Crossing an entry off is done by name: a review whose beer matches the
+// entry's name (or one of its `as` names) retires it from the shortlist. So a
+// name that agrees with nothing is not a cosmetic problem — it leaves a beer
+// sitting on the "still to drink" list that was drunk months ago.
+const normBeerNames = new Map([...beerNames].map(n => [wtNorm(n), n]));
+const tokens = k => new Set(k.split(' ').filter(Boolean));
+const subset = (a, b) => [...a].every(t => b.has(t));
+const seenWant = new Set();
+WANT_TO_TRY.forEach((e, i) => {
+  const where = `WANT_TO_TRY[${i}] ${e.beer || '(unnamed)'}`;
+  if (!isStr(e.beer)) return err(where, 'beer name is missing');
+  if (!sC[e.style]) err(where, `style "${e.style}" has no colour in the sC map in app.js`);
+  checkCC(where, 'origin', e.origin);
+  if (!isStr(e.region)) err(where, 'region is missing');
+  if (!isNum(e.abv) || e.abv <= 0 || e.abv > 20) err(where, `abv ${e.abv} is not a plausible number`);
+  if (!isNum(e.untappd) || e.untappd < 0 || e.untappd > 5) err(where, `untappd ${e.untappd} is not a 0–5 rating`);
+  if (!METHODS.includes(e.method)) err(where, `method "${e.method}" is not one of ${METHODS.join(', ')}`);
+
+  const names = [e.beer, ...(e.as || [])];
+  if (e.as !== undefined && (!Array.isArray(e.as) || !e.as.length || !e.as.every(isStr)))
+    err(where, 'as must be a non-empty array of other names this beer is logged under');
+  for (const n of e.as || [])
+    if (wtNorm(n) === wtNorm(e.beer)) err(where, `as lists "${n}", which is the entry's own name`);
+
+  const key = wtNorm(e.beer);
+  if (seenWant.has(key)) err(where, 'is on the shortlist twice');
+  seenWant.add(key);
+
+  // Already drunk? Then nothing more to check — the entry has crossed itself
+  // off and now scores its own prediction.
+  if (names.some(n => normBeerNames.has(wtNorm(n)))) return;
+  // Not drunk, as far as the names say. Warn on the near-misses, which are
+  // where a shelf name and a logged name have quietly drifted apart.
+  const near = [...normBeerNames].filter(([k]) => {
+    const a = tokens(key), b = tokens(k);
+    return k !== key && (subset(a, b) || subset(b, a));
+  }).map(([, n]) => `"${n}"`);
+  if (near.length)
+    warn(where, `still on the shortlist, but ${near.join(' / ')} is already reviewed — add as:[…] if it is the same beer`);
+});
 
 // ── REPORT ────────────────────────────────────────────────────
-const counts = `${beers.length} reviews · ${breweries.length} breweries · ${drunkLocs.length} locations · ${Object.keys(BRAND_DOMAINS).length} brand domains`;
+const wantPending = WANT_TO_TRY.filter(e =>
+  ![e.beer, ...(e.as || [])].some(n => normBeerNames.has(wtNorm(n)))).length;
+const counts = `${beers.length} reviews · ${breweries.length} breweries · ${drunkLocs.length} locations · ${Object.keys(BRAND_DOMAINS).length} brand domains · ${wantPending}/${WANT_TO_TRY.length} still to try`;
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);
   for (const w of warnings) console.log(`  · ${w}`);

@@ -19,7 +19,7 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const EXPORTS = [
   'FLAGS', 'CNAMES', 'beers', 'drunkLocs', 'breweries', 'BRAND_DOMAINS',
   'UNTAPPD_GLOBAL_AVGS', 'UNTAPPD_LAST_REFRESHED', 'UNTAPPD_REFRESH_INTERVAL_DAYS',
-  'IPO_WATCHLIST', 'IPO_CANDIDATES',
+  'WANT_TO_TRY',
 ];
 
 export function loadData(root = ROOT) {
@@ -28,12 +28,24 @@ export function loadData(root = ROOT) {
   return vm.runInNewContext(src + collect, Object.create(null), { filename: 'data.js' });
 }
 
-// app.js is the app, not data — it can't be executed outside a browser. Only
-// one thing in it is a data contract: the style → colour map every style has to
-// appear in. Lift that one declaration out and evaluate it alone.
+// app.js is the app, not data — it can't be executed outside a browser. A
+// couple of things in it are data contracts all the same: the style → colour
+// map every style has to appear in, and the name normaliser that decides when
+// a shortlist entry and a review are the same beer. Lift those declarations
+// out and evaluate them alone, so the checks use the app's own definition
+// rather than a copy that can drift away from it.
 export function loadStyleColors(root = ROOT) {
   const src = readFileSync(join(root, 'app.js'), 'utf8');
   const m = src.match(/^const sC=\{.*?\};$/ms);
   if (!m) throw new Error('could not find the `const sC={…};` style-colour map in app.js');
   return vm.runInNewContext(`${m[0]}\n;sC;`, Object.create(null), { filename: 'app.js' });
+}
+
+// One-line top-level `const <name>=…;` declarations only — enough for the
+// small, self-contained helpers the data checks need.
+export function loadAppConst(name, root = ROOT) {
+  const src = readFileSync(join(root, 'app.js'), 'utf8');
+  const m = src.match(new RegExp(`^const ${name}=.*;$`, 'm'));
+  if (!m) throw new Error(`could not find the \`const ${name}=…;\` declaration in app.js`);
+  return vm.runInNewContext(`${m[0]}\n;${name};`, Object.create(null), { filename: 'app.js' });
 }

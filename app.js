@@ -27,6 +27,24 @@ const esc = v => String(v ?? '')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
 // ══════════════════════════════════════════════════════════════
+// BEER-NAME NORMALISER
+// ══════════════════════════════════════════════════════════════
+// Decides when two spellings are the same beer, which is what lets the
+// want-to-try shortlist cross itself off the moment a review lands. Case,
+// accents and anything that isn't a letter or a digit are flattened away, so
+// "Smithwick's" and "Smithwicks" agree and so do "Żywiec" and "Zywiec".
+//
+// Deliberately no looser than that: what's left has to match word for word, or
+// Peroni Original would answer for Peroni Nastro Azzurro and a beer would be
+// crossed off on the strength of a different one. A beer genuinely shelved
+// under two names says so with `as` on its WANT_TO_TRY entry instead.
+//
+// `npm run check` loads this very declaration out of app.js, so the checks and
+// the page can never disagree about what counts as the same beer. Keep it on
+// one line.
+const wtNorm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\u00df/g,'ss').replace(/['\u2019]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+
+// ══════════════════════════════════════════════════════════════
 // LOGOS
 // ══════════════════════════════════════════════════════════════
 // Brandfetch's public dev client ID — embedded so users never need an account.
@@ -44,14 +62,13 @@ const logoURL         = d=>`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRA
 const logoFallbackURL = d=>`https://www.google.com/s2/favicons?domain=${d}&sz=512`;
 const logoFallback2URL= d=>`https://icon.horse/icon/${d}`;
 
-// Coverage warning. It has to see the watchlist and the recommendation
-// candidates as well as beers[] — those render logos too, and a gap there is
-// just as visible. All three come from data.js, which the page loads first, so
-// the check can run inline. `npm run check` enforces the same rule in CI.
+// Coverage warning. It has to see the want-to-try shortlist as well as
+// beers[] — those render logos too, and a gap there is just as visible. Both
+// come from data.js, which the page loads first, so the check can run inline.
+// `npm run check` enforces the same rule in CI.
 function validateBeerDomains(){
   const names=new Set(beers.map(b=>b.beer));
-  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
-    for(const e of list) names.add(e.beer);
+  for(const e of WANT_TO_TRY) names.add(e.beer);
   const missing=[...names].filter(n=>!BRAND_DOMAINS[n]);
   if(missing.length){
     console.warn(`[DOMAIN CHECK] ${missing.length} beer(s) missing a brand domain — these render the 🍺 placeholder:\n  - ${missing.join('\n  - ')}`);
@@ -155,8 +172,7 @@ function logoSources(name){
 // BRAND_DOMAINS above.
 function auditLogos({timeout=8000,concurrency=8}={}){
   const names=new Set(beers.map(b=>b.beer));
-  for(const list of [IPO_WATCHLIST,IPO_CANDIDATES])
-    for(const e of list) names.add(e.beer);
+  for(const e of WANT_TO_TRY) names.add(e.beer);
 
   const tierOf=(name,url)=>{
     if(LOCAL_LOGOS[name]===url) return 'local';
@@ -336,6 +352,7 @@ const LANG_MAP_FALLBACK={DE:"German",NL:"Dutch",BE:"Dutch",US:"English",IE:"Engl
 const LANG_COLORS={"German":"#e9a23b","Dutch":"#5b9fe3","English":"#46c68a","French":"#9b87e8","Japanese":"#e5646f","Spanish":"#d4bd52","Danish":"#8d94a3","Czech":"#4bb5ad","Italian":"#cf7ba4","Polish":"#d97f7f","Portuguese":"#e07a4c","Swedish":"#7fa8d4","Norwegian":"#8189cf","Chinese":"#d45a5a","Thai":"#a992e0","Greek":"#63a9cf","Afrikaans":"#8ab861","Arabic":"#d9997f"};
 const LANG_FLAGS={"German":"🇩🇪","Dutch":"🇳🇱","English":"🇬🇧","French":"🇫🇷","Japanese":"🇯🇵","Spanish":"🇪🇸","Danish":"🇩🇰","Czech":"🇨🇿","Italian":"🇮🇹","Polish":"🇵🇱","Portuguese":"🇵🇹","Swedish":"🇸🇪","Norwegian":"🇳🇴","Chinese":"🇨🇳","Thai":"🇹🇭","Greek":"🇬🇷","Afrikaans":"🇿🇦","Arabic":"🇱🇧"};
 let BEER_REVIEWS=new Map();       // beer name → [reviews]
+let BEER_REVIEWS_NORM=new Map();  // normalised beer name → {name, reviews}
 let BREWERY_BY_NAME=new Map();    // brewery name → brewery
 let breweries_BY_CC=new Map();    // country code → [breweries]
 let BEER_LANG_LOOKUP={};          // beer name → language label
@@ -347,6 +364,9 @@ function buildIndexes(){
     if(!arr){arr=[];BEER_REVIEWS.set(b.beer,arr);}
     arr.push(b);
   }
+  // Same reviews, keyed the way the want-to-try shortlist looks them up.
+  BEER_REVIEWS_NORM=new Map();
+  for(const [name,reviews] of BEER_REVIEWS) BEER_REVIEWS_NORM.set(wtNorm(name),{name,reviews});
   BREWERY_BY_NAME=new Map();
   breweries_BY_CC=new Map();
   BEER_LANG_LOOKUP={};
@@ -468,7 +488,7 @@ try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
 function reloadData(){
   refreshStats();
   // Lazy tabs redraw when next shown; the two eager panels redraw now.
-  ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_langD','_recD']
+  ['_cD','_ciD','_inD','_tmpD','_ciX','_wtD','_dM','_langD']
     .forEach(f=>{ window[f]=false; });
   try{ updateLiveStats(); }catch(e){ console.error('Reload stats error:',e); }
   try{ applyBeerFilter(); }catch(e){ console.error('Reload table error:',e); }
@@ -583,8 +603,7 @@ function showInsightsSubtab(name){
     if(!window._tmpD) drawTemporal();
   } else if(name==='markets'){
     if(!window._ciX) drawContrarian();
-    if(!window._ipoD) drawIPO();
-    if(!window._recD) drawRecommendations();
+    if(!window._wtD) drawWantToTry();
   }
   resizeChartsIn(document.getElementById(name));
   try{history.replaceState(null,'','#'+name);}catch(e){}
@@ -2053,12 +2072,6 @@ function drawContrarian(){
     return {name:b.n,jwal,global,delta};
   }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
 
-  const avgDelta=avg(rows.map(r=>r.delta));
-  const _setTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  const _setCl=(id,v)=>{const e=document.getElementById(id); if(e) e.className=v;};
-  _setTx('ciAvgDelta',(avgDelta>=0?'+':'')+avgDelta.toFixed(2));
-  _setCl('ciAvgDelta','kpi-val '+(avgDelta>0?'up':avgDelta<0?'dn':'fl'));
-
   // Freshness indicator — turns yellow once Untappd data is older than the refresh interval.
   const freshEl=document.getElementById('ciFreshness');
   if(freshEl){
@@ -2068,18 +2081,6 @@ function drawContrarian(){
     freshEl.textContent=`World ratings updated ${UNTAPPD_LAST_REFRESHED} (${ageDays}d ago)${stale?' · refresh due':''}`;
     freshEl.style.color=stale?THEME.warn:THEME.text3;
   }
-
-  const mostContr=rows.reduce((a,b)=>Math.abs(b.delta)>Math.abs(a.delta)?b:a);
-  _setTx('ciMostContrarian',mostContr.name);
-  _setTx('ciMostSub',`Δ${mostContr.delta>=0?'+':''}${mostContr.delta.toFixed(2)}`);
-
-  const overrater=rows.reduce((a,b)=>b.delta>a.delta?b:a);
-  _setTx('ciOverrater',overrater.name);
-  _setTx('ciOverSub',`+${overrater.delta.toFixed(2)} above world`);
-
-  const underrater=rows.reduce((a,b)=>b.delta<a.delta?b:a);
-  _setTx('ciUnderrater',underrater.name);
-  _setTx('ciUnderSub',`${underrater.delta.toFixed(2)} below world`);
 
   const sorted=rows.slice().sort((a,b)=>b.delta-a.delta);
   const contrarianCanvas=document.getElementById('contrarianChart');
@@ -2117,195 +2118,232 @@ function predictRating(style,origin,untappd,method='Bottle'){
 }
 
 // ══════════════════════════════════════════════════════════════
-// RECOMMENDATIONS — "WHAT TO DRINK NEXT"
+// WANT TO TRY — the shortlist, and what became of it
 // ══════════════════════════════════════════════════════════════
-// Ranks unreviewed candidate beers by predicted JWAL rating (taste
-// profile + Untappd consensus) and explains each pick with rationale
-// chips derived from his style / country / serving biases.
-function drawRecommendations(){
-  window._recD=true;
-  try {
-    const reviewed=new Set(beers.map(b=>b.beer));
-    const g=STATS.globalAvg;
-    const picks=IPO_CANDIDATES
-      .filter(c=>!reviewed.has(c.beer))
-      .map(c=>{
-        const pred=predictRating(c.style,c.origin,c.untappd,c.method);
-        return {...c,_pred:pred,_delta:pred-g};
-      })
-      .sort((a,b)=>b._pred-a._pred);
+// One list, two halves, and nothing to maintain between them. Every entry in
+// WANT_TO_TRY is either still to drink or already drunk, and which half it
+// falls in is worked out here on every render by looking for a review of it.
+// Log the beer in beers[] and it moves by itself: off the shortlist, into the
+// scorecard, where the guess made before the pour is held against the rating
+// given after it. No flag to flip, no row to delete, nothing that can go stale
+// because someone forgot.
 
-    const cntEl=document.getElementById('rec-count');
-    if(cntEl) cntEl.textContent=picks.length+' pick'+(picks.length!==1?'s':'');
-
-    // Rationale chips: compare each beer's attributes to JWAL's biases.
-    function rationale(c){
-      const chips=[];
-      // Same bar as the prediction: don't claim "I like X" off one review.
-      const sM=STATS.styleMap[c.style];
-      if(sM&&!thin(sM.c)){const sa=sM.t/sM.c; if(sa>=g) chips.push(`I like ${c.style} · ${sa.toFixed(2)}`);}
-      const cM=STATS.countryMap[c.origin];
-      if(cM&&!thin(cM.c)){const ca=cM.t/cM.c; if(ca>=g) chips.push(`${FLAGS[c.origin]||''} ${c.origin} favourite · ${ca.toFixed(2)}`);}
-      if(c.method==='Draft'||c.method==='Nitro') chips.push(`Better on ${c.method.toLowerCase()}`);
-      if(c._pred>=4.0) chips.push('Top shelf');
-      if(!chips.length) chips.push(`World rates it ${c.untappd.toFixed(2)}`);
-      return chips.slice(0,3);
-    }
-
-    const recEl=document.getElementById('recPicks');
-    if(recEl){
-      recEl.innerHTML=picks.length?picks.map((c,i)=>{
-        const col=rC(c._pred);
-        const chips=rationale(c).map(t=>`<span class="rec-chip">${t}</span>`).join('');
-        return `<div class="ipo-top-pick rec-pick" style="border-left-color:${col}">
-          <div class="tp-head"><span class="rec-rank">#${i+1}</span> ${logoImg(c.beer,20)} <span>${esc(c.beer)}</span></div>
-          <div class="tp-style">${FLAGS[c.origin]||''} ${esc(c.style)} · ${c.abv.toFixed(1)}% · ${esc(c.method)}</div>
-          <div class="tp-row">
-            <span style="color:var(--purple)">World ${c.untappd.toFixed(2)}</span>
-            <span class="tp-upside" style="color:${col}">${c._pred.toFixed(2)}</span>
-          </div>
-          <div class="tp-row" style="margin-top:4px">
-            <span style="color:${col}">${strs(c._pred)}</span>
-            <span style="color:var(--text-3)">My guess</span>
-          </div>
-          <div class="rec-why">${chips}</div>
-        </div>`;
-      }).join(''):'<div style="color:var(--text-3);padding:12px">All candidates reviewed — nothing pending.</div>';
-    }
-  } catch(e){ console.error('Recommendations error:',e); }
+// The reviews of a shortlist entry, under whichever name it was logged, or
+// null while it is still unopened. `as` covers the beers whose shelf name and
+// logged name differ — everything else matches on the normalised name.
+function wtReviews(e){
+  for(const n of [e.beer,...(e.as||[])]){
+    const hit=BEER_REVIEWS_NORM.get(wtNorm(n));
+    if(hit) return hit;
+  }
+  return null;
 }
 
-// ══════════════════════════════════════════════════════════════
-// IPO WATCHLIST
-// ══════════════════════════════════════════════════════════════
-function drawIPO(){
-  window._ipoD=true;
-  try {
+// Verdict on a predicted rating. The colour comes off the same rating ramp the
+// badges and charts use, so a "must try" reads the same green everywhere.
+function wtVerdict(guess){
+  return {label:guess>=4.0?'Must try':guess>=3.5?'Worth it':guess>=3.0?'Decent':'Long shot',
+          color:rC(guess)};
+}
 
-  // Analyst target uses the shared predictRating() scoring formula
-  // (50% Untappd consensus · 25% style bias · 15% country bias · 10%
-  // base anchor · + serving-method nudge).
-  // Pre-compute all analyst targets (cached in a Map)
-  const targetCache=new Map();
-  IPO_WATCHLIST.forEach(w=>{
-    targetCache.set(w.beer,predictRating(w.style,w.origin,w.untappd,w.method));
+// Why this beer, in at most three chips. Every claim about my taste is held to
+// MIN_N — one generous pour is not "a style I like" — and the two "new ground"
+// chips are the opposite case, where there is no history at all.
+function wtWhy(r){
+  const g=STATS.globalAvg,chips=[];
+  const sM=STATS.styleMap[r.style];
+  if(!sM) chips.push(`First ${r.style.toLowerCase()} on the board`);
+  else if(!thin(sM.c)&&sM.t/sM.c>=g) chips.push(`${r.style} averages ${(sM.t/sM.c).toFixed(2)} for me`);
+  const cM=STATS.countryMap[r.origin];
+  if(!cM) chips.push(`${FLAGS[r.origin]||''} ${CNAMES[r.origin]||r.origin} would be new`);
+  else if(!thin(cM.c)&&cM.t/cM.c>=g) chips.push(`${FLAGS[r.origin]||''} ${CNAMES[r.origin]||r.origin} averages ${(cM.t/cM.c).toFixed(2)}`);
+  if(r.method==='Draft'||r.method==='Nitro') chips.push(`On ${r.method.toLowerCase()}, which flatters it`);
+  if(r._world>=3.8) chips.push(`The world rates it ${r._world.toFixed(2)}`);
+  if(!chips.length) chips.push(`The world rates it ${r._world.toFixed(2)}`);
+  return chips.slice(0,3);
+}
+
+// The shortlist's own filter state. Kept here rather than read back off the
+// selects so a redraw after new data lands restores what was chosen.
+let _wtSort='guess',_wtStyle='',_wtOrigin='',_wtRows=[];
+
+function wtGauge(label,value,cls){
+  const pct=Math.max(0,Math.min(100,value/5*100));
+  return `<div class="wt-gauge">
+    <span class="wt-gauge-k">${esc(label)}</span>
+    <span class="wt-track"><span class="wt-fill ${cls}" style="width:${pct.toFixed(1)}%"></span></span>
+    <span class="wt-gauge-v">${value.toFixed(2)}</span>
+  </div>`;
+}
+
+const WT_SORTS={
+  guess:  (a,b)=>b._guess-a._guess,
+  edge:   (a,b)=>b._edge-a._edge,
+  world:  (a,b)=>b._world-a._world,
+  abv:    (a,b)=>a.abv-b.abv,
+  name:   (a,b)=>a.beer.localeCompare(b.beer),
+};
+
+// Only the shortlist grid redraws when a filter changes — the scorecard and
+// the charts below it don't depend on any of this.
+function renderWtShortlist(){
+  const grid=document.getElementById('wtPicks');
+  if(!grid) return;
+  const todo=_wtRows.filter(r=>!r._tried)
+    .filter(r=>!_wtStyle||r.style===_wtStyle)
+    .filter(r=>!_wtOrigin||r.origin===_wtOrigin)
+    .sort(WT_SORTS[_wtSort]||WT_SORTS.guess);
+
+  const cnt=document.getElementById('wt-count');
+  const total=_wtRows.filter(r=>!r._tried).length;
+  if(cnt) cnt.textContent=todo.length===total
+    ? `${total} beer${total===1?'':'s'}`
+    : `${todo.length} of ${total}`;
+
+  if(!todo.length){
+    grid.innerHTML=`<p class="wt-empty">${total
+      ? 'Nothing on the shortlist matches those filters.'
+      : 'The whole shortlist has been drunk. Add the next round to WANT_TO_TRY in data.js.'}</p>`;
+    return;
+  }
+  grid.innerHTML=todo.map((r,i)=>{
+    const {label,color}=wtVerdict(r._guess);
+    const chips=wtWhy(r).map(t=>`<span class="wt-chip">${esc(t)}</span>`).join('');
+    const flat=Math.abs(r._edge)<=0.05;
+    const edge=flat?'Level with the world'
+      :`${Math.abs(r._edge).toFixed(2)} ${r._edge>0?'above':'below'} the world`;
+    return `<article class="wt-card" style="--wt-accent:${color}">
+      <div class="wt-top">
+        <span class="wt-rank${i<3?' wt-rank-top':''}">${i+1}</span>
+        ${logoImg(r.beer,22)}
+        <span class="wt-name">${esc(r.beer)}</span>
+      </div>
+      <div class="wt-meta">${FLAGS[r.origin]||''} ${esc(r.style)} · ${r.abv.toFixed(1)}% · ${esc(r.method.toLowerCase())} · ${esc(r.region)}</div>
+      <div class="wt-gauges">
+        ${wtGauge('My guess',r._guess,'wt-fill-mine')}
+        ${wtGauge('World',r._world,'wt-fill-world')}
+      </div>
+      <div class="wt-foot">
+        <span class="wt-edge ${flat?'fl':r._edge>0?'up':'dn'}">${edge}</span>
+        <span class="wt-verdict">${esc(label)}</span>
+      </div>
+      <div class="wt-why">${chips}</div>
+    </article>`;
+  }).join('');
+}
+
+function drawWantToTry(){
+  window._wtD=true;
+  try{
+
+  // ── Every entry, scored. `_world` prefers the maintained Untappd average
+  // once a beer has been reviewed, so the scorecard and the contrarian chart
+  // below it quote the same number.
+  _wtRows=WANT_TO_TRY.map(e=>{
+    const hit=wtReviews(e);
+    const world=(hit&&UNTAPPD_GLOBAL_AVGS[hit.name]!==undefined)?UNTAPPD_GLOBAL_AVGS[hit.name]:e.untappd;
+    const guess=predictRating(e.style,e.origin,world,e.method);
+    const mine=hit?avg(hit.reviews.map(b=>b.rating)):null;
+    return {...e,_name:hit?hit.name:e.beer,_tried:!!hit,_reviews:hit?hit.reviews:[],
+            _world:world,_guess:guess,_mine:mine,_edge:guess-world,
+            _miss:mine===null?null:mine-guess};
   });
+  const todo=_wtRows.filter(r=>!r._tried);
+  const done=_wtRows.filter(r=>r._tried)
+    .sort((a,b)=>b._miss-a._miss);
 
-  const reviewed=new Set(beers.map(b=>b.beer));
-  // Enrich with target + upside, sort pending by upside descending
-  const pending=IPO_WATCHLIST.filter(w=>!reviewed.has(w.beer))
-    .map(w=>{const t=targetCache.get(w.beer);return {...w,_target:t,_upside:t-w.untappd};})
-    .sort((a,b)=>b._upside-a._upside);
-  const priced=IPO_WATCHLIST.filter(w=>reviewed.has(w.beer));
+  // ── Headline numbers
+  const best=todo.slice().sort(WT_SORTS.guess)[0];
+  const misses=done.map(r=>Math.abs(r._miss));
+  const mae=misses.length?avg(misses):null;
+  const close=done.filter(r=>Math.abs(r._miss)<=0.25).length;
+  const kpiEl=document.getElementById('wt-kpis');
+  if(kpiEl) kpiEl.innerHTML=`<div class="kpi-strip">
+    <div class="kpi"><div class="kpi-val" style="color:var(--accent)">${todo.length}</div>
+      <div class="kpi-label">Still to drink</div>
+      <div class="kpi-sub">of ${_wtRows.length} ever shortlisted</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--pos)">${done.length}</div>
+      <div class="kpi-label">Crossed off</div>
+      <div class="kpi-sub">${done.length?'Scored against the guess':'Nothing tried yet'}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:${best?rC(best._guess):'var(--text-3)'}">${best?best._guess.toFixed(2):'—'}</div>
+      <div class="kpi-label">Best guess going</div>
+      <div class="kpi-sub">${best?esc(best.beer):'The list is empty'}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:${mae===null?'var(--text-3)':mae<=0.35?'var(--pos)':mae<=0.6?'var(--warn)':'var(--neg)'}">${mae===null?'—':'±'+mae.toFixed(2)}</div>
+      <div class="kpi-label">How far my guesses land</div>
+      <div class="kpi-sub">${done.length?`${close} of ${done.length} within a quarter star`:'Try one and find out'}</div></div>
+  </div>`;
 
-  const _ipoTx=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  _ipoTx('ipo-pending',pending.length);
-  _ipoTx('ipo-priced',priced.length);
-  _ipoTx('ipo-watch-count',pending.length+' beer'+(pending.length!==1?'s':'')+' queued');
+  // ── Shortlist filters — options come from what is actually still on the list
+  const styleSel=document.getElementById('wtStyleFilter');
+  const originSel=document.getElementById('wtOriginFilter');
+  const fill=(sel,vals,label,cur)=>{
+    if(!sel) return;
+    sel.innerHTML=`<option value="">${label}</option>`+
+      vals.map(([v,t])=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(t)}</option>`).join('');
+    if(!vals.some(([v])=>v===cur)) sel.value='';
+  };
+  fill(styleSel,[...new Set(todo.map(r=>r.style))].sort().map(s=>[s,s]),'All styles',_wtStyle);
+  fill(originSel,[...new Set(todo.map(r=>r.origin))]
+    .sort((a,b)=>(CNAMES[a]||a).localeCompare(CNAMES[b]||b))
+    .map(o=>[o,`${FLAGS[o]||''} ${CNAMES[o]||o}`.trim()]),'Everywhere',_wtOrigin);
+  if(styleSel&&styleSel.value!==_wtStyle) _wtStyle=styleSel.value;
+  if(originSel&&originSel.value!==_wtOrigin) _wtOrigin=originSel.value;
+  const sortSel=document.getElementById('wtSort');
+  if(sortSel) sortSel.value=_wtSort;
 
-  const allTargets=[...targetCache.values()];
-  _ipoTx('ipo-avg-analyst',(allTargets.reduce((s,v)=>s+v,0)/allTargets.length).toFixed(2));
-  _ipoTx('ipo-avg-market',(IPO_WATCHLIST.reduce((s,w)=>s+w.untappd,0)/IPO_WATCHLIST.length).toFixed(2));
+  renderWtShortlist();
 
-  // Signal helper used by table + conveyor
-  function sigOf(target){
-    const label=target>=4.0?'Must try':target>=3.5?'Worth it':target>=3.0?'Decent':target>=2.5?'Meh':'Skip';
-    const color=target>=4.0?THEME.pos:target>=3.5?'#ccb44f':target>=3.0?'#e9a23b':target>=2.5?'#dd8555':THEME.neg;
-    return {label,color};
+  // ── Crossed off — the guesses that have been settled
+  const donePanel=document.getElementById('wtDonePanel');
+  if(donePanel) donePanel.hidden=!done.length;
+  const doneCount=document.getElementById('wt-done-count');
+  if(doneCount) doneCount.textContent=done.length+' beer'+(done.length===1?'':'s');
+  const scoreEl=document.getElementById('wtScoreline');
+  if(scoreEl&&done.length){
+    const over=done.filter(r=>r._miss>0.25).length,under=done.filter(r=>r._miss<-0.25).length;
+    scoreEl.textContent=`${done.length} shortlisted beers have been drunk since. My guess landed within a quarter star ${close} time${close===1?'':'s'}, ran low on ${over} and ran high on ${under}. Every guess is recomputed from my taste as it stands today, so they move as the rest of the data does.`;
   }
-
-  {const _wb=document.getElementById('ipoWatchBody'); if(_wb) _wb.innerHTML=pending.map(w=>{
-    const target=w._target, upside=w._upside;
-    const uClass=upside>0.2?'up':upside<-0.2?'dn':'fl';
-    const {label:signal,color:sigColor}=sigOf(target);
-    return `<tr style="border-left-color:${sigColor}">
-      <td>${logoImg(w.beer,24)}</td>
-      <td style="color:var(--text);font-weight:600">${esc(w.beer)}<br><span style="color:var(--text-3);font-size:12px;font-weight:400">${esc(w.style)}</span></td>
-      <td>${FLAGS[w.origin]||''} <span style="color:var(--text-2)">${esc(w.origin)}</span></td>
-      <td style="color:var(--info)">${w.abv.toFixed(1)}%</td>
-      <td style="color:var(--purple);font-family:var(--mono);font-weight:700">${w.untappd.toFixed(2)}</td>
-      <td style="color:var(--info);font-family:var(--mono);font-weight:700">${target.toFixed(2)}</td>
-      <td class="${uClass}" style="font-family:var(--mono);font-weight:700">${upside>=0?'+':''}${upside.toFixed(2)}</td>
-      <td><span style="font-size:12px;padding:2px 7px;border:1px solid ${sigColor};color:${sigColor};font-weight:700">${signal}</span></td>
+  const doneBody=document.getElementById('wtDoneBody');
+  if(doneBody) doneBody.innerHTML=done.map(r=>{
+    const miss=r._miss,vsWorld=r._mine-r._world;
+    const verdict=miss>0.25?'Beat the guess':miss<-0.25?'Fell short':'Called it';
+    const vColor=miss>0.25?THEME.pos:miss<-0.25?THEME.neg:THEME.warn;
+    const when=r._reviews.length?`${r._reviews[r._reviews.length-1].month} ${r._reviews[r._reviews.length-1].year}`:'';
+    return `<tr data-beer="${esc(r._name)}" tabindex="0">
+      <td>${logoImg(r._name,24)}</td>
+      <td class="wt-cell-beer">${esc(r._name)}<span>${esc(r.style)}${when?' · '+esc(when):''}</span></td>
+      <td>${FLAGS[r.origin]||''} <span style="color:var(--text-2)">${esc(r.origin)}</span></td>
+      <td style="color:var(--purple)">${r._world.toFixed(2)}</td>
+      <td style="color:var(--info)">${r._guess.toFixed(2)}</td>
+      <td><span class="rb ${rbC(r._mine)}">${r._mine.toFixed(2)}</span></td>
+      <td class="${miss>=0?'up':'dn'}">${miss>=0?'+':''}${miss.toFixed(2)}</td>
+      <td class="${vsWorld>=0?'up':'dn'}">${vsWorld>=0?'+':''}${vsWorld.toFixed(2)}</td>
+      <td><span class="wt-result" style="border-color:${vColor};color:${vColor}">${verdict}</span></td>
     </tr>`;
-  }).join('');}
+  }).join('');
 
-  // ── TOP-PICKS CONVEYOR (top 6 by upside)
-  const topPicksEl=document.getElementById('ipoTopPicks');
-  const topN=pending.slice(0,6);
-  const topCountEl=document.getElementById('ipo-top-count');
-  if(topCountEl) topCountEl.textContent=topN.length+' of '+pending.length;
-  if(topPicksEl){
-    topPicksEl.innerHTML=topN.length?topN.map(w=>{
-      const {label:signal,color:sigColor}=sigOf(w._target);
-      const uClass=w._upside>0?'up':w._upside<0?'dn':'fl';
-      return `<div class="ipo-top-pick" style="border-left-color:${sigColor}">
-        <div class="tp-head">${logoImg(w.beer,20)} <span>${esc(w.beer)}</span></div>
-        <div class="tp-style">${FLAGS[w.origin]||''} ${esc(w.style)} · ${w.abv.toFixed(1)}%</div>
-        <div class="tp-row">
-          <span style="color:var(--info)">My guess ${w._target.toFixed(2)}</span>
-          <span class="tp-upside ${uClass}">${w._upside>=0?'+':''}${w._upside.toFixed(2)}</span>
-        </div>
-        <div class="tp-row" style="margin-top:6px">
-          <span style="color:var(--purple)">World ${w.untappd.toFixed(2)}</span>
-          <span class="tp-signal" style="border-color:${sigColor};color:${sigColor}">${signal}</span>
-        </div>
-      </div>`;
-    }).join(''):'<div style="color:var(--text-3);padding:12px">Tried everything on the list — nothing pending.</div>';
-  }
-
-  // ── UPSIDE DISTRIBUTION CHART
-  const upCanvas=document.getElementById('ipoUpsideChart');
-  if(upCanvas && pending.length){
-    const buckets=[
-      {lbl:'< −0.5',lo:-Infinity,hi:-0.5,color:THEME.neg},
-      {lbl:'−0.5…0',lo:-0.5,hi:0,color:'#dd8555'},
-      {lbl:'0…+0.5',lo:0,hi:0.5,color:'#ccb44f'},
-      {lbl:'+0.5…+1',lo:0.5,hi:1,color:THEME.pos},
-      {lbl:'> +1.0',lo:1,hi:Infinity,color:'#46c68a'}
-    ];
-    const counts=buckets.map(b=>pending.filter(w=>w._upside>=b.lo && w._upside<b.hi).length);
-    safeChart('ipoUpsideChart',upCanvas,{type:'bar',
-      data:{labels:buckets.map(b=>b.lbl),datasets:[{data:counts,backgroundColor:buckets.map(b=>b.color),borderWidth:0}]},
-      options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>c.raw+' BEER'+(c.raw!==1?'S':'')}}},scales:{x:{beginAtZero:true,grid:{color:THEME.grid},ticks:{color:THEME.tick,precision:0}},y:{grid:{display:false},ticks:{color:THEME.label,font:{size:9}}}}}
+  // ── Calibration — how far each settled guess was out, and which way
+  const calCanvas=document.getElementById('wtCalibChart');
+  if(calCanvas&&done.length){
+    calCanvas.style.height=Math.max(220,done.length*24)+'px';
+    safeChart('wtCalibChart',calCanvas,{type:'bar',
+      // Fills are the semantic tokens at 80% (the `+'cc'` idiom barFill uses),
+      // so a retint of --pos / --neg carries here with nothing to keep in sync.
+      data:{labels:done.map(r=>r._name),datasets:[{data:done.map(r=>+r._miss.toFixed(2)),
+        backgroundColor:done.map(r=>(r._miss>0?THEME.pos:THEME.neg)+'cc'),
+        borderColor:done.map(r=>r._miss>0?THEME.pos:THEME.neg),borderWidth:1.5}]},
+      options:{indexAxis:'y',maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{...TT,callbacks:{
+          label:c=>`${c.raw>=0?'+':''}${c.raw} · guessed ${done[c.dataIndex]._guess.toFixed(2)} · rated ${done[c.dataIndex]._mine.toFixed(2)}`}}},
+        scales:{x:{min:-2,max:2,grid:{color:THEME.grid},ticks:{color:THEME.tick},
+                   title:{display:true,text:'← I guessed too high   ·   I guessed too low →',color:THEME.axisTitle}},
+                y:{grid:{display:false},ticks:{color:THEME.label,font:{size:9}}}}}
     });
-  } else if(upCanvas){
-    const prev=_charts['ipoUpsideChart']; if(prev){prev.destroy();delete _charts['ipoUpsideChart'];}
+  } else if(calCanvas){
+    const prev=_charts['wtCalibChart']; if(prev){prev.destroy();delete _charts['wtCalibChart'];}
   }
 
-  // ── PRICED PANEL (hide entirely when empty)
-  const pricedPanel=document.getElementById('ipoPricedPanel');
-  const _pb=document.getElementById('ipoPricedBody');
-  if(priced.length===0){
-    if(pricedPanel) pricedPanel.style.display='none';
-    if(_pb) _pb.innerHTML='';
-    _ipoTx('ipo-priced-count','0 beers');
-  } else {
-    if(pricedPanel) pricedPanel.style.display='';
-    _ipoTx('ipo-priced-count',priced.length+' beer'+(priced.length!==1?'s':''));
-    if(_pb) _pb.innerHTML=priced.map(w=>{
-      const target=targetCache.get(w.beer);
-      const revd=BEER_REVIEWS.get(w.beer)||[];
-      const jwalPrice=avg(revd.map(b=>b.rating));
-      const vsAnalyst=jwalPrice-target;
-      const vsMkt=jwalPrice-w.untappd;
-      const verdict=vsAnalyst>0.3?'Beat my guess':vsAnalyst>-0.3?'On target':'Below my guess';
-      const vColor=vsAnalyst>0.3?THEME.pos:vsAnalyst<-0.3?THEME.neg:THEME.warn;
-      return `<tr>
-        <td>${logoImg(w.beer,24)}</td>
-        <td style="color:var(--text);font-weight:600">${esc(w.beer)}<br><span style="color:var(--text-3);font-size:12px;font-weight:400">${esc(w.style)}</span></td>
-        <td>${FLAGS[w.origin]||''} <span style="color:var(--text-2)">${esc(w.origin)}</span></td>
-        <td style="color:var(--purple);font-family:var(--mono)">${w.untappd.toFixed(2)}</td>
-        <td style="color:var(--info);font-family:var(--mono)">${target.toFixed(2)}</td>
-        <td><span class="rb ${rbC(jwalPrice)}">${jwalPrice.toFixed(2)}</span></td>
-        <td class="${vsAnalyst>=0?'up':'dn'}" style="font-family:var(--mono)">${vsAnalyst>=0?'+':''}${vsAnalyst.toFixed(2)}</td>
-        <td class="${vsMkt>=0?'up':'dn'}" style="font-family:var(--mono)">${vsMkt>=0?'+':''}${vsMkt.toFixed(2)}</td>
-        <td><span style="font-size:12px;padding:1px 6px;border:1px solid ${vColor};color:${vColor}">${verdict}</span></td>
-      </tr>`;
-    }).join('');
-  }
-
-  } catch(e){ console.error('IPO error:',e); }
+  } catch(e){ console.error('Want-to-try error:',e); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2593,9 +2631,32 @@ try {
   });
 
   // Insights sub-section navigation (Places / Over time / What to try)
-  document.getElementById('insights').addEventListener('click', function(e) {
+  const insightsPanel = document.getElementById('insights');
+  insightsPanel.addEventListener('click', function(e) {
     const btn = e.target.closest('.subtab[data-subtab]');
     if (btn) showInsightsSubtab(btn.dataset.subtab);
+  });
+
+  // What to try — the shortlist's own sort and filters. Only the grid redraws.
+  const wtCtrls = {wtSort:'_wtSort', wtStyleFilter:'_wtStyle', wtOriginFilter:'_wtOrigin'};
+  insightsPanel.addEventListener('change', function(e) {
+    const key = wtCtrls[e.target.id];
+    if (!key) return;
+    if (key === '_wtSort') _wtSort = e.target.value;
+    else if (key === '_wtStyle') _wtStyle = e.target.value;
+    else _wtOrigin = e.target.value;
+    renderWtShortlist();
+  });
+
+  // A crossed-off beer has a review behind it — open it.
+  insightsPanel.addEventListener('click', function(e) {
+    const row = e.target.closest('#wtDoneBody tr[data-beer]');
+    if (row) openBeerModal(row.dataset.beer);
+  });
+  insightsPanel.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('#wtDoneBody tr[data-beer]');
+    if (row) { e.preventDefault(); openBeerModal(row.dataset.beer); }
   });
 
   // Overview — recent-activity / month-in-review rows open the beer modal

@@ -449,73 +449,44 @@
   </div>
 </div>
 
-<!-- ── WHAT TO TRY: recommendations + contrarian/ipo analytics ── -->
+<!-- ── WHAT TO TRY: the shortlist, and how the guesses on it turned out ── -->
 
 <div id="markets" class="subpanel">
 
   <section class="merged-section" data-section="markets">
-    <div class="merged-section-head">What to drink next</div>
-    <p class="section-note">Beers I haven't reviewed yet, ranked by how much I'm likely to enjoy them — a blend of my own taste so far and what the world thinks on Untappd.</p>
+    <div class="merged-section-head">What to try next</div>
+    <p class="section-note">A standing shortlist of beers I haven't got to yet, each carrying a guess at what I'll give it — my taste so far, weighted against what the world says on Untappd. Drink one and it crosses itself off: the entry drops out of the list below and reappears in the scorecard, guess against verdict.</p>
+
+    <div id="wt-kpis"></div>
 
     <div class="bb-panel">
-      <div class="bb-panel-head">Top picks for me<span class="ph-right" id="rec-count">—</span></div>
+      <div class="bb-panel-head">The shortlist<span class="ph-right" id="wt-count">—</span></div>
       <div class="bb-body">
-        <div class="ipo-top-picks" id="recPicks"></div>
+        <div class="bb-ctrl">
+          <span class="bb-ctrl-title">Still to drink</span>
+          <div class="ctrl-fields">
+            <select id="wtSort" class="bb-select" aria-label="Sort the shortlist">
+              <option value="guess">Best guess first</option>
+              <option value="edge">Biggest edge over the world</option>
+              <option value="world">The world's favourites</option>
+              <option value="abv">Lightest first</option>
+              <option value="name">A to Z</option>
+            </select>
+            <select id="wtStyleFilter" class="bb-select" aria-label="Filter the shortlist by style"><option value="">All styles</option></select>
+            <select id="wtOriginFilter" class="bb-select" aria-label="Filter the shortlist by origin"><option value="">Everywhere</option></select>
+          </div>
+          <span class="bb-ctrl-note" data-minn="Guesses lean on my averages"></span>
+        </div>
+        <div class="wt-grid" id="wtPicks"></div>
       </div>
     </div>
 
-    <details class="bb-collapse">
-      <summary>The nerdy bits<span class="sum-hint">How my taste compares &amp; beers I haven't tried yet</span></summary>
-      <div class="collapse-panels">
-        <div class="bb-panel">
-          <div class="bb-panel-head">My rating vs the world average<span class="ph-right">Green = I liked it more than most</span></div>
-          <div class="bb-body">
-            <div id="ciFreshness" class="freshness-note"></div>
-            <div class="chart-box chart-box-tall"><canvas id="contrarianChart"></canvas></div>
-          </div>
-        </div>
-
-        <div class="bb-panel">
-          <div class="bb-panel-head">Most promising to try<span class="ph-right" id="ipo-top-count">—</span></div>
-          <div class="bb-body"><div class="ipo-top-picks" id="ipoTopPicks"></div></div>
-        </div>
-
-        <div class="bb-grid-2">
-          <div class="bb-panel">
-            <div class="bb-panel-head">Want to try<span class="ph-right" id="ipo-watch-count">—</span></div>
-            <div class="bb-body">
-              <div class="table-wrap">
-                <table class="bb-table ipo-watch" id="ipoWatchTable">
-                  <thead><tr>
-                    <th style="width:36px"></th>
-                    <th>Beer / style</th>
-                    <th>Origin</th>
-                    <th>ABV</th>
-                    <th class="th-world">World</th>
-                    <th class="th-guess">My guess</th>
-                    <th>vs world</th>
-                    <th>Verdict</th>
-                  </tr></thead>
-                  <tbody id="ipoWatchBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="bb-panel">
-            <div class="bb-panel-head">How my guesses compare<span class="ph-right">My guess − world</span></div>
-            <div class="bb-body">
-              <div class="chart-box chart-box-tall"><canvas id="ipoUpsideChart"></canvas></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <div class="bb-panel" id="ipoPricedPanel" style="display:none">
-      <div class="bb-panel-head">Prediction scorecard<span class="ph-right" id="ipo-priced-count">0 beers</span></div>
+    <div class="bb-panel" id="wtDonePanel" hidden>
+      <div class="bb-panel-head">Crossed off<span class="ph-right" id="wt-done-count">—</span></div>
       <div class="bb-body">
+        <p class="wt-scoreline" id="wtScoreline"></p>
         <div class="table-wrap">
-          <table class="bb-table">
+          <table class="bb-table wt-done" id="wtDoneTable">
             <thead><tr>
               <th style="width:36px"></th>
               <th>Beer / style</th>
@@ -527,11 +498,30 @@
               <th>vs world</th>
               <th>Result</th>
             </tr></thead>
-            <tbody id="ipoPricedBody"></tbody>
+            <tbody id="wtDoneBody"></tbody>
           </table>
         </div>
       </div>
     </div>
+
+    <details class="bb-collapse">
+      <summary>How the guessing is going<span class="sum-hint">Where each settled guess landed &amp; how my ratings sit against the world's</span></summary>
+      <div class="collapse-panels">
+        <div class="bb-panel">
+          <div class="bb-panel-head">Where each guess landed<span class="ph-right">Green = better than I expected</span></div>
+          <div class="bb-body"><div class="chart-box chart-box-tall"><canvas id="wtCalibChart"></canvas></div></div>
+        </div>
+
+        <div class="bb-panel">
+          <div class="bb-panel-head">My rating vs the world average<span class="ph-right">Green = I liked it more than most</span></div>
+          <div class="bb-body">
+            <div id="ciFreshness" class="freshness-note"></div>
+            <div class="chart-box chart-box-tall"><canvas id="contrarianChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
   </section>
 
 </div><!-- /markets subpanel -->

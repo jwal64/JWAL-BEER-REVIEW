@@ -33,6 +33,9 @@
 --accent-hi:   #f5c274;
 --accent-soft: rgba(233,162,59,0.12);
 --accent-line: rgba(233,162,59,0.35);
+/* Ink for text sitting on the accent — near-black, warmed so it doesn't read
+   as a hole punched in the honey. */
+--on-accent:   #17130a;
 
 /* ── Semantics: rich, not neon ── */
 --pos:  #46c68a;
@@ -122,7 +125,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-::selection { background: var(--accent-line); color: #17130a; }
+::selection { background: var(--accent-line); color: var(--on-accent); }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -171,7 +174,7 @@ button, input, select, textarea { font-family: inherit; }
 /* Strip hover-only effects on touch devices to avoid sticky :hover after tap */
 @media (hover: none) {
   .nav-item:hover, .kpi:hover, .beer-card:hover, .subtab:hover,
-  .ipo-top-pick:hover, .feed-row:hover, .bb-table tbody tr:hover,
+  .feed-row:hover, .bb-table tbody tr:hover,
   .bb-collapse > summary:hover { background: initial; }
   .beer-card:hover, .kpi:hover { transform: none; }
 }
@@ -691,6 +694,12 @@ color: var(--text-2);
 vertical-align: middle;
 }
 .bb-table tbody tr.new-row { background: rgba(70,198,138,0.055); }
+/* A cell's own colour outranks the bare .up / .dn helpers, so a delta in a
+   table has to restate them at the table's specificity or it renders grey and
+   says nothing. */
+.bb-table tbody td.up { color: var(--pos); }
+.bb-table tbody td.dn { color: var(--neg); }
+.bb-table tbody td.fl { color: var(--warn); }
 
 /* Sortable column headers — click to sort, arrow marks the active column */
 .bb-table thead th[data-sort] { cursor: pointer; user-select: none; }
@@ -1454,84 +1463,128 @@ flex-shrink: 0;
 .brewery-clickable:hover { color: var(--accent); }
 
 /* ═══════════════════════════════════════════
-RECOMMENDATIONS / WATCHLIST
+WHAT TO TRY — shortlist cards + scorecard
 ═══════════════════════════════════════════ */
-.ipo-kpi-strip { display: grid; grid-template-columns: 1fr; gap: var(--s3); align-items: stretch; }
-.ipo-kpi-strip .ipo-kpi-group { margin-bottom: 0; padding: 0; }
 
-/* Recommendation cards wrap onto a second line instead of hiding half the list
-   behind a sideways scroll. */
-.ipo-top-picks {
+/* Cards wrap onto as many rows as the list needs. The shortlist is meant to be
+   read whole, so nothing here scrolls sideways or hides behind a "show more". */
+.wt-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
   gap: var(--s3);
 }
-.ipo-top-pick {
+.wt-card {
   min-width: 0;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: var(--r);
-  border-left-width: 3px;
+  border-left: 3px solid var(--wt-accent, var(--accent));
   border-radius: var(--r-sm);
-  padding: var(--s3) var(--s4);
-  cursor: pointer;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  padding: var(--s3) var(--s4) var(--s4);
 }
-.ipo-top-pick:hover { background: var(--surface-3); box-shadow: var(--edge); }
-.ipo-top-pick .tp-head {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  font-size: var(--fs-sm);
-  color: var(--text);
+/* The name and the origin line are each given room for two lines whether they
+   need it or not: the gauges are what a reader compares across a row, and a
+   one-line name next to a two-line one puts them at different heights. */
+.wt-top { display: flex; align-items: center; gap: var(--s2); margin-bottom: 3px; min-height: 38px; }
+.wt-rank {
+  flex: 0 0 auto;
+  min-width: 20px;
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 3px;
+  text-align: center;
+  color: var(--text-3);
+  background: var(--surface-4);
+  border-radius: var(--r-pill);
+  padding: 2px 7px;
 }
-.ipo-top-pick .tp-style { font-size: var(--fs-xs); color: var(--text-3); margin-bottom: var(--s3); }
-.ipo-top-pick .tp-row {
-  display: flex;
-  justify-content: space-between;
+/* Only the head of the list gets the accent — a badge on all thirty-six is a
+   pattern, not a signal. */
+.wt-rank-top { color: var(--on-accent); background: var(--accent); }
+.wt-name {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+.wt-meta { font-size: var(--fs-xs); color: var(--text-3); margin-bottom: var(--s3); min-height: 34px; }
+
+/* Two tracks on one scale beat two numbers side by side: the gap between my
+   guess and the world's average is the whole point of the card, and a reader
+   sees it before reading either figure. */
+.wt-gauges { display: flex; flex-direction: column; gap: 5px; }
+.wt-gauge {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 34px;
   align-items: center;
   gap: var(--s2);
   font-size: var(--fs-xs);
-  color: var(--text-3);
-  margin-top: 3px;
 }
-.ipo-top-pick .tp-upside { font-weight: 700; font-size: var(--fs-sm); }
-.ipo-top-pick .tp-signal {
-  font-size: 11px;
-  padding: 2px 8px;
-  border: 1px solid;
+.wt-gauge-k { color: var(--text-3); }
+.wt-gauge-v { color: var(--text-2); font-weight: 600; text-align: right; }
+.wt-track {
+  height: 6px;
   border-radius: var(--r-pill);
-  font-weight: 600;
+  background: var(--surface-4);
+  overflow: hidden;
 }
-.rec-rank {
-  font-size: 11px;
-  font-weight: 600;
-  color: #17130a;
-  background: var(--accent);
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
+.wt-fill { display: block; height: 100%; border-radius: var(--r-pill); }
+.wt-fill-mine { background: var(--accent); }
+.wt-fill-world { background: var(--purple); }
+/* The verdict is a conclusion, so it sits at the foot of the card next to the
+   number it was drawn from, rather than competing with the name for the top
+   line — which is what was clipping the longer names. */
+.wt-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+.wt-edge { font-size: var(--fs-xs); }
+.wt-edge.fl { color: var(--text-3); }
+.wt-verdict {
   flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--wt-accent, var(--accent));
+  border: 1px solid var(--wt-accent, var(--accent));
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
 }
-.rec-pick .rec-why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--s2); }
-.rec-chip {
+.wt-why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--s3); }
+.wt-chip {
   font-size: 11px;
   color: var(--text-3);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-pill);
   padding: 2px 8px;
+}
+.wt-empty { color: var(--text-3); font-size: var(--fs-sm); padding: var(--s3) 0; }
+
+/* Crossed off */
+.wt-scoreline {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  line-height: 1.65;
+  margin: 0 0 var(--s4);
+  max-width: 78ch;
+}
+.bb-table.wt-done tbody tr { cursor: pointer; }
+.wt-cell-beer { color: var(--text); font-weight: 600; }
+.wt-cell-beer span { display: block; font-size: 12px; font-weight: 400; color: var(--text-3); }
+.wt-result {
+  display: inline-block;
+  font-size: 12px;
+  padding: 1px 7px;
+  border: 1px solid;
+  border-radius: var(--r-pill);
+  /* A pill that breaks across three lines stops reading as one label — the
+     table scrolls sideways inside its wrap instead. */
   white-space: nowrap;
 }
+.bb-ctrl-note { font-size: var(--fs-xs); color: var(--text-3); margin-left: auto; white-space: nowrap; }
 .freshness-note { font-size: var(--fs-xs); color: var(--text-3); margin-bottom: var(--s3); }
-
-/* Two-column content grid (watchlist + chart) */
-.bb-grid-2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--s4); }
-@media (max-width: 900px) { .bb-grid-2 { grid-template-columns: 1fr; } }
-
-/* Watchlist row left-border stripe (set via inline style per signal color) */
-.bb-table.ipo-watch tbody tr { border-left: 3px solid transparent; }
-.bb-table.ipo-watch tbody td:first-child { padding-left: var(--s2); }
 
 #bump-chart-wrap { position: relative; }
 #bump-chart-wrap canvas { display: block; }
@@ -1745,15 +1798,17 @@ body { overscroll-behavior: none; }
 #mapsec-journey .bb-table td:nth-child(3) { display: none; }
 #mapsec-drank .bb-table, #mapsec-brewed .bb-table, #mapsec-journey .bb-table { min-width: 0; }
 
-/* WHAT TO TRY tables — drop origin (and the narrowest comparison column on
-   the scorecard) so the essentials fit with less horizontal scrolling. */
-#ipoWatchTable th:nth-child(3),
-#ipoWatchTable td:nth-child(3),
-#ipoPricedPanel .bb-table th:nth-child(3),
-#ipoPricedPanel .bb-table td:nth-child(3),
-#ipoPricedPanel .bb-table th:nth-child(7),
-#ipoPricedPanel .bb-table td:nth-child(7) { display: none; }
-#ipoWatchTable, #ipoPricedPanel .bb-table { min-width: 0; }
+/* The scorecard drops to what a phone can actually compare: the one comparison
+   the whole panel exists for — the guess, the rating it got and the verdict.
+   Origin, the world average and both raw deltas come off; the flag repeats the
+   beer's own name, and the Result chip already says which way the deltas went. */
+#wtDoneTable th:nth-child(3), #wtDoneTable td:nth-child(3),
+#wtDoneTable th:nth-child(4), #wtDoneTable td:nth-child(4),
+#wtDoneTable th:nth-child(7), #wtDoneTable td:nth-child(7),
+#wtDoneTable th:nth-child(8), #wtDoneTable td:nth-child(8) { display: none; }
+#wtDoneTable { min-width: 0; }
+#wtDoneTable th, #wtDoneTable td { padding-left: 6px; padding-right: 6px; }
+#wtDoneTable th:nth-child(2) { width: 42%; }
 
 .subtabs { display: flex; width: 100%; margin-bottom: var(--s4); }
 .subtab { flex: 1; padding: 9px var(--s2); min-height: 42px; font-size: var(--fs-xs); }
@@ -1768,7 +1823,8 @@ body { overscroll-behavior: none; }
 .map-mode { padding: var(--s3); }
 .passport-grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: var(--s4) var(--s2); }
 
-.ipo-top-picks { grid-template-columns: 1fr; }
+.wt-grid { grid-template-columns: 1fr; }
+.bb-ctrl-note { margin-left: 0; white-space: normal; }
 .bb-collapse > summary { flex-wrap: wrap; }
 .sum-hint { margin-left: 0; flex-basis: 100%; text-align: left; }
 

@@ -7,7 +7,7 @@ The site is static — `index.html` loads `data.js`, then `app.js`, then
 
 | File | Holds |
 |------|-------|
-| `data.js` | **All data**: `beers[]`, `breweries[]`, `drunkLocs[]`, `BRAND_DOMAINS`, `FLAGS`/`CNAMES`, the Untappd averages, the IPO lists |
+| `data.js` | **All data**: `beers[]`, `breweries[]`, `drunkLocs[]`, `WANT_TO_TRY[]`, `BRAND_DOMAINS`, `FLAGS`/`CNAMES`, the Untappd averages |
 | `app.js` | **All behaviour**: statistics, rendering, charts, maps, search. No beer data. |
 | `style.css` | The design system. `:root` is the only place a colour is written. |
 | `data/` | Generated JSON/CSV copies of `data.js`. Never edit by hand — `npm run export` writes them. |
@@ -171,6 +171,67 @@ Two things it cannot check, because they need a browser and the open internet:
 `npm run smoke` (needs `npm install`) opens the page in a real browser and checks
 every tab, the modal, the map and the command palette still render.
 
+## Standard Operating Procedure: The Want-To-Try Shortlist
+
+`WANT_TO_TRY` in `data.js` is the standing list of beers not yet drunk. The
+"What to try" sub-section of Insights renders it, and `predictRating()` scores
+each entry against my taste so far.
+
+### Nothing is ever removed from it
+
+An entry is not deleted when the beer gets drunk. `drawWantToTry()` looks for a
+review of each entry on every render, and the answer decides which half of the
+section it appears in:
+
+- **no review** → it stays on the shortlist, ranked by predicted rating
+- **a review** → it leaves the shortlist and appears under "Crossed off",
+  where the guess made beforehand is scored against the rating given after
+
+So the only data-entry step when you finally drink something on the list is the
+normal one: add the review to `beers[]`. The section updates itself, the KPI
+counts move, and the calibration chart gains a bar. Deleting the entry instead
+would throw away the prediction, which is the only thing that makes the
+scorecard worth having.
+
+### Adding an entry
+
+```js
+{beer:'Tsingtao', style:'Lager', origin:'CN', abv:4.7, region:'Qingdao, Shandong', untappd:3.29, method:'Bottle'},
+```
+
+Same rules as a beer: `style` needs a colour in `sC`, `origin` needs `FLAGS` +
+`CNAMES` (UK split by nation as everywhere else), `method` is one of the four,
+and the beer needs a `BRAND_DOMAINS` entry — a shortlist card renders a logo
+like anything else. `untappd` is the world's average, from the same source as
+`UNTAPPD_GLOBAL_AVGS`.
+
+### `as` — when the shelf name isn't the logged name
+
+Crossing off is done by name, through `wtNorm()` in `app.js`: case, accents,
+apostrophes and punctuation are flattened, and what's left has to match word for
+word. That is deliberately strict — a looser rule would let *Peroni Original*
+cross off *Peroni Nastro Azzurro*.
+
+When a beer really is logged under a different name, say so:
+
+```js
+{beer:'Paulaner Hefe', ..., as:['Paulaner Hefe-Weißbier']},
+```
+
+`npm run check` warns when a shortlist entry looks like an already-reviewed beer
+under another name ("still on the shortlist, but "…" is already reviewed"). Read
+that warning as a prompt to add an `as` — or, if they are genuinely different
+beers, to leave it alone.
+
+### The prediction
+
+`predictRating(style, origin, untappd, method)` blends 50% world consensus, 25%
+style bias, 15% country bias, 10% base anchor and a serving-method nudge. It is
+recomputed on every render, so a guess shifts as the rest of the data does — an
+already-crossed-off beer's guess is not frozen at the value it had on the day.
+The `MIN_N` rule applies: a style or country average under three reviews falls
+back to the global average rather than bending the prediction toward one pour.
+
 ## Rendering Rule: `esc()` Everything
 
 `app.js` builds HTML with template literals and `innerHTML`. **Every value that
@@ -275,8 +336,9 @@ generous pour, and a style tried once becomes "my weakest".
 - **Seasonal heatmap**: cells under `MIN_N` are left uncolored — the color reads as a
   verdict, so it's withheld until the sample supports one.
 - **Taste profile**: a trait below `MIN_N` shows "n reviews · need 3" instead of a bar.
-- **Recommendations** (`predictRating()` + rationale chips): a style or country average
-  only counts as signal at `MIN_N`+; below that the term falls back to the global average.
+- **What to try** (`predictRating()` + the rationale chips on a shortlist card): a style
+  or country average only counts as signal at `MIN_N`+; below that the term falls back to
+  the global average and the chip claiming "I like X" is not written at all.
 
 ### What it does not affect
 
@@ -303,18 +365,24 @@ The chain is tiered by *source*, not by domain: every domain a beer lists is tri
 at each tier before dropping to the next, because a real Brandfetch logo for a
 beer's second domain beats a 16px favicon for its first.
 
-Nothing in this repo can check whether a domain actually has a logo behind it —
-that needs a browser that can reach those CDNs. Two things do the checking:
+A domain being *present* proves nothing — whether a real logo sits behind it needs
+a browser that can reach those CDNs. Four things do the checking:
 
 | What | When | Catches |
 |------|------|---------|
-| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES`, plus domains that aren't bare domains |
+| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]` and `WANT_TO_TRY`, plus domains that aren't bare domains |
 | `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
-| `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
+| `npm run logos` | run it yourself, and monthly in CI | what each beer *actually* resolves to |
+| `auditLogos()` in the console | run it manually | the same, from inside a page you already have open |
 
-`auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
-sources in the same order the `<img>` chain does, and prints a table. Read it for
-two things:
+`npm run logos` (`tools/audit-logos.mjs`) drives `auditLogos()` in headless
+Chromium and exits non-zero on anything that didn't resolve, so the answer stops
+depending on somebody remembering to open a console. The **Logo audit** workflow
+runs it on the 1st of each month and opens a `logo-audit` issue listing what
+fell through, closing it once everything resolves again — a logo can break with
+no change to this repo, when a brand moves domain or a service drops it.
+
+Either way, read the result for two things:
 
 - **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
 - **`suspect`** — something answered, but at favicon size (≤32px), which usually
@@ -326,9 +394,12 @@ field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
 that is a remote URL rather than a file in `logos/` is a hotlink to someone
 else's server: it works until it doesn't, and `npm run check` warns about it.
 
-Note that the placeholder is also what you see with no network, or behind a proxy
-that blocks those CDNs, so run the audit somewhere with open internet before
-concluding a domain is wrong.
+The placeholder is also what you see with no network, or behind a proxy that
+blocks those CDNs — which is why `npm run logos` probes a few brands that
+certainly have logos before auditing anything, and reports the connection rather
+than printing a hundred false failures. It exits 0 on that (a skip, not a pass);
+`--strict` makes it a failure instead, which is what CI uses so a run that
+checked nothing can't read as all-clear.
 
 ## Design System: Dark
 
@@ -360,6 +431,7 @@ for the case where the stylesheet hasn't landed — update them alongside the CS
 | `--border` / `--border-strong` | hairlines; `-strong` for fields and edges |
 | `--text` / `--text-2` / `--text-3` | body, secondary, captions |
 | `--accent` / `--accent-hi` | honey: `--accent` fills and draws, `--accent-hi` is the lighter cut for text |
+| `--on-accent` | the near-black ink for text sitting *on* the accent |
 | `--pos` `--neg` `--warn` `--info` `--purple` | semantics |
 | `--edge` | the whisper of a top edge on raised surfaces |
 | `--glow` | a soft focus ring — *not* a bloom |

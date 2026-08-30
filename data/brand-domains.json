@@ -389,7 +389,7 @@
     ]
   },
   {
-    "beer": "Newcastle Brown",
+    "beer": "Newcastle Brown Ale",
     "domains": [
       "newcastlebrown.com",
       "newcastlebrownale.com"
@@ -429,12 +429,6 @@
     "beer": "Paulaner Hefe-Weißbier",
     "domains": [
       "paulaner.com"
-    ]
-  },
-  {
-    "beer": "Peroni",
-    "domains": [
-      "peroni.it"
     ]
   },
   {

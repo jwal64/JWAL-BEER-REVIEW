@@ -79,7 +79,7 @@ jobs:
               `1. For each beer below, look up its current global average on untappd.com.`,
               `2. Update the value in the \`UNTAPPD_GLOBAL_AVGS\` map in \`data.js\`.`,
               `3. Bump \`UNTAPPD_LAST_REFRESHED\` to today's date.`,
-              `4. Also re-check the \`untappd:\` field on each entry of \`IPO_WATCHLIST\` and \`IPO_CANDIDATES\`.`,
+              `4. Also re-check the \`untappd:\` field on each entry of \`WANT_TO_TRY\`.`,
               `5. Run \`npm run check && npm run export\`, then commit and merge — this issue auto-closes on the next scheduled run.`,
               ``,
               `## Beers to verify`,
