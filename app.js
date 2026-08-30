@@ -178,7 +178,7 @@ function auditLogos({timeout=8000,concurrency=8}={}){
     for(const url of srcs){
       const hit=await tryOne(url);
       if(hit) return {beer:name,result:tierOf(name,url),size:`${hit.w}×${hit.h}`,
-                      suspect:(!isVectorLogo(url)&&hit.w>0&&hit.w<LOGO_MIN_PX)?'yes':'',url,
+                      suspect:hit.w<=32?'yes':'',url,
                       domains:brandDomains(name).join(', ')||'—'};
     }
     return {beer:name,result:srcs.length?'PLACEHOLDER':'NO DOMAIN',size:'—',suspect:'',
@@ -196,102 +196,36 @@ function auditLogos({timeout=8000,concurrency=8}={}){
     console.log(`[LOGO AUDIT] ${out.length} beers · ` +
       Object.entries(by).map(([k,v])=>`${k}: ${v}`).join(' · '));
     if(bad.length)  console.warn(`[LOGO AUDIT] ${bad.length} showing the placeholder:\n  - ${bad.map(r=>r.beer).join('\n  - ')}`);
-    if(susp.length) console.warn(`[LOGO AUDIT] ${susp.length} resolved below ${LOGO_MIN_PX}px (a favicon, not the brand's logo):\n  - ${susp.map(r=>`${r.beer} (${r.size}, ${r.domains})`).join('\n  - ')}`);
+    if(susp.length) console.warn(`[LOGO AUDIT] ${susp.length} resolved at favicon size (likely a generic icon, not the brand):\n  - ${susp.map(r=>`${r.beer} (${r.size}, ${r.domains})`).join('\n  - ')}`);
     if(!bad.length&&!susp.length) console.log('[LOGO AUDIT] every beer resolved a real logo.');
     return out;
   });
 }
 window.auditLogos=auditLogos;
 
-// ── THE CHAIN AT RUNTIME ──
-// The first source that *answers* is not the one to keep. Favicon services
-// answer for any domain they can resolve, often with a 16px globe, and a 16px
-// globe stretched across a 64px card is worse than the beer emoji. So each
-// <img> walks its sources until one comes back at LOGO_MIN_PX or better,
-// remembering the largest it saw in case none does — the result is the highest
-// resolution available for that beer, not the first thing that loaded.
-//
-// Load and error don't bubble, so the two listeners capture instead. That also
-// means no inline onerror handlers: the chain is one place, not a string built
-// into every tag.
-const LOGO_MIN_PX = 128;
-const LOGO_RESOLVED = new Map();   // beer → the source that came back full size
-const _logoBest = new WeakMap();   // <img> → the largest source it has seen
-const isVectorLogo = u => /\.svg(\?|$)/i.test(u);
-
-function logoPlaceholder(img){
-  const span=document.createElement('span');
-  span.textContent='🍺';
-  if(img.classList.contains('bc-logo')) span.className='bc-emoji';
-  else if(img.classList.contains('map-logo')) { img.remove(); return; }
-  else {
-    const size=parseInt(img.style.width,10)||24;
-    span.style.cssText=`display:inline-block;width:${size}px;text-align:center;font-size:${Math.round(size*.6)}px;vertical-align:middle;margin-right:6px`;
+function logoChainOnError(sources,replaceJS){
+  const tail=sources.slice(1);
+  let conds='';
+  for(let i=0;i<tail.length;i++){
+    conds+=`${i===0?'if':'else if'}(f===${i}){this.src='${tail[i]}';}`;
   }
-  img.replaceWith(span);
-}
-function logoAdvance(img){
-  const srcs=logoSources(img.dataset.logo);
-  const i=(+img.dataset.i||0)+1;
-  if(i<srcs.length){ img.dataset.i=i; img.src=srcs[i]; return; }
-  // Out of sources: keep the biggest that answered, however small.
-  const best=_logoBest.get(img);
-  if(best){ logoSettle(img,best.url); img.src=best.url; return; }
-  logoPlaceholder(img);
-}
-// The chain's answer for this beer, good or merely best-available. Recording it
-// means the next twenty renders of the same beer start there instead of walking
-// the tiers again.
-function logoSettle(img,url){
-  img.dataset.done='1';
-  LOGO_RESOLVED.set(img.dataset.logo,url);
-}
-function logoLoaded(img){
-  if(img.dataset.done) return;
-  const w=img.naturalWidth;
-  // A vector scales to any size, and a 0 reading means the browser declined to
-  // measure one — both count as full resolution.
-  if(isVectorLogo(img.src)||w===0||w>=LOGO_MIN_PX){ logoSettle(img,img.src); return; }
-  const best=_logoBest.get(img);
-  if(!best||w>best.w) _logoBest.set(img,{url:img.src,w});
-  logoAdvance(img);
-}
-document.addEventListener('load',ev=>{
-  const t=ev.target;
-  if(t&&t.tagName==='IMG'&&t.dataset.logo) logoLoaded(t);
-},true);
-document.addEventListener('error',ev=>{
-  const t=ev.target;
-  if(!t||t.tagName!=='IMG'||!t.dataset.logo) return;
-  if(t.dataset.done) logoPlaceholder(t); else logoAdvance(t);
-},true);
-
-// Where a beer's chain starts: the source already known to be full size, if one
-// has resolved on this page, so the second and later renders of the same beer
-// don't repeat the walk.
-function logoStart(name){
-  const known=LOGO_RESOLVED.get(name);
-  if(known) return {src:known,i:0,done:true};
-  const srcs=logoSources(name);
-  return srcs.length?{src:srcs[0],i:0,done:false}:null;
+  const elseClause=tail.length?`else{${replaceJS}}`:replaceJS;
+  return ` onerror="var f=+this.dataset.f||0;this.dataset.f=f+1;${conds}${elseClause}"`;
 }
 function logoImg(name,size=24){
-  const start=logoStart(name);
-  const emoji=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
-  if(!start) return emoji;
-  return `<img src="${esc(start.src)}" data-logo="${esc(name)}" data-i="${start.i}"${start.done?' data-done="1"':''} class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${esc(name)}" loading="lazy" decoding="async">`;
+  const emojiSpan=`<span style="display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px">🍺</span>`;
+  const sources=logoSources(name);
+  if(!sources.length)return emojiSpan;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🍺',style:'display:inline-block;width:${size}px;text-align:center;font-size:${size*.6}px;vertical-align:middle;margin-right:6px'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="beer-logo-inline" style="width:${size}px;height:${size}px" alt="${esc(name)}" loading="lazy" decoding="async"${onerr}>`;
 }
 function cardLogo(name){
-  const start=logoStart(name);
-  if(!start) return `<span class="bc-emoji">🍺</span>`;
-  return `<img src="${esc(start.src)}" data-logo="${esc(name)}" data-i="${start.i}"${start.done?' data-done="1"':''} class="bc-logo" alt="${esc(name)}" loading="lazy" decoding="async">`;
-}
-// The same chain inside a map popup, where a missing logo just disappears
-// rather than leaving an emoji in the middle of the card.
-function mapLogo(name,style){
-  const start=logoStart(name);
-  if(!start) return '';
-  return `<img src="${esc(start.src)}" data-logo="${esc(name)}" data-i="${start.i}"${start.done?' data-done="1"':''} class="map-logo" style="${style}" alt="${esc(name)}" loading="lazy" decoding="async">`;
+  const sources=logoSources(name);
+  if(!sources.length)return `<span class="bc-emoji">🍺</span>`;
+  const emojiReplace=`this.onerror=null;this.replaceWith(Object.assign(document.createElement('span'),{className:'bc-emoji',textContent:'🍺'}));`;
+  const onerr=logoChainOnError(sources,emojiReplace);
+  return `<img src="${sources[0]}" class="bc-logo" alt="${esc(name)}" loading="lazy" decoding="async"${onerr}>`;
 }
 
 const MONTH_FULL = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
@@ -1666,8 +1600,10 @@ function buildBrewedLayer(map){
   breweries.forEach(b=>{
     const a=avg(b.ratings),r=Math.max(6,Math.min(14,5+b.ratings.length*1.2));
     const firstBeer=b.beers.split(' · ')[0];
-    const logoHtml=mapLogo(firstBeer,'width:60px;height:20px;object-fit:contain;display:block;margin:3px 0');
-    const beerList=b.beers.split(' · ').map(n=>`<span style="color:var(--text-2)">${esc(n)}</span>`).join('<span style="color:var(--text-3)"> · </span>');
+    const srcs=logoSources(firstBeer);
+    const onerr=srcs.length>1?logoChainOnError(srcs,'this.onerror=null;this.remove();'):' onerror="this.onerror=null;this.remove();"';
+    const logoHtml=srcs.length?`<img src="${srcs[0]}" style="width:60px;height:20px;object-fit:contain;display:block;margin:3px 0" loading="lazy" decoding="async"${onerr}>`:'';
+    const beerList=b.beers.split(' · ').map(n=>`<span style="color:var(--text-2)">${n}</span>`).join('<span style="color:var(--text-3)"> · </span>');
     const html=popKicker('🏭 A brewery’s hometown')+logoHtml+
       `<span style="color:var(--text);font-weight:700;font-size:13px">${esc(b.name)}</span><br>`+
       `<span style="color:var(--text-2);font-size:13px">brews in ${esc(b.location)} · ${FLAGS[b.cc]||''} ${esc(b.country)}</span><br>`+

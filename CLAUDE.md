@@ -112,25 +112,12 @@ can. See "Verifying logos" below.
 
 ### Step 2.6: Optional — Local Logo Override
 
-Beers normally render their brand logo from Brandfetch's CDN at runtime, with
-Google favicons and Icon Horse as fallbacks. A local file overrides that chain —
-for offline reliability, for custom artwork, or to bypass a misidentified match.
+Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
 
-The easy way, for every beer at once:
+1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
+2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
 
-```sh
-npm run logos -- --save
-```
-
-By hand, for one beer:
-
-1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`). Prefer SVG
-   — a vector is sharp at every size the site draws it.
-2. Add `logo:"logos/<filename>"` as the last field of the beer's entries in `beers[]`.
-
-The local file becomes that beer's first source; the remote chain stays behind it
-as fallback if the file is ever missing. A file smaller than `LOGO_MIN_PX` (128px)
-is treated as a favicon and skipped in favour of a larger remote source.
+The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
 
 ### Step 3: Research Checklist (for each new beer)
 
@@ -175,10 +162,10 @@ npm run export    # refresh data/ to match, and commit it
 - an `UNTAPPD_GLOBAL_AVGS` key that matches no beer
 - `data/` being out of step with `data.js`
 
-Two things it cannot check, because they need the open internet:
+Two things it cannot check, because they need a browser and the open internet:
 
-- [ ] `npm run logos` resolves a real logo for the beer, in high definition — not
-      `MISSING` and not `(small)` (see "Verifying Logos" below)
+- [ ] `auditLogos()` in the console resolves a real logo, not a `PLACEHOLDER` or a
+      favicon-sized `suspect` (see "Verifying Logos" below)
 - [ ] `nativeName` added if the native-language name differs from the marketed name
 
 `npm run smoke` (needs `npm install`) opens the page in a real browser and checks
@@ -308,68 +295,39 @@ hardcode "3" in HTML or CSS.
 ## Verifying Logos
 
 Beers render their real brand logo at runtime through a four-tier chain, tried in
-order until one answers **at full resolution**:
+order until one answers:
 
 **local `logos/` override → Brandfetch CDN → Google favicons → Icon Horse → 🍺**
 
-Two rules govern the walk:
+The chain is tiered by *source*, not by domain: every domain a beer lists is tried
+at each tier before dropping to the next, because a real Brandfetch logo for a
+beer's second domain beats a 16px favicon for its first.
 
-- **Tiered by source, not by domain.** Every domain a beer lists is tried at each
-  tier before dropping to the next: a real Brandfetch logo for a beer's second
-  domain beats a 16px favicon for its first.
-- **The first source that answers is not automatically the one kept.** Favicon
-  services answer for any domain they can resolve, often with a generic 16px
-  globe, and a 16px globe stretched across a 64px card is worse than the emoji.
-  So the chain keeps walking until something comes back at **`LOGO_MIN_PX`
-  (128px)** or better, remembering the largest it saw in case nothing does. SVGs
-  count as full resolution at any size — a vector has none to be short of.
-
-`LOGO_MIN_PX` lives in `app.js` and is the only place that number is written; the
-audit tools read it from there.
-
-### Checking what actually resolves
-
-Nothing in this repo can know whether a domain has a logo behind it without
-asking the CDNs. Three things do the asking:
+Nothing in this repo can check whether a domain actually has a logo behind it —
+that needs a browser that can reach those CDNs. Two things do the checking:
 
 | What | When | Catches |
 |------|------|---------|
-| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES`, plus values that aren't bare domains |
-| `npm run logos` | run it manually, needs open internet | what each beer *actually* resolves to, at what pixel size |
-| `auditLogos()` in the browser console | run it manually | the same, from inside the page |
+| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES`, plus domains that aren't bare domains |
+| `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
+| `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
 
-Read either audit for two outcomes:
+`auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
+sources in the same order the `<img>` chain does, and prints a table. Read it for
+two things:
 
-- **`MISSING`** (`PLACEHOLDER` in the browser) — no source answered; the beer
-  shows 🍺.
-- **`(small)`** (`suspect` in the browser) — something answered, but under
-  `LOGO_MIN_PX`, which usually means a generic icon standing in for a domain the
-  service doesn't know.
+- **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
+- **`suspect`** — something answered, but at favicon size (≤32px), which usually
+  means a generic globe standing in for a domain the service doesn't know.
 
-Both mean the domain is wrong in `BRAND_DOMAINS`, or the brand simply isn't in
-any of the services.
-
-### Making a logo permanent
-
-```sh
-npm run logos -- --save
-```
-
-downloads the best source for every beer into `logos/` and points each beer's
-`logo` field at the file. That is the only way a logo becomes certain: a local
-file can't 404, can't rate-limit, can't change to another brand's mark, and works
-offline. Follow it with `npm run check` and read the diff.
-
-A beer that **already** has a `logo` field is left alone — those were chosen by
-hand, so `--save` lists them as skipped rather than overwriting them. Add
-`--relink` to replace them as well.
-
-A `logo` field that is a **remote URL** rather than a file in `logos/` is a
-hotlink to someone else's server: it works until it doesn't. `npm run check`
-warns about those, and `--save` converts them.
+Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
+in any of the services, save the logo into `logos/` and point the beer's `logo`
+field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
+that is a remote URL rather than a file in `logos/` is a hotlink to someone
+else's server: it works until it doesn't, and `npm run check` warns about it.
 
 Note that the placeholder is also what you see with no network, or behind a proxy
-that blocks those CDNs, so run an audit somewhere with open internet before
+that blocks those CDNs, so run the audit somewhere with open internet before
 concluding a domain is wrong.
 
 ## Design System: Dark

@@ -7,7 +7,6 @@
   "scripts": {
     "check": "node tools/validate-data.mjs && node tools/export-data.mjs --check",
     "export": "node tools/export-data.mjs",
-    "logos": "node tools/audit-logos.mjs",
     "sri": "node tools/sri.mjs",
     "smoke": "node tools/smoke-test.mjs",
     "test": "npm run check"
