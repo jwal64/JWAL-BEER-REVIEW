@@ -14,7 +14,7 @@ server.
 | `style.css` | The design system. `:root` is the only place a colour is written. |
 | `data/` | Generated exports of `data.js` as JSON and CSV — see below. |
 | `tools/` | Plain Node scripts. No dependencies, nothing to install. |
-| `logos/` | Local logo files. `npm run logos -- --save` fills this from the CDNs so the logos stop depending on them. |
+| `logos/` | Local logo files. `npm run logos -- --save` fills this from the CDNs so the logos stop depending on them; logos already set by hand are left alone. |
 
 Chart.js and Leaflet load from a CDN, pinned to an exact version and locked to a
 `integrity` hash, so a compromised CDN can't swap the library out.

@@ -358,8 +358,11 @@ npm run logos -- --save
 downloads the best source for every beer into `logos/` and points each beer's
 `logo` field at the file. That is the only way a logo becomes certain: a local
 file can't 404, can't rate-limit, can't change to another brand's mark, and works
-offline. Re-running is safe — an existing override is repointed, not duplicated.
-Follow it with `npm run check` and read the diff.
+offline. Follow it with `npm run check` and read the diff.
+
+A beer that **already** has a `logo` field is left alone — those were chosen by
+hand, so `--save` lists them as skipped rather than overwriting them. Add
+`--relink` to replace them as well.
 
 A `logo` field that is a **remote URL** rather than a file in `logos/` is a
 hotlink to someone else's server: it works until it doesn't. `npm run check`

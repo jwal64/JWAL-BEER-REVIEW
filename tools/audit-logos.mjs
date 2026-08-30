@@ -5,6 +5,8 @@
 //   node tools/audit-logos.mjs            report
 //   node tools/audit-logos.mjs --save     also save the best source into logos/
 //                                         and point the beer's `logo` field at it
+//   … --save --relink                     replace `logo` fields that are already
+//                                         set, which --save otherwise leaves alone
 //
 // Needs the open internet — it requests the same URLs the page does. Behind a
 // proxy that blocks the logo CDNs every beer reports MISSING, which says
@@ -19,6 +21,7 @@ import { loadData, loadLogoConfig, ROOT } from './load-data.mjs';
 import { imageSize, extFor } from './image-size.mjs';
 
 const SAVE = process.argv.includes('--save');
+const RELINK = process.argv.includes('--relink');
 const ONLY = process.argv.find(a => a.startsWith('--only='))?.slice(7);
 const TIMEOUT = 15000;
 
@@ -150,15 +153,25 @@ if (SAVE) {
   const dir = join(ROOT, 'logos');
   mkdirSync(dir, { recursive: true });
   let saved = 0;
+  const kept = [];
   for (const r of rows) {
-    if (!r.buf || r.url.startsWith('file:')) continue;   // already local
+    if (!r.buf) continue;
     const beerHasEntry = D.beers.some(b => b.beer === r.beer);
     if (!beerHasEntry) continue;                          // watchlist-only: nothing to point at
+    // A beer that already has a `logo` field was chosen by hand — a local file,
+    // or a URL someone picked deliberately. Leave it alone; --relink is how you
+    // say you meant to replace it.
+    if (localLogo.has(r.beer) && !RELINK) { kept.push(r.beer); continue; }
     const name = slug(r.beer) + extFor(r.size);
     writeFileSync(join(dir, name), r.buf);
     if (setLogoField(r.beer, `logos/${name}`)) saved++;
   }
   console.log(`\nSaved ${saved} logo(s) into logos/ and pointed data.js at them.`);
+  if (kept.length) {
+    console.log(`Left ${kept.length} beer(s) with a logo already set untouched:`);
+    for (const n of kept) console.log(`  · ${n} → ${localLogo.get(n)}`);
+    console.log(`Pass --relink to replace those too.`);
+  }
   console.log(`Run \`npm run check\` and review the diff before committing.\n`);
 } else {
   console.log('');

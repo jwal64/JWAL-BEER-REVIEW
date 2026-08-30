@@ -7,14 +7,19 @@ only one that works with no network at all.
 ## Filling it automatically
 
 ```sh
-npm run logos              # what does each beer actually resolve to, and how big?
-npm run logos -- --save    # download the best source for every beer into logos/
-                           # and point each beer's `logo` field at the file
+npm run logos                       # what does each beer resolve to, and how big?
+npm run logos -- --save             # download the best source for every beer into
+                                    # logos/ and point its `logo` field at the file
+npm run logos -- --save --relink    # …replacing logos that are already set, too
 ```
 
 `--save` writes `logos/<beer-slug>.<ext>` and adds `logo:"logos/…"` to that
-beer's entries in `data.js`. Re-running it is safe: an existing override is
-repointed, not duplicated. Run `npm run check` and read the diff afterwards.
+beer's entries in `data.js`. Run `npm run check` and read the diff afterwards.
+
+**A beer that already has a `logo` field is left alone.** Those were chosen by
+hand — a local file, or a particular image someone picked — so `--save` never
+overwrites one; it lists what it skipped instead. `--relink` is how you say you
+meant to replace them.
 
 Both need the open internet — they request the same URLs the page does.
 
