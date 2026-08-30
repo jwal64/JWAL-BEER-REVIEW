@@ -59,6 +59,10 @@ Nothing else in the repo reads `data/` — it exists so the data can leave.
 
 ## Hosting it somewhere else
 
+Picking this repo up after a change of layout — or moving the data into a
+database — is covered in detail in [HANDOFF.md](HANDOFF.md).
+
+
 The site is four static files; any static host serves it as-is.
 
 To put the reviews in a database instead, import `data/*.json` — the JSON is
