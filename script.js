@@ -4,23 +4,6 @@
 const FLAGS={ES:"🇪🇸",DE:"🇩🇪",IE:"🇮🇪",JM:"🇯🇲",BE:"🇧🇪",JP:"🇯🇵",NL:"🇳🇱",FR:"🇫🇷",MX:"🇲🇽",CA:"🇨🇦",DK:"🇩🇰",US:"🇺🇸",IT:"🇮🇹",BR:"🇧🇷",CN:"🇨🇳",ZA:"🇿🇦",GR:"🇬🇷",AU:"🇦🇺",SE:"🇸🇪",CZ:"🇨🇿",PT:"🇵🇹",AR:"🇦🇷",GB:"🇬🇧","GB-ENG":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","GB-SCT":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","GB-WLS":"🏴󠁧󠁢󠁷󠁬󠁳󠁿","GB-NIR":"🇬🇧",NO:"🇳🇴",PL:"🇵🇱",TH:"🇹🇭",SG:"🇸🇬",AT:"🇦🇹",PR:"🇵🇷",LB:"🇱🇧",CU:"🇨🇺",DO:"🇩🇴"};
 const CNAMES={DE:"Germany",IE:"Ireland",JM:"Jamaica",BE:"Belgium",JP:"Japan",NL:"Netherlands",FR:"France",MX:"Mexico",CA:"Canada",DK:"Denmark",US:"USA",IT:"Italy",ES:"Spain",BR:"Brazil",CN:"China",ZA:"South Africa",GR:"Greece",AU:"Australia",SE:"Sweden",CZ:"Czech Republic",PT:"Portugal",AR:"Argentina",GB:"Great Britain","GB-ENG":"England","GB-SCT":"Scotland","GB-WLS":"Wales","GB-NIR":"Northern Ireland",NO:"Norway",PL:"Poland",TH:"Thailand",SG:"Singapore",AT:"Austria",PR:"Puerto Rico",LB:"Lebanon",CU:"Cuba",DO:"Dominican Republic"};
 
-// ══════════════════════════════════════════════════════════════
-// GOOGLE SHEETS INTEGRATION
-// ══════════════════════════════════════════════════════════════
-// To use: 1) Create a Google Sheet with 3 tabs: "Beers", "Breweries", "Locations"
-//         2) Publish it: File → Share → Publish to web → Entire Document → CSV
-//         3) Paste the sheet ID below (the long string in the URL between /d/ and /edit)
-//         4) Data loads live from the sheet — no PRs needed to add beers!
-//         If the sheet is unavailable, the hardcoded data below is used as fallback.
-const SHEETS_CONFIG = {
-  enabled: false,            // Set to true once you've set up your Google Sheet
-  sheetId: '',               // Paste your Google Sheet ID here
-  // Tab names in your Google Sheet (must match exactly):
-  beersTab: 'Beers',
-  breweriesTab: 'Breweries',
-  locationsTab: 'Locations'
-};
-
 let beers=[
   // JAN 2026 (17 beers)
   {beer:"Grolsch",         style:"Pilsner",            origin:"NL",abv:5.0,method:"Bottle",city:"Hengelo",     region:"Overijssel",      country:"Netherlands", cc:"NL", rating:3.50,isNew:false,month:"Jan",monthN:1,year:2026},
@@ -603,7 +586,7 @@ function stampMinNHints(root=document){
 }
 
 // ══════════════════════════════════════════════════════════════
-// PRE-COMPUTED STATISTICS — recomputed when data loads from Sheets
+// PRE-COMPUTED STATISTICS
 // ══════════════════════════════════════════════════════════════
 function computeStats(){
   const styleMap={},methodMap={},countryMap={},cityMap={},brandMap={},brandStats={};
@@ -704,7 +687,6 @@ function computeCanonLoc(){
   return out;
 }
 let CANON_LOC=computeCanonLoc();
-function refreshStats(){ CANON_LOC=computeCanonLoc(); STATS=computeStats(); buildIndexes(); rebuildLocalLogos(); }
 let STATS=computeStats();
 buildIndexes();
 
@@ -770,124 +752,6 @@ function updateLiveStats(){
 }
 try { updateLiveStats(); } catch(e){ console.error('Live stats error:',e); }
 try { stampMinNHints(); } catch(e){ console.error('Min-n hint error:',e); }
-
-// ══════════════════════════════════════════════════════════════
-// GOOGLE SHEETS LOADER — fetches live data and refreshes the dashboard
-// ══════════════════════════════════════════════════════════════
-(function loadFromGoogleSheets(){
-  if(!SHEETS_CONFIG.enabled || !SHEETS_CONFIG.sheetId) return;
-
-  const base=`https://docs.google.com/spreadsheets/d/${SHEETS_CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=`;
-
-  function parseCSV(text){
-    const rows=[];
-    const lines=text.split('\n');
-    if(lines.length<2) return rows;
-    const headers=parseCSVLine(lines[0]);
-    for(let i=1;i<lines.length;i++){
-      const line=lines[i].trim();
-      if(!line) continue;
-      const vals=parseCSVLine(line);
-      const obj={};
-      headers.forEach((h,j)=>{ obj[h.trim()]=vals[j]||''; });
-      rows.push(obj);
-    }
-    return rows;
-  }
-
-  function parseCSVLine(line){
-    const result=[];
-    let current='';
-    let inQuotes=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(inQuotes){
-        if(ch==='"'&&line[i+1]==='"'){current+='"';i++;}
-        else if(ch==='"'){inQuotes=false;}
-        else{current+=ch;}
-      } else {
-        if(ch==='"'){inQuotes=true;}
-        else if(ch===','){result.push(current);current='';}
-        else{current+=ch;}
-      }
-    }
-    result.push(current);
-    return result;
-  }
-
-  function toNum(v,fallback){const n=parseFloat(v);return isNaN(n)?fallback:n;}
-  function toBool(v){return v==='true'||v==='TRUE'||v==='1'||v==='yes'||v==='YES';}
-
-  function parseBeerRow(r){
-    return {
-      beer:r.beer||'',style:r.style||'',origin:r.origin||'',
-      abv:toNum(r.abv,0),method:r.method||'Bottle',
-      city:r.city||'',region:r.region||'',country:r.country||'',cc:r.cc||'',
-      rating:toNum(r.rating,0),isNew:toBool(r.isNew),
-      month:r.month||'',monthN:toNum(r.monthN,1),year:toNum(r.year,2026)
-    };
-  }
-
-  function parseBreweryRow(r){
-    const obj={
-      name:r.name||'',location:r.location||'',country:r.country||'',
-      cc:r.cc||'',lang:r.lang||'en',beers:r.beers||'',
-      lat:toNum(r.lat,0),lng:toNum(r.lng,0),
-      ratings:(r.ratings||'').split(',').map(v=>toNum(v.trim(),0)).filter(v=>v>0)
-    };
-    if(r.nativeName) obj.nativeName=r.nativeName;
-    return obj;
-  }
-
-  function parseLocationRow(r){
-    return {
-      city:r.city||'',region:r.region||'',country:r.country||'',cc:r.cc||'',
-      lat:toNum(r.lat,0),lng:toNum(r.lng,0)
-    };
-  }
-
-  function refreshUI(){
-    refreshStats();
-    // Reset all lazy-loaded tab flags so they re-render with new data
-    ['_cD','_ciD','_inD','_tmpD','_ciX','_ipoD','_dM','_langD']
-      .forEach(f=>window[f]=false);
-    // Re-run live stats
-    try { updateLiveStats(); } catch(e){console.error('Sheets refresh error:',e);}
-    // Re-render the currently active tab
-    const activePanel=document.querySelector('.panel.active');
-    if(activePanel) showTab(activePanel.id);
-    console.log(`%c[SHEETS] Loaded ${beers.length} beers, ${breweries.length} breweries, ${drunkLocs.length} locations from Google Sheets`,'color:#46c68a');
-  }
-
-  // Fetch all 3 sheets in parallel
-  Promise.all([
-    fetch(base+encodeURIComponent(SHEETS_CONFIG.beersTab)).then(r=>r.text()),
-    fetch(base+encodeURIComponent(SHEETS_CONFIG.breweriesTab)).then(r=>r.text()),
-    fetch(base+encodeURIComponent(SHEETS_CONFIG.locationsTab)).then(r=>r.text())
-  ]).then(([beersCSV,brewCSV,locsCSV])=>{
-    const sheetBeers=parseCSV(beersCSV).map(parseBeerRow);
-    const sheetBreweries=parseCSV(brewCSV).map(parseBreweryRow);
-    const sheetLocs=parseCSV(locsCSV).map(parseLocationRow);
-    // Only replace if we got valid data
-    if(sheetBeers.length>0){
-      beers.length=0;
-      sheetBeers.forEach(b=>beers.push(b));
-      // Re-merge localStorage user beers
-      try{const saved=JSON.parse(localStorage.getItem('brewUserBeers')||'[]');saved.forEach(b=>beers.push(b));}catch(e){}
-    }
-    if(sheetBreweries.length>0){
-      breweries.length=0;
-      sheetBreweries.forEach(b=>breweries.push(b));
-    }
-    if(sheetLocs.length>0){
-      drunkLocs.length=0;
-      sheetLocs.forEach(l=>drunkLocs.push(l));
-    }
-    refreshUI();
-  }).catch(err=>{
-    console.warn('[SHEETS] Could not load from Google Sheets, using hardcoded data.',err);
-  });
-})();
 
 // ── KEYBOARD SHORTCUTS (1-6 / F1-F6 for tabs; Esc for modal)
 (function(){
@@ -1564,8 +1428,8 @@ function arcPts(aLat,aLng,bLat,bLng){
   return pts;
 }
 
-// Track the Leaflet instance so a Sheets-driven refresh can dispose the
-// existing map before re-initializing — without this Leaflet throws
+// Track the Leaflet instance so a re-render can dispose the existing map
+// before re-initializing — without this Leaflet throws
 // "Map container is already initialized."
 let _worldMap=null, _mapLayers=null, _mapMode='drank';
 

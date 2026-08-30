@@ -167,8 +167,8 @@ single **canonical location** — its **most unique** city.
 
 Keep recording each review's **real** consumption city/region/country/cc in `beers[]` as
 normal — do **not** pre-apply this rule when adding data. It is enforced at display time in
-`script.js` by `computeCanonLoc()` / the `CANON_LOC` map (recomputed in `refreshStats()`),
-so it stays correct automatically as data changes. Ensure any consumption city involved
+`script.js` by `computeCanonLoc()` / the `CANON_LOC` map, built at load, so it stays
+correct automatically as data changes. Ensure any consumption city involved
 exists in `drunkLocs[]` as usual.
 
 > Note: as of the latest data, every beer is reviewed in exactly one city, so this rule is
