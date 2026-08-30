@@ -1,0 +1,163 @@
+name: Logo audit
+
+# `npm run check` can only see whether a beer has a BRAND_DOMAINS entry at all.
+# Whether a real logo sits behind that domain needs a browser that can reach
+# Brandfetch, Google and Icon Horse — which is what this runs, monthly, so a
+# beer that quietly falls back to the 🍺 placeholder is noticed by something
+# other than a person happening to look at that card.
+#
+# A logo can break without the repo changing: a brand moves domain, or one of
+# the three services drops it. That is why this is scheduled rather than run on
+# push.
+
+on:
+  schedule:
+    - cron: '0 10 1 * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright and Chromium
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Audit every logo
+        id: audit
+        run: |
+          # A beer with no logo is what this is for, so a non-zero exit is a
+          # result, not a workflow failure. Only a crash should fail the run.
+          #
+          # --strict so an unreachable CDN fails loudly instead of exiting 0:
+          # a run that audited nothing would otherwise read as "all clear" and
+          # close the issue.
+          set +e
+          node tools/audit-logos.mjs --json --strict > audit.json
+          STATUS=$?
+          set -e
+          if [ ! -s audit.json ]; then
+            echo "The audit produced no report. Either it crashed, or the logo CDNs were" >&2
+            echo "unreachable from the runner — see the step log above. Nothing was checked," >&2
+            echo "so no issue is opened or closed on this run." >&2
+            exit 1
+          fi
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          node -e "
+            const a = require('./audit.json');
+            const line = r => \`- [ ] **\${r.beer}** — \${r.domains}\`;
+            const out = [];
+            if (a.bad.length) out.push('## Showing the 🍺 placeholder', '',
+              'No source answered for these — the domain is wrong, or no service knows it.', '',
+              ...a.bad.map(line), '');
+            if (a.suspect.length) out.push('## Resolved at favicon size', '',
+              'Something answered, but at 32px or smaller — usually a generic globe standing in',
+              'for a domain the service does not know, which renders as a logo but is not one.', '',
+              ...a.suspect.map(r => \`- [ ] **\${r.beer}** — \${r.size}, \${r.domains}\`), '');
+            require('fs').writeFileSync('report.md', out.join('\n'));
+            console.log(\`::notice::\${a.total} beers audited · \${a.bad.length} placeholder · \${a.suspect.length} suspect\`);
+          "
+          {
+            echo "report<<REPORT_EOF"
+            cat report.md
+            echo "REPORT_EOF"
+          } >> "$GITHUB_OUTPUT"
+          node -e "
+            const a = require('./audit.json');
+            console.log('total=' + a.total);
+            console.log('bad=' + a.bad.length);
+            console.log('suspect=' + a.suspect.length);
+          " >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the logo issue
+        if: steps.audit.outputs.status != '0'
+        uses: actions/github-script@v7
+        env:
+          TOTAL: ${{ steps.audit.outputs.total }}
+          BAD: ${{ steps.audit.outputs.bad }}
+          SUSPECT: ${{ steps.audit.outputs.suspect }}
+          REPORT: ${{ steps.audit.outputs.report }}
+        with:
+          script: |
+            const { TOTAL, BAD, SUSPECT, REPORT } = process.env;
+            const title = `${BAD} beers show no logo, ${SUSPECT} look wrong`;
+            const body = [
+              `${TOTAL} beers were checked against the live logo chain`,
+              `(local \`logos/\` → Brandfetch → Google favicons → Icon Horse).`,
+              ``,
+              REPORT || '_(the report came back empty — check the workflow run)_',
+              `## How to fix one`,
+              `1. Correct the beer's entry in \`BRAND_DOMAINS\` in \`data.js\`. A beer may list`,
+              `   several domains — they are tried in order, and every one has to belong to`,
+              `   that brand. A parent company's domain is not a fallback.`,
+              `2. If no service knows the brand at all, save the logo into \`logos/\` and point`,
+              `   the beer's \`logo\` field at it. That is the only way to make one certain.`,
+              `3. Re-run this workflow, or \`npm run logos\` locally, to confirm.`,
+              ``,
+              `This issue is updated on each monthly run and closes itself once every beer`,
+              `resolves a real logo.`,
+            ].join('\n');
+
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'logo-audit',
+            });
+
+            if (existing.length > 0) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing[0].number,
+                title,
+                body,
+              });
+              core.info(`Updated existing issue #${existing[0].number}`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['logo-audit'],
+              });
+              core.info(`Opened issue #${created.number}`);
+            }
+
+      - name: Close the logo issue once every beer resolves
+        if: steps.audit.outputs.status == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'logo-audit',
+            });
+            for (const issue of open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: 'Every beer resolves a real logo again — closing.',
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+            }

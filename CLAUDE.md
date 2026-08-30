@@ -365,18 +365,24 @@ The chain is tiered by *source*, not by domain: every domain a beer lists is tri
 at each tier before dropping to the next, because a real Brandfetch logo for a
 beer's second domain beats a 16px favicon for its first.
 
-Nothing in this repo can check whether a domain actually has a logo behind it —
-that needs a browser that can reach those CDNs. Two things do the checking:
+A domain being *present* proves nothing — whether a real logo sits behind it needs
+a browser that can reach those CDNs. Four things do the checking:
 
 | What | When | Catches |
 |------|------|---------|
 | `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]` and `WANT_TO_TRY`, plus domains that aren't bare domains |
 | `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
-| `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
+| `npm run logos` | run it yourself, and monthly in CI | what each beer *actually* resolves to |
+| `auditLogos()` in the console | run it manually | the same, from inside a page you already have open |
 
-`auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
-sources in the same order the `<img>` chain does, and prints a table. Read it for
-two things:
+`npm run logos` (`tools/audit-logos.mjs`) drives `auditLogos()` in headless
+Chromium and exits non-zero on anything that didn't resolve, so the answer stops
+depending on somebody remembering to open a console. The **Logo audit** workflow
+runs it on the 1st of each month and opens a `logo-audit` issue listing what
+fell through, closing it once everything resolves again — a logo can break with
+no change to this repo, when a brand moves domain or a service drops it.
+
+Either way, read the result for two things:
 
 - **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
 - **`suspect`** — something answered, but at favicon size (≤32px), which usually
@@ -388,9 +394,12 @@ field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
 that is a remote URL rather than a file in `logos/` is a hotlink to someone
 else's server: it works until it doesn't, and `npm run check` warns about it.
 
-Note that the placeholder is also what you see with no network, or behind a proxy
-that blocks those CDNs, so run the audit somewhere with open internet before
-concluding a domain is wrong.
+The placeholder is also what you see with no network, or behind a proxy that
+blocks those CDNs — which is why `npm run logos` probes a few brands that
+certainly have logos before auditing anything, and reports the connection rather
+than printing a hundred false failures. It exits 0 on that (a skip, not a pass);
+`--strict` makes it a failure instead, which is what CI uses so a run that
+checked nothing can't read as all-clear.
 
 ## Design System: Dark
 

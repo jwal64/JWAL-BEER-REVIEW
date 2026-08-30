@@ -40,6 +40,7 @@ domain fails the build instead of quietly rendering wrong.
 | `npm run export` | Regenerates `data/` from `data.js` |
 | `npm run sri` | Re-derives the CDN `integrity` hashes from npm (`-- --write` to fix them) |
 | `npm run smoke` | Opens the page in a real browser and checks it works (needs `npm install`) |
+| `npm run logos` | Checks every beer actually resolves a logo, against the live CDNs (needs `npm install`) |
 
 ## The data
 

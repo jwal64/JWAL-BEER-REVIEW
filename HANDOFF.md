@@ -201,6 +201,7 @@ None of these need an install except `smoke`.
 | `npm run export` | Regenerates `data/` from `data.js` |
 | `npm run sri` | Re-derives the CDN integrity hashes from the npm registry (`-- --write` to fix) |
 | `npm run smoke` | Drives the real page in headless Chromium (needs `npm install`) |
+| `npm run logos` | Resolves every beer's logo against the live CDNs (needs `npm install`) |
 
 `CLAUDE.md` holds the full rules — how to add a beer, the ranking threshold, the
 design tokens. `README.md` is the short version.

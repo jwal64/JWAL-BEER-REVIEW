@@ -9,6 +9,7 @@
     "export": "node tools/export-data.mjs",
     "sri": "node tools/sri.mjs",
     "smoke": "node tools/smoke-test.mjs",
+    "logos": "node tools/audit-logos.mjs",
     "test": "npm run check"
   },
   "engines": {
