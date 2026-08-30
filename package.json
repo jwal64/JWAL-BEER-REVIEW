@@ -1,0 +1,20 @@
+{
+  "name": "jwal-beer-review",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A running log of every beer I drink — ratings, places and trends. A static site: index.html + data.js + app.js + style.css, no build step.",
+  "license": "MIT",
+  "scripts": {
+    "check": "node tools/validate-data.mjs && node tools/export-data.mjs --check",
+    "export": "node tools/export-data.mjs",
+    "sri": "node tools/sri.mjs",
+    "smoke": "node tools/smoke-test.mjs",
+    "test": "npm run check"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

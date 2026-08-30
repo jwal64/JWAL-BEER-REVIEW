@@ -1,0 +1,218 @@
+[
+  {
+    "city": "New York",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 40.7128,
+    "lng": -74.006
+  },
+  {
+    "city": "New Rochelle",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 40.9115,
+    "lng": -73.7826
+  },
+  {
+    "city": "White Plains",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 41.034,
+    "lng": -73.7629
+  },
+  {
+    "city": "Eastchester",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 40.9565,
+    "lng": -73.8115
+  },
+  {
+    "city": "Hartsdale",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 41.0215,
+    "lng": -73.7987
+  },
+  {
+    "city": "Montreal",
+    "region": "Quebec",
+    "country": "Canada",
+    "cc": "CA",
+    "lat": 45.5017,
+    "lng": -73.5673
+  },
+  {
+    "city": "Amsterdam",
+    "region": "Noord-Holland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lat": 52.3676,
+    "lng": 4.9041
+  },
+  {
+    "city": "Hengelo",
+    "region": "Overijssel",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lat": 52.266,
+    "lng": 6.793
+  },
+  {
+    "city": "Uncasville",
+    "region": "Connecticut",
+    "country": "USA",
+    "cc": "US",
+    "lat": 41.4775,
+    "lng": -72.0892
+  },
+  {
+    "city": "Queens",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 40.7282,
+    "lng": -73.7949
+  },
+  {
+    "city": "Oldenzaal",
+    "region": "Overijssel",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lat": 52.3107,
+    "lng": 6.928
+  },
+  {
+    "city": "Nijmegen",
+    "region": "Gelderland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lat": 51.8426,
+    "lng": 5.8528
+  },
+  {
+    "city": "Antwerp",
+    "region": "Antwerp",
+    "country": "Belgium",
+    "cc": "BE",
+    "lat": 51.2194,
+    "lng": 4.4025
+  },
+  {
+    "city": "Boston",
+    "region": "Massachusetts",
+    "country": "USA",
+    "cc": "US",
+    "lat": 42.3601,
+    "lng": -71.0589
+  },
+  {
+    "city": "Stamford",
+    "region": "Connecticut",
+    "country": "USA",
+    "cc": "US",
+    "lat": 41.0534,
+    "lng": -73.5387
+  },
+  {
+    "city": "Clemson",
+    "region": "South Carolina",
+    "country": "USA",
+    "cc": "US",
+    "lat": 34.6834,
+    "lng": -82.8374
+  },
+  {
+    "city": "Barcelona",
+    "region": "Catalonia",
+    "country": "Spain",
+    "cc": "ES",
+    "lat": 41.3851,
+    "lng": 2.1734
+  },
+  {
+    "city": "Madrid",
+    "region": "Madrid",
+    "country": "Spain",
+    "cc": "ES",
+    "lat": 40.4168,
+    "lng": -3.7038
+  },
+  {
+    "city": "Lagos",
+    "region": "Algarve",
+    "country": "Portugal",
+    "cc": "PT",
+    "lat": 37.1028,
+    "lng": -8.6736
+  },
+  {
+    "city": "Sciara",
+    "region": "Sicily",
+    "country": "Italy",
+    "cc": "IT",
+    "lat": 37.9156,
+    "lng": 13.9344
+  },
+  {
+    "city": "East Rutherford",
+    "region": "New Jersey",
+    "country": "USA",
+    "cc": "US",
+    "lat": 40.8127,
+    "lng": -74.0846
+  },
+  {
+    "city": "San Juan",
+    "region": "San Juan",
+    "country": "Puerto Rico",
+    "cc": "PR",
+    "lat": 18.4655,
+    "lng": -66.1057
+  },
+  {
+    "city": "Washington",
+    "region": "District of Columbia",
+    "country": "USA",
+    "cc": "US",
+    "lat": 38.9072,
+    "lng": -77.0369
+  },
+  {
+    "city": "Boynton Beach",
+    "region": "Florida",
+    "country": "USA",
+    "cc": "US",
+    "lat": 26.5253,
+    "lng": -80.0664
+  },
+  {
+    "city": "Miami",
+    "region": "Florida",
+    "country": "USA",
+    "cc": "US",
+    "lat": 25.7617,
+    "lng": -80.1918
+  },
+  {
+    "city": "Ischia",
+    "region": "Campania",
+    "country": "Italy",
+    "cc": "IT",
+    "lat": 40.7333,
+    "lng": 13.95
+  },
+  {
+    "city": "Capri",
+    "region": "Campania",
+    "country": "Italy",
+    "cc": "IT",
+    "lat": 40.5532,
+    "lng": 14.2222
+  }
+]

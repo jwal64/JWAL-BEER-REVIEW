@@ -1,8 +1,24 @@
 # JWAL Beer Review - Development Guide
 
+## Where things live
+
+The site is static — `index.html` loads `data.js`, then `app.js`, then
+`style.css`. There is no build step.
+
+| File | Holds |
+|------|-------|
+| `data.js` | **All data**: `beers[]`, `breweries[]`, `drunkLocs[]`, `BRAND_DOMAINS`, `FLAGS`/`CNAMES`, the Untappd averages, the IPO lists |
+| `app.js` | **All behaviour**: statistics, rendering, charts, maps, search. No beer data. |
+| `style.css` | The design system. `:root` is the only place a colour is written. |
+| `data/` | Generated JSON/CSV copies of `data.js`. Never edit by hand — `npm run export` writes them. |
+| `tools/` | Zero-dependency Node scripts (validate, export, SRI, smoke test). |
+
+Add data to `data.js` only. A review added to `app.js` would be invisible to
+`npm run check` and to everything in `data/`.
+
 ## Standard Operating Procedure: Adding New Beers
 
-When adding a new beer entry to `script.js`, **every beer must have its brewery location and language data tracked**. Follow these steps in order:
+When adding a new beer entry to `data.js`, **every beer must have its brewery location and language data tracked**. Follow these steps in order:
 
 ### Step 1: Add the Beer Entry to the `beers[]` Array
 
@@ -39,7 +55,7 @@ specific constituent-country code instead, based on where the brewery is actuall
 | Wales                | `GB-WLS`            | Wales                |
 | Northern Ireland     | `GB-NIR`            | Northern Ireland     |
 
-These codes already exist in `FLAGS` and `CNAMES` in `script.js`. The plain `GB` code and
+These codes already exist in `FLAGS` and `CNAMES` in `data.js`. The plain `GB` code and
 "Great Britain" label are only a fallback for the rare case where the specific UK nation
 can't be determined — always prefer the specific code when known. This applies to the
 `origin` field on beer entries and the `cc`/`country` fields on brewery entries; `lang`
@@ -69,7 +85,7 @@ Required brewery fields:
 
 ### Step 2.5: Add the Brand Domain (REQUIRED)
 
-Every beer must have an entry in `BRAND_DOMAINS` at the top of `script.js`, or it
+Every beer must have an entry in `BRAND_DOMAINS` in `data.js`, or it
 renders the 🍺 placeholder forever — there is no name-based guess behind it:
 
 ```js
@@ -114,7 +130,7 @@ Before adding any beer, research and confirm:
    - `ja` = Japanese, `cs` = Czech, `pl` = Polish, `da` = Danish, `pt` = Portuguese
    - `en` = English, `sv` = Swedish, `no` = Norwegian, `zh` = Chinese
 4. **Native name**: If the beer's name in its native language differs from the marketed English name (e.g. Pilsner Urquell -> Plzeňský Prazdroj, Sapporo -> サッポロビール), record the `nativeName`.
-5. **Country maps**: Ensure the brewery's country code exists in `FLAGS` and `CNAMES` at the top of `script.js`. If not, add it.
+5. **Country maps**: Ensure the brewery's country code exists in `FLAGS` and `CNAMES` at the top of `data.js`. If not, add it.
 
 ### Step 4: Update Consumption Location (if new)
 
@@ -126,18 +142,72 @@ If the beer was consumed in a new city, add it to the `drunkLocs[]` array:
 
 ### Step 5: Validate
 
-After adding a new beer, verify:
-- [ ] Beer entry has all required fields (no missing commas, correct types)
-- [ ] `origin` code matches the brewery's country code
-- [ ] Brewery exists in `breweries[]` with `lang` field set
+```sh
+npm run check     # enforces every rule below
+npm run export    # refresh data/ to match, and commit it
+```
+
+`npm run check` needs nothing installed, and runs in CI on every push. It fails on:
+
+- a beer entry with a missing or wrong-typed field
+- a rating that isn't 0–5 in quarter steps, or a `monthN` that disagrees with `month`
+- an `origin` or `cc` with no entry in `FLAGS` **and** `CNAMES`, or a `country` that
+  doesn't match `CNAMES[cc]`
+- a `style` with no colour in the `sC` map in `app.js`
+- a beer no brewery in `breweries[]` lists
+- a brewery whose `beers` and `ratings` are different lengths, or whose rating
+  matches no review of that beer
+- a beer with no `BRAND_DOMAINS` entry (it would render the 🍺 placeholder forever)
+- a consumption city missing from `drunkLocs[]`
+- an `UNTAPPD_GLOBAL_AVGS` key that matches no beer
+- `data/` being out of step with `data.js`
+
+Two things it cannot check, because they need a browser and the open internet:
+
+- [ ] `auditLogos()` in the console resolves a real logo, not a `PLACEHOLDER` or a
+      favicon-sized `suspect` (see "Verifying Logos" below)
 - [ ] `nativeName` added if the native-language name differs from the marketed name
-- [ ] If beer is from a new brewery, a full brewery entry was added
-- [ ] If beer is from an existing brewery, update its `beers` and `ratings` fields
-- [ ] Beer has a `BRAND_DOMAINS` entry (the console logs `[DOMAIN CHECK]` on load if not)
-- [ ] `auditLogos()` in the browser console resolves a real logo for it
-- [ ] Consumption city exists in `drunkLocs[]`
-- [ ] Country code exists in `FLAGS` and `CNAMES`
-- [ ] If the beer introduces a brand-new `style`, that style has a color in the `sC` map in `script.js`
+
+`npm run smoke` (needs `npm install`) opens the page in a real browser and checks
+every tab, the modal, the map and the command palette still render.
+
+## Rendering Rule: `esc()` Everything
+
+`app.js` builds HTML with template literals and `innerHTML`. **Every value that
+comes from the data goes through `esc()` first** — beer names, brewery names,
+cities, regions, styles, methods:
+
+```js
+`<div class="beer-card" data-beer="${esc(b.beer)}">${esc(b.beer)}</div>`
+```
+
+Not decoration: a beer named `Smithwick's` or a brewery with a `<` in its name
+closes the attribute early and takes the rest of the row with it. `esc()` handles
+`& < > " '` and stringifies whatever it's given, so wrapping a number is never
+wrong — when in doubt, wrap.
+
+Two exceptions, both deliberate:
+
+- **Canvas text** — Chart.js labels and tooltips are drawn, not parsed. Escaping
+  there renders a literal `&amp;`.
+- **Values that are already HTML** — `logoImg(...)`, a nested `.map(...).join('')`,
+  a `cond ? '<span>' : ''`. Escaping those prints the tags.
+
+Leaflet's `bindTooltip` / `bindPopup` **do** parse HTML: escape there.
+
+## CDN Rule: Pin and Hash
+
+Chart.js and Leaflet load from jsDelivr at an exact version with an `integrity`
+hash. Changing either version means re-deriving the hash:
+
+```sh
+npm run sri -- --write
+```
+
+`npm run sri` takes the hash from the npm registry, not from the CDN, and
+verifies the download against the integrity npm published for that version. A
+wrong hash means the browser refuses the file and the charts or the map simply
+never appear — so never hand-write one.
 
 ## Location Rule: Canonical / Most-Unique Location
 
@@ -167,7 +237,7 @@ single **canonical location** — its **most unique** city.
 
 Keep recording each review's **real** consumption city/region/country/cc in `beers[]` as
 normal — do **not** pre-apply this rule when adding data. It is enforced at display time in
-`script.js` by `computeCanonLoc()` / the `CANON_LOC` map (recomputed in `refreshStats()`),
+`app.js` by `computeCanonLoc()` / the `CANON_LOC` map (recomputed in `refreshStats()`),
 so it stays correct automatically as data changes. Ensure any consumption city involved
 exists in `drunkLocs[]` as usual.
 
@@ -181,7 +251,7 @@ A group needs **at least `MIN_N` reviews (currently 3)** before its average is a
 win or lose a ranking. Without this, a country visited once tops the table on a single
 generous pour, and a style tried once becomes "my weakest".
 
-`MIN_N` and its helpers live at the top of the stats section in `script.js`:
+`MIN_N` and its helpers live at the top of the stats section in `app.js`:
 
 | Helper | What it does |
 |--------|--------------|
@@ -218,7 +288,7 @@ touches them.
 
 ### Changing the threshold
 
-Edit `MIN_N` in `script.js` and everything follows, including the on-screen captions —
+Edit `MIN_N` in `app.js` and everything follows, including the on-screen captions —
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
 
@@ -238,7 +308,8 @@ that needs a browser that can reach those CDNs. Two things do the checking:
 
 | What | When | Catches |
 |------|------|---------|
-| `[DOMAIN CHECK]` console warning | automatically on load | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES` |
+| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]`, `IPO_WATCHLIST` and `IPO_CANDIDATES`, plus domains that aren't bare domains |
+| `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
 | `auditLogos()` in the console | run it manually | what each beer *actually* resolves to |
 
 `auditLogos()` walks every beer that renders a logo anywhere in the app, tries its
@@ -251,7 +322,9 @@ two things:
 
 Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
 in any of the services, save the logo into `logos/` and point the beer's `logo`
-field at it (Step 2.6) — that is the only way to make a logo certain.
+field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
+that is a remote URL rather than a file in `logos/` is a hotlink to someone
+else's server: it works until it doesn't, and `npm run check` warns about it.
 
 Note that the placeholder is also what you see with no network, or behind a proxy
 that blocks those CDNs, so run the audit somewhere with open internet before
@@ -271,9 +344,9 @@ and **glow**. Don't reintroduce them.
 ### Where a color is written
 
 **`:root` in `style.css` is the only place.** Do not hardcode a hex anywhere else
-— not in CSS rules, not in inline styles in `script.js`.
+— not in CSS rules, not in inline styles in `app.js`.
 
-`script.js` reads the tokens off `:root` at boot through `cssVar()` and freezes
+`app.js` reads the tokens off `:root` at boot through `cssVar()` and freezes
 them into `THEME` (canvas and Leaflet can't resolve CSS variables). So changing a
 token in `style.css` retints the charts, map markers and passport stamps too, with
 nothing to keep in sync by hand. The literals in the `THEME` object are fallbacks
@@ -306,7 +379,7 @@ Negative tracking belongs only on large type (`.kpi-val`, `.tb-title`,
 `--fs-label` (12px) is the caption size: tile labels, table heads, section
 markers. Sentence case, in `--text-3`.
 
-### Categorical palettes (`script.js`)
+### Categorical palettes (`app.js`)
 
 Rich, evenly spaced hues held deliberately short of neon — full saturation on a
 dark ground is what tips a chart into looking like a trading screen. A new entry
@@ -314,7 +387,7 @@ should sit at the same middle brightness.
 
 | Constant | Covers |
 |----------|--------|
-| `sC` | beer style → color (add a color here for any new `style`) |
+| `sC` | beer style → color (add a color here for any new `style`; `npm run check` fails without it) |
 | `rC(r)` | rating → color ramp; mirrors the `.r5`…`.r2` badges in `style.css` |
 | `MONTH_COLORS`, `BUMP_COLORS`, `LANG_COLORS`, `STAMP_INKS` | month, bump-chart, brewing-language and passport series |
 

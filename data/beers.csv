@@ -1,0 +1,80 @@
+beer,style,origin,originCountry,abv,method,city,region,country,cc,rating,isNew,month,monthN,year
+Grolsch,Pilsner,NL,Netherlands,5,Bottle,Hengelo,Overijssel,Netherlands,NL,3.5,false,Jan,1,2026
+Hertog Jan,Pilsner,NL,Netherlands,5.1,Bottle,Hengelo,Overijssel,Netherlands,NL,2,false,Jan,1,2026
+Coors Light,Lager,US,USA,4.2,Can,New Rochelle,New York,USA,US,3,false,Jan,1,2026
+Sapporo Premium,Lager,JP,Japan,4.9,Bottle,Hartsdale,New York,USA,US,3.5,false,Jan,1,2026
+Kirin Ichiban,Lager,JP,Japan,5,Bottle,Hartsdale,New York,USA,US,3,false,Jan,1,2026
+Modelo Especial,Lager,MX,Mexico,4.5,Bottle,White Plains,New York,USA,US,3.25,false,Jan,1,2026
+Stella Artois,Lager,BE,Belgium,5,Bottle,Eastchester,New York,USA,US,2.75,false,Jan,1,2026
+Duvel,Belgian Ale,BE,Belgium,8.5,Bottle,Amsterdam,Noord-Holland,Netherlands,NL,4.25,false,Jan,1,2026
+Carlsberg,Pilsner,DK,Denmark,5,Draft,Montreal,Quebec,Canada,CA,3,false,Jan,1,2026
+Harp Lager,Lager,IE,Ireland,4.5,Draft,Montreal,Quebec,Canada,CA,4.25,false,Jan,1,2026
+Kronenbourg 1664,Lager,FR,France,5.5,Draft,Montreal,Quebec,Canada,CA,3,false,Jan,1,2026
+Michelob Ultra,Lager,US,USA,4.2,Can,White Plains,New York,USA,US,2.5,false,Jan,1,2026
+Red Stripe,Lager,JM,Jamaica,4.7,Bottle,Clemson,South Carolina,USA,US,3.75,false,Jan,1,2026
+Heineken,Lager,NL,Netherlands,5,Draft,Uncasville,Connecticut,USA,US,3.25,false,Feb,2,2026
+Guinness Draught,Stout,IE,Ireland,4.2,Nitro,Eastchester,New York,USA,US,4,false,Feb,2,2026
+Weihenstephaner Hefeweissbier,Wheat Beer,DE,Germany,5.4,Bottle,New Rochelle,New York,USA,US,4.5,false,Feb,2,2026
+Hofbräu Münchner Weiße,Wheat Beer,DE,Germany,5.1,Draft,New York,New York,USA,US,4.75,false,Feb,2,2026
+Negra Modelo,Lager,MX,Mexico,5.4,Bottle,New Rochelle,New York,USA,US,3,false,Feb,2,2026
+Hofbräu Dunkel,Lager,DE,Germany,5.5,Draft,New York,New York,USA,US,2.75,false,Feb,2,2026
+Bud Light,Lager,US,USA,4.2,Bottle,East Rutherford,New Jersey,USA,US,3,true,Feb,2,2026
+Budweiser,Lager,US,USA,5,Bottle,New York,New York,USA,US,3,true,Feb,2,2026
+Corona Extra,Lager,MX,Mexico,4.5,Bottle,New Rochelle,New York,USA,US,3.75,false,Feb,2,2026
+Birra Moretti,Lager,IT,Italy,4.6,Bottle,Sciara,Sicily,Italy,IT,3.75,true,Feb,2,2026
+Erdinger Weißbier,Wheat Beer,DE,Germany,5.3,Bottle,New Rochelle,New York,USA,US,3.25,true,Feb,2,2026
+Estrella Galicia,Lager,ES,Spain,5.5,Bottle,Madrid,Madrid,Spain,ES,4.25,true,Mar,3,2026
+Pilsner Urquell,Pilsner,CZ,Czech Republic,4.4,Bottle,New Rochelle,New York,USA,US,3.25,true,Mar,3,2026
+Wrench,IPA,US,USA,7.1,Can,New Rochelle,New York,USA,US,4,true,Mar,3,2026
+La Fin Du Monde,Belgian Ale,CA,Canada,9,Bottle,Montreal,Quebec,Canada,CA,3.75,false,Mar,3,2026
+Żywiec,Lager,PL,Poland,5.5,Bottle,New Rochelle,New York,USA,US,2.75,true,Mar,3,2026
+Estrella Damm,Lager,ES,Spain,5.4,Bottle,Barcelona,Catalonia,Spain,ES,3.5,true,Mar,3,2026
+Grolsch Puur Weizen,Wheat Beer,NL,Netherlands,5.1,Draft,Oldenzaal,Overijssel,Netherlands,NL,5,true,Mar,3,2026
+Frisse Lentebok,Lager,NL,Netherlands,6.5,Bottle,Hengelo,Overijssel,Netherlands,NL,3.25,true,Mar,3,2026
+Leffe Blonde,Belgian Ale,BE,Belgium,6.6,Draft,Nijmegen,Gelderland,Netherlands,NL,4.75,false,Mar,3,2026
+Texels Skuumkoppe,Wheat Beer,NL,Netherlands,6,Bottle,Nijmegen,Gelderland,Netherlands,NL,3,true,Mar,3,2026
+Affligem Tripel,Belgian Ale,BE,Belgium,9,Draft,Antwerp,Antwerp,Belgium,BE,3.75,true,Mar,3,2026
+De Koninck,Pale Ale,BE,Belgium,5.2,Draft,Antwerp,Antwerp,Belgium,BE,2.75,true,Mar,3,2026
+IJwit,Wheat Beer,NL,Netherlands,6.5,Draft,Antwerp,Antwerp,Belgium,BE,3.75,true,Mar,3,2026
+La Chouffe Blonde,Belgian Ale,BE,Belgium,8,Bottle,New Rochelle,New York,USA,US,4.25,true,Mar,3,2026
+Stiegl Goldbräu,Lager,AT,Austria,5,Bottle,New Rochelle,New York,USA,US,2.75,true,Mar,3,2026
+Modelo Oro,Lager,MX,Mexico,4,Can,New Rochelle,New York,USA,US,3,true,Mar,3,2026
+Super Bock,Lager,PT,Portugal,5.2,Bottle,Lagos,Algarve,Portugal,PT,3,true,Apr,4,2026
+Estrella Jalisco,Lager,MX,Mexico,4.5,Bottle,New Rochelle,New York,USA,US,3.75,true,Apr,4,2026
+Rolling Rock Extra Pale,Lager,US,USA,4.4,Bottle,New Rochelle,New York,USA,US,3.25,true,Apr,4,2026
+Carlsberg Elephant,Lager,DK,Denmark,7.2,Bottle,New Rochelle,New York,USA,US,3.5,true,Apr,4,2026
+Dos Equis Lager Especial,Lager,MX,Mexico,4.2,Draft,Queens,New York,USA,US,1.75,true,Apr,4,2026
+Miller Lite,Lager,US,USA,4.2,Bottle,New Rochelle,New York,USA,US,2.25,true,Apr,4,2026
+Belhaven Scottish Stout,Stout,GB-SCT,Scotland,5.2,Nitro,Boston,Massachusetts,USA,US,3,true,May,5,2026
+Samuel Adams Summer Ale,Wheat Beer,US,USA,5.3,Draft,Boston,Massachusetts,USA,US,3,true,May,5,2026
+Pacífico Clara,Lager,MX,Mexico,4.5,Bottle,Clemson,South Carolina,USA,US,3.75,true,May,5,2026
+Narragansett Lager,Lager,US,USA,5,Can,New York,New York,USA,US,3.25,true,May,5,2026
+Big Wave Golden Ale,Pale Ale,US,USA,4.4,Can,New York,New York,USA,US,3.75,true,May,5,2026
+Smithwick's,Red Ale,IE,Ireland,4.5,Draft,White Plains,New York,USA,US,2.75,true,May,5,2026
+Daura,Lager,ES,Spain,5.4,Bottle,New York,New York,USA,US,3,true,May,5,2026
+Asahi Super Dry,Lager,JP,Japan,5,Bottle,Eastchester,New York,USA,US,3.5,true,May,5,2026
+Blue Moon,Wheat Beer,US,USA,5.4,Draft,New York,New York,USA,US,3.5,true,May,5,2026
+Hop Commander,IPA,US,USA,6.5,Draft,New York,New York,USA,US,3,true,Jun,6,2026
+Paulaner Hefe-Weißbier,Wheat Beer,DE,Germany,5.5,Bottle,New York,New York,USA,US,4,true,Jun,6,2026
+Medalla Light,Lager,PR,Puerto Rico,4.2,Bottle,San Juan,San Juan,Puerto Rico,PR,4,true,Jun,6,2026
+Magna,Lager,PR,Puerto Rico,4.5,Bottle,San Juan,San Juan,Puerto Rico,PR,4,true,Jun,6,2026
+Ocean SJU,Lager,PR,Puerto Rico,5.9,Bottle,San Juan,San Juan,Puerto Rico,PR,2.5,true,Jun,6,2026
+Bloodline Blood Orange IPA,IPA,US,USA,8,Bottle,San Juan,San Juan,Puerto Rico,PR,3.5,true,Jun,6,2026
+Goose IPA,IPA,US,USA,5.9,Can,Washington,District of Columbia,USA,US,3.5,true,Jun,6,2026
+Almaza Pilsener,Pilsner,LB,Lebanon,4.2,Bottle,Washington,District of Columbia,USA,US,2.75,true,Jun,6,2026
+Mythos,Lager,GR,Greece,5,Bottle,Washington,District of Columbia,USA,US,3.25,true,Jun,6,2026
+Stone IPA,IPA,US,USA,6.9,Can,New Rochelle,New York,USA,US,2.5,true,Jul,7,2026
+Mahou Cinco Estrellas,Lager,ES,Spain,5.5,Bottle,Boynton Beach,Florida,USA,US,3.5,true,Jul,7,2026
+Hatuey Lager,Lager,CU,Cuba,5,Bottle,Miami,Florida,USA,US,4,true,Jul,7,2026
+Pub Ale,Pale Ale,GB-ENG,England,4.7,Can,New Rochelle,New York,USA,US,4.25,true,Jul,7,2026
+Spaten Oktoberfest Ur-Märzen / Winter,Lager,DE,Germany,5.9,Draft,New York,New York,USA,US,2.75,true,Jul,7,2026
+Peroni Nastro Azzurro,Lager,IT,Italy,5.1,Bottle,Ischia,Campania,Italy,IT,3,true,Aug,8,2026
+DAB Dortmunder Export,Lager,DE,Germany,5,Draft,Ischia,Campania,Italy,IT,4.5,true,Aug,8,2026
+Beck's,Pilsner,DE,Germany,4.9,Bottle,Ischia,Campania,Italy,IT,3,true,Aug,8,2026
+Ichnusa Anima Sarda,Lager,IT,Italy,4.7,Bottle,Ischia,Campania,Italy,IT,3.75,true,Aug,8,2026
+Chill Lemon,Shandy / Radler,IT,Italy,2,Bottle,Capri,Campania,Italy,IT,4,true,Aug,8,2026
+Peroni Original,Lager,IT,Italy,4.7,Bottle,Ischia,Campania,Italy,IT,3.25,true,Aug,8,2026
+Bitburger Radler,Shandy / Radler,DE,Germany,2.5,Can,New Rochelle,New York,USA,US,4,true,Aug,8,2026
+Radeberger Pilsner,Pilsner,DE,Germany,4.8,Bottle,White Plains,New York,USA,US,3,true,Aug,8,2026
+Presidente,Pilsner,DO,Dominican Republic,5,Bottle,New Rochelle,New York,USA,US,3,true,Aug,8,2026
+Heineken Silver,Lager,NL,Netherlands,4,Draft,Queens,New York,USA,US,3,true,Aug,8,2026
