@@ -8,7 +8,7 @@
 // have drifted.
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadData, ROOT } from './load-data.mjs';
+import { loadData, loadAppConst, ROOT } from './load-data.mjs';
 
 const OUT = join(ROOT, 'data');
 const splitBeers = s => String(s || '').split('·').map(v => v.trim()).filter(Boolean);
@@ -49,10 +49,16 @@ const untappd = {
   averages: Object.entries(D.UNTAPPD_GLOBAL_AVGS).map(([beer, untappdAvg]) => ({ beer, untappdAvg })),
 };
 
-const watchlist = [
-  ...D.IPO_WATCHLIST.map(e => ({ ...e, list: 'watchlist' })),
-  ...D.IPO_CANDIDATES.map(e => ({ ...e, list: 'candidate' })),
-];
+// The shortlist, plus whether each entry has been drunk yet — the same
+// crossing-off the page does, so a consumer of data/ doesn't have to re-derive
+// it by matching names against beers.json.
+const wtNorm = loadAppConst('wtNorm');
+const reviewedByName = new Map(D.beers.map(b => [wtNorm(b.beer), b.beer]));
+const wantToTry = D.WANT_TO_TRY.map(e => {
+  const reviewedAs = [e.beer, ...(e.as || [])]
+    .map(n => reviewedByName.get(wtNorm(n))).find(Boolean) || null;
+  return { ...e, as: e.as || [], tried: reviewedAs !== null, reviewedAs };
+});
 
 // ── CSV ───────────────────────────────────────────────────────
 const cell = v => {
@@ -79,7 +85,7 @@ write('breweries.json', breweries);
 write('locations.json', locations);
 write('brand-domains.json', brandDomains);
 write('untappd-averages.json', untappd);
-write('watchlist.json', watchlist);
+write('want-to-try.json', wantToTry);
 
 write('beers.csv', toCSV(beers, ['beer','style','origin','originCountry','abv','method','city','region','country','cc','rating','isNew','month','monthN','year']));
 write('breweries.csv', toCSV(

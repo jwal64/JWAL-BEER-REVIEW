@@ -294,14 +294,13 @@ const BRAND_DOMAINS = {
 "Narragansett Lager":"narragansettbeer.com",
 "Peroni Nastro Azzurro":"peroni.it",
 "Peroni Original":"peroni.it",
-"Newcastle Brown":["newcastlebrown.com","newcastlebrownale.com"],
+"Newcastle Brown Ale":["newcastlebrown.com","newcastlebrownale.com"],
 "Norrlands Guld":"norrlandsguld.se",
 "Ocean SJU":"oceanlabbrewing.com",
 "Orion":"orionbeer.co.jp",
 "Pacífico Clara":"drinkpacifico.com",
 "Paulaner Hefe":"paulaner.com",
 "Paulaner Hefe-Weißbier":"paulaner.com",
-"Peroni":"peroni.it",
 "Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
 "Pub Ale":["boddingtons.co.uk","boddingtons.com"],
 "Presidente":["presidente.com.do","cnd.com.do"],
@@ -357,7 +356,7 @@ const UNTAPPD_GLOBAL_AVGS={
   'Dos Equis Lager Especial':3.25,
   'Frisse Lentebok':3.25,
   // Apr 2026 expansion — values mirror Untappd consensus snapshots
-  // (cross-checked against IPO_WATCHLIST entries where overlap exists).
+  // (cross-checked against WANT_TO_TRY entries where overlap exists).
   'Estrella Galicia':3.65,'Pilsner Urquell':3.80,'Wrench':3.95,
   'Żywiec':3.35,'Peroni Nastro Azzurro':3.56,'Estrella Damm':3.61,
   'Grolsch Puur Weizen':3.50,'Leffe Blonde':3.75,'Texels Skuumkoppe':3.65,
@@ -369,54 +368,81 @@ const UNTAPPD_GLOBAL_AVGS={
   'Belhaven Scottish Stout':3.45,'Samuel Adams Summer Ale':3.50,
 };
 
-// ══════════════════════════════════════════════════════════════
-// SHARED CONSTANTS — IPO
-// ══════════════════════════════════════════════════════════════
-// 26 beers on watchlist (6 user-specified + 9 Claude picks + 5 additional + 6 pipeline promotions)
-const IPO_WATCHLIST=[
-  // User-specified
-  {beer:'Birra Moretti',   style:'Lager',        origin:'IT', abv:4.6, region:'Udine, Friuli-Venezia Giulia', untappd:3.58, method:'Bottle'},
-  {beer:'Peroni',          style:'Lager',        origin:'IT', abv:5.1, region:'Rome, Lazio',           untappd:3.52, method:'Bottle'},
-  {beer:'Blue Moon',       style:'Wheat Beer',   origin:'US', abv:5.4, region:'Denver, Colorado',      untappd:3.56, method:'Draft'},
-  {beer:'Miller Lite',     style:'Lager',        origin:'US', abv:4.2, region:'Milwaukee, Wisconsin',  untappd:2.51, method:'Can'},
-  {beer:'Estrella Damm',   style:'Lager',        origin:'ES', abv:5.4, region:'Barcelona, Catalonia',  untappd:3.61, method:'Bottle'},
-  {beer:'Estrella Galicia',style:'Lager',        origin:'ES', abv:5.5, region:'A Coruña, Galicia',     untappd:3.65, method:'Bottle'},
-  // Claude picks — one per country not yet covered
-  {beer:'Brahma',          style:'Lager',        origin:'BR', abv:4.8, region:'São Paulo, SP',         untappd:3.18, method:'Can'},
-  {beer:'Quilmes',         style:'Lager',        origin:'AR', abv:4.9, region:'Buenos Aires, BA',      untappd:3.22, method:'Bottle'},
-  {beer:'Tsingtao',        style:'Lager',        origin:'CN', abv:4.7, region:'Qingdao, Shandong',     untappd:3.29, method:'Bottle'},
-  {beer:'Castle Lager',    style:'Lager',        origin:'ZA', abv:5.0, region:'Johannesburg, Gauteng', untappd:3.18, method:'Can'},
-  {beer:'Pilsner Urquell', style:'Pilsner',      origin:'CZ', abv:4.4, region:'Pilsen, Bohemia',       untappd:3.80, method:'Bottle'},
-  {beer:'Super Bock',      style:'Lager',        origin:'PT', abv:5.2, region:'Leça do Balio, Porto',  untappd:3.41, method:'Bottle'},
-  {beer:'Mythos',          style:'Lager',        origin:'GR', abv:4.7, region:'Athens, Attica',        untappd:3.31, method:'Bottle'},
-  {beer:'Victoria Bitter', style:'Lager',        origin:'AU', abv:4.9, region:'Melbourne, Victoria',   untappd:3.12, method:'Can'},
-  {beer:'Norrlands Guld',  style:'Lager',        origin:'SE', abv:5.3, region:'Stockholm',             untappd:3.28, method:'Can'},
-  // Additional picks
-  {beer:'Asahi Super Dry', style:'Lager',        origin:'JP', abv:5.0, region:'Tokyo',                 untappd:3.60, method:'Bottle'},
-  {beer:'Hoegaarden',      style:'Wheat Beer',   origin:'BE', abv:4.9, region:'Hoegaarden',            untappd:3.72, method:'Bottle'},
-  {beer:'Kronenbourg 1664',style:'Lager',        origin:'FR', abv:5.5, region:'Obernai, Alsace',       untappd:3.30, method:'Can'},
-  {beer:'Newcastle Brown', style:'Brown Ale',    origin:'GB-ENG', abv:4.7, region:'Tadcaster, Yorkshire',  untappd:3.28, method:'Bottle'},
-  {beer:'Ringnes',         style:'Lager',        origin:'NO', abv:4.7, region:'Oslo',                  untappd:3.10, method:'Can'},
-  // Pipeline promotions
-  {beer:'Żywiec',          style:'Lager',        origin:'PL', abv:5.5, region:'Żywiec, Silesia',       untappd:3.35, method:'Bottle'},
-  {beer:'Tyskie',          style:'Pilsner',      origin:'PL', abv:5.6, region:'Tychy, Silesia',        untappd:3.28, method:'Can'},
-  {beer:'Chimay Blue',     style:'Belgian Ale',  origin:'BE', abv:9.0, region:'Chimay, Hainaut',       untappd:4.05, method:'Bottle'},
-  {beer:'Leffe Blonde',    style:'Belgian Ale',  origin:'BE', abv:6.6, region:'Dinant, Namur',         untappd:3.75, method:'Bottle'},
-  {beer:'Coopers Pale Ale',style:'Pale Ale',     origin:'AU', abv:4.5, region:'Adelaide, SA',          untappd:3.72, method:'Bottle'},
-  {beer:'Sam Adams Boston Lager',style:'Lager',  origin:'US', abv:5.0, region:'Boston, MA',            untappd:3.48, method:'Bottle'},
-];
 
-// Recommendation candidates — only beers NOT already on IPO_WATCHLIST
-const IPO_CANDIDATES=[
-  {beer:'Paulaner Hefe',    style:'Wheat Beer',   origin:'DE', abv:5.5, region:'Munich',              untappd:3.87, method:'Bottle'},
-  {beer:'Augustiner Helles',style:'Lager',        origin:'DE', abv:5.2, region:'Munich',              untappd:4.10, method:'Draft'},
-  {beer:'Peroni Nastro Azzurro',style:'Lager',    origin:'IT', abv:5.1, region:'Rome, Lazio',         untappd:3.56, method:'Bottle'},
-  {beer:"Smithwick's",      style:'Red Ale',      origin:'IE', abv:4.5, region:'Kilkenny',            untappd:3.45, method:'Draft'},
-  {beer:"Tennent's",        style:'Lager',        origin:'GB-SCT', abv:4.0, region:'Glasgow, Scotland',   untappd:2.95, method:'Can'},
-  {beer:'Orion',            style:'Lager',        origin:'JP', abv:5.0, region:'Naha, Okinawa',       untappd:3.42, method:'Can'},
-  {beer:'Menabrea',         style:'Lager',        origin:'IT', abv:4.8, region:'Biella, Piedmont',    untappd:3.55, method:'Bottle'},
-  {beer:'Tuborg',           style:'Pilsner',      origin:'DK', abv:4.6, region:'Copenhagen',          untappd:3.10, method:'Can'},
-  {beer:'Sol',              style:'Lager',        origin:'MX', abv:4.5, region:'Mexico City',         untappd:3.15, method:'Bottle'},
-  {beer:'Singha',           style:'Lager',        origin:'TH', abv:5.0, region:'Bangkok',             untappd:3.25, method:'Bottle'},
-  {beer:'Tiger Beer',       style:'Lager',        origin:'SG', abv:5.0, region:'Singapore',           untappd:3.18, method:'Can'},
+// ══════════════════════════════════════════════════════════════
+// WANT TO TRY — the shortlist
+// ══════════════════════════════════════════════════════════════
+// Beers I mean to get to, with the world's verdict on each. The app ranks
+// them; this list is only the pool, so its order carries no meaning and
+// entries stay put once added — grouped by where the beer comes from purely
+// so a new pick is easy to slot in.
+//
+// Nothing here has to be removed when a beer gets drunk. The moment a review
+// for it lands in beers[] the entry crosses itself off: it leaves the
+// shortlist and reappears under "how the guesses turned out", where the
+// prediction made before the pour is scored against the rating given after
+// it. That is the whole point of keeping the guess on record.
+//
+// Fields mirror a beers[] entry, minus everything that only exists once a
+// beer has actually been drunk:
+//   beer    the name as it will be logged in beers[]
+//   style   must have a colour in the sC map in app.js
+//   origin  ISO code of the brewery's country (GB split by nation, as ever)
+//   abv     percent
+//   region  the brewery's city and region
+//   untappd the world's average, same source as UNTAPPD_GLOBAL_AVGS
+//   method  how I expect to drink it — it nudges the prediction
+//   as      OPTIONAL. Other names the same beer may be logged under in
+//           beers[], for when the shelf name differs from the name here.
+//           Without it the entry would sit on the shortlist forever while a
+//           review of the same beer sat in beers[] under its other name.
+//           `npm run check` warns when an entry looks like it needs one.
+const WANT_TO_TRY=[
+  // ── Germany
+  {beer:'Paulaner Hefe',         style:'Wheat Beer',  origin:'DE',     abv:5.5, region:'Munich, Bavaria',              untappd:3.87, method:'Bottle', as:['Paulaner Hefe-Weißbier']},
+  {beer:'Augustiner Helles',     style:'Lager',       origin:'DE',     abv:5.2, region:'Munich, Bavaria',              untappd:4.10, method:'Draft'},
+  // ── Italy
+  {beer:'Birra Moretti',         style:'Lager',       origin:'IT',     abv:4.6, region:'Udine, Friuli-Venezia Giulia', untappd:3.58, method:'Bottle'},
+  {beer:'Peroni Nastro Azzurro', style:'Lager',       origin:'IT',     abv:5.1, region:'Rome, Lazio',                  untappd:3.56, method:'Bottle'},
+  {beer:'Menabrea',              style:'Lager',       origin:'IT',     abv:4.8, region:'Biella, Piedmont',             untappd:3.55, method:'Bottle'},
+  // ── Spain
+  {beer:'Estrella Galicia',      style:'Lager',       origin:'ES',     abv:5.5, region:'A Coruña, Galicia',            untappd:3.65, method:'Bottle'},
+  {beer:'Estrella Damm',         style:'Lager',       origin:'ES',     abv:5.4, region:'Barcelona, Catalonia',         untappd:3.61, method:'Bottle'},
+  // ── Central Europe
+  {beer:'Pilsner Urquell',       style:'Pilsner',     origin:'CZ',     abv:4.4, region:'Pilsen, Bohemia',              untappd:3.80, method:'Bottle'},
+  {beer:'Żywiec',                style:'Lager',       origin:'PL',     abv:5.5, region:'Żywiec, Silesia',              untappd:3.35, method:'Bottle'},
+  {beer:'Tyskie',                style:'Pilsner',     origin:'PL',     abv:5.6, region:'Tychy, Silesia',               untappd:3.28, method:'Can'},
+  // ── Belgium
+  {beer:'Chimay Blue',           style:'Belgian Ale', origin:'BE',     abv:9.0, region:'Chimay, Hainaut',              untappd:4.05, method:'Bottle'},
+  {beer:'Leffe Blonde',          style:'Belgian Ale', origin:'BE',     abv:6.6, region:'Dinant, Namur',                untappd:3.75, method:'Bottle'},
+  {beer:'Hoegaarden',            style:'Wheat Beer',  origin:'BE',     abv:4.9, region:'Hoegaarden, Flemish Brabant',  untappd:3.72, method:'Bottle'},
+  // ── France, Portugal, Greece
+  {beer:'Kronenbourg 1664',      style:'Lager',       origin:'FR',     abv:5.5, region:'Obernai, Alsace',              untappd:3.30, method:'Can'},
+  {beer:'Super Bock',            style:'Lager',       origin:'PT',     abv:5.2, region:'Leça do Balio, Porto',         untappd:3.41, method:'Bottle'},
+  {beer:'Mythos',                style:'Lager',       origin:'GR',     abv:4.7, region:'Athens, Attica',               untappd:3.31, method:'Bottle'},
+  // ── Nordics
+  {beer:'Tuborg',                style:'Pilsner',     origin:'DK',     abv:4.6, region:'Copenhagen',                   untappd:3.10, method:'Can'},
+  {beer:'Norrlands Guld',        style:'Lager',       origin:'SE',     abv:5.3, region:'Stockholm',                    untappd:3.28, method:'Can'},
+  {beer:'Ringnes',               style:'Lager',       origin:'NO',     abv:4.7, region:'Oslo',                         untappd:3.10, method:'Can'},
+  // ── Britain and Ireland
+  {beer:'Newcastle Brown Ale',   style:'Brown Ale',   origin:'GB-ENG', abv:4.7, region:'Tadcaster, Yorkshire',         untappd:3.28, method:'Bottle'},
+  {beer:"Tennent's",             style:'Lager',       origin:'GB-SCT', abv:4.0, region:'Glasgow, Scotland',            untappd:2.95, method:'Can'},
+  {beer:"Smithwick's",           style:'Red Ale',     origin:'IE',     abv:4.5, region:'Kilkenny, Leinster',           untappd:3.45, method:'Draft'},
+  // ── The Americas
+  {beer:'Blue Moon',             style:'Wheat Beer',  origin:'US',     abv:5.4, region:'Denver, Colorado',             untappd:3.56, method:'Draft'},
+  {beer:'Sam Adams Boston Lager',style:'Lager',       origin:'US',     abv:5.0, region:'Boston, Massachusetts',        untappd:3.48, method:'Bottle'},
+  {beer:'Miller Lite',           style:'Lager',       origin:'US',     abv:4.2, region:'Milwaukee, Wisconsin',         untappd:2.51, method:'Can'},
+  {beer:'Sol',                   style:'Lager',       origin:'MX',     abv:4.5, region:'Mexico City',                  untappd:3.15, method:'Bottle'},
+  {beer:'Brahma',                style:'Lager',       origin:'BR',     abv:4.8, region:'São Paulo, SP',                untappd:3.18, method:'Can'},
+  {beer:'Quilmes',               style:'Lager',       origin:'AR',     abv:4.9, region:'Buenos Aires, BA',             untappd:3.22, method:'Bottle'},
+  // ── Asia and the Pacific
+  {beer:'Asahi Super Dry',       style:'Lager',       origin:'JP',     abv:5.0, region:'Tokyo',                        untappd:3.60, method:'Bottle'},
+  {beer:'Orion',                 style:'Lager',       origin:'JP',     abv:5.0, region:'Naha, Okinawa',                untappd:3.42, method:'Can'},
+  {beer:'Tsingtao',              style:'Lager',       origin:'CN',     abv:4.7, region:'Qingdao, Shandong',            untappd:3.29, method:'Bottle'},
+  {beer:'Singha',                style:'Lager',       origin:'TH',     abv:5.0, region:'Bangkok',                      untappd:3.25, method:'Bottle'},
+  {beer:'Tiger Beer',            style:'Lager',       origin:'SG',     abv:5.0, region:'Singapore',                    untappd:3.18, method:'Can'},
+  {beer:'Coopers Pale Ale',      style:'Pale Ale',    origin:'AU',     abv:4.5, region:'Adelaide, South Australia',    untappd:3.72, method:'Bottle'},
+  {beer:'Victoria Bitter',       style:'Lager',       origin:'AU',     abv:4.9, region:'Melbourne, Victoria',          untappd:3.12, method:'Can'},
+  // ── Africa
+  {beer:'Castle Lager',          style:'Lager',       origin:'ZA',     abv:5.0, region:'Johannesburg, Gauteng',        untappd:3.18, method:'Can'},
 ];

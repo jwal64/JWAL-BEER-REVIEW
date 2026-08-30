@@ -104,6 +104,33 @@ await check('insight charts drawn', () => page.evaluate(() => {
   return drawn > 4 && `${drawn} charts`;
 }));
 
+// What to try: the shortlist has to render, and — the part with no other way
+// of being checked — an entry has to cross itself off the moment a review of
+// it lands. Nothing marks the entry as drunk; the page works it out.
+await page.click('#insights .subtab[data-subtab="markets"]');
+await page.waitForTimeout(300);
+await check('want-to-try shortlist', async () => {
+  const cards = await page.locator('#wtPicks .wt-card').count();
+  const done = await page.locator('#wtDoneBody tr').count();
+  return cards > 0 && done > 0 && `${cards} to try · ${done} crossed off`;
+});
+await check('trying a shortlisted beer crosses it off', () => page.evaluate(() => {
+  const before = document.querySelectorAll('#wtPicks .wt-card').length;
+  const pick = WANT_TO_TRY.find(e => !wtReviews(e));
+  if (!pick) return 'nothing left on the shortlist to test with';
+  beers.push({ beer: pick.beer, style: pick.style, origin: pick.origin, abv: pick.abv,
+    method: pick.method, city: 'New Rochelle', region: 'New York', country: 'USA',
+    cc: 'US', rating: 4, isNew: false, month: 'Aug', monthN: 8, year: 2026 });
+  reloadData();
+  const after = document.querySelectorAll('#wtPicks .wt-card').length;
+  const scored = [...document.querySelectorAll('#wtDoneBody tr')]
+    .some(r => r.dataset.beer === pick.beer);
+  beers.pop(); reloadData();
+  const restored = document.querySelectorAll('#wtPicks .wt-card').length;
+  return after === before - 1 && scored && restored === before &&
+    `${pick.beer} left the list and scored its guess`;
+}));
+
 await page.locator('body').click({ position: { x: 5, y: 5 } });
 await page.keyboard.press('Control+k');
 await page.waitForTimeout(200);

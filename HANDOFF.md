@@ -17,8 +17,8 @@ It is now two files, loaded in that order by `index.html`:
 
 | File | Holds | Roughly |
 |------|-------|---------|
-| `data.js` | Every review, brewery, location, brand domain, Untappd average and watchlist entry. No behaviour. | 422 lines |
-| `app.js` | Statistics, tables, charts, maps, search, the command palette. No beer data. | 2,744 lines |
+| `data.js` | Every review, brewery, location, brand domain, Untappd average and want-to-try entry. No behaviour. | 448 lines |
+| `app.js` | Statistics, tables, charts, maps, search, the command palette. No beer data. | 2,803 lines |
 
 Git records this as a rename (`script.js` → `app.js`, ~70% similar) plus a new
 `data.js`.
@@ -155,7 +155,8 @@ pairing cannot be lost.
 
 Plus `brand-domains.json` (beer → the domains its logo is looked up from),
 `untappd-averages.json` (the world's average per beer, for the contrarian
-chart) and `watchlist.json` (beers not yet reviewed).
+chart) and `want-to-try.json` (the shortlist, each entry flagged `tried` and,
+when it has been, the name it was reviewed under).
 
 **Join keys**
 
