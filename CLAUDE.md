@@ -1,104 +1,132 @@
 # JWAL Beer Review - Development Guide
 
-## Where things live
+## Where the data lives now
 
-The site is static — `index.html` loads `data.js`, then `app.js`, then
-`style.css`. There is no build step.
+**The Supabase database behind [beer-review-buddy](https://github.com/jwal64/beer-review-buddy)
+is the source of truth.** A beer is added in that app. This repo renders what
+the database holds.
+
+```
+  beer-review-buddy            Supabase              JWAL-BEER-REVIEW
+  (add a beer, on a phone) ──> beers, breweries, ──> data.js ──> the site
+                               locations, brand
+                               domains, want-to-try
+                                     │
+                                     └── npm run sync, nightly in CI
+```
+
+`data.js` is a **generated file**. `npm run sync` rewrites it from those tables,
+and the Sync from Supabase workflow runs that nightly and commits the result. An
+edit made to `data.js` by hand is lost at the next sync — it is not a way to add
+a beer, and there is no second place to add one.
+
+The site is still static — `index.html` loads `data.js`, then `app.js`, then
+`style.css`. There is no build step, and no runtime dependency on Supabase: the
+page works offline and keeps working if the database is unreachable.
 
 | File | Holds |
 |------|-------|
-| `data.js` | **All data**: `beers[]`, `breweries[]`, `drunkLocs[]`, `WANT_TO_TRY[]`, `BRAND_DOMAINS`, `FLAGS`/`CNAMES`, the Untappd averages |
+| `data.js` | **All data, generated**: `beers[]`, `breweries[]`, `drunkLocs[]`, `WANT_TO_TRY[]`, `BRAND_DOMAINS`, `FLAGS`/`CNAMES`, the Untappd averages |
 | `app.js` | **All behaviour**: statistics, rendering, charts, maps, search. No beer data. |
 | `style.css` | The design system. `:root` is the only place a colour is written. |
 | `data/` | Generated JSON/CSV copies of `data.js`. Never edit by hand — `npm run export` writes them. |
-| `tools/` | Zero-dependency Node scripts (validate, export, SRI, smoke test). |
+| `tools/` | Zero-dependency Node scripts (sync, validate, export, SRI, smoke test). |
 
-Add data to `data.js` only. A review added to `app.js` would be invisible to
-`npm run check` and to everything in `data/`.
+### The projection, and what is derived
+
+`tools/supabase-rows.mjs` is the one place that says what a column means. Both
+directions go through it — the seed that filled the database and the sync that
+reads it back — so the two cannot disagree. `npm run roundtrip` sends the data
+out through the columns and back and fails if a value is lost; it runs on every
+push and needs no network.
+
+Two brewery fields have **no column behind them** and are derived from the
+reviews, because a beer row names its own brewery:
+
+| Derived | From |
+|---------|------|
+| `breweries[].beers` | the distinct beers whose `brewery` is this one, oldest review first |
+| `breweries[].ratings` | what each of those scored, in the same order |
+
+Do not look for them in the database, and do not try to write them.
 
 ## Standard Operating Procedure: Adding New Beers
 
-When adding a new beer entry to `data.js`, **every beer must have its brewery location and language data tracked**. Follow these steps in order:
+A beer is added **in the beer-review-buddy app**, which writes it to Supabase.
+Nothing is added by editing `data.js`. What follows is what a complete review
+needs, wherever it is entered from — the app's form, the Supabase table editor,
+or SQL.
 
-### Step 1: Add the Beer Entry to the `beers[]` Array
+The rules have not changed. What changed is that the database now enforces most
+of them at the moment the row is written, instead of leaving them all to
+`npm run check` days later.
 
-Each entry in the `beers[]` array requires these fields:
+### Step 1: The review — a row in `beers`
 
-```js
-{
-  beer: "BeerName",           // Marketed/displayed beer name
-  style: "Category",          // One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale, Shandy / Radler
-  origin: "XX",              // ISO 3166-1 alpha-2 country code of the BREWERY's home country (see UK exception below)
-  abv: 5.0,                  // Alcohol by volume (number)
-  method: "Bottle",          // "Bottle", "Can", "Draft", or "Nitro"
-  city: "CityName",          // City where the beer was CONSUMED (not brewed)
-  region: "RegionName",      // Region/state where consumed
-  country: "CountryName",    // Country where consumed (full name)
-  cc: "XX",                  // ISO 3166-1 alpha-2 of consumption country
-  rating: 3.50,              // Rating out of 5.00 (quarter increments)
-  isNew: true,               // true if this beer has never been reviewed before
-  month: "Mar",              // 3-letter month abbreviation
-  monthN: 3,                 // Month number (1-12)
-  year: 2026                 // 4-digit year
-}
-```
+| Column | Meaning | Enforced by |
+|--------|---------|-------------|
+| `name` | Marketed/displayed beer name | not null |
+| `style` | One of: Lager, Pilsner, Wheat Beer, Belgian Ale, IPA, Pale Ale, Stout, Brown Ale, Red Ale, Shandy / Radler | `npm run check` (needs a colour in `sC` in `app.js`) |
+| `brewery` | The brewery's exact `name` in `breweries` — this is the link | `npm run check` |
+| `origin_cc` | ISO 3166-1 alpha-2 of the **brewery's** home country (see the UK exception) | not null |
+| `abv` | Alcohol by volume | not null |
+| `method` | `Bottle`, `Can`, `Draft` or `Nitro` | check constraint |
+| `city` / `region` / `country` / `cc` | Where it was **consumed**, not brewed. `country` must be the name `countries` gives for `cc` | not null; `npm run check` for the match |
+| `rating` | Out of 5, in quarter steps | check constraint |
+| `is_new` | Whether this beer had never been drunk before. **Not derivable** — a beer can be new to the log and old to the drinker | defaults false |
+| `drank_on` | The date. Only its month and year reach the site | not null |
+| `logo` | Optional. A path to a file in this repo's `logos/`, for a brand no logo service knows | `npm run check` (the file must exist) |
+| `seq` | Optional. Orders reviews within a month; a new row can leave it null and sorts last | — |
 
 ### UK Exception: Split GB by Constituent Country
 
 For breweries based in the United Kingdom, do **not** use the plain `GB` code. Use the
 specific constituent-country code instead, based on where the brewery is actually located:
 
-| Constituent Country | `origin`/`cc` code | Full `country` name |
+| Constituent Country | `origin_cc`/`cc` code | Full `country` name |
 |----------------------|---------------------|----------------------|
 | England              | `GB-ENG`            | England              |
 | Scotland             | `GB-SCT`            | Scotland             |
 | Wales                | `GB-WLS`            | Wales                |
 | Northern Ireland     | `GB-NIR`            | Northern Ireland     |
 
-These codes already exist in `FLAGS` and `CNAMES` in `data.js`. The plain `GB` code and
+These codes already exist in the `countries` table. The plain `GB` code and
 "Great Britain" label are only a fallback for the rare case where the specific UK nation
-can't be determined — always prefer the specific code when known. This applies to the
-`origin` field on beer entries and the `cc`/`country` fields on brewery entries; `lang`
-stays `"en"` for all four.
+can't be determined — always prefer the specific code when known. This applies to
+`origin_cc` on a beer and to `cc` on a brewery; `lang` stays `"en"` for all four.
 
-### Step 2: Add or Update the `breweries[]` Array (REQUIRED)
+### Step 2: The brewery — a row in `breweries` (REQUIRED)
 
-**Every unique brewery must have an entry** in the `breweries[]` array. Before adding a new beer, check if its brewery already exists.
+**Every beer must name a brewery that exists.** Check whether it is already
+there before adding one; the app offers the existing list first.
 
-Required brewery fields:
+| Column | Meaning |
+|--------|---------|
+| `name` | Official brewery/company name. Unique, and what a beer's `brewery` points at |
+| `location` | `"City, Region"` — the original/founding site, not a satellite plant |
+| `country` / `cc` | Its own country and code |
+| `lang` | ISO 639-1 code of the brewery's home language (`de`, `ja`, `pl`, `cs`, …). **Not null** — the passport and the brewing-language chart are built from it |
+| `native_name` | Optional. The beer's name in that language, when it differs from the marketed one (Pilsner Urquell → Plzeňský Prazdroj) |
+| `lat` / `lng` | Coordinates of the brewery's city, for the map |
 
-```js
-{
-  name: "Brewery Name",           // Official brewery/company name
-  location: "City, Region",       // Brewery's physical location (city and region)
-  country: "CountryName",         // Brewery's country (full name)
-  cc: "XX",                       // ISO 3166-1 alpha-2 country code
-  lang: "xx",                     // ISO 639-1 language code (e.g. "de", "ja", "pl", "cs")
-  beers: "Beer1 · Beer2",         // All beers from this brewery, separated by " · "
-  lat: 49.6853,                   // Latitude of brewery location
-  lng: 19.1925,                   // Longitude of brewery location
-  ratings: [3.50],                // Array of all ratings for beers from this brewery
-  // OPTIONAL - only include if the native name differs from the marketed name:
-  nativeName: "NativeBeerName"    // Beer name in the brewery's native language/script
-}
+`beers` and `ratings` are **not** columns — see "The projection, and what is
+derived" above.
+
+### Step 2.5: The brand domain — a row in `brand_domains` (REQUIRED)
+
+A beer with no row here renders the 🍺 placeholder forever — there is no
+name-based guess behind it. `beer_name` is the beer's exact name; `domains` is
+an array, tried in order:
+
+```sql
+insert into brand_domains (beer_name, domains)
+values ('Radeberger Pilsner', array['radeberger.de']);
+
+insert into brand_domains (beer_name, domains)
+values ('Pilsner Urquell', array['pilsnerurquell.com','prazdroj.cz']);
 ```
 
-### Step 2.5: Add the Brand Domain (REQUIRED)
-
-Every beer must have an entry in `BRAND_DOMAINS` in `data.js`, or it
-renders the 🍺 placeholder forever — there is no name-based guess behind it:
-
-```js
-"Radeberger Pilsner":"radeberger.de",
-```
-
-A value is one domain, or an array of domains tried in order:
-
-```js
-"Pilsner Urquell":["pilsnerurquell.com","prazdroj.cz"],
-```
-
-Use the array form for a brand that lives at more than one address (brand site vs.
+Use more than one for a brand that lives at more than one address (brand site vs.
 the brewery that owns it, `.com` vs. the local TLD) so a miss on the first still
 resolves a real logo.
 
@@ -107,17 +135,18 @@ company's domain is not a fallback — Heineken's logo on an Almaza is a
 confidently wrong answer, which is worse than no logo. Leave the beer with one
 domain and let it fall through to the placeholder instead.
 
-Nothing in the repo can verify a domain: only a browser that can reach the CDNs
-can. See "Verifying logos" below.
+A check constraint rejects anything that is not a bare domain (no scheme, no
+path). Nothing can verify what actually sits *behind* a domain except a browser
+that can reach the CDNs — see "Verifying logos" below.
 
 ### Step 2.6: Optional — Local Logo Override
 
-Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
+Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. To make a specific beer use a local file instead (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
 
-1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
-2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
+1. Save the file into this repo as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`) and commit it.
+2. Set that beer's `logo` column to `logos/<filename>`.
 
-The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
+The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers with `logo` null continue to use Brandfetch normally.
 
 ### Step 3: Research Checklist (for each new beer)
 
@@ -129,20 +158,25 @@ Before adding any beer, research and confirm:
    - `de` = German, `nl` = Dutch, `fr` = French, `es` = Spanish, `it` = Italian
    - `ja` = Japanese, `cs` = Czech, `pl` = Polish, `da` = Danish, `pt` = Portuguese
    - `en` = English, `sv` = Swedish, `no` = Norwegian, `zh` = Chinese
-4. **Native name**: If the beer's name in its native language differs from the marketed English name (e.g. Pilsner Urquell -> Plzeňský Prazdroj, Sapporo -> サッポロビール), record the `nativeName`.
-5. **Country maps**: Ensure the brewery's country code exists in `FLAGS` and `CNAMES` at the top of `data.js`. If not, add it.
+4. **Native name**: If the beer's name in its native language differs from the marketed English name (e.g. Pilsner Urquell -> Plzeňský Prazdroj, Sapporo -> サッポロビール), record it as the brewery's `native_name`.
+5. **Country**: Ensure the brewery's country code exists in the `countries` table, carrying both a flag and a display name. If not, add it — one without the other renders a blank or the literal code.
 
-### Step 4: Update Consumption Location (if new)
+### Step 4: Add the Consumption Location (if new)
 
-If the beer was consumed in a new city, add it to the `drunkLocs[]` array:
+If the beer was drunk in a city not yet in `locations`, add it — otherwise the
+maps drop the review:
 
-```js
-{city:"CityName", region:"RegionName", country:"CountryName", cc:"XX", lat:00.0000, lng:-00.0000}
+```sql
+insert into locations (city, region, country, cc, lat, lng)
+values ('CityName', 'RegionName', 'CountryName', 'XX', 0.0, 0.0);
 ```
 
-### Step 5: Validate
+### Step 5: Sync and Validate
+
+The nightly workflow does this on its own. To bring it across immediately:
 
 ```sh
+npm run sync      # rewrite data.js from the database
 npm run check     # enforces every rule below
 npm run export    # refresh data/ to match, and commit it
 ```
@@ -162,20 +196,23 @@ npm run export    # refresh data/ to match, and commit it
 - an `UNTAPPD_GLOBAL_AVGS` key that matches no beer
 - `data/` being out of step with `data.js`
 
-Two things it cannot check, because they need a browser and the open internet:
+`npm run roundtrip` additionally fails if a value cannot survive the trip through
+the database columns — which is what a sync would then quietly write into the site.
+
+Two things neither can check, because they need a browser and the open internet:
 
 - [ ] `auditLogos()` in the console resolves a real logo, not a `PLACEHOLDER` or a
       favicon-sized `suspect` (see "Verifying Logos" below)
-- [ ] `nativeName` added if the native-language name differs from the marketed name
+- [ ] `native_name` set if the native-language name differs from the marketed name
 
 `npm run smoke` (needs `npm install`) opens the page in a real browser and checks
 every tab, the modal, the map and the command palette still render.
 
 ## Standard Operating Procedure: The Want-To-Try Shortlist
 
-`WANT_TO_TRY` in `data.js` is the standing list of beers not yet drunk. The
-"What to try" sub-section of Insights renders it, and `predictRating()` scores
-each entry against my taste so far.
+The `want_to_try` table is the standing list of beers not yet drunk; it reaches
+the site as `WANT_TO_TRY` in `data.js`. The "What to try" sub-section of Insights
+renders it, and `predictRating()` scores each entry against my taste so far.
 
 ### Nothing is ever removed from it
 
@@ -188,22 +225,22 @@ section it appears in:
   where the guess made beforehand is scored against the rating given after
 
 So the only data-entry step when you finally drink something on the list is the
-normal one: add the review to `beers[]`. The section updates itself, the KPI
-counts move, and the calibration chart gains a bar. Deleting the entry instead
-would throw away the prediction, which is the only thing that makes the
-scorecard worth having.
+normal one: add the review. The section updates itself, the KPI counts move, and
+the calibration chart gains a bar. Deleting the row instead would throw away the
+prediction, which is the only thing that makes the scorecard worth having.
 
 ### Adding an entry
 
-```js
-{beer:'Tsingtao', style:'Lager', origin:'CN', abv:4.7, region:'Qingdao, Shandong', untappd:3.29, method:'Bottle'},
+```sql
+insert into want_to_try (beer, style, origin, abv, region, untappd, method)
+values ('Tsingtao', 'Lager', 'CN', 4.7, 'Qingdao, Shandong', 3.29, 'Bottle');
 ```
 
-Same rules as a beer: `style` needs a colour in `sC`, `origin` needs `FLAGS` +
-`CNAMES` (UK split by nation as everywhere else), `method` is one of the four,
-and the beer needs a `BRAND_DOMAINS` entry — a shortlist card renders a logo
-like anything else. `untappd` is the world's average, from the same source as
-`UNTAPPD_GLOBAL_AVGS`.
+Same rules as a beer: `style` needs a colour in `sC`, `origin` needs a row in
+`countries` (UK split by nation as everywhere else), `method` is one of the four,
+and the beer needs a `brand_domains` row — a shortlist card renders a logo like
+anything else. `untappd` is the world's average, from the same source as the
+`untappd_averages` table.
 
 ### `as` — when the shelf name isn't the logged name
 
@@ -212,10 +249,12 @@ apostrophes and punctuation are flattened, and what's left has to match word for
 word. That is deliberately strict — a looser rule would let *Peroni Original*
 cross off *Peroni Nastro Azzurro*.
 
-When a beer really is logged under a different name, say so:
+When a beer really is logged under a different name, say so — that is the `aka`
+column, which reaches the site as `as`:
 
-```js
-{beer:'Paulaner Hefe', ..., as:['Paulaner Hefe-Weißbier']},
+```sql
+update want_to_try set aka = array['Paulaner Hefe-Weißbier']
+where beer = 'Paulaner Hefe';
 ```
 
 `npm run check` warns when a shortlist entry looks like an already-reviewed beer
@@ -296,7 +335,7 @@ single **canonical location** — its **most unique** city.
 
 ### Data-entry implication
 
-Keep recording each review's **real** consumption city/region/country/cc in `beers[]` as
+Keep recording each review's **real** consumption city/region/country/cc as
 normal — do **not** pre-apply this rule when adding data. It is enforced at display time in
 `app.js` by `computeCanonLoc()` / the `CANON_LOC` map (recomputed in `refreshStats()`),
 so it stays correct automatically as data changes. Ensure any consumption city involved
@@ -370,7 +409,8 @@ a browser that can reach those CDNs. Four things do the checking:
 
 | What | When | Catches |
 |------|------|---------|
-| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]` and `WANT_TO_TRY`, plus domains that aren't bare domains |
+| the `brand_domains` check constraint | when the row is written | a domain that isn't a bare domain (scheme or path) |
+| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]` and `WANT_TO_TRY` |
 | `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
 | `npm run logos` | run it yourself, and monthly in CI | what each beer *actually* resolves to |
 | `auditLogos()` in the console | run it manually | the same, from inside a page you already have open |
@@ -388,9 +428,9 @@ Either way, read the result for two things:
 - **`suspect`** — something answered, but at favicon size (≤32px), which usually
   means a generic globe standing in for a domain the service doesn't know.
 
-Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
+Both mean the domain needs correcting in the `brand_domains` table. If a brand simply isn't
 in any of the services, save the logo into `logos/` and point the beer's `logo`
-field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
+column at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
 that is a remote URL rather than a file in `logos/` is a hotlink to someone
 else's server: it works until it doesn't, and `npm run check` warns about it.
 
@@ -492,7 +532,8 @@ label and the tooltip already carry the "not ranked" reading.
 
 ## Notable Native Beer Names
 
-These beers have native-language names that differ from their marketed names:
+These beers have native-language names that differ from their marketed names.
+They are stored as `native_name` on the brewery row:
 
 | Marketed Name           | Native Name        | Language |
 |-------------------------|--------------------|----------|

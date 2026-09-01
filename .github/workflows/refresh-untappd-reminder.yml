@@ -1,7 +1,7 @@
 name: Untappd Ratings Refresh Reminder
 
 # Fires every 2 weeks (1st and 15th of every month at 09:00 UTC).
-# Opens a GitHub issue if the UNTAPPD_LAST_REFRESHED stamp in data.js is
+# Opens a GitHub issue if the untappd_last_refreshed stamp is
 # older than UNTAPPD_REFRESH_INTERVAL_DAYS (default 14).
 on:
   schedule:
@@ -72,18 +72,19 @@ jobs:
           script: |
             const title = `Refresh Untappd ratings (last verified ${process.env.STAMP})`;
             const body = [
-              `The Untappd consensus values in \`data.js\` were last verified on **${process.env.STAMP}**`,
+              `The Untappd consensus values were last verified on **${process.env.STAMP}**`,
               `(${process.env.AGE_DAYS} days ago, threshold ${process.env.INTERVAL}d).`,
               ``,
               `## How to refresh`,
+              `These live in Supabase, not in this repo — \`data.js\` is generated from it.`,
               `1. For each beer below, look up its current global average on untappd.com.`,
-              `2. Update the value in the \`UNTAPPD_GLOBAL_AVGS\` map in \`data.js\`.`,
-              `3. Bump \`UNTAPPD_LAST_REFRESHED\` to today's date.`,
-              `4. Also re-check the \`untappd:\` field on each entry of \`WANT_TO_TRY\`.`,
-              `5. Run \`npm run check && npm run export\`, then commit and merge — this issue auto-closes on the next scheduled run.`,
+              `2. Update its \`avg\` in the \`untappd_averages\` table.`,
+              `3. Also re-check \`untappd\` on each row of \`want_to_try\`.`,
+              `4. Set \`app_meta.untappd_last_refreshed\` to today's date (\`YYYY-MM-DD\`).`,
+              `5. Run the **Sync from Supabase** workflow, or wait for the nightly one — this issue auto-closes on the next scheduled run.`,
               ``,
               `## Beers to verify`,
-              process.env.BEER_LIST || '_(extraction failed — check `data.js` manually)_',
+              process.env.BEER_LIST || '_(extraction failed — check the `untappd_averages` table manually)_',
             ].join('\n');
 
             const { data: existing } = await github.rest.issues.listForRepo({

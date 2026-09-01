@@ -160,16 +160,16 @@
     "lng": -90.2124,
     "beers": [
       {
-        "beer": "Budweiser",
-        "rating": 3
+        "beer": "Michelob Ultra",
+        "rating": 2.5
       },
       {
         "beer": "Bud Light",
         "rating": 3
       },
       {
-        "beer": "Michelob Ultra",
-        "rating": 2.5
+        "beer": "Budweiser",
+        "rating": 3
       }
     ]
   },

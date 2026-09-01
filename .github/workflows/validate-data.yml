@@ -31,5 +31,15 @@ jobs:
       - name: Check data/ is in step with data.js
         run: node tools/export-data.mjs --check
 
+      # data.js is written from the Supabase tables now, so the projection
+      # between the two is part of the data. This sends the file out through
+      # the columns and back and fails if a value does not survive the trip —
+      # which is what a sync would then quietly write into the site.
+      #
+      # It needs no network and no secrets: the rows in the middle are built
+      # from data.js itself.
+      - name: Check the Supabase projection round-trips
+        run: node tools/roundtrip-supabase.mjs
+
       - name: Syntax-check the browser scripts
         run: node --check data.js && node --check app.js

@@ -1,0 +1,67 @@
+name: Sync from Supabase
+
+# The database behind beer-review-buddy is where a beer is added now. This is
+# what carries it across: it rewrites data.js from those tables, checks the
+# result against every rule in CLAUDE.md, refreshes data/, and commits — so a
+# beer logged on a phone shows up on the site without anyone opening an editor.
+#
+# Nightly, and on demand. A sync that finds nothing new writes nothing and
+# leaves no commit behind.
+#
+# Needs two repository secrets:
+#   SUPABASE_URL  https://<project>.supabase.co
+#   SUPABASE_KEY  the publishable (anon) key — every table is world-readable
+#                 behind RLS and nothing here writes, so this never needs to be
+#                 the service-role key.
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+# Only one sync at a time: two overlapping runs would race to commit the same
+# regenerated file.
+concurrency:
+  group: sync-from-supabase
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Rewrite data.js from the database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: npm run sync
+
+      # The site is generated now, but it is still checked exactly as when it
+      # was written by hand: a review that came out of the database with a
+      # country code that has no flag, a brewery that lists no beers or a beer
+      # with no brand domain fails here rather than rendering wrong.
+      - name: Check the result
+        run: npm run check
+
+      - name: Refresh the exports
+        run: npm run export
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet; then
+            echo "No change — data.js already matches the database."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data.js data/
+          git commit -m 'Sync the reviews from Supabase'
+          git push
