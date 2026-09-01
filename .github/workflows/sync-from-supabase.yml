@@ -38,7 +38,23 @@ jobs:
         with:
           node-version: '20'
 
+      # Until the two secrets exist there is nothing to sync from, and a run
+      # that fails every night is a run nobody reads. Skip instead, and say so.
+      - name: Check the secrets are set
+        id: secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipped — set the SUPABASE_URL and SUPABASE_KEY repository secrets to turn this on."
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Rewrite data.js from the database
+        if: steps.secrets.outputs.ready == 'true'
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -49,12 +65,15 @@ jobs:
       # country code that has no flag, a brewery that lists no beers or a beer
       # with no brand domain fails here rather than rendering wrong.
       - name: Check the result
+        if: steps.secrets.outputs.ready == 'true'
         run: npm run check
 
       - name: Refresh the exports
+        if: steps.secrets.outputs.ready == 'true'
         run: npm run export
 
       - name: Commit if anything changed
+        if: steps.secrets.outputs.ready == 'true'
         run: |
           if git diff --quiet; then
             echo "No change — data.js already matches the database."
