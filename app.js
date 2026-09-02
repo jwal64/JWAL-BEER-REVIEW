@@ -154,6 +154,35 @@ function strs(r){const f=Math.floor(r),h=(r%1)>=.5;return"★".repeat(f)+(h?"½"
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
 const std=a=>{if(!a.length)return 0;const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)**2)));};
 
+// ── PLACES ──
+// A place is written one way everywhere: city, then the region or state, then
+// the country — "New Rochelle, New York, USA", "Montreal, Quebec, Canada".
+// It was written five different ways before this: "City, Region", "City,
+// Region · 🇺🇸 Country", the region alone in a table column, and the city alone
+// in a journey line, which left a reader unable to tell Hartsdale in New York
+// from any other Hartsdale.
+//
+// The region is dropped only when it repeats the city — Antwerp is in Antwerp,
+// and saying so twice reads as a mistake rather than as detail.
+function place(city,region,country){
+  const out=[String(city??'').trim()];
+  const r=String(region??'').trim(), c=String(country??'').trim();
+  if(r&&r!==out[0]) out.push(r);
+  if(c) out.push(c);
+  return out.filter(Boolean).join(', ');
+}
+// A brewery keeps "City, Region" in one field and its country in another, so
+// its place is assembled from the pieces rather than concatenated — otherwise
+// a brewery whose location is just a city loses its region silently.
+function breweryPlace(br){
+  const parts=String(br?.location??'').split(',').map(s=>s.trim()).filter(Boolean);
+  return place(parts[0],parts.slice(1).join(', '),br?.country);
+}
+// The same, with the country's flag in front. The flag is decoration and the
+// text has to stand without it: a terminal, a screen reader and a font with no
+// emoji all show nothing where it is.
+const placeFlag=(cc,city,region,country)=>`${FLAGS[cc]||''} ${place(city,region,country)}`.trim();
+
 // Source chain priority: local override → Brandfetch → Google favicons → Icon
 // Horse → 🍺 emoji span. Walk via dataset.f counter; each failure advances to
 // the next available source.
@@ -729,7 +758,7 @@ document.getElementById('mktPanel').innerHTML=`
   <div class="insight-row"><span class="insight-key">Best style</span><div><div class="insight-val up">${esc(bestStyle.s)}</div><div class="insight-sub">${bestStyle.a.toFixed(2)} avg · ${bestStyle.c} review${bestStyle.c>1?'s':''}</div></div></div>
   <div class="insight-row"><span class="insight-key">Weakest style</span><div><div class="insight-val dn">${esc(worstStyle.s)}</div><div class="insight-sub">${worstStyle.a.toFixed(2)} avg · ${worstStyle.c} review${worstStyle.c>1?'s':''}</div></div></div>
   <div class="insight-row"><span class="insight-key">Top country</span><div><div class="insight-val">${esc(topCountry.l)}</div><div class="insight-sub">${topCountry.a.toFixed(2)} avg · ${topCountry.c} review${topCountry.c>1?'s':''}</div></div></div>
-  <div class="insight-row"><span class="insight-key">Top city</span><div><div class="insight-val">${esc(topCity.city)}, ${esc(topCity.region)}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
+  <div class="insight-row"><span class="insight-key">Top city</span><div><div class="insight-val">${esc(place(topCity.city,topCity.region,topCity.country))}</div><div class="insight-sub">${topCity.a.toFixed(2)} avg · ${topCity.c} review${topCity.c>1?'s':''}</div></div></div>
   <div class="insight-row"><span class="insight-key">Best method</span><div><div class="insight-val">${bestMethod}</div><div class="insight-sub">${bestMethodAvg.toFixed(2)} avg · ${bestMethodCt} review${bestMethodCt>1?'s':''}</div></div></div>
   <div class="insight-row"><span class="insight-key">Trend</span><div><div class="insight-val ${trendCls}">${trendLabel}</div><div class="insight-sub">5-review rolling average · ${Object.keys(STATS.countryMap).length} countries · ${Object.keys(STATS.cityMap).length} cities</div></div></div>`;
 
@@ -854,7 +883,7 @@ function renderTable(data){
         <td>${FLAGS[b.origin]||''} ${esc(b.origin)}</td>
         <td style="color:var(--info)">${b.abv.toFixed(1)}%</td>
         <td style="color:var(--text-3)">${esc(b.method)}</td>
-        <td style="color:var(--text-3)">${esc(b.city)}, ${esc(b.region)} · ${FLAGS[b.cc]||''} ${esc(b.country)}</td>
+        <td style="color:var(--text-3)">${FLAGS[b.cc]||''} ${esc(place(b.city,b.region,b.country))}</td>
         <td style="color:var(--text-3)">${esc(b.month)} ${b.year}</td>
         <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
         <td style="color:var(--accent-hi);font-size:12px">${strs(b.rating)}</td>
@@ -992,7 +1021,7 @@ function openBeerModal(name){
           <td><span class="rb ${rbC(b.rating)}">${b.rating.toFixed(2)}</span></td>
           <td style="color:var(--accent-hi);font-size:12px">${strs(b.rating)}</td>
           <td style="color:var(--text-3)">${esc(b.method)}</td>
-          <td style="color:var(--text-2)">${esc(b.city)}, ${esc(b.region)}</td>
+          <td style="color:var(--text-2)">${FLAGS[b.cc]||''} ${esc(place(b.city,b.region,b.country))}</td>
           <td>${FLAGS[b.cc]||''} ${esc(b.country)}</td>
           <td style="color:var(--text-3);font-size:12px">${esc(b.month)} ${b.year}</td>
         </tr>`).join('')}
@@ -1054,7 +1083,7 @@ function drawCity(){
   });
   document.getElementById('cityCards').innerHTML=cD.map(d=>`
     <div class="mini-row${thin(d.c)?' rank-thin':''}">
-      <div><div style="font-size:13px;color:var(--text);font-weight:600">${esc(d.city)}</div><div style="font-size:12px;color:var(--text-3)">${esc(d.region)} · ${FLAGS[d.cc]||''} ${esc(d.country)} · ${d.c} review${d.c>1?'s':''}${thin(d.c)?' · unranked':''}</div></div>
+      <div><div style="font-size:13px;color:var(--text);font-weight:600">${esc(place(d.city,d.region,d.country))}</div><div style="font-size:12px;color:var(--text-3)">${FLAGS[d.cc]||''} ${d.c} review${d.c>1?'s':''}${thin(d.c)?' · unranked':''}</div></div>
       <span class="rb ${rbC(d.a)}">${d.a.toFixed(2)}</span>
     </div>`).join('');
 }
@@ -1616,7 +1645,7 @@ function buildDrankLayer(map){
     const home=HOME_CITIES.has(l.city);
     const rows=d.reviews.map(b=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:1px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-2)">${esc(b.beer)}</span><span style="color:${rC(b.rating)};font-weight:700">${b.rating.toFixed(2)}</span></div>`).join('');
     const html=popKicker('📍 A city where I drank')+
-      `<span style="color:var(--text);font-weight:700;font-size:13px">${esc(l.city)}</span>, ${esc(l.region)}&nbsp;&nbsp;${FLAGS[l.cc]||''} ${esc(l.country)}${home?' · <span style="color:var(--accent-hi)">⌂ Home turf</span>':''}<br>`+
+      `<span style="color:var(--text);font-weight:700;font-size:13px">${esc(l.city)}</span><br><span style="color:var(--text-2);font-size:13px">${FLAGS[l.cc]||''} ${esc(place('',l.region,l.country))}</span>${home?' · <span style="color:var(--accent-hi)">⌂ Home turf</span>':''}<br>`+
       `<span style="color:var(--text-2);font-size:13px">${d.c} pour${d.c>1?'s':''} here · my average <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`+
       `<div style="margin-top:6px">${rows}</div>`;
     L.circleMarker([l.lat,l.lng],{radius:r,fillColor:THEME.accent,color:home?THEME.accentHi:THEME.bg,weight:home?2:1,opacity:.9,fillOpacity:.8})
@@ -1638,7 +1667,7 @@ function buildBrewedLayer(map){
     const beerList=b.beers.split(' · ').map(n=>`<span style="color:var(--text-2)">${n}</span>`).join('<span style="color:var(--text-3)"> · </span>');
     const html=popKicker('🏭 A brewery’s hometown')+logoHtml+
       `<span style="color:var(--text);font-weight:700;font-size:13px">${esc(b.name)}</span><br>`+
-      `<span style="color:var(--text-2);font-size:13px">brews in ${esc(b.location)} · ${FLAGS[b.cc]||''} ${esc(b.country)}</span><br>`+
+      `<span style="color:var(--text-2);font-size:13px">brews in ${FLAGS[b.cc]||''} ${esc(breweryPlace(b))}</span><br>`+
       `<span style="color:var(--text-3);font-size:12px">What I’ve had:</span> <span style="font-size:13px">${beerList}</span><br>`+
       `my average: <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5 · ${rWord(a)}</span> <span style="color:var(--text-3)">(${b.ratings.length} pour${b.ratings.length>1?'s':''})</span>`;
     L.circleMarker([b.lat,b.lng],{radius:r,fillColor:rC(a),color:THEME.bg,weight:1,opacity:.9,fillOpacity:.85})
@@ -1655,7 +1684,7 @@ function buildJourneyLayer(map,journeys){
     const a=avg(j.ratings),pts=arcPts(j.br.lat,j.br.lng,j.loc.lat,j.loc.lng);
     const html=popKicker('✈ One beer’s trip to my glass')+
       `<span style="color:var(--text);font-weight:700;font-size:13px">${esc(j.beer)}</span><br>`+
-      `<span style="color:var(--text-2)">${j.br.location.split(',')[0]} ${FLAGS[j.br.cc]||''}</span> <span style="color:var(--text-3)">→</span> <span style="color:var(--text-2)">${esc(j.loc.city)} ${FLAGS[j.loc.cc]||''}</span><br>`+
+      `<span style="color:var(--text-2)">${FLAGS[j.br.cc]||''} ${esc(breweryPlace(j.br))}</span> <span style="color:var(--text-3)">→</span> <span style="color:var(--text-2)">${FLAGS[j.loc.cc]||''} ${esc(place(j.loc.city,j.loc.region,j.loc.country))}</span><br>`+
       `<span style="color:var(--text-2);font-size:13px">traveled ~<b style="color:var(--accent-hi)">${fmtMi(j.miles)} mi</b> · my rating <span style="color:${rC(a)};font-weight:700">${a.toFixed(2)}/5</span></span>`;
     L.polyline(pts,{color:rC(a),weight:1.6,opacity:.65})
       .bindTooltip(`${esc(j.beer)} · ${fmtMi(j.miles)} mi`,{sticky:true,className:'mtip'})
@@ -1716,7 +1745,7 @@ function renderBrewedTable(){
     return `<tr>
       <td>${logoImg(firstBeer,22)}</td>
       <td style="font-weight:600"><span class="brewery-clickable" data-brewery="${esc(b.name)}">${esc(b.name)}</span></td>
-      <td style="color:var(--text-3);font-size:12px">${esc(b.location)}</td>
+      <td style="color:var(--text-3);font-size:12px">${esc(breweryPlace(b))}</td>
       <td style="color:var(--text-2)">${FLAGS[b.cc]||''} ${esc(b.country)}</td>
       <td style="color:var(--text-3);font-size:12px">${b.beers}</td>
       <td><span class="rb ${rbC(b.avg)}${thin(b.n)?' rb-thin':''}" title="${esc(b.n)} review${b.n===1?'':'s'}${thin(b.n)?` · under ${MIN_N}, not ranked`:''}">${b.avg.toFixed(2)}</span></td>
@@ -1730,8 +1759,8 @@ function renderJourneyTable(journeys){
   const far=s[0],near=s[s.length-1];
   const sumEl=document.getElementById('journeySummary');
   if(sumEl&&far) sumEl.innerHTML=`<div class="jny-sum">
-    <span>🏆 Longest haul: <b style="color:var(--accent-hi)">${esc(far.beer)}</b> — ${fmtMi(far.miles)} mi (${far.br.location.split(',')[0]} → ${esc(far.loc.city)})</span>
-    <span>🏠 Most local: <b style="color:var(--pos)">${esc(near.beer)}</b> — ${fmtMi(near.miles)} mi (${near.br.location.split(',')[0]} → ${esc(near.loc.city)})</span>
+    <span>🏆 Longest haul: <b style="color:var(--accent-hi)">${esc(far.beer)}</b> — ${fmtMi(far.miles)} mi (${esc(breweryPlace(far.br))} → ${esc(place(far.loc.city,far.loc.region,far.loc.country))})</span>
+    <span>🏠 Most local: <b style="color:var(--pos)">${esc(near.beer)}</b> — ${fmtMi(near.miles)} mi (${esc(breweryPlace(near.br))} → ${esc(place(near.loc.city,near.loc.region,near.loc.country))})</span>
     <span>🌍 All pours combined: <b style="color:var(--info)">${fmtMi(totalMi)} beer-miles</b></span>
   </div>`;
   document.getElementById('journeyTbody').innerHTML=s.map((j,i)=>{
@@ -1739,7 +1768,7 @@ function renderJourneyTable(journeys){
     return `<tr data-beer="${esc(j.beer)}" style="cursor:pointer">
       <td style="color:var(--text-3)">${i+1}</td>
       <td style="color:var(--text);font-weight:600">${esc(j.beer)}</td>
-      <td style="color:var(--text-2)">${FLAGS[j.br.cc]||''} ${esc(j.br.location)}</td>
+      <td style="color:var(--text-2)">${FLAGS[j.br.cc]||''} ${esc(breweryPlace(j.br))}</td>
       <td style="color:var(--text-2)">${FLAGS[j.loc.cc]||''} ${esc(j.loc.city)}</td>
       <td style="text-align:right;color:var(--info)">${fmtMi(j.miles)}</td>
       <td><span class="rb ${rbC(a)}">${a.toFixed(2)}</span></td>
@@ -2231,7 +2260,7 @@ function renderWtShortlist(){
         ${logoImg(r.beer,22)}
         <span class="wt-name">${esc(r.beer)}</span>
       </div>
-      <div class="wt-meta">${FLAGS[r.origin]||''} ${esc(r.style)} · ${r.abv.toFixed(1)}% · ${esc(r.method.toLowerCase())} · ${esc(r.region)}</div>
+      <div class="wt-meta">${FLAGS[r.origin]||''} ${esc(r.style)} · ${r.abv.toFixed(1)}% · ${esc(r.method.toLowerCase())} · ${esc(place('',r.region,CNAMES[r.origin]))}</div>
       <div class="wt-gauges">
         ${wtGauge('My guess',r._guess,'wt-fill-mine')}
         ${wtGauge('World',r._world,'wt-fill-world')}
@@ -2443,7 +2472,7 @@ function drawWantToTry(){
           <div class="cmd-item" data-brewery="${esc(b.name)}" data-action="brewery">
             <span class="cmd-item-icon">🏭</span>
             <span class="cmd-item-main">${esc(b.name)}</span>
-            <span class="cmd-item-meta">${esc(b.location)} · ${FLAGS[b.cc]||''}</span>
+            <span class="cmd-item-meta">${FLAGS[b.cc]||''} ${esc(breweryPlace(b))}</span>
           </div>`).join('');
       }
     }
@@ -2495,7 +2524,7 @@ function openBreweryDrawer(name){
     body.innerHTML=`
       <div class="drawer-stat"><span class="drawer-key">Brewery</span><span class="drawer-val" style="max-width:200px">${esc(brewery.name)}</span></div>
       ${brewery.nativeName?`<div class="drawer-stat"><span class="drawer-key">Native name</span><span class="drawer-val" style="max-width:200px">${esc(brewery.nativeName)}</span></div>`:''}
-      <div class="drawer-stat"><span class="drawer-key">Location</span><span class="drawer-val">${esc(brewery.location)}</span></div>
+      <div class="drawer-stat"><span class="drawer-key">Location</span><span class="drawer-val">${esc(breweryPlace(brewery))}</span></div>
       <div class="drawer-stat"><span class="drawer-key">Country</span><span class="drawer-val">${FLAGS[brewery.cc]||''} ${esc(brewery.country)}</span></div>
       <div class="drawer-stat"><span class="drawer-key">Language</span><span class="drawer-val">${LANG_NAMES_IDX[brewery.lang]||brewery.lang}</span></div>
       <div class="drawer-stat"><span class="drawer-key">Average rating</span><span class="rb ${rbC(avgR)}" style="font-size:13px">${avgR.toFixed(2)}</span></div>
