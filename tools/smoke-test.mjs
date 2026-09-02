@@ -38,7 +38,11 @@ const server = createServer(async (req, res) => {
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const base = `http://127.0.0.1:${server.address().port}`;
 
-const browser = await chromium.launch();
+// CHROMIUM_PATH for an environment that has a browser but not the one
+// Playwright expects to find — a container with Chromium preinstalled, which
+// is where the agent sessions run.
+const browser = await chromium.launch(
+  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 const page = await browser.newPage();
 const errors = [], failed = [];
 
@@ -54,7 +58,8 @@ if (LIB) {
 }
 // Logos, fonts and map tiles are decoration: the page is expected to render
 // without them, so failures there are not the test's business.
-const DECORATION = /brandfetch|google|icon\.horse|tile|cartocdn|fonts|wikimedia|\.png|\.jpg/;
+const DECORATION =
+  /gstatic|google|icon\.horse|duckduckgo|tile|cartocdn|fonts|wikimedia|\.png|\.jpg|\.webp/;
 const NOISE = /Failed to load resource|ERR_FAILED|ERR_TUNNEL|ERR_NAME_NOT_RESOLVED/;
 
 page.on('console', m => { if (m.type() === 'error' && !NOISE.test(m.text())) errors.push(m.text()); });
