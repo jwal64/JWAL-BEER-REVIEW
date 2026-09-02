@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Singha Thai Lager">
+  <rect width="512" height="512" rx="60" fill="#a3121b"/>
+  <g fill="none" stroke="#e0b23c" stroke-width="9">
+    <circle cx="256" cy="180" r="104"/>
+    <circle cx="256" cy="180" r="88"/>
+  </g>
+  <g fill="#e0b23c">
+    <path d="M256 112 c30 0 54 22 54 50 c0 12 -5 22 -12 30 l14 34 h-30 l-8 -22 h-36 l-8 22 h-30 l14 -34 c-7 -8 -12 -18 -12 -30 c0 -28 24 -50 54 -50 Z" opacity="0.92"/>
+    <path d="M214 138 l-20 -22 l30 8 Z"/>
+    <path d="M298 138 l20 -22 l-30 8 Z"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="380" font-size="88" fill="#ffffff" letter-spacing="4">SINGHA</text>
+  </g>
+  <rect x="140" y="404" width="232" height="5" fill="#e0b23c"/>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="456" font-size="34" fill="#e0b23c" letter-spacing="2">&#3626;&#3636;&#3591;&#3627;&#3660;</text>
+  </g>
+</svg>

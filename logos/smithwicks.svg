@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Smithwick&apos;s Irish Red Ale">
+  <rect width="512" height="512" rx="60" fill="#9b1420"/>
+  <g fill="#e3b23c">
+    <path d="M256 92 l104 42 v92 c0 74 -44 128 -104 152 -60 -24 -104 -78 -104 -152 v-92 Z" opacity="0.28"/>
+    <path d="M256 118 l82 33 v75 c0 60 -35 103 -82 123 -47 -20 -82 -63 -82 -123 v-75 Z" fill="none" stroke="#e3b23c" stroke-width="7"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="248" font-size="58" fill="#ffffff">S</text>
+    <text x="256" y="404" font-size="62" fill="#ffffff" letter-spacing="1">Smithwick&#8217;s</text>
+  </g>
+  <rect x="146" y="426" width="220" height="4" fill="#e3b23c"/>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="470" font-size="30" fill="#e3b23c" letter-spacing="4">EST. 1710</text>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mythos Hellenic Lager">
+  <rect width="512" height="512" rx="60" fill="#0b52a1"/>
+  <g fill="none" stroke="#ffffff" stroke-width="14">
+    <path d="M96 150 h48 v-34 h68 v34 h48 v-34 h68 v34 h48"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="316" font-size="96" fill="#ffffff" letter-spacing="3">MYTHOS</text>
+  </g>
+  <rect x="120" y="344" width="272" height="6" fill="#ffffff"/>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="398" font-size="34" fill="#ffffff" letter-spacing="6">ΜΥΘΟΣ</text>
+    <text x="256" y="446" font-size="26" fill="#9fc4ea" letter-spacing="3">HELLENIC LAGER</text>
+  </g>
+</svg>

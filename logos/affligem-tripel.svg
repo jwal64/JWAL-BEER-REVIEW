@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Affligem Tripel Belgian Abbey Ale">
+  <rect width="512" height="512" rx="60" fill="#6e1420"/>
+  <g fill="#e0b64a">
+    <path d="M256 88 c46 0 84 38 84 84 v66 h-168 v-66 c0-46 38-84 84-84 Z" opacity="0.24"/>
+    <path d="M256 116 c34 0 62 28 62 62 v60 h-124 v-60 c0-34 28-62 62-62 Z" fill="none" stroke="#e0b64a" stroke-width="8"/>
+    <rect x="248" y="140" width="16" height="86" rx="3"/>
+    <rect x="222" y="166" width="68" height="15" rx="3"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="330" font-size="72" fill="#ffffff" letter-spacing="2">AFFLIGEM</text>
+  </g>
+  <rect x="132" y="354" width="248" height="5" fill="#e0b64a"/>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="414" font-size="52" fill="#e0b64a" letter-spacing="6">TRIPEL</text>
+  </g>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="462" font-size="25" fill="#ffffff" letter-spacing="3">ABDIJBIER &#183; ANNO 1074</text>
+  </g>
+</svg>

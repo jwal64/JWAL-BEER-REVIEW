@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Newcastle Brown Ale">
+  <rect width="512" height="512" rx="60" fill="#f2ead9"/>
+  <path d="M256 96 L295 213 L418 213 L319 286 L357 403 L256 331 L155 403 L193 286 L94 213 L217 213 Z" fill="#0b4ea2"/>
+  <g fill="#f2ead9" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="258" font-size="42" letter-spacing="1">NBA</text>
+  </g>
+  <g fill="#0b4ea2" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="452" font-size="43" letter-spacing="2">NEWCASTLE</text>
+  </g>
+  <g fill="#7a5c2e" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="486" font-size="26" letter-spacing="5">BROWN ALE</text>
+  </g>
+</svg>

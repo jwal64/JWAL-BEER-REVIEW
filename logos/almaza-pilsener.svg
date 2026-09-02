@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Almaza Pilsener">
+  <rect width="512" height="512" rx="60" fill="#c8102e"/>
+  <g transform="translate(256 176)">
+    <path d="M0 -84 L74 0 L0 84 L-74 0 Z" fill="none" stroke="#e8c76a" stroke-width="12"/>
+    <path d="M0 -46 L40 0 L0 46 L-40 0 Z" fill="#e8c76a"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="346" font-size="84" fill="#ffffff" letter-spacing="4">ALMAZA</text>
+    <text x="256" y="424" font-size="60" fill="#e8c76a">&#1571;&#1604;&#1605;&#1575;&#1586;&#1577;</text>
+  </g>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="466" font-size="26" fill="#ffffff" letter-spacing="5">PILSENER</text>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mahou Cinco Estrellas">
+  <rect width="512" height="512" rx="60" fill="#b8101f"/>
+  <g fill="#f3c73f">
+    <path d="M76 150 l9 27 h29 l-23 17 9 27 -24-17 -23 17 9-27 -24-17 h29 Z"/>
+    <path d="M166 150 l9 27 h29 l-23 17 9 27 -24-17 -23 17 9-27 -24-17 h29 Z"/>
+    <path d="M256 150 l9 27 h29 l-23 17 9 27 -24-17 -23 17 9-27 -24-17 h29 Z"/>
+    <path d="M346 150 l9 27 h29 l-23 17 9 27 -24-17 -23 17 9-27 -24-17 h29 Z"/>
+    <path d="M436 150 l9 27 h29 l-23 17 9 27 -24-17 -23 17 9-27 -24-17 h29 Z"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="330" font-size="106" fill="#ffffff" letter-spacing="2">Mahou</text>
+  </g>
+  <rect x="126" y="356" width="260" height="5" fill="#f3c73f"/>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="404" font-size="34" fill="#f3c73f" letter-spacing="3">CINCO</text>
+    <text x="256" y="446" font-size="34" fill="#f3c73f" letter-spacing="3">ESTRELLAS</text>
+  </g>
+</svg>
