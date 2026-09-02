@@ -235,9 +235,18 @@ function auditLogos({timeout=8000,concurrency=8}={}){
     const srcs=logoSources(name);
     for(const url of srcs){
       const hit=await tryOne(url);
-      if(hit) return {beer:name,result:tierOf(name,url),size:`${hit.w}×${hit.h}`,
-                      suspect:hit.w<=32?'yes':'',url,
-                      domains:brandDomains(name).join(', ')||'—'};
+      if(hit){
+        const tier=tierOf(name,url);
+        // "Suspect" means favicon-sized, which is how a service's generic
+        // globe announces itself. A committed file is not that: it was chosen
+        // deliberately and logo-fetch-report.json records where from, so a
+        // small one is a small mark rather than a wrong one — the Modelo
+        // beers' crest is 32px because that is the only size the brewery
+        // publishes.
+        return {beer:name,result:tier,size:`${hit.w}×${hit.h}`,
+                suspect:(tier!=='local'&&hit.w<=32)?'yes':'',url,
+                domains:brandDomains(name).join(', ')||'—'};
+      }
     }
     return {beer:name,result:srcs.length?'PLACEHOLDER':'NO DOMAIN',size:'—',suspect:'',
             url:'',domains:brandDomains(name).join(', ')||'—'};

@@ -387,21 +387,21 @@
     "domains": [
       "modelousa.com"
     ],
-    "logo": null
+    "logo": "logos/modelo-especial.webp"
   },
   {
     "beer": "Negra Modelo",
     "domains": [
       "modelousa.com"
     ],
-    "logo": null
+    "logo": "logos/negra-modelo.webp"
   },
   {
     "beer": "Modelo Oro",
     "domains": [
       "modelousa.com"
     ],
-    "logo": null
+    "logo": "logos/modelo-oro.webp"
   },
   {
     "beer": "Mythos",
