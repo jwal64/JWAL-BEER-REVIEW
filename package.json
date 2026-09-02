@@ -10,6 +10,8 @@
     "sri": "node tools/sri.mjs",
     "smoke": "node tools/smoke-test.mjs",
     "logos": "node tools/audit-logos.mjs",
+    "fetch-logos": "node tools/fetch-logos.mjs",
+    "logo-sheet": "node tools/logo-sheet.mjs",
     "test": "npm run check"
   },
   "engines": {

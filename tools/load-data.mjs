@@ -22,9 +22,17 @@ const EXPORTS = [
   'WANT_TO_TRY',
 ];
 
+// Declarations a data.js may not have yet. Collected with a typeof guard so an
+// older file — one written before the binding existed — loads and reads as
+// empty, rather than throwing a ReferenceError from the collector and taking
+// every check down with it.
+const OPTIONAL = ['BRAND_LOGOS'];
+
 export function loadData(root = ROOT) {
   const src = readFileSync(join(root, 'data.js'), 'utf8');
-  const collect = `\n;({${EXPORTS.join(',')}});\n`;
+  const collect = `\n;({${EXPORTS.join(',')}` +
+    OPTIONAL.map(n => `,${n}:typeof ${n}==='undefined'?undefined:${n}`).join('') +
+    `});\n`;
   return vm.runInNewContext(src + collect, Object.create(null), { filename: 'data.js' });
 }
 

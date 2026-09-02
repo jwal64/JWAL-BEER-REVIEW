@@ -110,14 +110,38 @@ domain and let it fall through to the placeholder instead.
 Nothing in the repo can verify a domain: only a browser that can reach the CDNs
 can. See "Verifying logos" below.
 
-### Step 2.6: Optional — Local Logo Override
+### Step 2.6: Fetch the Logo (REQUIRED)
 
-Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
+Every beer's logo is a **file in this repo**, under `logos/`, named in
+`BRAND_LOGOS` in `data.js`. `npm run check` fails on a beer that has none — so
+this is a step, not an option:
 
-1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
-2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
+```sh
+npm run fetch-logos        # needs open internet; fetches only what's missing
+npm run logo-sheet         # renders every logo onto one sheet — then look at it
+```
 
-The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
+`fetch-logos` walks a ladder for the beer's brand domains and takes the first
+tier that answers: the icons the site declares, then the logo drawn in its
+header (inline SVG included), then the favicon services, then a square-ish
+`og:image`. It writes the file, and writes the `BRAND_LOGOS` entry.
+
+**Look at the sheet.** No check can tell a brand's mark from a photograph of a
+bottle or a generated grey letter — both load, both are the right size, both
+pass everything. A person spots either in a second. If one is wrong, fix the
+domain in `BRAND_DOMAINS` and re-fetch that beer:
+
+```sh
+npm run fetch-logos -- --force --only "Sol"
+```
+
+For a brand that no source has, draw or save the logo into `logos/` yourself
+and add the entry to `BRAND_LOGOS` by hand. The fetcher leaves a file it did
+not write alone, `--force` included.
+
+A single beer can still override its brand's file with `logo:"logos/<file>"` on
+its own `beers[]` entry — the per-review escape hatch, for artwork that belongs
+to one pour rather than to the brand.
 
 ### Step 3: Research Checklist (for each new beer)
 
@@ -354,52 +378,108 @@ Edit `MIN_N` in `app.js` and everything follows, including the on-screen caption
 they are generated from the constant via `data-minn`, so no text needs updating. Do **not**
 hardcode "3" in HTML or CSS.
 
-## Verifying Logos
+## Logos
 
-Beers render their real brand logo at runtime through a four-tier chain, tried in
-order until one answers:
+**Every beer's logo is a file in this repo.** `logos/`, one per
+beer name, named in `BRAND_LOGOS` in data.js. That is where a logo comes from: the same picture on
+every render, working offline, and nobody else's to withdraw.
 
-**local `logos/` override → Brandfetch CDN → Google favicons → Icon Horse → 🍺**
+It was not always. Until this changed, every logo was fetched at page load from
+Brandfetch, then Google, then Icon Horse — and Brandfetch began answering 403
+to the public client ID both surfaces embedded, for every domain and every URL
+shape. The first tier resolved nothing for anybody. 97 of 101 beers fell
+through to Google's *default* 16px favicon and the site rendered a hundred
+identical grey globes for a month. Nothing in the repo had changed; nothing in
+the repo could have prevented it, because every check there was only asked
+whether a beer had a *domain*.
 
-The chain is tiered by *source*, not by domain: every domain a beer lists is tried
-at each tier before dropping to the next, because a real Brandfetch logo for a
-beer's second domain beats a 16px favicon for its first.
+### The chain now
 
-A domain being *present* proves nothing — whether a real logo sits behind it needs
-a browser that can reach those CDNs. Four things do the checking:
+**committed `logos/` file → Google favicons (256) → Icon Horse → DuckDuckGo → 🍺**
+
+The first tier answers for every beer that has been fetched, so the rest is
+what happens to a beer whose logo has not been fetched yet. Still tiered by *source*, not by domain:
+every domain a beer lists is tried at each tier before dropping to the next.
+
+Two details in those URLs are load-bearing. Google serves favicons at 16, 32,
+64, 128 and 256; asked for a size it does not serve it answers the 16px default
+rather than failing, so `sz=512` looked like a working tier while returning a
+globe — don't raise it. And Brandfetch is *gone*, not merely deprioritised:
+leaving it in costs a failed request per logo and buys nothing.
+
+### Getting a logo
+
+```sh
+npm run fetch-logos                        # everything with no file yet
+npm run fetch-logos -- --force --only "Sol"
+npm run fetch-logos -- --data-only         # just re-point data.js at logos/
+npm run logo-sheet                         # all of them on one sheet, to look at
+```
+
+`tools/fetch-logos.mjs` needs open internet and Chromium. It walks a ladder per
+brand and takes the first *tier* that answers — the order is a judgement about
+what a thing is, not how big it is:
+
+1. **the icons the site declares** — square, made to be shrunk, the brand's own
+2. **the logo drawn in its header** — the mark itself, often inline SVG that
+   reading the HTML as text would never find; serialised with its computed fill
+   written onto every node, because those colours live in a stylesheet that is
+   not coming with it
+3. **the favicon services** — the same icons, second-hand
+4. **`og:image`, only if roughly square** — usually a hero photograph, so it is
+   fenced and last
+
+Rasters are re-encoded to WebP at the image's own longest edge, capped at
+256px. SVG is written through untouched. A file the tool did not write is never
+replaced, `--force` included — so a logo drawn by hand stays.
+
+### Looking at them
+
+`npm run logo-sheet` renders every file onto one page, each on a half-light,
+half-dark tile. **Do this, and look at it.** It is the only check that can tell
+a brand's mark from a photograph of a bottle or from a generated grey letter —
+both load, both are the right size, both pass everything else. That sheet is
+what caught 29 beers whose "logo" was a 1200×630 social card, and 12 more that
+Icon Horse had answered with a capital letter on a grey square.
+
+Two known shapes of wrong, both now rejected by the fetcher, both worth
+recognising if they come back:
+
+- **a generated lettermark** — Icon Horse draws one for a domain it cannot find
+  an icon for and serves it 200 OK at exactly 256×256. A confident wrong answer
+  is worse than no answer.
+- **a photograph** — a site's biggest header image is often a lifestyle shot.
+  Only an element that *calls itself* a logo is taken now.
+
+### What checks what
 
 | What | When | Catches |
 |------|------|---------|
-| `npm run check` | on every push, in CI | beers with no `BRAND_DOMAINS` entry at all, across `beers[]` and `WANT_TO_TRY`, plus domains that aren't bare domains |
-| `[DOMAIN CHECK]` console warning | automatically on load | the same gap, in the browser |
-| `npm run logos` | run it yourself, and monthly in CI | what each beer *actually* resolves to |
-| `auditLogos()` in the console | run it manually | the same, from inside a page you already have open |
+| `npm run check` | on every push, in CI | a beer with no `BRAND_DOMAINS` entry, **and a beer with no committed logo file** — both are errors |
+| `[DOMAIN CHECK]` console warning | automatically on load | a missing domain, in the browser |
+| `npm run logos` | run it yourself, and monthly in CI | what each beer *actually* resolves to in a browser |
+| `npm run logo-sheet` | after any fetch | whether the thing that resolved is the brand's logo at all |
 
 `npm run logos` (`tools/audit-logos.mjs`) drives `auditLogos()` in headless
-Chromium and exits non-zero on anything that didn't resolve, so the answer stops
-depending on somebody remembering to open a console. The **Logo audit** workflow
-runs it on the 1st of each month and opens a `logo-audit` issue listing what
-fell through, closing it once everything resolves again — a logo can break with
-no change to this repo, when a brand moves domain or a service drops it.
-
-Either way, read the result for two things:
-
-- **`PLACEHOLDER`** — no source answered; the beer shows 🍺.
-- **`suspect`** — something answered, but at favicon size (≤32px), which usually
-  means a generic globe standing in for a domain the service doesn't know.
-
-Both mean the domain needs correcting in `BRAND_DOMAINS`. If a brand simply isn't
-in any of the services, save the logo into `logos/` and point the beer's `logo`
-field at it (Step 2.6) — that is the only way to make a logo certain. A `logo`
-that is a remote URL rather than a file in `logos/` is a hotlink to someone
-else's server: it works until it doesn't, and `npm run check` warns about it.
+Chromium and exits non-zero on anything that didn't resolve. The **Logo audit**
+workflow runs it on the 1st of each month and opens a `logo-audit` issue
+listing what fell through, closing it once everything resolves again. Read its
+result for two things: **`PLACEHOLDER`** (no source answered; the beer shows 🍺)
+and **`suspect`** (something answered, but at favicon size — a generic globe).
+With a committed file for every beer, both should now be empty; either one
+means a file went missing or a `BRAND_LOGOS` entry points nowhere.
 
 The placeholder is also what you see with no network, or behind a proxy that
 blocks those CDNs — which is why `npm run logos` probes a few brands that
-certainly have logos before auditing anything, and reports the connection rather
-than printing a hundred false failures. It exits 0 on that (a skip, not a pass);
-`--strict` makes it a failure instead, which is what CI uses so a run that
-checked nothing can't read as all-clear.
+certainly have logos before auditing anything, and reports the connection
+rather than printing a hundred false failures. It exits 0 on that (a skip, not
+a pass); `--strict` makes it a failure instead, which is what CI uses so a run
+that checked nothing can't read as all-clear.
+
+`tools/probe-logo-sources.mjs` is the tool for the next time a whole tier goes
+quiet: it asks every candidate source shape what it actually returns for a real
+brand domain — status, type, bytes, pixel size — which is how the 403 and the
+`sz=512` default were found.
 
 ## Design System: Dark
 

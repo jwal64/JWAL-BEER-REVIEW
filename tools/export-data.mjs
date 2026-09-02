@@ -40,8 +40,11 @@ const breweries = D.breweries.map(br => {
 
 const locations = D.drunkLocs.map(l => ({ ...l }));
 
+// Where each beer's logo comes from: the file committed for the brand, and
+// the domains the runtime chain falls back to when there isn't one.
 const brandDomains = Object.entries(D.BRAND_DOMAINS)
-  .map(([beer, d]) => ({ beer, domains: Array.isArray(d) ? d : [d] }));
+  .map(([beer, d]) => ({ beer, domains: Array.isArray(d) ? d : [d],
+                         logo: (D.BRAND_LOGOS ?? {})[beer] ?? null }));
 
 const untappd = {
   lastRefreshed: D.UNTAPPD_LAST_REFRESHED,

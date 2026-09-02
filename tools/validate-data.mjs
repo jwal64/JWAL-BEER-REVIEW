@@ -31,6 +31,9 @@ const wtNorm = loadAppConst('wtNorm');
 const { FLAGS, CNAMES, beers, drunkLocs, breweries, BRAND_DOMAINS,
         UNTAPPD_GLOBAL_AVGS, UNTAPPD_LAST_REFRESHED, UNTAPPD_REFRESH_INTERVAL_DAYS,
         WANT_TO_TRY } = D;
+// A data.js written before the logos moved into the repo has no map at all;
+// read it as empty so the check below reports every beer rather than throwing.
+const BRAND_LOGOS = D.BRAND_LOGOS ?? {};
 
 // A country code has to carry both a flag and a display name — one without the
 // other renders a blank or the literal code.
@@ -152,6 +155,32 @@ for (const [name, value] of Object.entries(BRAND_DOMAINS)) {
 }
 for (const name of logoBeers)
   if (!BRAND_DOMAINS[name]) err(`BRAND_DOMAINS`, `"${name}" renders a logo but has no entry`);
+
+// ── BRAND LOGOS ───────────────────────────────────────────────
+// The committed file for each brand. This is the check that makes "every beer
+// has its real logo" a fact about the repo rather than a hope about three
+// CDNs: the file is here, or this fails. It is not a warning, because a
+// warning is what the last state of this was — every beer had a domain, every
+// beer passed, and 97 of them rendered a grey globe for a month.
+//
+// `npm run fetch-logos` fills the gap for a beer that has none (it needs open
+// internet); the Fetch logos workflow does it on a runner. A brand no service
+// knows can always be drawn by hand into logos/ — a file put there is left
+// alone by the fetcher.
+for (const [name, file] of Object.entries(BRAND_LOGOS)) {
+  const where = `BRAND_LOGOS["${name}"]`;
+  if (!isStr(file)) err(where, 'must be a path string');
+  else if (/^https?:\/\//.test(file))
+    err(where, `hotlinks ${new URL(file).host} — a logo held on someone else's server is exactly what this replaces`);
+  else if (!file.startsWith('logos/')) err(where, `"${file}" is not under logos/`);
+  else if (!existsSync(join(ROOT, file))) err(where, `"${file}" does not exist`);
+  if (!logoBeers.has(name)) warn(where, 'no beer or shortlist entry uses this logo');
+}
+for (const name of logoBeers)
+  if (!BRAND_LOGOS[name])
+    err('BRAND_LOGOS', `"${name}" has no committed logo file — run \`npm run fetch-logos\`, ` +
+      'or draw one into logos/ and add it here');
+
 
 // ── UNTAPPD CONSENSUS ─────────────────────────────────────────
 for (const [name, v] of Object.entries(UNTAPPD_GLOBAL_AVGS)) {

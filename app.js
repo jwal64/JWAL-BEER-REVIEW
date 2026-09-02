@@ -47,20 +47,29 @@ const wtNorm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').to
 // ══════════════════════════════════════════════════════════════
 // LOGOS
 // ══════════════════════════════════════════════════════════════
-// Brandfetch's public dev client ID — embedded so users never need an account.
-const BRANDFETCH_CLIENT_ID = "1idIddY24o2pZE9n2hu";
-// Tiered logo sources: primary (Brandfetch HD logo) → fallback 1 (Google HD
-// favicons) → fallback 2 (Icon Horse, 256px PNG). Emoji renders inline if every
-// remote source fails. All endpoints requested at 2–4× the display size so
-// logos stay crisp on high-DPR screens.
+// Every beer's logo is a file in logos/, committed with the data (BRAND_LOGOS).
+// The remote tiers below are what happens when one is missing — a beer added
+// through the app's own form before `npm run fetch-logos` has run for it.
+//
+// They used to be the whole story, and that is exactly what went wrong: the
+// first tier was Brandfetch, which now answers 403 to the public client ID
+// this file embedded — every domain, every URL shape — so it resolved nothing
+// for anybody, and 97 beers fell through to Google's *default* favicon and
+// rendered a hundred identical grey globes for a month.
+//
+// The 256 on the Google URL is load-bearing. It serves 16, 32, 64, 128 and
+// 256; asked for a size it does not serve it answers the 16px default instead
+// of failing, which is how `sz=512` looked like a working tier while
+// returning a globe. Don't raise it.
+//
 // A beer's domains, always as a list.
 function brandDomains(name){
   const d=BRAND_DOMAINS[name];
   return d?(Array.isArray(d)?d:[d]):[];
 }
-const logoURL         = d=>`https://cdn.brandfetch.io/${d}/w/1024/h/1024?c=${BRANDFETCH_CLIENT_ID}`;
-const logoFallbackURL = d=>`https://www.google.com/s2/favicons?domain=${d}&sz=512`;
-const logoFallback2URL= d=>`https://icon.horse/icon/${d}`;
+const logoURL         = d=>`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${d}&size=256`;
+const logoFallbackURL = d=>`https://icon.horse/icon/${d}`;
+const logoFallback2URL= d=>`https://icons.duckduckgo.com/ip3/${d}.ico`;
 
 // Coverage warning. It has to see the want-to-try shortlist as well as
 // beers[] — those render logos too, and a gap there is just as visible. Both
@@ -77,11 +86,15 @@ function validateBeerDomains(){
 }
 try{ validateBeerDomains(); }catch(e){ console.error('Domain check error:',e); }
 
-// Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
-// entry to use a file you've placed in logos/ instead of Brandfetch. The
-// remote chain still serves as fallback if the local file is missing.
+// Where a beer's logo actually comes from. BRAND_LOGOS is the committed file
+// for the brand — one entry per beer name, so it covers a beer reviewed six
+// times and one still only on the shortlist alike. A `logo` on a review row
+// overrides it for that beer, which is the older, per-pour escape hatch and
+// still the way to give one beer artwork its brand's file doesn't have.
 const LOCAL_LOGOS={};
 function rebuildLocalLogos(){
+  for(const k in LOCAL_LOGOS) delete LOCAL_LOGOS[k];
+  Object.assign(LOCAL_LOGOS,typeof BRAND_LOGOS==='object'&&BRAND_LOGOS?BRAND_LOGOS:{});
   for(const b of beers) if(b.logo) LOCAL_LOGOS[b.beer]=b.logo;
 }
 rebuildLocalLogos();
@@ -176,9 +189,9 @@ function auditLogos({timeout=8000,concurrency=8}={}){
 
   const tierOf=(name,url)=>{
     if(LOCAL_LOGOS[name]===url) return 'local';
-    if(url.includes('brandfetch')) return 'brandfetch';
-    if(url.includes('google.com/s2')) return 'favicon';
+    if(url.includes('gstatic.com/faviconV2')) return 'favicon';
     if(url.includes('icon.horse')) return 'iconhorse';
+    if(url.includes('duckduckgo')) return 'duckduckgo';
     return '?';
   };
   const tryOne=url=>new Promise(res=>{

@@ -14,7 +14,7 @@ server.
 | `style.css` | The design system. `:root` is the only place a colour is written. |
 | `data/` | Generated exports of `data.js` as JSON and CSV — see below. |
 | `tools/` | Plain Node scripts. No dependencies, nothing to install. |
-| `logos/` | Optional local logo files for beers whose brand no logo service knows. |
+| `logos/` | **Every beer's logo**, one file each, named in `BRAND_LOGOS` in `data.js`. Not an override any more — it is where logos live. |
 
 Chart.js and Leaflet load from a CDN, pinned to an exact version and locked to a
 `integrity` hash, so a compromised CDN can't swap the library out.
