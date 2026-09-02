@@ -513,11 +513,22 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     writeFileSync(join(ROOT, r.file), r.buf);
   }
 
+  // Merged, not replaced. A `--only` run touches a handful of beers, and the
+  // report is also the record of which files are this tool's to overwrite —
+  // rewriting it from one run would make every other logo look hand-placed.
+  const previous = new Map();
+  try {
+    for (const f of JSON.parse(readFileSync(REPORT, 'utf8')).fetched ?? []) previous.set(f.beer, f);
+  } catch { /* no report yet */ }
+  for (const r of found)
+    previous.set(r.name, { beer: r.name, file: r.file, source: r.source, domain: r.domain,
+                           url: r.url, size: `${r.size.w}×${r.size.h}`, bytes: r.buf.length });
+  for (const n of kept) previous.delete(n);
+
   writeFileSync(REPORT, JSON.stringify({
     at: new Date().toISOString(),
     total: names.length,
-    fetched: found.map(r => ({ beer: r.name, file: r.file, source: r.source, domain: r.domain,
-                               url: r.url, size: `${r.size.w}×${r.size.h}`, bytes: r.buf.length })),
+    fetched: [...previous.values()].sort((a, b) => a.beer.localeCompare(b.beer)),
     // Files somebody chose by hand. Listed so the report stays the full answer
     // to "where does each beer's logo come from", not just this run's part.
     kept: kept.map(n => ({ beer: n, file: `logos/${fileFor(n)}` })),
