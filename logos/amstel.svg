@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Amstel Lager Beer">
+  <rect width="512" height="512" rx="60" fill="#c8102e"/>
+  <g fill="none" stroke="#ffffff" stroke-width="10" stroke-linejoin="round">
+    <path d="M256 108 l20 42 46 7 -33 33 8 46 -41 -22 -41 22 8 -46 -33 -33 46 -7 z"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="256" y="336" font-size="92" fill="#ffffff" letter-spacing="2">AMSTEL</text>
+  </g>
+  <rect x="140" y="362" width="232" height="6" fill="#ffffff"/>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="256" y="410" font-size="27" fill="#ffffff" letter-spacing="4">AMSTERDAM</text>
+    <text x="256" y="446" font-size="23" fill="#f3a6b3" letter-spacing="3">LAGER BEER</text>
+  </g>
+</svg>

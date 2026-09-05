@@ -1345,5 +1345,23 @@
     "month": "Aug",
     "monthN": 8,
     "year": 2026
+  },
+  {
+    "beer": "Amstel",
+    "style": "Lager",
+    "origin": "NL",
+    "originCountry": "Netherlands",
+    "abv": 5,
+    "method": "Bottle",
+    "city": "Tarrytown",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "rating": 2.5,
+    "isNew": true,
+    "month": "Sep",
+    "monthN": 9,
+    "year": 2026,
+    "logo": "logos/amstel.svg"
   }
 ]
