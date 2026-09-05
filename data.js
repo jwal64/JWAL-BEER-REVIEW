@@ -109,6 +109,8 @@ let beers=[
   {beer:"Radeberger Pilsner",    style:"Pilsner",        origin:"DE",abv:4.8,method:"Bottle",city:"White Plains", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Presidente",            style:"Pilsner",        origin:"DO",abv:5.0,method:"Bottle",city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   {beer:"Heineken Silver",       style:"Lager",          origin:"NL",abv:4.0,method:"Draft", city:"Queens",       region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
+  // SEP 2026
+  {beer:"Amstel",                style:"Lager",          origin:"NL",abv:5.0,method:"Bottle",city:"Tarrytown",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/amstel.svg"},
 ];
 
 // ── CONSUMPTION LOCATIONS — every city a review was logged in
@@ -140,6 +142,7 @@ let drunkLocs=[
   {city:"Miami",        region:"Florida",             country:"USA",         cc:"US", lat:25.7617,lng:-80.1918},
   {city:"Ischia",       region:"Campania",            country:"Italy",       cc:"IT", lat:40.7333,lng:13.9500},
   {city:"Capri",        region:"Campania",            country:"Italy",       cc:"IT", lat:40.5532,lng:14.2222},
+  {city:"Tarrytown",    region:"New York",            country:"USA",         cc:"US", lat:41.0762,lng:-73.8593},
 ];
 
 // ── BREWERIES — where each beer is actually made
@@ -209,6 +212,7 @@ let breweries=[
   {name:"Bitburger Braugruppe",      location:"Bitburg, Rhineland-Palatinate", country:"Germany", cc:"DE", lang:"de", beers:"Bitburger Radler",                                          lat:49.9739,lng:6.5334,   ratings:[4.00]},
   {name:"Radeberger Exportbierbrauerei", location:"Radeberg, Saxony",      country:"Germany",     cc:"DE", lang:"de", beers:"Radeberger Pilsner",                                        lat:51.1136,lng:13.9169,  ratings:[3.00]},
   {name:"Cervecería Nacional Dominicana", location:"Santo Domingo, Distrito Nacional", country:"Dominican Republic", cc:"DO", lang:"es", beers:"Presidente",                lat:18.4861,lng:-69.9312, ratings:[3.00]},
+  {name:"Amstel Brouwerij (Heineken)", location:"Amsterdam, Noord-Holland", country:"Netherlands", cc:"NL", lang:"nl", beers:"Amstel",                                       lat:52.3578,lng:4.8918,   ratings:[2.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -232,6 +236,7 @@ let breweries=[
 const BRAND_DOMAINS = {
 "Affligem Tripel":"affligembeer.be",
 "Almaza Pilsener":"almaza.com",
+"Amstel":"amstel.com",
 "Asahi Super Dry":"asahibeer.com",
 "Augustiner Helles":"augustiner-braeu.de",
 "Big Wave Golden Ale":"konabrewingco.com",

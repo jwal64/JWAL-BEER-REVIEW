@@ -214,5 +214,13 @@
     "cc": "IT",
     "lat": 40.5532,
     "lng": 14.2222
+  },
+  {
+    "city": "Tarrytown",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "lat": 41.0762,
+    "lng": -73.8593
   }
 ]

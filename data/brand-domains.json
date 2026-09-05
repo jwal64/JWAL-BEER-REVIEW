@@ -12,6 +12,12 @@
     ]
   },
   {
+    "beer": "Amstel",
+    "domains": [
+      "amstel.com"
+    ]
+  },
+  {
     "beer": "Asahi Super Dry",
     "domains": [
       "asahibeer.com"

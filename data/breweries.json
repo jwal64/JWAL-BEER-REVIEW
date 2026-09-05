@@ -1035,5 +1035,20 @@
         "rating": 3
       }
     ]
+  },
+  {
+    "name": "Amstel Brouwerij (Heineken)",
+    "location": "Amsterdam, Noord-Holland",
+    "country": "Netherlands",
+    "cc": "NL",
+    "lang": "nl",
+    "lat": 52.3578,
+    "lng": 4.8918,
+    "beers": [
+      {
+        "beer": "Amstel",
+        "rating": 2.5
+      }
+    ]
   }
 ]
