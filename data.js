@@ -212,7 +212,7 @@ let breweries=[
   {name:"Bitburger Braugruppe",      location:"Bitburg, Rhineland-Palatinate", country:"Germany", cc:"DE", lang:"de", beers:"Bitburger Radler",                                          lat:49.9739,lng:6.5334,   ratings:[4.00]},
   {name:"Radeberger Exportbierbrauerei", location:"Radeberg, Saxony",      country:"Germany",     cc:"DE", lang:"de", beers:"Radeberger Pilsner",                                        lat:51.1136,lng:13.9169,  ratings:[3.00]},
   {name:"Cervecería Nacional Dominicana", location:"Santo Domingo, Distrito Nacional", country:"Dominican Republic", cc:"DO", lang:"es", beers:"Presidente",                lat:18.4861,lng:-69.9312, ratings:[3.00]},
-  {name:"Amstel Brouwerij (Heineken)", location:"Amsterdam, Noord-Holland", country:"Netherlands", cc:"NL", lang:"nl", beers:"Amstel",                                       lat:52.3578,lng:4.8918,   ratings:[2.50]},
+  {name:"Amstel Brouwerij (Heineken)", location:"Amsterdam, Noord-Holland", country:"Netherlands", cc:"NL", lang:"nl", beers:"Amstel",                                       lat:52.3601,lng:4.9114,   ratings:[2.50]},
 ];
 
 // ══════════════════════════════════════════════════════════════
