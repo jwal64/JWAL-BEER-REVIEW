@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Pabst Blue Ribbon">
+  <rect width="512" height="512" rx="60" fill="#0a3161"/>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" fill="#ffffff">
+    <text x="256" y="126" font-size="52" letter-spacing="4">PABST</text>
+  </g>
+  <g>
+    <path d="M96 190 h320 v46 q0 26 -22 34 l-138 50 -138 -50 q-22 -8 -22 -34 Z" fill="#c8102e"/>
+    <path d="M96 190 h320 v18 h-320 Z" fill="#ffffff" opacity="0.9"/>
+    <path d="M160 320 l-34 96 40 -14 22 34 30 -86 Z" fill="#c8102e"/>
+    <path d="M352 320 l34 96 -40 -14 -22 34 -30 -86 Z" fill="#c8102e"/>
+  </g>
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" fill="#ffffff">
+    <text x="256" y="250" font-size="30" letter-spacing="2">BLUE RIBBON</text>
+  </g>
+  <g text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#f0b323">
+    <text x="256" y="410" font-size="26" letter-spacing="6">1844</text>
+  </g>
+</svg>

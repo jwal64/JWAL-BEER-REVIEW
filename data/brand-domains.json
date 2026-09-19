@@ -420,6 +420,12 @@
     ]
   },
   {
+    "beer": "Pabst Blue Ribbon",
+    "domains": [
+      "pabstblueribbon.com"
+    ]
+  },
+  {
     "beer": "Pacífico Clara",
     "domains": [
       "drinkpacifico.com"

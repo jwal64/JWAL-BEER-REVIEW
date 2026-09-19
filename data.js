@@ -111,6 +111,7 @@ let beers=[
   {beer:"Heineken Silver",       style:"Lager",          origin:"NL",abv:4.0,method:"Draft", city:"Queens",       region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   // SEP 2026
   {beer:"Amstel",                style:"Lager",          origin:"NL",abv:5.0,method:"Bottle",city:"Tarrytown",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/amstel.svg"},
+  {beer:"Pabst Blue Ribbon",     style:"Lager",          origin:"US",abv:4.7,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/pabst-blue-ribbon.svg"},
 ];
 
 // ── CONSUMPTION LOCATIONS — every city a review was logged in
@@ -213,6 +214,7 @@ let breweries=[
   {name:"Radeberger Exportbierbrauerei", location:"Radeberg, Saxony",      country:"Germany",     cc:"DE", lang:"de", beers:"Radeberger Pilsner",                                        lat:51.1136,lng:13.9169,  ratings:[3.00]},
   {name:"Cervecería Nacional Dominicana", location:"Santo Domingo, Distrito Nacional", country:"Dominican Republic", cc:"DO", lang:"es", beers:"Presidente",                lat:18.4861,lng:-69.9312, ratings:[3.00]},
   {name:"Amstel Brouwerij (Heineken)", location:"Amsterdam, Noord-Holland", country:"Netherlands", cc:"NL", lang:"nl", beers:"Amstel",                                       lat:52.3601,lng:4.9114,   ratings:[2.50]},
+  {name:"Pabst Brewing Company",     location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Pabst Blue Ribbon",                            lat:43.0389,lng:-87.9065, ratings:[3.25]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -303,6 +305,7 @@ const BRAND_DOMAINS = {
 "Norrlands Guld":"norrlandsguld.se",
 "Ocean SJU":"oceanlabbrewing.com",
 "Orion":"orionbeer.co.jp",
+"Pabst Blue Ribbon":"pabstblueribbon.com",
 "Pacífico Clara":"drinkpacifico.com",
 "Paulaner Hefe":"paulaner.com",
 "Paulaner Hefe-Weißbier":"paulaner.com",
