@@ -1363,5 +1363,23 @@
     "monthN": 9,
     "year": 2026,
     "logo": "logos/amstel.svg"
+  },
+  {
+    "beer": "Pabst Blue Ribbon",
+    "style": "Lager",
+    "origin": "US",
+    "originCountry": "USA",
+    "abv": 4.7,
+    "method": "Can",
+    "city": "New Rochelle",
+    "region": "New York",
+    "country": "USA",
+    "cc": "US",
+    "rating": 3.25,
+    "isNew": true,
+    "month": "Sep",
+    "monthN": 9,
+    "year": 2026,
+    "logo": "logos/pabst-blue-ribbon.webp"
   }
 ]

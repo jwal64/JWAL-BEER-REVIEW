@@ -1050,5 +1050,20 @@
         "rating": 2.5
       }
     ]
+  },
+  {
+    "name": "Pabst Brewing Company",
+    "location": "Milwaukee, Wisconsin",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 43.0389,
+    "lng": -87.9065,
+    "beers": [
+      {
+        "beer": "Pabst Blue Ribbon",
+        "rating": 3.25
+      }
+    ]
   }
 ]
