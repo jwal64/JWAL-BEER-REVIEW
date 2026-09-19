@@ -111,7 +111,7 @@ let beers=[
   {beer:"Heineken Silver",       style:"Lager",          origin:"NL",abv:4.0,method:"Draft", city:"Queens",       region:"New York",        country:"USA",         cc:"US", rating:3.00,isNew:true, month:"Aug",monthN:8,year:2026},
   // SEP 2026
   {beer:"Amstel",                style:"Lager",          origin:"NL",abv:5.0,method:"Bottle",city:"Tarrytown",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/amstel.svg"},
-  {beer:"Pabst Blue Ribbon",     style:"Lager",          origin:"US",abv:4.7,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/pabst-blue-ribbon.svg"},
+  {beer:"Pabst Blue Ribbon",     style:"Lager",          origin:"US",abv:4.7,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/pabst-blue-ribbon.webp"},
 ];
 
 // ── CONSUMPTION LOCATIONS — every city a review was logged in
