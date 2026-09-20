@@ -75,13 +75,22 @@ Required brewery fields:
   cc: "XX",                       // ISO 3166-1 alpha-2 country code
   lang: "xx",                     // ISO 639-1 language code (e.g. "de", "ja", "pl", "cs")
   beers: "Beer1 · Beer2",         // All beers from this brewery, separated by " · "
-  lat: 49.6853,                   // Latitude of brewery location
-  lng: 19.1925,                   // Longitude of brewery location
+  lat: 49.6853,                   // Latitude of this brewery's own site
+  lng: 19.1925,                   // Longitude — not the city centre, see below
   ratings: [3.50],                // Array of all ratings for beers from this brewery
   // OPTIONAL - only include if the native name differs from the marketed name:
   nativeName: "NativeBeerName"    // Beer name in the brewery's native language/script
 }
 ```
+
+**Point the coordinates at the brewery, not at its city.** Two breweries in one
+city that both carry the city-centre point land on the same pixel at every zoom,
+and the one written later paints over the earlier one and takes its clicks with
+it — so that brewery's beers have no reachable pin on the brewed map, and
+nothing about the page looks wrong. It has happened twice, to Amstel under
+Heineken and to Miller Lite under Pabst, both times by copying the coordinates
+of the brewery already there. `npm run check` now fails on two breweries sharing
+a point.
 
 ### Step 2.5: Add the Brand Domain (REQUIRED)
 

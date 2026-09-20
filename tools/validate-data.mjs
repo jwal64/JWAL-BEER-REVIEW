@@ -89,6 +89,14 @@ beers.forEach((b, i) => {
 });
 
 // ── BREWERIES ─────────────────────────────────────────────────
+// A pin is only on the map if it is reachable. Two breweries on the exact same
+// point project to the same pixel at every zoom, so the one added later paints
+// over the earlier one and takes its clicks with it — its beers then have no
+// brewery pin at all, and nothing looks broken. This has happened twice (Amstel
+// under Heineken, Miller Lite under Pabst), both times by copying a city-centre
+// coordinate from the brewery already there, so give each one its own site
+// rather than its city's.
+const pinnedAt = new Map();
 const seenBrewery = new Set();
 breweries.forEach((br, i) => {
   const where = `breweries[${i}] ${br.name || '(unnamed)'}`;
@@ -103,6 +111,13 @@ breweries.forEach((br, i) => {
     err(where, `lang "${br.lang}" is not a 2-letter ISO 639-1 code`);
   if (!isNum(br.lat) || br.lat < -90 || br.lat > 90) err(where, `lat ${br.lat} is out of range`);
   if (!isNum(br.lng) || br.lng < -180 || br.lng > 180) err(where, `lng ${br.lng} is out of range`);
+  if (isNum(br.lat) && isNum(br.lng)) {
+    const pin = `${br.lat},${br.lng}`;
+    if (pinnedAt.has(pin))
+      err(where, `sits on the exact same point as "${pinnedAt.get(pin)}" — ` +
+                 'one pin hides the other, so give this brewery its own site');
+    else pinnedAt.set(pin, br.name);
+  }
 
   const listed = String(br.beers || '').split('·').map(s => s.trim()).filter(Boolean);
   if (!listed.length) err(where, 'beers field is empty');
