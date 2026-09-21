@@ -115,9 +115,25 @@ can. See "Verifying logos" below.
 Beers normally render their real brand logo from Brandfetch's CDN at runtime, with Google favicons and Icon Horse as fallbacks. If you want a specific beer to use a local file you've placed in `logos/` (for offline reliability, custom artwork, or to bypass a misidentified Brandfetch match):
 
 1. Save the file as `logos/<anything>.svg` (or `.png`/`.webp`/`.jpg`).
-2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`.
+2. Add `logo:"logos/<filename>"` as the last field of the beer's entry in `beers[]`
+   — or of its `WANT_TO_TRY` entry, if the beer has not been drunk yet and so has
+   no `beers[]` row. A shortlist card renders a logo like anything else.
+   `rebuildLocalLogos()` reads the shortlist first and reviews second, so a beer
+   that is both resolves to what its review says.
 
 The local file becomes the primary source for that beer. The Brandfetch chain remains as automatic fallback if the local file is missing. Beers without a `logo` field continue to use Brandfetch normally.
+
+**Read `logos/README.md` before reaching for this.** Eleven real brand marks are
+already committed there, and the note explains where they came from when this
+environment can reach no logo source at all — every brand domain, Google, Icon
+Horse, DuckDuckGo and both Wikimedia hosts answer `403` at `CONNECT`, while
+anonymous git reads of public GitHub repositories are served. It also says
+plainly what those eleven do *not* fix: every other beer still resolves through
+the Brandfetch chain at page load, and that chain's first tier is dead.
+
+A `logo` that is a remote URL is a hotlink to someone else's server, and
+`npm run check` warns about it — on shortlist entries as well as reviews now.
+One is left, on Dos Equis Lager Especial.
 
 ### Step 3: Research Checklist (for each new beer)
 

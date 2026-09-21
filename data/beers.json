@@ -201,7 +201,8 @@
     "isNew": false,
     "month": "Jan",
     "monthN": 1,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/michelob-ultra.webp"
   },
   {
     "beer": "Red Stripe",
@@ -252,7 +253,8 @@
     "isNew": false,
     "month": "Feb",
     "monthN": 2,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/guinness-draught.svg"
   },
   {
     "beer": "Weihenstephaner Hefeweissbier",
@@ -303,7 +305,8 @@
     "isNew": false,
     "month": "Feb",
     "monthN": 2,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/negra-modelo.svg"
   },
   {
     "beer": "Hofbräu Dunkel",
@@ -490,7 +493,8 @@
     "isNew": true,
     "month": "Mar",
     "monthN": 3,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/zywiec.webp"
   },
   {
     "beer": "Estrella Damm",
@@ -712,7 +716,7 @@
     "month": "Apr",
     "monthN": 4,
     "year": 2026,
-    "logo": "https://pennbeer.com/app/uploads/2021/06/ynaOvePfbmJEMed-400x400-noPad-300x300.png"
+    "logo": "logos/estrella-jalisco.svg"
   },
   {
     "beer": "Rolling Rock Extra Pale",
@@ -833,7 +837,7 @@
     "month": "May",
     "monthN": 5,
     "year": 2026,
-    "logo": "https://upload.wikimedia.org/wikipedia/en/f/f7/Pacifico_Logo.png"
+    "logo": "logos/pacifico-clara.svg"
   },
   {
     "beer": "Narragansett Lager",
@@ -884,7 +888,8 @@
     "isNew": true,
     "month": "May",
     "monthN": 5,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/smithwicks.svg"
   },
   {
     "beer": "Daura",
@@ -1157,7 +1162,8 @@
     "isNew": true,
     "month": "Jul",
     "monthN": 7,
-    "year": 2026
+    "year": 2026,
+    "logo": "logos/pub-ale.svg"
   },
   {
     "beer": "Spaten Oktoberfest Ur-Märzen / Winter",
