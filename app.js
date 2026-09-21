@@ -80,8 +80,14 @@ try{ validateBeerDomains(); }catch(e){ console.error('Domain check error:',e); }
 // Optional per-beer local logo override. Set `logo:"logos/<file>"` on a beer
 // entry to use a file you've placed in logos/ instead of Brandfetch. The
 // remote chain still serves as fallback if the local file is missing.
+//
+// A shortlist entry takes it too, and has to: a "What to try" card renders a
+// logo like anything else, and a beer that has not been drunk yet has no
+// beers[] row to hang the override on. Reviews are read last so that a beer
+// which is both drunk and shortlisted resolves to what its review says.
 const LOCAL_LOGOS={};
 function rebuildLocalLogos(){
+  for(const e of WANT_TO_TRY) if(e.logo) LOCAL_LOGOS[e.beer]=e.logo;
   for(const b of beers) if(b.logo) LOCAL_LOGOS[b.beer]=b.logo;
 }
 rebuildLocalLogos();

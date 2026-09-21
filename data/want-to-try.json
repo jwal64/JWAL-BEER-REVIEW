@@ -237,6 +237,7 @@
     "region": "Tadcaster, Yorkshire",
     "untappd": 3.28,
     "method": "Bottle",
+    "logo": "logos/newcastle-brown-ale.webp",
     "as": [],
     "tried": false,
     "reviewedAs": null
@@ -309,6 +310,7 @@
     "region": "Mexico City",
     "untappd": 3.15,
     "method": "Bottle",
+    "logo": "logos/sol.svg",
     "as": [],
     "tried": false,
     "reviewedAs": null
@@ -381,6 +383,7 @@
     "region": "Bangkok",
     "untappd": 3.25,
     "method": "Bottle",
+    "logo": "logos/singha.svg",
     "as": [],
     "tried": false,
     "reviewedAs": null

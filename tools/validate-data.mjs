@@ -78,15 +78,20 @@ beers.forEach((b, i) => {
     err(where, 'no brewery in breweries[] lists this beer, so it has no origin story or map pin');
   if (!BRAND_DOMAINS[b.beer])
     err(where, 'no BRAND_DOMAINS entry, so it renders the 🍺 placeholder');
-  // A logo override is normally a file in logos/. A remote URL works too, but
-  // it is a hotlink to someone else's server: it can 404 or change without
-  // notice, so it is called out rather than trusted.
-  if (b.logo !== undefined) {
-    if (!isStr(b.logo)) err(where, 'logo override must be a path string');
-    else if (/^https?:\/\//.test(b.logo)) warn(where, `logo override hotlinks ${new URL(b.logo).host} — save the file into logos/ instead to make it reliable`);
-    else if (!existsSync(join(ROOT, b.logo))) err(where, `logo override "${b.logo}" does not exist`);
-  }
+  checkLogoOverride(where, b.logo);
 });
+
+// A logo override is normally a file in logos/. A remote URL works too, but it
+// is a hotlink to someone else's server: it can 404 or change without notice,
+// so it is called out rather than trusted. Reviews and shortlist entries both
+// carry one — a "What to try" card renders a logo like anything else — so the
+// rule is written once and applied to both.
+function checkLogoOverride(where, logo) {
+  if (logo === undefined) return;
+  if (!isStr(logo)) err(where, 'logo override must be a path string');
+  else if (/^https?:\/\//.test(logo)) warn(where, `logo override hotlinks ${new URL(logo).host} — save the file into logos/ instead to make it reliable`);
+  else if (!existsSync(join(ROOT, logo))) err(where, `logo override "${logo}" does not exist`);
+}
 
 // ── BREWERIES ─────────────────────────────────────────────────
 const seenBrewery = new Set();
@@ -182,6 +187,7 @@ WANT_TO_TRY.forEach((e, i) => {
   if (!isNum(e.abv) || e.abv <= 0 || e.abv > 20) err(where, `abv ${e.abv} is not a plausible number`);
   if (!isNum(e.untappd) || e.untappd < 0 || e.untappd > 5) err(where, `untappd ${e.untappd} is not a 0–5 rating`);
   if (!METHODS.includes(e.method)) err(where, `method "${e.method}" is not one of ${METHODS.join(', ')}`);
+  checkLogoOverride(where, e.logo);
 
   const names = [e.beer, ...(e.as || [])];
   if (e.as !== undefined && (!Array.isArray(e.as) || !e.as.length || !e.as.every(isStr)))
