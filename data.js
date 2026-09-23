@@ -112,6 +112,7 @@ let beers=[
   // SEP 2026
   {beer:"Amstel",                style:"Lager",          origin:"NL",abv:5.0,method:"Bottle",city:"Tarrytown",    region:"New York",        country:"USA",         cc:"US", rating:2.50,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/amstel.svg"},
   {beer:"Pabst Blue Ribbon",     style:"Lager",          origin:"US",abv:4.7,method:"Can",   city:"New Rochelle", region:"New York",        country:"USA",         cc:"US", rating:3.25,isNew:true, month:"Sep",monthN:9,year:2026,logo:"logos/pabst-blue-ribbon.webp"},
+  {beer:"Killsner",              style:"Pilsner",        origin:"US",abv:5.0,method:"Can",   city:"New York",     region:"New York",        country:"USA",         cc:"US", rating:2.75,isNew:true, month:"Sep",monthN:9,year:2026},
 ];
 
 // ── CONSUMPTION LOCATIONS — every city a review was logged in
@@ -215,6 +216,7 @@ let breweries=[
   {name:"Cervecería Nacional Dominicana", location:"Santo Domingo, Distrito Nacional", country:"Dominican Republic", cc:"DO", lang:"es", beers:"Presidente",                lat:18.4861,lng:-69.9312, ratings:[3.00]},
   {name:"Amstel Brouwerij (Heineken)", location:"Amsterdam, Noord-Holland", country:"Netherlands", cc:"NL", lang:"nl", beers:"Amstel",                                       lat:52.3601,lng:4.9114,   ratings:[2.50]},
   {name:"Pabst Brewing Company",     location:"Milwaukee, Wisconsin",      country:"USA",         cc:"US", lang:"en", beers:"Pabst Blue Ribbon",                            lat:43.0389,lng:-87.9065, ratings:[3.25]},
+  {name:"Kills Boro Brewing Co.",    location:"Staten Island, New York",   country:"USA",         cc:"US", lang:"en", beers:"Killsner",                                     lat:40.6444,lng:-74.0989, ratings:[2.75]},
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -280,6 +282,7 @@ const BRAND_DOMAINS = {
 "Hertog Jan":"hertogjan.nl",
 "Hoegaarden":"hoegaarden.com",
 "IJwit":"brouwerijhetij.nl",
+"Killsner":"killsboro.com",
 "Kirin Ichiban":"kirin.co.jp",
 "Kronenbourg 1664":["1664.com","kronenbourg1664.com"],
 "La Chouffe Blonde":"achouffe.be",

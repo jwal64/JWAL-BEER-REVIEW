@@ -1065,5 +1065,20 @@
         "rating": 3.25
       }
     ]
+  },
+  {
+    "name": "Kills Boro Brewing Co.",
+    "location": "Staten Island, New York",
+    "country": "USA",
+    "cc": "US",
+    "lang": "en",
+    "lat": 40.6444,
+    "lng": -74.0989,
+    "beers": [
+      {
+        "beer": "Killsner",
+        "rating": 2.75
+      }
+    ]
   }
 ]
